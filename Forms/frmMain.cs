@@ -10,6 +10,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -133,7 +134,7 @@ namespace aphrodite {
             SetTextBoxHint(txtID.Handle, "Pool ID...");
         }
         private void frmMain_Load(object sender, EventArgs e) {
-            if (Settings.Default.saveLocation == "null")
+            if (string.IsNullOrWhiteSpace(Settings.Default.saveLocation) || string.IsNullOrEmpty(Settings.Default.saveLocation))
                 Settings.Default.saveLocation = Environment.CurrentDirectory;
 
             for (int i = 1; i < Environment.GetCommandLineArgs().Length; i++) {
@@ -168,11 +169,18 @@ namespace aphrodite {
                     txtTags.Text += arg.Replace("tags:", "").Replace("%20", " ") + " ";
                 }
                 else {
-                    txtTags.Text += arg.Replace("%20", " ") + " ";
+                    if (File.Exists(arg)) {
+                        tbMain.SelectedIndex = 2;
+                    }
+                    else {
+                        txtTags.Text += arg.Replace("%20", " ") + " ";
+                    }
                 }
+
                 if (txtTags.Text.StartsWith(" ")) {
                     txtTags.Text = txtTags.Text.TrimStart(' ');
                 }
+
                 if (txtTags.Text.EndsWith(" ")) {
                     txtTags.Text = txtTags.Text.TrimEnd(' ');
                 }
@@ -196,16 +204,15 @@ namespace aphrodite {
             }
         }
         
-        private void txtTags_KeyPress(object sender, KeyPressEventArgs e) {
-            // Enforce 6 tag limit
-            if (txtTags.Text.Count(x => x == ' ') >= 5 && e.KeyChar != (char)8 && e.KeyChar == (char)Keys.Space && txtTags.SelectionLength != txtTags.TextLength) {
-                e.Handled = true;
+        private void tbMain_SelectedIndexChanged(object sender, EventArgs e) {
+            if (tbMain.SelectedTab == tbTags) {
+                txtTags.Focus();
             }
-            else {
-                e.Handled = false;
+            else if (tbMain.SelectedTab == tbPools) {
+                txtID.Focus();
             }
         }
-        
+
         private void mSettings_Click(object sender, EventArgs e) {
             frmSettings settings = new frmSettings();
             settings.ShowDialog();
@@ -228,6 +235,9 @@ namespace aphrodite {
         }
         private void mProtocol_Click(object sender, EventArgs e) {
             installProtocol();
+        }
+        private void btnHLQ_Click(object sender, EventArgs e) {
+            Process.Start("https://iqdb.harry.lu/");
         }
         #endregion
 
@@ -333,6 +343,22 @@ namespace aphrodite {
             }
             else {
                 return false;
+            }
+        }
+        
+        private void txtID_TextChanged(object sender, EventArgs e) {
+            var txtSender = (TextBox)sender;
+            var curPos = txtSender.SelectionStart;
+            txtSender.Text = Regex.Replace(txtSender.Text, "[^0-9]", "");
+            txtSender.SelectionStart = curPos;
+        }
+        private void txtTags_KeyPress(object sender, KeyPressEventArgs e) {
+            // Enforce 6 tag limit
+            if (txtTags.Text.Count(x => x == ' ') >= 5 && e.KeyChar != (char)8 && e.KeyChar == (char)Keys.Space && txtTags.SelectionLength != txtTags.TextLength) {
+                e.Handled = true;
+            }
+            else {
+                e.Handled = false;
             }
         }
 

@@ -182,6 +182,7 @@ namespace aphrodite {
                     XmlNodeList xmlArtist = doc.DocumentElement.SelectNodes("/root/item/artist/item");
                     XmlNodeList xmlScore = doc.DocumentElement.SelectNodes("/root/item/score");
                     XmlNodeList xmlRating = doc.DocumentElement.SelectNodes("/root/item/rating");
+                    XmlNodeList xmlDescription = doc.DocumentElement.SelectNodes("/root/item/description");
                     Debug.Print("There are " + xmlURL.Count + " posts on the page");
                     for (int j = 0; j < xmlTags.Count; j++) {
                         string artists = xmlArtist[j].InnerText;
@@ -273,7 +274,7 @@ namespace aphrodite {
                             else {
                                 urls.Add(xmlURL[j].InnerText);
                             }
-                            taginfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n\n";
+                            taginfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n        DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n\n";
                         }
                         else if (blacklisted) {
                             if (Tags.Default.separateRatings) {
@@ -293,7 +294,7 @@ namespace aphrodite {
                             else {
                                 blacklistedURLS.Add(xmlURL[j].InnerText);
                             }
-                            blacklistinfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n    OFFENDING TAGS: " + foundblacklistedtags + "\n\n";
+                            blacklistinfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n        DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n    OFFENDING TAGS: " + foundblacklistedtags + "\n\n";
                         }
 
                         artists = string.Empty;
@@ -344,6 +345,7 @@ namespace aphrodite {
                     XmlNodeList xmlArtist = doc.DocumentElement.SelectNodes("/root/item/artist/item");
                     XmlNodeList xmlScore = doc.DocumentElement.SelectNodes("/root/item/score");
                     XmlNodeList xmlRating = doc.DocumentElement.SelectNodes("/root/item/rating");
+                    XmlNodeList xmlDescription = doc.DocumentElement.SelectNodes("/root/item/description");
                     Debug.Print("There are " + xmlURL.Count + " posts on the page");
                     for (int j = 0; j < xmlTags.Count; j++) {
                         string artists = xmlArtist[j].InnerText;
@@ -436,7 +438,7 @@ namespace aphrodite {
                             else {
                                 urls.Add(xmlURL[j].InnerText);
                             }
-                            taginfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n\n";
+                            taginfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n        DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n\n";
                         }
                         else if (blacklisted) {
                             if (Tags.Default.separateRatings) {
@@ -456,7 +458,7 @@ namespace aphrodite {
                             else {
                                 blacklistedURLS.Add(xmlURL[j].InnerText);
                             }
-                            blacklistinfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n    OFFENDING TAGS: " + foundblacklistedtags + "\n\n";
+                            blacklistinfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n        DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n    OFFENDING TAGS: " + foundblacklistedtags + "\n\n";
                         }
 
                         if (imageAmount > 0 && urls.Count == imageAmount) {
@@ -485,6 +487,7 @@ namespace aphrodite {
                                 xmlArtist = doc.DocumentElement.SelectNodes("/root/item/artist/item");
                                 xmlScore = doc.DocumentElement.SelectNodes("/root/item/score");
                                 xmlRating = doc.DocumentElement.SelectNodes("/root/item/rating");
+                                xmlDescription = doc.DocumentElement.SelectNodes("/root/item/description");
                                 Debug.Print("There are " + xmlURL.Count + " posts on page " + page);
                                 for (int j = 0; j < xmlTags.Count; j++) {
                                     string artists = xmlArtist[j].InnerText;
@@ -576,7 +579,7 @@ namespace aphrodite {
                                         else {
                                             urls.Add(xmlURL[j].InnerText);
                                         }
-                                        taginfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n\n";
+                                        taginfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n        DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n\n";
                                     }
                                     else if (blacklisted) {
                                         if (Tags.Default.separateRatings) {
@@ -596,7 +599,7 @@ namespace aphrodite {
                                         else {
                                             blacklistedURLS.Add(xmlURL[j].InnerText);
                                         }
-                                        blacklistinfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n    OFFENDING TAGS: " + foundblacklistedtags + "\n\n";
+                                        blacklistinfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n        DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n    OFFENDING TAGS: " + foundblacklistedtags + "\n\n";
                                     }
 
                                     if (imageAmount > 0 && urls.Count == imageAmount) {
@@ -879,6 +882,8 @@ namespace aphrodite {
                 }
 
                 this.Invoke((MethodInvoker)(() => lbFile.Text = "All " + (imageCount) + " files downloaded."));
+                this.Invoke((MethodInvoker)(() => pbDownloadStatus.Value = 100));
+                this.Invoke((MethodInvoker)(() => lbPercentage.Text = "Done"));
 
                 Debug.Print("Tags have been downloaded successfully, returning");
                 this.Invoke(((MethodInvoker)(() => tmrTitle.Stop())));

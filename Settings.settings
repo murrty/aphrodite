@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="saveLocation" Type="System.String" Scope="User">
-      <Value Profile="(Default)">null</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="blacklist" Type="System.String" Scope="User">
       <Value Profile="(Default)" />

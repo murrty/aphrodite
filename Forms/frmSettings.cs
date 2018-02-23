@@ -66,6 +66,14 @@ namespace aphrodite {
             chkMerge.Checked = Pools.Default.mergeBlacklisted;
             chkOpen.Checked = Pools.Default.openAfter;
         }
+        private void btnBrws_Click(object sender, EventArgs e) {
+            FolderBrowserDialog fbd = new FolderBrowserDialog() { Description = "Select a folder to store downloads" };
+            if (!string.IsNullOrEmpty(txtSaveTo.Text))
+                fbd.SelectedPath = txtSaveTo.Text;
+
+            if (fbd.ShowDialog() == DialogResult.OK) 
+                txtSaveTo.Text = fbd.SelectedPath;
+        }      
         private void btnSave_Click(object sender, EventArgs e) {
             saveSettings();
             if (pluginChange)
@@ -84,5 +92,6 @@ namespace aphrodite {
                 Settings.Default.Save();
             }
         }
+
     }
 }

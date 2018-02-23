@@ -28,34 +28,34 @@
             this.btnSave = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tbGeneral = new System.Windows.Forms.TabPage();
-            this.tbTags = new System.Windows.Forms.TabPage();
-            this.tbPools = new System.Windows.Forms.TabPage();
+            this.label1 = new System.Windows.Forms.Label();
+            this.chkSaveBlacklisted = new System.Windows.Forms.CheckBox();
+            this.chkSaveInfo = new System.Windows.Forms.CheckBox();
             this.btnBrws = new System.Windows.Forms.Button();
             this.txtSaveTo = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.chkSaveInfo = new System.Windows.Forms.CheckBox();
-            this.btnBlacklist = new System.Windows.Forms.Button();
-            this.chkSaveBlacklisted = new System.Windows.Forms.CheckBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.chkSeparate = new System.Windows.Forms.CheckBox();
+            this.tbTags = new System.Windows.Forms.TabPage();
+            this.numLimit = new System.Windows.Forms.NumericUpDown();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.chkMinimumScore = new System.Windows.Forms.CheckBox();
+            this.numScore = new System.Windows.Forms.NumericUpDown();
             this.chkSafe = new System.Windows.Forms.CheckBox();
             this.chkQuestionable = new System.Windows.Forms.CheckBox();
             this.chkExplicit = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.chkMinimumScore = new System.Windows.Forms.CheckBox();
-            this.numScore = new System.Windows.Forms.NumericUpDown();
-            this.label4 = new System.Windows.Forms.Label();
-            this.numLimit = new System.Windows.Forms.NumericUpDown();
-            this.label6 = new System.Windows.Forms.Label();
-            this.chkPoolName = new System.Windows.Forms.CheckBox();
-            this.chkMerge = new System.Windows.Forms.CheckBox();
+            this.chkSeparate = new System.Windows.Forms.CheckBox();
+            this.tbPools = new System.Windows.Forms.TabPage();
             this.chkOpen = new System.Windows.Forms.CheckBox();
+            this.chkMerge = new System.Windows.Forms.CheckBox();
+            this.chkPoolName = new System.Windows.Forms.CheckBox();
+            this.btnBlacklist = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tbGeneral.SuspendLayout();
             this.tbTags.SuspendLayout();
-            this.tbPools.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numScore)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numLimit)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numScore)).BeginInit();
+            this.tbPools.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnCancel
@@ -106,6 +106,63 @@
             this.tbGeneral.Text = "General";
             this.tbGeneral.UseVisualStyleBackColor = true;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(87, 128);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(237, 13);
+            this.label1.TabIndex = 20;
+            this.label1.Text = "Blacklisted tags are mutual between pools && tags";
+            // 
+            // chkSaveBlacklisted
+            // 
+            this.chkSaveBlacklisted.AutoSize = true;
+            this.chkSaveBlacklisted.Location = new System.Drawing.Point(11, 76);
+            this.chkSaveBlacklisted.Name = "chkSaveBlacklisted";
+            this.chkSaveBlacklisted.Size = new System.Drawing.Size(139, 17);
+            this.chkSaveBlacklisted.TabIndex = 19;
+            this.chkSaveBlacklisted.Text = "Save blacklisted images";
+            this.chkSaveBlacklisted.UseVisualStyleBackColor = true;
+            // 
+            // chkSaveInfo
+            // 
+            this.chkSaveInfo.AutoSize = true;
+            this.chkSaveInfo.Location = new System.Drawing.Point(10, 53);
+            this.chkSaveInfo.Name = "chkSaveInfo";
+            this.chkSaveInfo.Size = new System.Drawing.Size(391, 17);
+            this.chkSaveInfo.TabIndex = 18;
+            this.chkSaveInfo.Text = "Save image info (tags.nfo, pool.nfo, tags.blacklisted.nfo, pools.blacklisted.nfo)" +
+    "";
+            this.chkSaveInfo.UseVisualStyleBackColor = true;
+            // 
+            // btnBrws
+            // 
+            this.btnBrws.Location = new System.Drawing.Point(378, 23);
+            this.btnBrws.Name = "btnBrws";
+            this.btnBrws.Size = new System.Drawing.Size(24, 23);
+            this.btnBrws.TabIndex = 16;
+            this.btnBrws.Text = "...";
+            this.btnBrws.UseVisualStyleBackColor = true;
+            this.btnBrws.Click += new System.EventHandler(this.btnBrws_Click);
+            // 
+            // txtSaveTo
+            // 
+            this.txtSaveTo.Location = new System.Drawing.Point(33, 25);
+            this.txtSaveTo.Name = "txtSaveTo";
+            this.txtSaveTo.ReadOnly = true;
+            this.txtSaveTo.Size = new System.Drawing.Size(339, 20);
+            this.txtSaveTo.TabIndex = 15;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(8, 7);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(47, 13);
+            this.label3.TabIndex = 17;
+            this.label3.Text = "Save to:";
+            // 
             // tbTags
             // 
             this.tbTags.Controls.Add(this.numLimit);
@@ -126,96 +183,66 @@
             this.tbTags.Text = "Tags";
             this.tbTags.UseVisualStyleBackColor = true;
             // 
-            // tbPools
+            // numLimit
             // 
-            this.tbPools.Controls.Add(this.chkOpen);
-            this.tbPools.Controls.Add(this.chkMerge);
-            this.tbPools.Controls.Add(this.chkPoolName);
-            this.tbPools.Location = new System.Drawing.Point(4, 22);
-            this.tbPools.Name = "tbPools";
-            this.tbPools.Padding = new System.Windows.Forms.Padding(3);
-            this.tbPools.Size = new System.Drawing.Size(410, 168);
-            this.tbPools.TabIndex = 2;
-            this.tbPools.Text = "Pools";
-            this.tbPools.UseVisualStyleBackColor = true;
+            this.numLimit.Location = new System.Drawing.Point(165, 136);
+            this.numLimit.Maximum = new decimal(new int[] {
+            9999999,
+            0,
+            0,
+            0});
+            this.numLimit.Name = "numLimit";
+            this.numLimit.Size = new System.Drawing.Size(81, 20);
+            this.numLimit.TabIndex = 38;
+            this.numLimit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // btnBrws
+            // label6
             // 
-            this.btnBrws.Location = new System.Drawing.Point(378, 23);
-            this.btnBrws.Name = "btnBrws";
-            this.btnBrws.Size = new System.Drawing.Size(24, 23);
-            this.btnBrws.TabIndex = 16;
-            this.btnBrws.Text = "...";
-            this.btnBrws.UseVisualStyleBackColor = true;
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(104, 101);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(202, 26);
+            this.label6.TabIndex = 37;
+            this.label6.Text = "Image download limit (0 = off)\r\n(0 and/or high values isn\'t recommended)";
+            this.label6.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
-            // txtSaveTo
+            // label4
             // 
-            this.txtSaveTo.Location = new System.Drawing.Point(33, 25);
-            this.txtSaveTo.Name = "txtSaveTo";
-            this.txtSaveTo.ReadOnly = true;
-            this.txtSaveTo.Size = new System.Drawing.Size(339, 20);
-            this.txtSaveTo.TabIndex = 15;
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(244, 13);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(78, 13);
+            this.label4.TabIndex = 36;
+            this.label4.Text = "Score minimum";
             // 
-            // label3
+            // chkMinimumScore
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(8, 7);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(47, 13);
-            this.label3.TabIndex = 17;
-            this.label3.Text = "Save to:";
+            this.chkMinimumScore.AutoSize = true;
+            this.chkMinimumScore.Location = new System.Drawing.Point(247, 63);
+            this.chkMinimumScore.Name = "chkMinimumScore";
+            this.chkMinimumScore.Size = new System.Drawing.Size(125, 17);
+            this.chkMinimumScore.TabIndex = 35;
+            this.chkMinimumScore.Text = "Use a minimum score";
+            this.chkMinimumScore.UseVisualStyleBackColor = true;
             // 
-            // chkSaveInfo
+            // numScore
             // 
-            this.chkSaveInfo.AutoSize = true;
-            this.chkSaveInfo.Location = new System.Drawing.Point(10, 53);
-            this.chkSaveInfo.Name = "chkSaveInfo";
-            this.chkSaveInfo.Size = new System.Drawing.Size(391, 17);
-            this.chkSaveInfo.TabIndex = 18;
-            this.chkSaveInfo.Text = "Save image info (tags.nfo, pool.nfo, tags.blacklisted.nfo, pools.blacklisted.nfo)" +
-    "";
-            this.chkSaveInfo.UseVisualStyleBackColor = true;
-            // 
-            // btnBlacklist
-            // 
-            this.btnBlacklist.Location = new System.Drawing.Point(4, 200);
-            this.btnBlacklist.Name = "btnBlacklist";
-            this.btnBlacklist.Size = new System.Drawing.Size(102, 23);
-            this.btnBlacklist.TabIndex = 19;
-            this.btnBlacklist.Text = "Manage blacklist";
-            this.btnBlacklist.UseVisualStyleBackColor = true;
-            this.btnBlacklist.Click += new System.EventHandler(this.btnBlacklist_Click);
-            // 
-            // chkSaveBlacklisted
-            // 
-            this.chkSaveBlacklisted.AutoSize = true;
-            this.chkSaveBlacklisted.Location = new System.Drawing.Point(11, 76);
-            this.chkSaveBlacklisted.Name = "chkSaveBlacklisted";
-            this.chkSaveBlacklisted.Size = new System.Drawing.Size(139, 17);
-            this.chkSaveBlacklisted.TabIndex = 19;
-            this.chkSaveBlacklisted.Text = "Save blacklisted images";
-            this.chkSaveBlacklisted.UseVisualStyleBackColor = true;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(87, 128);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(237, 13);
-            this.label1.TabIndex = 20;
-            this.label1.Text = "Blacklisted tags are mutual between pools && tags";
-            // 
-            // chkSeparate
-            // 
-            this.chkSeparate.AutoSize = true;
-            this.chkSeparate.Checked = true;
-            this.chkSeparate.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkSeparate.Location = new System.Drawing.Point(47, 63);
-            this.chkSeparate.Name = "chkSeparate";
-            this.chkSeparate.Size = new System.Drawing.Size(102, 17);
-            this.chkSeparate.TabIndex = 26;
-            this.chkSeparate.Text = "Separate ratings";
-            this.chkSeparate.UseVisualStyleBackColor = true;
+            this.numScore.Enabled = false;
+            this.numScore.Location = new System.Drawing.Point(270, 34);
+            this.numScore.Maximum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            0});
+            this.numScore.Minimum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            -2147483648});
+            this.numScore.Name = "numScore";
+            this.numScore.Size = new System.Drawing.Size(63, 20);
+            this.numScore.TabIndex = 34;
+            this.numScore.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // chkSafe
             // 
@@ -262,66 +289,50 @@
             this.label2.TabIndex = 30;
             this.label2.Text = "Ratings to download";
             // 
-            // chkMinimumScore
+            // chkSeparate
             // 
-            this.chkMinimumScore.AutoSize = true;
-            this.chkMinimumScore.Location = new System.Drawing.Point(247, 63);
-            this.chkMinimumScore.Name = "chkMinimumScore";
-            this.chkMinimumScore.Size = new System.Drawing.Size(125, 17);
-            this.chkMinimumScore.TabIndex = 35;
-            this.chkMinimumScore.Text = "Use a minimum score";
-            this.chkMinimumScore.UseVisualStyleBackColor = true;
+            this.chkSeparate.AutoSize = true;
+            this.chkSeparate.Checked = true;
+            this.chkSeparate.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkSeparate.Location = new System.Drawing.Point(47, 63);
+            this.chkSeparate.Name = "chkSeparate";
+            this.chkSeparate.Size = new System.Drawing.Size(102, 17);
+            this.chkSeparate.TabIndex = 26;
+            this.chkSeparate.Text = "Separate ratings";
+            this.chkSeparate.UseVisualStyleBackColor = true;
             // 
-            // numScore
+            // tbPools
             // 
-            this.numScore.Enabled = false;
-            this.numScore.Location = new System.Drawing.Point(270, 34);
-            this.numScore.Maximum = new decimal(new int[] {
-            99999,
-            0,
-            0,
-            0});
-            this.numScore.Minimum = new decimal(new int[] {
-            99999,
-            0,
-            0,
-            -2147483648});
-            this.numScore.Name = "numScore";
-            this.numScore.Size = new System.Drawing.Size(63, 20);
-            this.numScore.TabIndex = 34;
-            this.numScore.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.tbPools.Controls.Add(this.chkOpen);
+            this.tbPools.Controls.Add(this.chkMerge);
+            this.tbPools.Controls.Add(this.chkPoolName);
+            this.tbPools.Location = new System.Drawing.Point(4, 22);
+            this.tbPools.Name = "tbPools";
+            this.tbPools.Padding = new System.Windows.Forms.Padding(3);
+            this.tbPools.Size = new System.Drawing.Size(410, 168);
+            this.tbPools.TabIndex = 2;
+            this.tbPools.Text = "Pools";
+            this.tbPools.UseVisualStyleBackColor = true;
             // 
-            // label4
+            // chkOpen
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(244, 13);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(78, 13);
-            this.label4.TabIndex = 36;
-            this.label4.Text = "Score minimum";
+            this.chkOpen.AutoSize = true;
+            this.chkOpen.Location = new System.Drawing.Point(67, 99);
+            this.chkOpen.Name = "chkOpen";
+            this.chkOpen.Size = new System.Drawing.Size(138, 17);
+            this.chkOpen.TabIndex = 19;
+            this.chkOpen.Text = "Open after downloading";
+            this.chkOpen.UseVisualStyleBackColor = true;
             // 
-            // numLimit
+            // chkMerge
             // 
-            this.numLimit.Location = new System.Drawing.Point(165, 136);
-            this.numLimit.Maximum = new decimal(new int[] {
-            9999999,
-            0,
-            0,
-            0});
-            this.numLimit.Name = "numLimit";
-            this.numLimit.Size = new System.Drawing.Size(81, 20);
-            this.numLimit.TabIndex = 38;
-            this.numLimit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(104, 101);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(202, 26);
-            this.label6.TabIndex = 37;
-            this.label6.Text = "Image download limit (0 = off)\r\n(0 and/or high values isn\'t recommended)";
-            this.label6.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.chkMerge.AutoSize = true;
+            this.chkMerge.Location = new System.Drawing.Point(67, 76);
+            this.chkMerge.Name = "chkMerge";
+            this.chkMerge.Size = new System.Drawing.Size(276, 17);
+            this.chkMerge.TabIndex = 13;
+            this.chkMerge.Text = "Merge blacklisted images with non blacklisted images";
+            this.chkMerge.UseVisualStyleBackColor = true;
             // 
             // chkPoolName
             // 
@@ -335,25 +346,15 @@
             this.chkPoolName.Text = "Save files as \"poolname_####\"";
             this.chkPoolName.UseVisualStyleBackColor = true;
             // 
-            // chkMerge
+            // btnBlacklist
             // 
-            this.chkMerge.AutoSize = true;
-            this.chkMerge.Location = new System.Drawing.Point(67, 76);
-            this.chkMerge.Name = "chkMerge";
-            this.chkMerge.Size = new System.Drawing.Size(276, 17);
-            this.chkMerge.TabIndex = 13;
-            this.chkMerge.Text = "Merge blacklisted images with non blacklisted images";
-            this.chkMerge.UseVisualStyleBackColor = true;
-            // 
-            // chkOpen
-            // 
-            this.chkOpen.AutoSize = true;
-            this.chkOpen.Location = new System.Drawing.Point(67, 99);
-            this.chkOpen.Name = "chkOpen";
-            this.chkOpen.Size = new System.Drawing.Size(138, 17);
-            this.chkOpen.TabIndex = 19;
-            this.chkOpen.Text = "Open after downloading";
-            this.chkOpen.UseVisualStyleBackColor = true;
+            this.btnBlacklist.Location = new System.Drawing.Point(4, 200);
+            this.btnBlacklist.Name = "btnBlacklist";
+            this.btnBlacklist.Size = new System.Drawing.Size(102, 23);
+            this.btnBlacklist.TabIndex = 19;
+            this.btnBlacklist.Text = "Manage blacklist";
+            this.btnBlacklist.UseVisualStyleBackColor = true;
+            this.btnBlacklist.Click += new System.EventHandler(this.btnBlacklist_Click);
             // 
             // frmSettings
             // 
@@ -374,10 +375,10 @@
             this.tbGeneral.PerformLayout();
             this.tbTags.ResumeLayout(false);
             this.tbTags.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numLimit)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numScore)).EndInit();
             this.tbPools.ResumeLayout(false);
             this.tbPools.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numScore)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numLimit)).EndInit();
             this.ResumeLayout(false);
 
         }

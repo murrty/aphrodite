@@ -44,6 +44,9 @@
             this.btnDownloadPool = new System.Windows.Forms.Button();
             this.txtID = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
+            this.tbSearch = new System.Windows.Forms.TabPage();
+            this.btnHLQ = new System.Windows.Forms.Button();
+            this.label4 = new System.Windows.Forms.Label();
             this.mainMenu1 = new System.Windows.Forms.MainMenu(this.components);
             this.mSettings = new System.Windows.Forms.MenuItem();
             this.mBlacklist = new System.Windows.Forms.MenuItem();
@@ -54,18 +57,21 @@
             ((System.ComponentModel.ISupportInitialize)(this.numLimit)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numScore)).BeginInit();
             this.tbPools.SuspendLayout();
+            this.tbSearch.SuspendLayout();
             this.SuspendLayout();
             // 
             // tbMain
             // 
             this.tbMain.Controls.Add(this.tbTags);
             this.tbMain.Controls.Add(this.tbPools);
+            this.tbMain.Controls.Add(this.tbSearch);
             this.tbMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tbMain.Location = new System.Drawing.Point(0, 0);
             this.tbMain.Name = "tbMain";
             this.tbMain.SelectedIndex = 0;
             this.tbMain.Size = new System.Drawing.Size(282, 203);
-            this.tbMain.TabIndex = 0;
+            this.tbMain.TabIndex = 12;
+            this.tbMain.SelectedIndexChanged += new System.EventHandler(this.tbMain_SelectedIndexChanged);
             // 
             // tbTags
             // 
@@ -93,7 +99,7 @@
             this.btnDownloadTags.Location = new System.Drawing.Point(97, 164);
             this.btnDownloadTags.Name = "btnDownloadTags";
             this.btnDownloadTags.Size = new System.Drawing.Size(81, 23);
-            this.btnDownloadTags.TabIndex = 30;
+            this.btnDownloadTags.TabIndex = 7;
             this.btnDownloadTags.Text = "Download";
             this.btnDownloadTags.UseVisualStyleBackColor = true;
             this.btnDownloadTags.Click += new System.EventHandler(this.btnDownloadTags_Click);
@@ -106,7 +112,7 @@
             this.chkSafe.Location = new System.Drawing.Point(95, 76);
             this.chkSafe.Name = "chkSafe";
             this.chkSafe.Size = new System.Drawing.Size(32, 17);
-            this.chkSafe.TabIndex = 29;
+            this.chkSafe.TabIndex = 3;
             this.chkSafe.Text = "S";
             this.chkSafe.UseVisualStyleBackColor = true;
             // 
@@ -118,7 +124,7 @@
             this.chkQuestionable.Location = new System.Drawing.Point(56, 76);
             this.chkQuestionable.Name = "chkQuestionable";
             this.chkQuestionable.Size = new System.Drawing.Size(33, 17);
-            this.chkQuestionable.TabIndex = 28;
+            this.chkQuestionable.TabIndex = 2;
             this.chkQuestionable.Text = "Q";
             this.chkQuestionable.UseVisualStyleBackColor = true;
             // 
@@ -130,7 +136,7 @@
             this.chkExplicit.Location = new System.Drawing.Point(18, 76);
             this.chkExplicit.Name = "chkExplicit";
             this.chkExplicit.Size = new System.Drawing.Size(32, 17);
-            this.chkExplicit.TabIndex = 27;
+            this.chkExplicit.TabIndex = 1;
             this.chkExplicit.Text = "E";
             this.chkExplicit.UseVisualStyleBackColor = true;
             // 
@@ -144,7 +150,7 @@
             0});
             this.numLimit.Name = "numLimit";
             this.numLimit.Size = new System.Drawing.Size(81, 20);
-            this.numLimit.TabIndex = 26;
+            this.numLimit.TabIndex = 6;
             this.numLimit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label6
@@ -153,7 +159,7 @@
             this.label6.Location = new System.Drawing.Point(36, 103);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(202, 26);
-            this.label6.TabIndex = 25;
+            this.label6.TabIndex = 13;
             this.label6.Text = "Image download limit (0 = off)\r\n(0 and/or high values isn\'t recommended)";
             this.label6.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
@@ -163,7 +169,7 @@
             this.chkMinimumScore.Location = new System.Drawing.Point(152, 55);
             this.chkMinimumScore.Name = "chkMinimumScore";
             this.chkMinimumScore.Size = new System.Drawing.Size(96, 17);
-            this.chkMinimumScore.TabIndex = 24;
+            this.chkMinimumScore.TabIndex = 4;
             this.chkMinimumScore.Text = "Score minimum";
             this.chkMinimumScore.UseVisualStyleBackColor = true;
             this.chkMinimumScore.CheckedChanged += new System.EventHandler(this.chkMinimumScore_CheckedChanged);
@@ -184,7 +190,7 @@
             -2147483648});
             this.numScore.Name = "numScore";
             this.numScore.Size = new System.Drawing.Size(63, 20);
-            this.numScore.TabIndex = 23;
+            this.numScore.TabIndex = 5;
             this.numScore.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label2
@@ -201,7 +207,7 @@
             this.txtTags.Location = new System.Drawing.Point(38, 27);
             this.txtTags.Name = "txtTags";
             this.txtTags.Size = new System.Drawing.Size(223, 20);
-            this.txtTags.TabIndex = 20;
+            this.txtTags.TabIndex = 0;
             this.txtTags.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.txtTags.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtTags_KeyPress);
             // 
@@ -211,7 +217,7 @@
             this.label1.Location = new System.Drawing.Point(13, 9);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(69, 13);
-            this.label1.TabIndex = 21;
+            this.label1.TabIndex = 13;
             this.label1.Text = "Tags (limit 6):";
             // 
             // tbPools
@@ -224,7 +230,7 @@
             this.tbPools.Location = new System.Drawing.Point(4, 22);
             this.tbPools.Name = "tbPools";
             this.tbPools.Padding = new System.Windows.Forms.Padding(3);
-            this.tbPools.Size = new System.Drawing.Size(274, 218);
+            this.tbPools.Size = new System.Drawing.Size(274, 177);
             this.tbPools.TabIndex = 1;
             this.tbPools.Text = "Pools";
             this.tbPools.UseVisualStyleBackColor = true;
@@ -235,7 +241,7 @@
             this.chkMerge.Location = new System.Drawing.Point(53, 110);
             this.chkMerge.Name = "chkMerge";
             this.chkMerge.Size = new System.Drawing.Size(168, 17);
-            this.chkMerge.TabIndex = 21;
+            this.chkMerge.TabIndex = 10;
             this.chkMerge.Text = "Merge blacklisted with the rest";
             this.chkMerge.UseVisualStyleBackColor = true;
             // 
@@ -245,7 +251,7 @@
             this.chkOpen.Location = new System.Drawing.Point(53, 87);
             this.chkOpen.Name = "chkOpen";
             this.chkOpen.Size = new System.Drawing.Size(138, 17);
-            this.chkOpen.TabIndex = 18;
+            this.chkOpen.TabIndex = 9;
             this.chkOpen.Text = "Open after downloading";
             this.chkOpen.UseVisualStyleBackColor = true;
             // 
@@ -254,7 +260,7 @@
             this.btnDownloadPool.Location = new System.Drawing.Point(98, 145);
             this.btnDownloadPool.Name = "btnDownloadPool";
             this.btnDownloadPool.Size = new System.Drawing.Size(79, 23);
-            this.btnDownloadPool.TabIndex = 19;
+            this.btnDownloadPool.TabIndex = 11;
             this.btnDownloadPool.Text = "Download";
             this.btnDownloadPool.UseVisualStyleBackColor = true;
             this.btnDownloadPool.Click += new System.EventHandler(this.btnDownloadPool_Click);
@@ -264,8 +270,9 @@
             this.txtID.Location = new System.Drawing.Point(98, 47);
             this.txtID.Name = "txtID";
             this.txtID.Size = new System.Drawing.Size(79, 20);
-            this.txtID.TabIndex = 17;
+            this.txtID.TabIndex = 8;
             this.txtID.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.txtID.TextChanged += new System.EventHandler(this.txtID_TextChanged);
             // 
             // label3
             // 
@@ -273,8 +280,40 @@
             this.label3.Location = new System.Drawing.Point(73, 29);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(45, 13);
-            this.label3.TabIndex = 20;
+            this.label3.TabIndex = 13;
             this.label3.Text = "Pool ID:";
+            // 
+            // tbSearch
+            // 
+            this.tbSearch.Controls.Add(this.btnHLQ);
+            this.tbSearch.Controls.Add(this.label4);
+            this.tbSearch.Location = new System.Drawing.Point(4, 22);
+            this.tbSearch.Name = "tbSearch";
+            this.tbSearch.Padding = new System.Windows.Forms.Padding(3);
+            this.tbSearch.Size = new System.Drawing.Size(274, 177);
+            this.tbSearch.TabIndex = 2;
+            this.tbSearch.Text = "Reverse image search";
+            this.tbSearch.UseVisualStyleBackColor = true;
+            // 
+            // btnHLQ
+            // 
+            this.btnHLQ.Location = new System.Drawing.Point(99, 89);
+            this.btnHLQ.Name = "btnHLQ";
+            this.btnHLQ.Size = new System.Drawing.Size(76, 23);
+            this.btnHLQ.TabIndex = 0;
+            this.btnHLQ.Text = "go there";
+            this.btnHLQ.UseVisualStyleBackColor = true;
+            this.btnHLQ.Click += new System.EventHandler(this.btnHLQ_Click);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(29, 65);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(216, 13);
+            this.label4.TabIndex = 1;
+            this.label4.Text = "There\'s a site to reverse image search e621.";
+            this.label4.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // mainMenu1
             // 
@@ -333,6 +372,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.numScore)).EndInit();
             this.tbPools.ResumeLayout(false);
             this.tbPools.PerformLayout();
+            this.tbSearch.ResumeLayout(false);
+            this.tbSearch.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -363,6 +404,9 @@
         private System.Windows.Forms.TextBox txtID;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.MenuItem mProtocol;
+        private System.Windows.Forms.TabPage tbSearch;
+        private System.Windows.Forms.Button btnHLQ;
+        private System.Windows.Forms.Label label4;
     }
 }
 

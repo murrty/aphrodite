@@ -109,6 +109,7 @@ namespace aphrodite {
             int blacklistCount = 0;
             string poolInfo = string.Empty;
             string blacklistInfo = string.Empty;
+            int page = 0;
 
             if (!header.StartsWith("User-Agent: ")) {
                 header = "User-Agent: " + header;
@@ -141,7 +142,7 @@ namespace aphrodite {
                 XmlNodeList xmlName = doc.DocumentElement.SelectNodes("/root/name");
                 XmlNodeList xmlDescription = doc.DocumentElement.SelectNodes("/root/description");
                 XmlNodeList xmlCount = doc.DocumentElement.SelectNodes("/root/post_count");
-                poolInfo += "POOL: " + poolID + "\n    NAME: " + xmlName[0].InnerText + "\n    DESCRIPTION: " + xmlDescription[0].InnerText + "\n    PAGES: " + xmlCount[0].InnerText + "\n    URL: https://e621.net/pool/show/" + poolID + "\n\n";
+                poolInfo += "POOL: " + poolID + "\n    NAME: " + xmlName[0].InnerText + "\n    PAGES: " + xmlCount[0].InnerText + "\n    URL: https://e621.net/pool/show/" + poolID + "\n    DESCRIPTION:\n\"" + xmlDescription[0].InnerText + "\"\n\n";
 
                 Debug.Print("Calculating pages to download");
                 int count = Convert.ToInt32(xmlCount[0].InnerText);
@@ -163,10 +164,82 @@ namespace aphrodite {
                 saveTo += "\\" + poolName.Replace("_", " ");
                 this.Invoke((MethodInvoker)(() => lbName.Text = poolName.Replace("_", " ")));
 
+                Debug.Print("Gathering list of URLs from the pool");
+                XmlNodeList xmlID = doc.DocumentElement.SelectNodes("/root/posts/item/id");
+                XmlNodeList xmlMD5 = doc.DocumentElement.SelectNodes("/root/posts/item/md5");
+                XmlNodeList xmlUrl = doc.DocumentElement.SelectNodes("/root/posts/item/file_url");
+                XmlNodeList xmlTags = doc.DocumentElement.SelectNodes("/root/posts/item/tags");
+                XmlNodeList xmlArtist = doc.DocumentElement.SelectNodes("/root/posts/item/artist/item");
+                XmlNodeList xmlScore = doc.DocumentElement.SelectNodes("/root/posts/item/score");
+                XmlNodeList xmlRating = doc.DocumentElement.SelectNodes("/root/posts/item/rating");
+                xmlDescription = doc.DocumentElement.SelectNodes("/root/posts/item/description");
+                Debug.Print("There are " + xmlUrl.Count + 1 + " posts in this pool");
+                // Check blacklist
+                for (int j = 0; j < xmlTags.Count; j++) {
+                    string artists = xmlArtist[j].InnerText;
+                    string rating = xmlRating[j].InnerText;
+                    bool blacklisted = false;
+                    string foundblacklistedtags = string.Empty;
+                    List<string> foundTags = xmlTags[j].InnerText.Split(' ').ToList();
+                    page++;
+
+                    if (rating == "e") {
+                        rating = rating.Replace("e", "Explicit");
+                    }
+                    else if (rating == "q") {
+                        rating = rating.Replace("q", "Questionable");
+                    }
+                    else if (rating == "s") {
+                        rating = rating.Replace("s", "Safe");
+                    }
+                    else {
+                        rating = "unknown";
+                    }
+
+                    if (blacklist.Count > 0) {
+                        for (int k = 0; k < foundTags.Count; k++) {
+                            for (int l = 0; l < blacklist.Count; l++) {
+                                if (foundTags[k] == blacklist[l]) {
+                                    if (blacklisted) {
+                                        foundblacklistedtags += " " + foundTags[k];
+                                    }
+                                    else {
+                                        foundblacklistedtags += foundTags[k];
+                                        blacklisted = true;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (blacklisted) {
+                            Debug.Print("Blacklisted tag found, adding to the blacklist. Offending tags: " + foundblacklistedtags + " on id " + xmlID[j].InnerText);
+                            blacklistCount++;
+                        }
+                    }
+
+                    urls.Add(xmlUrl[j].InnerText);
+
+                    //for (int k = 0; k < xmlArtist.Count; k++) {
+                    //    artists += xmlArtist[k].InnerText + "\n                   ";
+                    //}
+                    //artists = artists.TrimEnd(' ');
+                    //artists = artists.TrimEnd('\n');
+
+                    if (!blacklisted) {
+                        poolInfo += "    PAGE: " + (page) + "\n        MD5: " + xmlMD5[j].InnerText + "\n        URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n        ARTIST(S): " + artists + "\n        TAGS: " + xmlTags[j].InnerText + "\n        SCORE: " + xmlScore[j].InnerText + "\n        RATING: " + rating + "\n        DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n\n";
+                    }
+                    else if (blacklisted) {
+                        blacklistedURLS.Add(xmlUrl[j].InnerText);
+                        blacklistInfo += "    PAGE " + (page) + ":\n        MD5: " + xmlMD5[j].InnerText + "\n        URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n        ARTIST(S): " + artists + "\n        TAGS: " + xmlTags[j].InnerText + "\n        SCORE: " + xmlScore[j].InnerText + "\n        RATING: " + rating + "\n        DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n        OFFENDING TAGS: " + foundblacklistedtags + "\n\n";
+                        if (!Settings.Default.saveBlacklisted || Pools.Default.mergeBlacklisted)
+                            poolInfo += "    BLACKLISTED PAGE: " + (page) + "\n        MD5: " + xmlMD5[j].InnerText + "\n        URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n        ARTIST(S): " + artists + "\n        TAGS: " + xmlTags[j].InnerText + "\n        SCORE: " + xmlScore[j].InnerText + "\n        RATING: " + rating + "\n        DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n\n";
+                    }
+                }
+
                 // Get a list of Json links in each additional page (if applicable), otherwise just get the links from the pages.
                 if (pages > 1) {
                     Debug.Print("Gathering list of URLs from each page in the pool");
-                    for (int i = 1; i < pages + 1; i++) {
+                    for (int i = 2; i < pages + 1; i++) {
                         this.Invoke((MethodInvoker)(() => status.Text = "Downloading pool information from page " + (i) + "..."));
                         Debug.Print("Page number " + i);
                         dlURL = poolJson + poolID + poolPageJson + i;
@@ -175,13 +248,14 @@ namespace aphrodite {
                             break;
 
                         doc.LoadXml(xml);
-                        XmlNodeList xmlID = doc.DocumentElement.SelectNodes("/root/posts/item/id");
-                        XmlNodeList xmlMD5 = doc.DocumentElement.SelectNodes("/root/posts/item/md5");
-                        XmlNodeList xmlUrl = doc.DocumentElement.SelectNodes("/root/posts/item/file_url");
-                        XmlNodeList xmlTags = doc.DocumentElement.SelectNodes("/root/posts/item/tags");
-                        XmlNodeList xmlArtist = doc.DocumentElement.SelectNodes("/root/posts/item/artist/item");
-                        XmlNodeList xmlScore = doc.DocumentElement.SelectNodes("/root/posts/item/score");
-                        XmlNodeList xmlRating = doc.DocumentElement.SelectNodes("/root/posts/item/rating");
+                        xmlID = doc.DocumentElement.SelectNodes("/root/posts/item/id");
+                        xmlMD5 = doc.DocumentElement.SelectNodes("/root/posts/item/md5");
+                        xmlUrl = doc.DocumentElement.SelectNodes("/root/posts/item/file_url");
+                        xmlTags = doc.DocumentElement.SelectNodes("/root/posts/item/tags");
+                        xmlArtist = doc.DocumentElement.SelectNodes("/root/posts/item/artist/item");
+                        xmlScore = doc.DocumentElement.SelectNodes("/root/posts/item/score");
+                        xmlRating = doc.DocumentElement.SelectNodes("/root/posts/item/rating");
+                        xmlDescription = doc.DocumentElement.SelectNodes("/root/posts/item/description");
                         Debug.Print("There are " + xmlUrl.Count + 1 + " posts on page " + i);
                         // Check blacklist
                         for (int j = 0; j < xmlTags.Count; j++) {
@@ -190,6 +264,7 @@ namespace aphrodite {
                             bool blacklisted = false;
                             string foundblacklistedtags = string.Empty;
                             List<string> foundTags = xmlTags[j].InnerText.Split(' ').ToList();
+                            page++;
 
                             if (rating == "e") {
                                 rating = rating.Replace("e", "Explicit");
@@ -234,90 +309,22 @@ namespace aphrodite {
                             //artists = artists.TrimEnd('\n');
 
                             if (!blacklisted) {
-                                poolInfo += "    PAGE: " + (j + 1) + "\n        MD5: " + xmlMD5[j].InnerText + "\n        URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n        ARTIST(S): " + artists + "\n        TAGS: " + xmlTags[j].InnerText + "\n        SCORE: " + xmlScore[j].InnerText + "\n        RATING: " + rating + "\n\n";
+                                poolInfo += "    PAGE: " + (page) + "\n        MD5: " + xmlMD5[j].InnerText + "\n        URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n        ARTIST(S): " + artists + "\n        TAGS: " + xmlTags[j].InnerText + "\n        SCORE: " + xmlScore[j].InnerText + "\n        RATING: " + rating + "\n        DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n\n";
                             }
                             else if (blacklisted) {
                                 blacklistedURLS.Add(xmlUrl[j].InnerText);
-                                blacklistInfo += "    PAGE " + (j + 1) + ":\n        MD5: " + xmlMD5[j].InnerText + "\n        URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n        ARTIST: " + xmlArtist[j].InnerText + "\n        TAGS: " + xmlTags[j].InnerText + "\n        SCORE: " + xmlScore[j].InnerText + "\n        RATING: " + xmlRating[j].InnerText + "\n        OFFENDING TAGS: " + foundblacklistedtags + "\n\n";
+                                blacklistInfo += "    PAGE " + (page) + ":\n        MD5: " + xmlMD5[j].InnerText + "\n        URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n        ARTIST: " + xmlArtist[j].InnerText + "\n        TAGS: " + xmlTags[j].InnerText + "\n        SCORE: " + xmlScore[j].InnerText + "\n        RATING: " + rating + "\n        DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n        OFFENDING TAGS: " + foundblacklistedtags + "\n\n";
                                 if (!Settings.Default.saveBlacklisted || Pools.Default.mergeBlacklisted)
-                                    poolInfo += "    BLACKLISTED PAGE: " + (j + 1) + "\n        MD5: " + xmlMD5[j].InnerText + "\n        URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n        ARTIST: " + xmlArtist[j].InnerText + "\n        TAGS: " + xmlTags[j].InnerText + "\n        SCORE: " + xmlScore[j].InnerText + "\n        RATING: " + xmlRating[j].InnerText + "\n\n";
+                                    poolInfo += "    BLACKLISTED PAGE: " + (page) + "\n        MD5: " + xmlMD5[j].InnerText + "\n        URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n        ARTIST: " + xmlArtist[j].InnerText + "\n        TAGS: " + xmlTags[j].InnerText + "\n        SCORE: " + xmlScore[j].InnerText + "\n        RATING: " + rating + "\n        DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n\n";
                             }
                         }
                     }
                 }
                 else {
-                    Debug.Print("Gathering list of URLs from the pool");
-                    XmlNodeList xmlID = doc.DocumentElement.SelectNodes("/root/posts/item/id");
-                    XmlNodeList xmlMD5 = doc.DocumentElement.SelectNodes("/root/posts/item/md5");
-                    XmlNodeList xmlUrl = doc.DocumentElement.SelectNodes("/root/posts/item/file_url");
-                    XmlNodeList xmlTags = doc.DocumentElement.SelectNodes("/root/posts/item/tags");
-                    XmlNodeList xmlArtist = doc.DocumentElement.SelectNodes("/root/posts/item/artist/item");
-                    XmlNodeList xmlScore = doc.DocumentElement.SelectNodes("/root/posts/item/score");
-                    XmlNodeList xmlRating = doc.DocumentElement.SelectNodes("/root/posts/item/rating");
-                    Debug.Print("There are " + xmlUrl.Count + 1 + " posts in this pool");
-                    // Check blacklist
-                    for (int j = 0; j < xmlTags.Count; j++) {
-                        string artists = xmlArtist[j].InnerText;
-                        string rating = xmlRating[j].InnerText;
-                        bool blacklisted = false;
-                        string foundblacklistedtags = string.Empty;
-                        List<string> foundTags = xmlTags[j].InnerText.Split(' ').ToList();
-
-                        if (rating == "e") {
-                            rating = rating.Replace("e", "Explicit");
-                        }
-                        else if (rating == "q") {
-                            rating = rating.Replace("q", "Questionable");
-                        }
-                        else if (rating == "s") {
-                            rating = rating.Replace("s", "Safe");
-                        }
-                        else {
-                            rating = "unknown";
-                        }
-
-                        if (blacklist.Count > 0) {
-                            for (int k = 0; k < foundTags.Count; k++) {
-                                for (int l = 0; l < blacklist.Count; l++) {
-                                    if (foundTags[k] == blacklist[l]) {
-                                        if (blacklisted) {
-                                            foundblacklistedtags += " " + foundTags[k];
-                                        }
-                                        else {
-                                            foundblacklistedtags += foundTags[k];
-                                            blacklisted = true;
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (blacklisted) {
-                                Debug.Print("Blacklisted tag found, adding to the blacklist. Offending tags: " + foundblacklistedtags + " on id " + xmlID[j].InnerText);
-                                blacklistCount++;
-                            }
-                        }
-
-                        urls.Add(xmlUrl[j].InnerText);
-
-                        //for (int k = 0; k < xmlArtist.Count; k++) {
-                        //    artists += xmlArtist[k].InnerText + "\n                   ";
-                        //}
-                        //artists = artists.TrimEnd(' ');
-                        //artists = artists.TrimEnd('\n');
-
-                        if (!blacklisted) {
-                            poolInfo += "    PAGE: " + (j + 1) + "\n        MD5: " + xmlMD5[j].InnerText + "\n        URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n        ARTIST(S): " + artists + "\n        TAGS: " + xmlTags[j].InnerText + "\n        SCORE: " + xmlScore[j].InnerText + "\n        RATING: " + rating + "\n\n";
-                        }
-                        else if (blacklisted) {
-                            blacklistedURLS.Add(xmlUrl[j].InnerText);
-                            blacklistInfo += "    PAGE " + (j + 1) + ":\n        MD5: " + xmlMD5[j].InnerText + "\n        URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n        ARTIST(S): " + artists + "\n        TAGS: " + xmlTags[j].InnerText + "\n        SCORE: " + xmlScore[j].InnerText + "\n        RATING: " + rating + "\n        OFFENDING TAGS: " + foundblacklistedtags + "\n\n";
-                            if (!Settings.Default.saveBlacklisted || Pools.Default.mergeBlacklisted)
-                                poolInfo += "    BLACKLISTED PAGE: " + (j + 1) + "\n        MD5: " + xmlMD5[j].InnerText + "\n        URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n        ARTIST(S): " + artists + "\n        TAGS: " + xmlTags[j].InnerText + "\n        SCORE: " + xmlScore[j].InnerText + "\n        RATING: " + rating + "\n\n";
-                        }
-                    }
+                    
                 }
 
-                this.Invoke((MethodInvoker)(() => lbTotal.Text = (urls.Count - blacklistedURLS.Count) + " posts\n" + (blacklistedURLS.Count) + " blacklisted\n" + (urls.Count) + " total"));
+                this.Invoke((MethodInvoker)(() => lbTotal.Text = (urls.Count - blacklistedURLS.Count) + " pages\n" + (blacklistedURLS.Count) + " blacklisted\n" + (urls.Count) + " total"));
 
                 if (urls.Count <= 0)
                     return false;
@@ -379,7 +386,7 @@ namespace aphrodite {
                         else {
                             pagenumber = (y + 1).ToString();
                         }
-                        this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading file " + (y + 1) + " of " + (urls.Count)));
+                        this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading page " + (y + 1) + " of " + (urls.Count)));
 
                         string filename;
                         if (usePoolName) {
@@ -441,7 +448,9 @@ namespace aphrodite {
                     }
                 }
 
-                this.Invoke((MethodInvoker)(() => lbFile.Text = "All " + (urls.Count) + " files downloaded."));
+                this.Invoke((MethodInvoker)(() => lbFile.Text = "All " + (urls.Count) + " pages downloaded."));
+                this.Invoke((MethodInvoker)(() => pbDownloadStatus.Value = 100));
+                this.Invoke((MethodInvoker)(() => lbPercentage.Text = "Done"));
 
 
                 Debug.Print("Pool has been downloaded successfully, returning");
