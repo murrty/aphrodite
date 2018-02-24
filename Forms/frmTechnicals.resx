@@ -117,27 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="label5.Text" xml:space="preserve">
-    <value>A protocol is used by browsers to run applications, usually with arguments from
-websites. Using a protocol with this program is useful if you want to download
-while browsing e621. They're all optional, but require a userscript.
-the 'images:' protocol uses a separate userscript for... various reasons.</value>
-  </data>
-  <metadata name="JustTheTips.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
-  <metadata name="JustTheTips.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
-  <data name="chkSaveInfo.ToolTip" xml:space="preserve">
-    <value>Saves image information, such as tags, description, md5, etc. into files in the same directory.
-Tags would be saved as tags.nfo &amp; tags.blacklisted.nfo
-Pools would be saved as pools.nfo &amp; pools.blacklisted.nfo
-Images would be saved as images.nfo &amp; images.blacklisted.nfo</value>
-  </data>
-  <metadata name="JustTheTips.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>

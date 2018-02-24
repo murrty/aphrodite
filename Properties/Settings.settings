@@ -3,10 +3,10 @@
   <Profiles />
   <Settings>
     <Setting Name="currentVersion" Type="System.Decimal" Scope="Application">
-      <Value Profile="(Default)">1.1</Value>
+      <Value Profile="(Default)">1.2</Value>
     </Setting>
     <Setting Name="UserAgent" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">User-Agent: aphrodite/1.1 (Contact: https://github.com/murrty/aphrodite ... open an issue)</Value>
+      <Value Profile="(Default)">User-Agent: aphrodite/1.2 (Contact: https://github.com/murrty/aphrodite ... open an issue)</Value>
     </Setting>
   </Settings>
 </SettingsFile>

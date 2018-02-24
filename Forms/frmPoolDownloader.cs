@@ -339,10 +339,12 @@ namespace aphrodite {
                         Directory.CreateDirectory(saveTo + "\\blacklisted");
                 }
                 if (saveInfo) {
+                    poolInfo.TrimEnd('\n');
                     Debug.Print("Saving pool.nfo");
                     this.Invoke((MethodInvoker)(() => status.Text = "Saving pool.nfo"));
                     File.WriteAllText(saveTo + "\\pool.nfo", poolInfo);
                     if (Settings.Default.saveBlacklisted && !Pools.Default.mergeBlacklisted) {
+                        blacklistInfo.TrimEnd('\n');
                         Debug.Print("Saving pool.blacklisted.nfo");
                         this.Invoke((MethodInvoker)(() => status.Text = "Saving pool.blacklisted.nfo"));
                         File.WriteAllText(saveTo + "\\blacklisted\\pool.blacklisted.nfo", poolInfo);
@@ -525,7 +527,8 @@ namespace aphrodite {
                     }
                     this.Invoke((MethodInvoker)(() => lbID.Text = "Pool ID " + poolurl.Split('/')[5]));
                     if (downloadPool(poolurl.Split('/')[5], saveDir, Settings.Default.saveInfo, Pools.Default.usePoolName, Properties.Settings.Default.UserAgent)) {
-                        MessageBox.Show("Pool " + id + " has finished downloading.");
+                        if (!Settings.Default.ignoreFinish)
+                            MessageBox.Show("Pool " + id + " has finished downloading.");
 
                         if (openAfter)
                             Process.Start(saveDir);
@@ -537,7 +540,8 @@ namespace aphrodite {
                 }
                 else {
                     if (downloadPool(id, saveDir, Settings.Default.saveInfo, Pools.Default.usePoolName, Properties.Settings.Default.UserAgent)) {
-                        MessageBox.Show("Pool " + id + " has finished downloading.");
+                        if (!Settings.Default.ignoreFinish)
+                            MessageBox.Show("Pool " + id + " has finished downloading.");
 
                         if (openAfter)
                             Process.Start(saveDir);

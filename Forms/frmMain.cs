@@ -18,9 +18,7 @@ namespace aphrodite {
     public partial class frmMain : Form {
         #region Variables
         frmAbout frAbout = new frmAbout();
-        bool isAdmin = true;
-
-        
+        bool isAdmin = false;
         #endregion
 
         #region Methods
@@ -36,89 +34,6 @@ namespace aphrodite {
             const Int32 BCM_SETSHIELD = 0x160C;
             btn.FlatStyle = System.Windows.Forms.FlatStyle.System;
             SendMessage(btn.Handle, BCM_SETSHIELD, 0, 1);
-        }
-
-        private bool installProtocol() {
-            if (!isAdmin) {
-                if (MessageBox.Show("This task requires re-running as administrator. Restart elevated?", "aphrodite", MessageBoxButtons.YesNo) == DialogResult.Yes) {
-                    var exeName = Process.GetCurrentProcess().MainModule.FileName;
-                    ProcessStartInfo startInfo = new ProcessStartInfo(exeName);
-                    startInfo.Verb = "runas";
-                    startInfo.Arguments = "installProtocol";
-                    Process.Start(startInfo);
-                    Environment.Exit(0);
-                }
-                return false;
-            }
-            else {
-                string directory = Environment.CurrentDirectory;
-                string filename = AppDomain.CurrentDomain.FriendlyName;
-                switch (MessageBox.Show("Would you like to specifiy a location to store aphrodite? Select no to use current directory.\n\nThis is required for the plugin to work properly, and is recommended that you select a place that won't be messed with AND have permission to write files to.", "aphrodite", MessageBoxButtons.YesNoCancel)) {
-                    case System.Windows.Forms.DialogResult.Yes:
-                        using (FolderBrowserDialog fbd = new FolderBrowserDialog() { Description = "Select a directory to store aphrodite.exe", SelectedPath = Environment.CurrentDirectory, ShowNewFolderButton = true }) {
-                            if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
-                                directory = fbd.SelectedPath;
-                            }
-                            else {
-                                return false;
-                            }
-                        }
-                        break;
-                    case System.Windows.Forms.DialogResult.Cancel:
-                        return false;
-                }
-
-                // Copy the current program to the new directory.
-                if (directory != Environment.CurrentDirectory) {
-                    if (File.Exists(directory + "\\aphrodite.exe"))
-                        File.Delete(directory + "\\aphrodite.exe");
-
-                    File.Copy(Environment.CurrentDirectory + "\\" + filename, directory + "\\aphrodite.exe");
-                }
-
-                // Create Pools folder in the new directory.
-                if (!Directory.Exists(directory + "\\Tags"))
-                    Directory.CreateDirectory(directory + "\\Tags");
-                if (!Directory.Exists(directory + "\\Pools"))
-                    Directory.CreateDirectory(directory + "\\Pools");
-
-                // Create the new keys in the registry.
-                Registry.ClassesRoot.CreateSubKey("tags");
-                RegistryKey setIdentifier = Registry.ClassesRoot.OpenSubKey("tags", true);
-                setIdentifier.SetValue("URL Protocol", "");
-                Registry.ClassesRoot.CreateSubKey("tags\\shell");
-                Registry.ClassesRoot.CreateSubKey("tags\\shell\\open");
-                Registry.ClassesRoot.CreateSubKey("tags\\shell\\open\\command");
-                RegistryKey setProtocol = Registry.ClassesRoot.OpenSubKey("tags\\shell\\open\\command", true);
-                setProtocol.SetValue("", "\"" + directory + "\\aphrodite.exe\" \"%1\"");
-                Registry.ClassesRoot.CreateSubKey("tags\\DefaultIcon");
-                RegistryKey setIcon = Registry.ClassesRoot.OpenSubKey("tags\\DefaultIcon", true);
-                setIcon.SetValue("", "\"" + directory + "\\aphrodite.exe\",1");
-
-                Registry.ClassesRoot.CreateSubKey("pools");
-                setIdentifier = Registry.ClassesRoot.OpenSubKey("pools", true);
-                setIdentifier.SetValue("URL Protocol", "");
-                Registry.ClassesRoot.CreateSubKey("pools\\shell");
-                Registry.ClassesRoot.CreateSubKey("pools\\shell\\open");
-                Registry.ClassesRoot.CreateSubKey("pools\\shell\\open\\command");
-                setProtocol = Registry.ClassesRoot.OpenSubKey("pools\\shell\\open\\command", true);
-                setProtocol.SetValue("", "\"" + directory + "\\aphrodite.exe\" \"%1\"");
-                Registry.ClassesRoot.CreateSubKey("pools\\DefaultIcon");
-                setIcon = Registry.ClassesRoot.OpenSubKey("pools\\DefaultIcon", true);
-                setIcon.SetValue("", "\"" + directory + "\\aphrodite.exe\",1");
-
-                if (MessageBox.Show("Protocol information set. Would you like to install the plugin? Requires Greasemonkey/Tampermonkey add-on for your browser.", "aphrodite", MessageBoxButtons.YesNo) == DialogResult.Yes) {
-                    Process.Start("https://github.com/murrty/aphrodite/raw/master/Resources/aphrodite.user.js");
-                }
-
-                //btnProtocol.Enabled = false;
-                //btnProtocol.Visible = false;
-
-                Process.Start(directory + "\\aphrodite.exe");
-                Environment.Exit(0);
-
-                return true;
-            }
         }
         #endregion
 
@@ -140,22 +55,34 @@ namespace aphrodite {
             for (int i = 1; i < Environment.GetCommandLineArgs().Length; i++) {
                 string arg = Environment.GetCommandLineArgs()[i];
                 if (arg.StartsWith("installProtocol")) {
-                    installProtocol();
+                    frmSettings settings = new frmSettings();
+                    settings.isAdmin = isAdmin;
+                    settings.protocol = true;
+                    settings.ShowDialog();
                 }
-                if (arg.StartsWith("pools:configuresettings") || arg.StartsWith("tags:configuresettings") || arg.StartsWith("configuresettings")) {
+                if (arg.StartsWith("pools:configuresettings") || arg.StartsWith("tags:configuresettings") || arg.StartsWith("images:configuresettings") || arg.StartsWith("configuresettings")) {
                     frmSettings settings = new frmSettings();
                     settings.pluginChange = true;
+                    settings.isAdmin = isAdmin;
+                    if (arg.StartsWith("tags:"))
+                        settings.plugin = 1;
+                    else if (arg.StartsWith("pools:"))
+                        settings.plugin = 2;
+                    else if (arg.StartsWith("images:"))
+                        settings.plugin = 3;
+                    else
+                        settings.plugin = 0;
                     settings.ShowDialog();
                     Environment.Exit(0);
                 }
-                if (isValidPoolLink(arg.Replace("pools:", ""))) {
+                if (arg.StartsWith("pools:") && isValidPoolLink(arg.Replace("pools:", ""))) {
                     frmPoolDownloader poolDL = new frmPoolDownloader();
                     poolDL.fromURL = true;
                     poolDL.poolurl = arg.Replace("pools:", "");
                     poolDL.ShowDialog();
                     Environment.Exit(0);
                 }
-                else if (isValidTagLink(arg.Replace("tags:", ""))) {
+                else if (arg.StartsWith("tags:") && isValidTagLink(arg.Replace("tags:", ""))) {
                     frmTagDownloader tagDL = new frmTagDownloader();
                     tagDL.fromURL = true;
                     tagDL.url = arg.Replace("tags:", "");
@@ -164,6 +91,21 @@ namespace aphrodite {
                     tagDL.ratings = "e q s".Split(' ');
                     tagDL.ShowDialog();
                     Environment.Exit(0);
+                }
+                else if (arg.StartsWith("images:") && isValidImageLink(arg.Replace("images:", ""))) {
+                    ImageDownloader imgdl = new ImageDownloader();
+                    imgdl.saveInfo = Settings.Default.saveInfo;
+                    imgdl.saveTo = Settings.Default.saveLocation + "\\Images";
+                    imgdl.header = Properties.Settings.Default.UserAgent;
+                    if (imgdl.downloadImage(arg.Replace("images:", ""))) {
+                        if (!Settings.Default.ignoreFinish)
+                            MessageBox.Show("Image has finished downloading.");
+                        Environment.Exit(0);
+                    }
+                    else {
+                        MessageBox.Show("An error occured while downloading the image.");
+                        Environment.Exit(0);
+                    }
                 }
                 else if (arg.StartsWith("tags:")) {
                     txtTags.Text += arg.Replace("tags:", "").Replace("%20", " ") + " ";
@@ -203,7 +145,6 @@ namespace aphrodite {
                 mProtocol.Enabled = true;
             }
         }
-        
         private void tbMain_SelectedIndexChanged(object sender, EventArgs e) {
             if (tbMain.SelectedTab == tbTags) {
                 txtTags.Focus();
@@ -215,6 +156,7 @@ namespace aphrodite {
 
         private void mSettings_Click(object sender, EventArgs e) {
             frmSettings settings = new frmSettings();
+            settings.isAdmin = isAdmin;
             settings.ShowDialog();
             chkExplicit.Checked = Tags.Default.Explicit;
             chkQuestionable.Checked = Tags.Default.Questionable;
@@ -234,7 +176,10 @@ namespace aphrodite {
             frAbout.Show();
         }
         private void mProtocol_Click(object sender, EventArgs e) {
-            installProtocol();
+            frmSettings settings = new frmSettings();
+            settings.isAdmin = isAdmin;
+            settings.protocol = true;
+            settings.ShowDialog();
         }
         private void btnHLQ_Click(object sender, EventArgs e) {
             Process.Start("https://iqdb.harry.lu/");
@@ -382,6 +327,17 @@ namespace aphrodite {
             poolDL.Show();
 
             txtID.Clear();
+        }
+        #endregion
+
+        #region Images
+        public static bool isValidImageLink(string url) {
+            if (url.StartsWith("http://e621.net/post/show/") || url.StartsWith("https://e621.net/post/show/") || url.StartsWith("http://www.e621.net/post/show/") || url.StartsWith("https://www.e621.net/post/show/") || url.StartsWith("e621.net/post/show/") || url.StartsWith("www.e621.net/post/show/")) {
+                return true;
+            }
+            else {
+                return false;
+            }
         }
         #endregion
     }

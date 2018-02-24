@@ -274,7 +274,7 @@ namespace aphrodite {
                             else {
                                 urls.Add(xmlURL[j].InnerText);
                             }
-                            taginfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n        DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n\n";
+                            taginfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n    DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n\n";
                         }
                         else if (blacklisted) {
                             if (Tags.Default.separateRatings) {
@@ -294,7 +294,7 @@ namespace aphrodite {
                             else {
                                 blacklistedURLS.Add(xmlURL[j].InnerText);
                             }
-                            blacklistinfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n        DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n    OFFENDING TAGS: " + foundblacklistedtags + "\n\n";
+                            blacklistinfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n    DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n    OFFENDING TAGS: " + foundblacklistedtags + "\n\n";
                         }
 
                         artists = string.Empty;
@@ -438,7 +438,7 @@ namespace aphrodite {
                             else {
                                 urls.Add(xmlURL[j].InnerText);
                             }
-                            taginfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n        DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n\n";
+                            taginfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n    DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n\n";
                         }
                         else if (blacklisted) {
                             if (Tags.Default.separateRatings) {
@@ -458,7 +458,7 @@ namespace aphrodite {
                             else {
                                 blacklistedURLS.Add(xmlURL[j].InnerText);
                             }
-                            blacklistinfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n        DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n    OFFENDING TAGS: " + foundblacklistedtags + "\n\n";
+                            blacklistinfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n    DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n    OFFENDING TAGS: " + foundblacklistedtags + "\n\n";
                         }
 
                         if (imageAmount > 0 && urls.Count == imageAmount) {
@@ -579,7 +579,7 @@ namespace aphrodite {
                                         else {
                                             urls.Add(xmlURL[j].InnerText);
                                         }
-                                        taginfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n        DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n\n";
+                                        taginfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n    DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n\n";
                                     }
                                     else if (blacklisted) {
                                         if (Tags.Default.separateRatings) {
@@ -599,7 +599,7 @@ namespace aphrodite {
                                         else {
                                             blacklistedURLS.Add(xmlURL[j].InnerText);
                                         }
-                                        blacklistinfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n        DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n    OFFENDING TAGS: " + foundblacklistedtags + "\n\n";
+                                        blacklistinfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n    DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n    OFFENDING TAGS: " + foundblacklistedtags + "\n\n";
                                     }
 
                                     if (imageAmount > 0 && urls.Count == imageAmount) {
@@ -660,11 +660,13 @@ namespace aphrodite {
                 }
 
                 if (saveInfo) {
+                    taginfo.TrimEnd('\n');
                     Debug.Print("Saving tags.nfo");
                     this.Invoke((MethodInvoker)(() => status.Text = "Saving tags.nfo"));
                     File.WriteAllText(saveTo + "\\tags.nfo", taginfo);
 
                     if (Settings.Default.saveBlacklisted && blacklistCount > 0) {
+                        blacklistinfo.TrimEnd('\n');
                         this.Invoke((MethodInvoker)(() => status.Text = "Saving tags.blacklisted.nfo"));
                         if (Tags.Default.separateRatings)
                             File.WriteAllText(saveTo + "\\tags.blacklisted.nfo", blacklistinfo);
@@ -957,13 +959,16 @@ namespace aphrodite {
                     tags = url.Split('/')[6].TrimEnd('#');
                     txtTags.Text = tags;
                     if (downloadTags(true, url)) {
-                        MessageBox.Show("Tags have finished downloading");
+                        if (!Settings.Default.ignoreFinish)
+                            MessageBox.Show("Tags have finished downloading");
+
                         Environment.Exit(0);
                     }
                 }
                 else {
                     if (downloadTags(false, string.Empty)) {
-                        MessageBox.Show("Tags have finished downloading");
+                        if (!Settings.Default.ignoreFinish)
+                            MessageBox.Show("Tags have finished downloading");
                     }
                 }
             });

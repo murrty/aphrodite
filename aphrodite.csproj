@@ -85,6 +85,18 @@
     <Compile Include="Forms\frmBlacklist.Designer.cs">
       <DependentUpon>frmBlacklist.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\frmTechnicals.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmTechnicals.Designer.cs">
+      <DependentUpon>frmTechnicals.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\ImageDownloader.cs" />
+    <Compile Include="Images.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Images.settings</DependentUpon>
+    </Compile>
     <Compile Include="Pools.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -120,6 +132,9 @@
     <EmbeddedResource Include="Forms\frmBlacklist.resx">
       <DependentUpon>frmBlacklist.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmTechnicals.resx">
+      <DependentUpon>frmTechnicals.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -130,6 +145,10 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="Images.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Images.Designer.cs</LastGenOutput>
+    </None>
     <None Include="Pools.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Pools.Designer.cs</LastGenOutput>
@@ -156,6 +175,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\aphrodite.images.user.js" />
     <Content Include="Resources\aphrodite.user.js" />
     <Content Include="Resources\Brad.ico" />
     <Content Include="Resources\Brad.png" />
