@@ -21,7 +21,8 @@ namespace aphrodite {
         public static string getJSON(string url) {
             try {
                 using (WebClient wc = new WebClient()) {
-                    wc.Headers.Add("User-Agent: " + Properties.Settings.Default.UserAgent);
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                    wc.Headers.Add(Program.UserAgent);
                     string json = wc.DownloadString(url);
                     byte[] bytes = Encoding.ASCII.GetBytes(json);
                     using (var stream = new MemoryStream(bytes)) {

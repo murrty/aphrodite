@@ -52,6 +52,7 @@
             this.chkMerge = new System.Windows.Forms.CheckBox();
             this.chkPoolName = new System.Windows.Forms.CheckBox();
             this.tbImages = new System.Windows.Forms.TabPage();
+            this.chkSeparateImages = new System.Windows.Forms.CheckBox();
             this.rbMD5 = new System.Windows.Forms.RadioButton();
             this.label9 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
@@ -66,7 +67,7 @@
             this.btnImagesProtocol = new System.Windows.Forms.Button();
             this.btnBlacklist = new System.Windows.Forms.Button();
             this.JustTheTips = new System.Windows.Forms.ToolTip(this.components);
-            this.chkSeparateImages = new System.Windows.Forms.CheckBox();
+            this.chkSeparateBlacklist = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tbGeneral.SuspendLayout();
             this.tbTags.SuspendLayout();
@@ -402,6 +403,7 @@
             // 
             // tbImages
             // 
+            this.tbImages.Controls.Add(this.chkSeparateBlacklist);
             this.tbImages.Controls.Add(this.chkSeparateImages);
             this.tbImages.Controls.Add(this.rbMD5);
             this.tbImages.Controls.Add(this.label9);
@@ -414,6 +416,19 @@
             this.tbImages.TabIndex = 4;
             this.tbImages.Text = "Images";
             this.tbImages.UseVisualStyleBackColor = true;
+            // 
+            // chkSeparateImages
+            // 
+            this.chkSeparateImages.AutoSize = true;
+            this.chkSeparateImages.Checked = true;
+            this.chkSeparateImages.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkSeparateImages.Location = new System.Drawing.Point(59, 72);
+            this.chkSeparateImages.Name = "chkSeparateImages";
+            this.chkSeparateImages.Size = new System.Drawing.Size(102, 17);
+            this.chkSeparateImages.TabIndex = 9;
+            this.chkSeparateImages.Text = "Separate ratings";
+            this.JustTheTips.SetToolTip(this.chkSeparateImages, "Separate ratings into separate folders for images");
+            this.chkSeparateImages.UseVisualStyleBackColor = true;
             // 
             // rbMD5
             // 
@@ -556,18 +571,17 @@
             this.btnBlacklist.UseVisualStyleBackColor = true;
             this.btnBlacklist.Click += new System.EventHandler(this.btnBlacklist_Click);
             // 
-            // chkSeparateImages
+            // chkSeparateBlacklist
             // 
-            this.chkSeparateImages.AutoSize = true;
-            this.chkSeparateImages.Checked = true;
-            this.chkSeparateImages.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkSeparateImages.Location = new System.Drawing.Point(59, 72);
-            this.chkSeparateImages.Name = "chkSeparateImages";
-            this.chkSeparateImages.Size = new System.Drawing.Size(102, 17);
-            this.chkSeparateImages.TabIndex = 9;
-            this.chkSeparateImages.Text = "Separate ratings";
-            this.JustTheTips.SetToolTip(this.chkSeparateImages, "Separate ratings into separate folders for images");
-            this.chkSeparateImages.UseVisualStyleBackColor = true;
+            this.chkSeparateBlacklist.AutoSize = true;
+            this.chkSeparateBlacklist.Checked = true;
+            this.chkSeparateBlacklist.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkSeparateBlacklist.Location = new System.Drawing.Point(178, 72);
+            this.chkSeparateBlacklist.Name = "chkSeparateBlacklist";
+            this.chkSeparateBlacklist.Size = new System.Drawing.Size(157, 17);
+            this.chkSeparateBlacklist.TabIndex = 10;
+            this.chkSeparateBlacklist.Text = "Separate blacklisted images";
+            this.chkSeparateBlacklist.UseVisualStyleBackColor = true;
             // 
             // frmSettings
             // 
@@ -648,6 +662,7 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.CheckBox chkIgnoreFinish;
         private System.Windows.Forms.CheckBox chkSeparateImages;
+        private System.Windows.Forms.CheckBox chkSeparateBlacklist;
 
     }
 }

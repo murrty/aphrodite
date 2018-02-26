@@ -114,6 +114,7 @@ namespace aphrodite {
             Images.Default.artistMD5 = rbArtist.Checked;
             Images.Default.MD5 = rbMD5.Checked;
             Images.Default.separateRatings = chkSeparateImages.Checked;
+            Images.Default.separateBlacklisted = chkSeparateBlacklist.Checked;
 
             // Save all 4
             Settings.Default.Save();
@@ -146,6 +147,7 @@ namespace aphrodite {
             rbArtist.Checked = Images.Default.artistMD5;
             rbMD5.Checked = Images.Default.MD5;
             chkSeparateImages.Checked = Images.Default.separateRatings;
+            chkSeparateBlacklist.Checked = Images.Default.separateBlacklisted;
         }
         private void checkAdmin() {
             if (!isAdmin) {

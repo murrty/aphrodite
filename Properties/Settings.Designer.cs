@@ -25,20 +25,10 @@ namespace aphrodite.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1.2")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1.21")]
         public decimal currentVersion {
             get {
                 return ((decimal)(this["currentVersion"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("User-Agent: aphrodite/1.2 (Contact: https://github.com/murrty/aphrodite ... open " +
-            "an issue)")]
-        public string UserAgent {
-            get {
-                return ((string)(this["UserAgent"]));
             }
         }
     }

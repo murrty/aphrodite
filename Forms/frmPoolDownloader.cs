@@ -51,6 +51,7 @@ namespace aphrodite {
             try {
                 Debug.Print("Starting pool json download");
                 using (WebClient wc = new WebClient()) {
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                     wc.Headers.Add(header);
                     string json = wc.DownloadString(url);
                     byte[] bytes = Encoding.ASCII.GetBytes(json);
@@ -169,14 +170,14 @@ namespace aphrodite {
                 XmlNodeList xmlMD5 = doc.DocumentElement.SelectNodes("/root/posts/item/md5");
                 XmlNodeList xmlUrl = doc.DocumentElement.SelectNodes("/root/posts/item/file_url");
                 XmlNodeList xmlTags = doc.DocumentElement.SelectNodes("/root/posts/item/tags");
-                XmlNodeList xmlArtist = doc.DocumentElement.SelectNodes("/root/posts/item/artist/item");
+                XmlNodeList xmlArtist = doc.DocumentElement.SelectNodes("/root/posts/item/artist");
                 XmlNodeList xmlScore = doc.DocumentElement.SelectNodes("/root/posts/item/score");
                 XmlNodeList xmlRating = doc.DocumentElement.SelectNodes("/root/posts/item/rating");
                 xmlDescription = doc.DocumentElement.SelectNodes("/root/posts/item/description");
                 Debug.Print("There are " + xmlUrl.Count + 1 + " posts in this pool");
                 // Check blacklist
                 for (int j = 0; j < xmlTags.Count; j++) {
-                    string artists = xmlArtist[j].InnerText;
+                    string artists = xmlArtist[j].InnerXml.ToString().Replace("</item><item type=\"string\">", "\n                   ").Replace("<item type=\"string\">", "").Replace("</item>", "");
                     string rating = xmlRating[j].InnerText;
                     bool blacklisted = false;
                     string foundblacklistedtags = string.Empty;
@@ -252,14 +253,14 @@ namespace aphrodite {
                         xmlMD5 = doc.DocumentElement.SelectNodes("/root/posts/item/md5");
                         xmlUrl = doc.DocumentElement.SelectNodes("/root/posts/item/file_url");
                         xmlTags = doc.DocumentElement.SelectNodes("/root/posts/item/tags");
-                        xmlArtist = doc.DocumentElement.SelectNodes("/root/posts/item/artist/item");
+                        xmlArtist = doc.DocumentElement.SelectNodes("/root/posts/item/artist");
                         xmlScore = doc.DocumentElement.SelectNodes("/root/posts/item/score");
                         xmlRating = doc.DocumentElement.SelectNodes("/root/posts/item/rating");
                         xmlDescription = doc.DocumentElement.SelectNodes("/root/posts/item/description");
                         Debug.Print("There are " + xmlUrl.Count + 1 + " posts on page " + i);
                         // Check blacklist
                         for (int j = 0; j < xmlTags.Count; j++) {
-                            string artists = xmlArtist[j].InnerText;
+                            string artists = xmlArtist[j].InnerXml.ToString().Replace("</item><item type=\"string\">", "\n                   ").Replace("<item type=\"string\">", "").Replace("</item>", "");
                             string rating = xmlRating[j].InnerText;
                             bool blacklisted = false;
                             string foundblacklistedtags = string.Empty;
@@ -320,9 +321,6 @@ namespace aphrodite {
                         }
                     }
                 }
-                else {
-                    
-                }
 
                 this.Invoke((MethodInvoker)(() => lbTotal.Text = (urls.Count - blacklistedURLS.Count) + " pages\n" + (blacklistedURLS.Count) + " blacklisted\n" + (urls.Count) + " total"));
 
@@ -339,12 +337,12 @@ namespace aphrodite {
                         Directory.CreateDirectory(saveTo + "\\blacklisted");
                 }
                 if (saveInfo) {
-                    poolInfo.TrimEnd('\n');
+                    poolInfo = poolInfo.TrimEnd('\n');
                     Debug.Print("Saving pool.nfo");
                     this.Invoke((MethodInvoker)(() => status.Text = "Saving pool.nfo"));
                     File.WriteAllText(saveTo + "\\pool.nfo", poolInfo);
                     if (Settings.Default.saveBlacklisted && !Pools.Default.mergeBlacklisted) {
-                        blacklistInfo.TrimEnd('\n');
+                        blacklistInfo = blacklistInfo.TrimEnd('\n');
                         Debug.Print("Saving pool.blacklisted.nfo");
                         this.Invoke((MethodInvoker)(() => status.Text = "Saving pool.blacklisted.nfo"));
                         File.WriteAllText(saveTo + "\\blacklisted\\pool.blacklisted.nfo", poolInfo);
@@ -353,6 +351,7 @@ namespace aphrodite {
 
                 // Finally, download them. (URL .Split('/')[6] = FileName)
                 using (WebClient wc = new WebClient()) {
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                     wc.DownloadProgressChanged += (s, e) => {
                         this.Invoke((MethodInvoker)(() => pbDownloadStatus.Value = e.ProgressPercentage));
                         this.Invoke((MethodInvoker)(() => lbPercentage.Text = e.ProgressPercentage.ToString() + "%"));
@@ -468,6 +467,13 @@ namespace aphrodite {
                 return false;
                 throw thrEx;
             }
+            catch (ObjectDisposedException disEx) {
+                Debug.Print("Seems like the object got disposed.");
+                Debug.Print("==========BEGIN OBJDISPOSEDEXCEPTION==========");
+                Debug.Print(disEx.ToString());
+                Debug.Print("==========END OBJDISPOSEDEXCEPTION==========");
+                return false;
+            }
             catch (WebException WebE) {
                 Debug.Print("A WebException has occured.");
                 Debug.Print("==========BEGIN WEBEXCEPTION==========");
@@ -526,7 +532,7 @@ namespace aphrodite {
                         poolurl = "https://" + poolurl;
                     }
                     this.Invoke((MethodInvoker)(() => lbID.Text = "Pool ID " + poolurl.Split('/')[5]));
-                    if (downloadPool(poolurl.Split('/')[5], saveDir, Settings.Default.saveInfo, Pools.Default.usePoolName, Properties.Settings.Default.UserAgent)) {
+                    if (downloadPool(poolurl.Split('/')[5], saveDir, Settings.Default.saveInfo, Pools.Default.usePoolName, Program.UserAgent)) {
                         if (!Settings.Default.ignoreFinish)
                             MessageBox.Show("Pool " + id + " has finished downloading.");
 
@@ -537,9 +543,10 @@ namespace aphrodite {
                     else {
                         this.DialogResult = DialogResult.Abort;
                     }
+                    this.Dispose();
                 }
                 else {
-                    if (downloadPool(id, saveDir, Settings.Default.saveInfo, Pools.Default.usePoolName, Properties.Settings.Default.UserAgent)) {
+                    if (downloadPool(id, saveDir, Settings.Default.saveInfo, Pools.Default.usePoolName, Program.UserAgent)) {
                         if (!Settings.Default.ignoreFinish)
                             MessageBox.Show("Pool " + id + " has finished downloading.");
 

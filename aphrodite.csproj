@@ -55,6 +55,12 @@
     <Compile Include="Forms\frmAbout.designer.cs">
       <DependentUpon>frmAbout.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\frmBlacklist.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmBlacklist.Designer.cs">
+      <DependentUpon>frmBlacklist.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\frmPoolDownloader.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -78,12 +84,6 @@
     </Compile>
     <Compile Include="Forms\frmSettings.Designer.cs">
       <DependentUpon>frmSettings.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\frmBlacklist.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\frmBlacklist.Designer.cs">
-      <DependentUpon>frmBlacklist.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\frmTechnicals.cs">
       <SubType>Form</SubType>
@@ -117,6 +117,9 @@
     <EmbeddedResource Include="Forms\frmAbout.resx">
       <DependentUpon>frmAbout.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmBlacklist.resx">
+      <DependentUpon>frmBlacklist.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmPoolDownloader.resx">
       <DependentUpon>frmPoolDownloader.cs</DependentUpon>
     </EmbeddedResource>
@@ -128,9 +131,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmMain.resx">
       <DependentUpon>frmMain.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\frmBlacklist.resx">
-      <DependentUpon>frmBlacklist.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmTechnicals.resx">
       <DependentUpon>frmTechnicals.cs</DependentUpon>

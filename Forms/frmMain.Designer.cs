@@ -209,6 +209,7 @@
             this.txtTags.Size = new System.Drawing.Size(223, 20);
             this.txtTags.TabIndex = 0;
             this.txtTags.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.txtTags.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtTags_KeyDown);
             this.txtTags.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtTags_KeyPress);
             // 
             // label1
@@ -273,6 +274,7 @@
             this.txtID.TabIndex = 8;
             this.txtID.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.txtID.TextChanged += new System.EventHandler(this.txtID_TextChanged);
+            this.txtID.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtID_KeyDown);
             // 
             // label3
             // 

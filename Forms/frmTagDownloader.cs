@@ -16,7 +16,7 @@ using System.Xml.Linq;
 
 namespace aphrodite {
     public partial class frmTagDownloader : Form {
-        #region Varaibles
+        #region Variables
         public string tags = string.Empty;
         public bool openAfter = false;
         public int minimumScore = 0;
@@ -24,6 +24,7 @@ namespace aphrodite {
         public int imageAmount = 0;
         public bool saveInfo = false;
         public string blacklistedTags = string.Empty;
+        public string zblacklistedTags = string.Empty;
         public string saveTo = Settings.Default.saveLocation + "\\Tags";
         public string[] ratings = null;
 
@@ -68,6 +69,7 @@ namespace aphrodite {
             try {
                 Debug.Print("Starting tag json download");
                 using (WebClient wc = new WebClient()) {
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                     wc.Headers.Add(header);
                     string json = wc.DownloadString(url);
                     byte[] bytes = Encoding.ASCII.GetBytes(json);
@@ -96,6 +98,13 @@ namespace aphrodite {
                 return null;
                 throw thrEx;
             }
+            catch (ObjectDisposedException disEx) {
+                Debug.Print("Seems like the object got disposed.");
+                Debug.Print("==========BEGIN OBJDISPOSEDEXCEPTION==========");
+                Debug.Print(disEx.ToString());
+                Debug.Print("==========END OBJDISPOSEDEXCEPTION==========");
+                return null;
+            }
             catch (WebException WebE) {
                 Debug.Print("A WebException has occured.");
                 Debug.Print("==========BEGIN WEBEXCEPTION==========");
@@ -117,7 +126,7 @@ namespace aphrodite {
 
         private bool downloadTags(bool isUrl = false, string url = "") {
             string dlURL = string.Empty;
-            string header = Properties.Settings.Default.UserAgent;
+            string header = Program.UserAgent;
             Debug.Print("downloadTags starting");
             this.Invoke((MethodInvoker)(() => status.Text = "Preparing to download..."));
 
@@ -125,6 +134,7 @@ namespace aphrodite {
             string tagName = tags;
             List<string> blacklist = new List<string>();
             List<string> blacklistedURLS = new List<string>();
+            List<string> zblacklist = new List<string>();
             List<string> rExplicit = new List<string>();
             List<string> rQuestionable = new List<string>();
             List<string> rSafe = new List<string>();
@@ -132,6 +142,7 @@ namespace aphrodite {
             List<string> rbQuestionable = new List<string>();
             List<string> rbSafe = new List<string>();
             int blacklistCount = 0;
+            int skippedposts = 0;
             string[] tagLength;
             string pagestr = string.Empty;
             List<string> urls = new List<string>();
@@ -145,6 +156,9 @@ namespace aphrodite {
 
             if (!string.IsNullOrEmpty(blacklistedTags) && !string.IsNullOrWhiteSpace(blacklistedTags))
                 blacklist = new List<string>(blacklistedTags.Split(' '));
+
+            if (!string.IsNullOrEmpty(zblacklistedTags) && !string.IsNullOrWhiteSpace(zblacklistedTags))
+                zblacklist = new List<string>(zblacklistedTags.Split(' '));
 
             if (!saveTo.EndsWith("\\Tags"))
                 saveTo += "\\Tags";
@@ -179,15 +193,16 @@ namespace aphrodite {
                     XmlNodeList xmlID = doc.DocumentElement.SelectNodes("/root/item/id");
                     XmlNodeList xmlURL = doc.DocumentElement.SelectNodes("/root/item/file_url");
                     XmlNodeList xmlTags = doc.DocumentElement.SelectNodes("/root/item/tags");
-                    XmlNodeList xmlArtist = doc.DocumentElement.SelectNodes("/root/item/artist/item");
+                    XmlNodeList xmlArtist = doc.DocumentElement.SelectNodes("/root/item/artist");
                     XmlNodeList xmlScore = doc.DocumentElement.SelectNodes("/root/item/score");
                     XmlNodeList xmlRating = doc.DocumentElement.SelectNodes("/root/item/rating");
                     XmlNodeList xmlDescription = doc.DocumentElement.SelectNodes("/root/item/description");
                     Debug.Print("There are " + xmlURL.Count + " posts on the page");
                     for (int j = 0; j < xmlTags.Count; j++) {
-                        string artists = xmlArtist[j].InnerText;
+                        string artists = xmlArtist[j].InnerXml.ToString().Replace("</item><item type=\"string\">", "\n               ").Replace("<item type=\"string\">", "").Replace("</item>", "");
                         string rating = xmlRating[j].InnerText;
                         bool blacklisted = false;
+                        bool skip = false;
                         string foundblacklistedtags = string.Empty;
                         List<string> foundTags = xmlTags[j].InnerText.Split(' ').ToList();
 
@@ -207,8 +222,23 @@ namespace aphrodite {
                         if (imageAmount > 0 && urls.Count == imageAmount)
                             break;
 
-                        if (blacklist.Count > 0) {
-                            for (int k = 0; k < foundTags.Count; k++) {
+                        for (int k = 0; k < foundTags.Count; k++) {
+                            if (zblacklist.Count > 0) {
+                                for (int l = 0; l < zblacklist.Count; l++) {
+                                    if (foundTags[k] == zblacklist[l]) {
+                                        skippedposts++;
+                                        skip = true;
+                                        break;
+                                    }
+                                    if (skip)
+                                        break;
+                                }
+                            }
+
+                            if (skip)
+                                break;
+
+                            if (blacklist.Count > 0) {
                                 for (int l = 0; l < blacklist.Count; l++) {
                                     if (foundTags[k] == blacklist[l]) {
                                         if (blacklisted) {
@@ -227,6 +257,9 @@ namespace aphrodite {
                                 blacklistCount++;
                             }
                         }
+
+                        if (skip)
+                            continue;
 
                         if (blacklisted) {
                             if (Settings.Default.saveBlacklisted) {
@@ -342,15 +375,16 @@ namespace aphrodite {
                     XmlNodeList xmlMD5 = doc.DocumentElement.SelectNodes("/root/item/md5");
                     XmlNodeList xmlURL = doc.DocumentElement.SelectNodes("/root/item/file_url");
                     XmlNodeList xmlTags = doc.DocumentElement.SelectNodes("/root/item/tags");
-                    XmlNodeList xmlArtist = doc.DocumentElement.SelectNodes("/root/item/artist/item");
+                    XmlNodeList xmlArtist = doc.DocumentElement.SelectNodes("/root/item/artist");
                     XmlNodeList xmlScore = doc.DocumentElement.SelectNodes("/root/item/score");
                     XmlNodeList xmlRating = doc.DocumentElement.SelectNodes("/root/item/rating");
                     XmlNodeList xmlDescription = doc.DocumentElement.SelectNodes("/root/item/description");
                     Debug.Print("There are " + xmlURL.Count + " posts on the page");
                     for (int j = 0; j < xmlTags.Count; j++) {
-                        string artists = xmlArtist[j].InnerText;
+                        string artists = xmlArtist[j].InnerXml.ToString().Replace("</item><item type=\"string\">", "\n               ").Replace("<item type=\"string\">", "").Replace("</item>", "");
                         string rating = xmlRating[j].InnerText;
                         bool blacklisted = false;
+                        bool skip = false;
                         string foundblacklistedtags = string.Empty;
                         List<string> foundTags = xmlTags[j].InnerText.Split(' ').ToList();
 
@@ -370,8 +404,23 @@ namespace aphrodite {
                         if (imageAmount > 0 && urls.Count == imageAmount)
                             break;
 
-                        if (blacklist.Count > 0) {
-                            for (int k = 0; k < foundTags.Count; k++) {
+                        for (int k = 0; k < foundTags.Count; k++) {
+                            if (zblacklist.Count > 0) {
+                                for (int l = 0; l < zblacklist.Count; l++) {
+                                    if (foundTags[k] == zblacklist[l]) {
+                                        skippedposts++;
+                                        skip = true;
+                                        break;
+                                    }
+                                    if (skip)
+                                        break;
+                                }
+                            }
+
+                            if (skip)
+                                break;
+
+                            if (blacklist.Count > 0) {
                                 for (int l = 0; l < blacklist.Count; l++) {
                                     if (foundTags[k] == blacklist[l]) {
                                         if (blacklisted) {
@@ -390,6 +439,9 @@ namespace aphrodite {
                                 blacklistCount++;
                             }
                         }
+
+                        if (skip)
+                            continue;
 
                         if (blacklisted) {
                             if (Settings.Default.saveBlacklisted) {
@@ -484,15 +536,16 @@ namespace aphrodite {
                                 xmlMD5 = doc.DocumentElement.SelectNodes("/root/item/md5");
                                 xmlURL = doc.DocumentElement.SelectNodes("/root/item/file_url");
                                 xmlTags = doc.DocumentElement.SelectNodes("/root/item/tags");
-                                xmlArtist = doc.DocumentElement.SelectNodes("/root/item/artist/item");
+                                xmlArtist = doc.DocumentElement.SelectNodes("/root/item/artist");
                                 xmlScore = doc.DocumentElement.SelectNodes("/root/item/score");
                                 xmlRating = doc.DocumentElement.SelectNodes("/root/item/rating");
                                 xmlDescription = doc.DocumentElement.SelectNodes("/root/item/description");
                                 Debug.Print("There are " + xmlURL.Count + " posts on page " + page);
                                 for (int j = 0; j < xmlTags.Count; j++) {
-                                    string artists = xmlArtist[j].InnerText;
+                                    string artists = xmlArtist[j].InnerXml.ToString().Replace("</item><item type=\"string\">", "\n               ").Replace("<item type=\"string\">", "").Replace("</item>", "");
                                     string rating = xmlRating[j].InnerText;
                                     bool blacklisted = false;
+                                    bool skip = false;
                                     string foundblacklistedtags = string.Empty;
                                     List<string> foundTags = xmlTags[j].InnerText.Split(' ').ToList();
 
@@ -512,8 +565,23 @@ namespace aphrodite {
                                     if (imageAmount > 0 && urls.Count == imageAmount)
                                         break;
 
-                                    if (blacklist.Count > 0) {
-                                        for (int k = 0; k < foundTags.Count; k++) {
+                                    for (int k = 0; k < foundTags.Count; k++) {
+                                        if (zblacklist.Count > 0) {
+                                            for (int l = 0; l < zblacklist.Count; l++) {
+                                                if (foundTags[k] == zblacklist[l]) {
+                                                    skippedposts++;
+                                                    skip = true;
+                                                    break;
+                                                }
+                                                if (skip)
+                                                    break;
+                                            }
+                                        }
+
+                                        if (skip)
+                                            break;
+
+                                        if (blacklist.Count > 0) {
                                             for (int l = 0; l < blacklist.Count; l++) {
                                                 if (foundTags[k] == blacklist[l]) {
                                                     if (blacklisted) {
@@ -528,10 +596,13 @@ namespace aphrodite {
                                         }
 
                                         if (blacklisted) {
-                                            Debug.Print("Blacklisted tag found, adding to the blacklist. Offending tags: " + foundblacklistedtags + " on id " + xmlID[j].InnerText);
+                                            Debug.Print("Blacklisted tag found, adding to the blacklist. Offending tag: " + foundblacklistedtags + " on id " + xmlID[j].InnerText);
                                             blacklistCount++;
                                         }
                                     }
+
+                                    if (skip)
+                                        continue;
 
                                     if (blacklisted) {
                                         if (Settings.Default.saveBlacklisted) {
@@ -621,11 +692,11 @@ namespace aphrodite {
                         total = rExplicit.Count + rQuestionable.Count + rSafe.Count;
                     }
                     this.Invoke((MethodInvoker)(() => lbFile.Text = "File 0 of " + (total)));
-                    this.Invoke((MethodInvoker)(() => lbBlacklist.Text = (rExplicit.Count + rQuestionable.Count + rSafe.Count) + " posts\n" + (rbExplicit.Count + rbQuestionable.Count + rbSafe.Count) + " blacklisted\n" + (rExplicit.Count + rQuestionable.Count + rSafe.Count + rbExplicit.Count + rbQuestionable.Count + rbSafe.Count) + " total"));
+                    this.Invoke((MethodInvoker)(() => lbBlacklist.Text = (rExplicit.Count + rQuestionable.Count + rSafe.Count) + " posts\n" + (rbExplicit.Count + rbQuestionable.Count + rbSafe.Count) + " blacklisted\n" + (skippedposts) + " zero-toleranced (skipped)\n" + (rExplicit.Count + rQuestionable.Count + rSafe.Count + rbExplicit.Count + rbQuestionable.Count + rbSafe.Count + skippedposts) + " total"));
                 }
                 else {
                     this.Invoke((MethodInvoker)(() => lbFile.Text = "File 0 of " + urls.Count));
-                    this.Invoke((MethodInvoker)(() => lbBlacklist.Text = (urls.Count) + " posts\n" + (blacklistCount) + " blacklisted\n" + (urls.Count + blacklistCount) + " total"));
+                    this.Invoke((MethodInvoker)(() => lbBlacklist.Text = (urls.Count) + " posts\n" + (blacklistCount) + " blacklisted\n" + (skippedposts) + " zero-toleranced (skipped)\n" + (urls.Count + blacklistCount + skippedposts) + " total"));
                 }
 
                 if (!Directory.Exists(saveTo)) {
@@ -676,16 +747,19 @@ namespace aphrodite {
                 }
 
                 using (WebClient wc = new WebClient()) {
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                     wc.DownloadProgressChanged += (s, e) => {
-                        this.Invoke((MethodInvoker)(() => pbDownloadStatus.Value = e.ProgressPercentage));
-                        this.Invoke((MethodInvoker)(() => lbPercentage.Text = e.ProgressPercentage.ToString() + "%"));
+                        if (!this.Disposing || !this.IsDisposed)
+                            this.Invoke((MethodInvoker)(() => pbDownloadStatus.Value = e.ProgressPercentage));
+                            this.Invoke((MethodInvoker)(() => lbPercentage.Text = e.ProgressPercentage.ToString() + "%"));
                     };
                     wc.DownloadFileCompleted += (s, e) => {
-                        lock (e.UserState) {
-                            this.Invoke((MethodInvoker)(() => pbDownloadStatus.Value = 0));
-                            this.Invoke((MethodInvoker)(() => lbPercentage.Text = "0%"));
-                            Monitor.Pulse(e.UserState);
-                        }
+                        if (!this.IsDisposed)
+                            lock (e.UserState) {
+                                this.Invoke((MethodInvoker)(() => pbDownloadStatus.Value = 0));
+                                this.Invoke((MethodInvoker)(() => lbPercentage.Text = "0%"));
+                                Monitor.Pulse(e.UserState);
+                            }
                     };
                     wc.Headers.Add(header);
                     Debug.Print("Header set, starting download of all " + urls.Count + " posts.");
@@ -901,6 +975,13 @@ namespace aphrodite {
                 return false;
                 throw thrEx;
             }
+            catch (ObjectDisposedException disEx) {
+                Debug.Print("Seems like the object got disposed.");
+                Debug.Print("==========BEGIN OBJDISPOSEDEXCEPTION==========");
+                Debug.Print(disEx.ToString());
+                Debug.Print("==========END OBJDISPOSEDEXCEPTION==========");
+                return false;
+            }
             catch (WebException WebE) {
                 Debug.Print("A WebException has occured.");
                 Debug.Print("==========BEGIN WEBEXCEPTION==========");
@@ -961,9 +1042,8 @@ namespace aphrodite {
                     if (downloadTags(true, url)) {
                         if (!Settings.Default.ignoreFinish)
                             MessageBox.Show("Tags have finished downloading");
-
-                        Environment.Exit(0);
                     }
+                    this.Dispose();
                 }
                 else {
                     if (downloadTags(false, string.Empty)) {

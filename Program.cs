@@ -6,6 +6,7 @@ using System.Windows.Forms;
 
 namespace aphrodite {
     static class Program {
+        public static readonly string UserAgent = "User-Agent: aphrodite/" + (Properties.Settings.Default.currentVersion) + " (Contact: https://github.com/murrty/aphrodite ... open an issue)";
         /// <summary>
         /// The main entry point for the application.
         /// </summary>

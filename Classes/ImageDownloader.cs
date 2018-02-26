@@ -17,6 +17,8 @@ namespace aphrodite {
         #region Variables
         public string header = null;
         public string saveTo = Settings.Default.saveLocation + "\\Images";
+        public List<string> blacklist = new List<string>(Settings.Default.blacklist.Split(' '));
+        //public List<string> ztb = new List<string>(Settings.Default.zeroToleranceBlacklist.Split(' '));
         public bool saveInfo = false;
 
         public readonly string json = "https://e621.net/post/show.json?id=";
@@ -38,6 +40,7 @@ namespace aphrodite {
             try {
                 Debug.Print("Starting tag json download");
                 using (WebClient wc = new WebClient()) {
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                     wc.Headers.Add(header);
                     string json = wc.DownloadString(url);
                     byte[] bytes = Encoding.ASCII.GetBytes(json);
@@ -88,6 +91,7 @@ namespace aphrodite {
         public bool downloadImage(string url) {
             string dlURL = string.Empty;
             string postID = string.Empty;
+            string staticDir = saveTo;
             if (url.StartsWith("http://")) {
                 url.Replace("http://", "https://");
             }
@@ -98,6 +102,7 @@ namespace aphrodite {
 
             try {
                 string imageinfo = string.Empty;
+                string blacklistInfo = string.Empty;
                 Debug.Print("Calling getJson for image");
                 dlURL = json + postID;
                 string xml = getJSON(json + postID, header);
@@ -120,6 +125,9 @@ namespace aphrodite {
                 XmlNodeList xmlExt = doc.DocumentElement.SelectNodes("/root/file_ext");
                 string artists = string.Empty;
                 string rating = xmlRating[0].InnerText;
+                List<string> foundTags = new List<string>(xmlTags[0].InnerText.Split(' '));
+                bool blacklisted = false;
+                string blacklistedTags = string.Empty;
                 if (rating == "e") {
                     rating = rating.Replace("e", "Explicit");
                 }
@@ -137,45 +145,101 @@ namespace aphrodite {
                     artists += xmlArtist[i].InnerText + "\n               ";
                 }
 
+                if (blacklist.Count > 0) {
+                    for (int i = 0; i < foundTags.Count; i++) {
+                        for (int j = 0; j < blacklist.Count; j++) {
+                            if (foundTags[i] == blacklist[j]) {
+                                if (blacklisted) {
+                                    blacklistedTags += " " + foundTags[i];
+                                }
+                                else {
+                                    blacklistedTags += foundTags[i];
+                                    blacklisted = true;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                //if (ztb.Count > 0) {
+                //    for (int k = 0; k < foundTags.Count; k++) {
+                //        for (int l = 0; l < ztb.Count; l++) {
+                //            if (foundTags[k] == ztb[l]) {
+                //                return false;
+                //            }
+                //        }
+                //    }
+                //}
+
                 // Trims end of artist info
                 artists = artists.TrimEnd(' ');
                 artists = artists.TrimEnd('\n');
 
-                imageinfo += "POST " + postID + ":\n    MD5: " + xmlMD5[0].InnerText + "\n    URL: https://e621.net/post/show/" + postID + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[0].InnerText + "\n    SCORE: " + xmlScore[0].InnerText + "\n    RATING: " + rating + "\n    DESCRIPITON:\n\"    " + xmlDescription[0].InnerText + "\"\n\n";
+                if (!blacklisted) {
+                    imageinfo += "POST " + postID + ":\n    MD5: " + xmlMD5[0].InnerText + "\n    URL: https://e621.net/post/show/" + postID + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[0].InnerText + "\n    SCORE: " + xmlScore[0].InnerText + "\n    RATING: " + rating + "\n    DESCRIPITON:\n\"    " + xmlDescription[0].InnerText + "\"\n\n";
+                }
+                else {
+                    if (Images.Default.separateBlacklisted) {
+                        blacklistInfo += "BLACKLISTED POST " + postID + ":\n    MD5: " + xmlMD5[0].InnerText + "\n    URL: https://e621.net/post/show/" + postID + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[0].InnerText + "\n    SCORE: " + xmlScore[0].InnerText + "\n    RATING: " + rating + "\n    OFFENDING TAGS: " + blacklistedTags + "\n    DESCRIPITON:\n\"    " + xmlDescription[0].InnerText + "\"\n\n";
+                    }
+                    else {
+                        imageinfo += "BLACKLISTED POST " + postID + ":\n    MD5: " + xmlMD5[0].InnerText + "\n    URL: https://e621.net/post/show/" + postID + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[0].InnerText + "\n    SCORE: " + xmlScore[0].InnerText + "\n    RATING: " + rating + "\n    OFFENDING TAGS: " + blacklistedTags + "\n    DESCRIPITON:\n\"    " + xmlDescription[0].InnerText + "\"\n\n";
+                    }
+                }
+
 
                 imageinfo = imageinfo.TrimEnd('\n');
+                blacklistInfo = blacklistInfo.TrimEnd('\n');
 
                 if (!Directory.Exists(saveTo)) {
                     Debug.Print("Save directory does not exist, creating...");
                     Directory.CreateDirectory(saveTo);
                 }
 
-                if (Settings.Default.saveInfo) {
-                    Debug.Print("Saving/writing images.nfo");
-                    if (!File.Exists(saveTo + "\\images.nfo")) {
-                        File.WriteAllText(saveTo + "\\images.nfo", imageinfo);
-                    }
-                    else {
-                        imageinfo = "\n\n" + imageinfo;
-                        File.AppendAllText(saveTo + "\\images.nfo", imageinfo);
+                if (blacklisted && !Images.Default.separateBlacklisted) {
+                    if (!Directory.Exists(saveTo + "\\blacklisted")) {
+                        Debug.Print("Save directory does not exist, creating...");
+                        Directory.CreateDirectory(saveTo + "\\blacklisted");
                     }
                 }
 
+
                 if (Images.Default.separateRatings) {
                     if (xmlRating[0].InnerText == "e") {
-                        if (!Directory.Exists(saveTo + "\\explicit"))
-                            Directory.CreateDirectory(saveTo + "\\explicit");
-                        saveTo += "\\explicit\\";
+                        if (blacklisted && Images.Default.separateBlacklisted) {
+                            if (!Directory.Exists(saveTo + "\\explicit\\blacklisted"))
+                                Directory.CreateDirectory(saveTo + "\\explicit\\blacklisted");
+                            saveTo += "\\explicit\\blacklisted\\";
+                        }
+                        else {
+                            if (!Directory.Exists(saveTo + "\\explicit"))
+                                Directory.CreateDirectory(saveTo + "\\explicit");
+                            saveTo += "\\explicit\\";
+                        }
                     }
                     else if (xmlRating[0].InnerText == "q") {
-                        if (!Directory.Exists(saveTo + "\\questionable"))
-                            Directory.CreateDirectory(saveTo + "\\questionable");
-                        saveTo += "\\questionable\\";
+                        if (blacklisted && Images.Default.separateBlacklisted) {
+                            if (!Directory.Exists(saveTo + "\\questionable\\blacklisted"))
+                                Directory.CreateDirectory(saveTo + "\\questionable\\blacklisted");
+                            saveTo += "\\questionable\\blacklisted\\";
+                        }
+                        else {
+                            if (!Directory.Exists(saveTo + "\\questionable"))
+                                Directory.CreateDirectory(saveTo + "\\questionable");
+                            saveTo += "\\questionable\\";
+                        }
                     }
                     else if (xmlRating[0].InnerText == "s") {
-                        if (!Directory.Exists(saveTo + "\\safe"))
-                            Directory.CreateDirectory(saveTo + "\\safe");
-                        saveTo += "\\safe\\";
+                        if (blacklisted && Images.Default.separateBlacklisted) {
+                            if (!Directory.Exists(saveTo + "\\safe\\blacklisted"))
+                                Directory.CreateDirectory(saveTo + "\\safe\\blacklisted");
+                            saveTo += "\\safe\\blacklisted\\";
+                        }
+                        else {
+                            if (!Directory.Exists(saveTo + "\\safe"))
+                                Directory.CreateDirectory(saveTo + "\\safe");
+                            saveTo += "\\safe\\";
+                        }
                     }
                 }
 
@@ -190,7 +254,36 @@ namespace aphrodite {
                     filename = xmlMD5[0].InnerText + "." + xmlExt[0].InnerText;
                 }
 
+                if (File.Exists(saveTo + filename)) {
+                    if (!Settings.Default.ignoreFinish)
+                        MessageBox.Show("The image already exists.");
+                    return true;
+                }
+
+                if (Settings.Default.saveInfo) {
+                    Debug.Print("Saving/writing images.nfo");
+                    if (blacklisted && Images.Default.separateBlacklisted) {
+                        if (!File.Exists(staticDir + "\\images.blacklisted.nfo")) {
+                            File.WriteAllText(staticDir + "\\images.blacklisted.nfo", blacklistInfo);
+                        }
+                        else {
+                            blacklistInfo = "\n\n" + blacklistInfo;
+                            File.AppendAllText(staticDir + "\\images.blacklisted.nfo", blacklistInfo);
+                        }
+                    }
+                    else {
+                        if (!File.Exists(staticDir + "\\images.nfo")) {
+                            File.WriteAllText(staticDir + "\\images.nfo", imageinfo);
+                        }
+                        else {
+                            imageinfo = "\n\n" + imageinfo;
+                            File.AppendAllText(staticDir + "\\images.nfo", imageinfo);
+                        }
+                    }
+                }
+
                 using (WebClient wc = new WebClient()) {
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                     wc.Headers.Add(header);
                     Debug.Print("Header set, starting download of image");
 

@@ -82,5 +82,17 @@ namespace aphrodite {
                 this["ignoreFinish"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string zeroToleranceBlacklist {
+            get {
+                return ((string)(this["zeroToleranceBlacklist"]));
+            }
+            set {
+                this["zeroToleranceBlacklist"] = value;
+            }
+        }
     }
 }

@@ -96,7 +96,7 @@ namespace aphrodite {
                     ImageDownloader imgdl = new ImageDownloader();
                     imgdl.saveInfo = Settings.Default.saveInfo;
                     imgdl.saveTo = Settings.Default.saveLocation + "\\Images";
-                    imgdl.header = Properties.Settings.Default.UserAgent;
+                    imgdl.header = Program.UserAgent;
                     if (imgdl.downloadImage(arg.Replace("images:", ""))) {
                         if (!Settings.Default.ignoreFinish)
                             MessageBox.Show("Image has finished downloading.");
@@ -196,6 +196,20 @@ namespace aphrodite {
             }
         }
 
+        private void txtTags_KeyPress(object sender, KeyPressEventArgs e) {
+            // Enforce 6 tag limit
+            if (txtTags.Text.Count(x => x == ' ') >= 5 && e.KeyChar != (char)8 && e.KeyChar == (char)Keys.Space && txtTags.SelectionLength != txtTags.TextLength) {
+                e.Handled = true;
+            }
+            else {
+                e.Handled = false;
+            }
+        }
+        private void txtTags_KeyDown(object sender, KeyEventArgs e) {
+            if (e.KeyCode == Keys.Enter)
+                btnDownloadTags_Click(this, new EventArgs());
+        }
+
         private void btnDownloadTags_Click(object sender, EventArgs e) {
             if (string.IsNullOrWhiteSpace(txtTags.Text)) {
                 MessageBox.Show("Please specify tags to download.");
@@ -270,6 +284,7 @@ namespace aphrodite {
             tagDL.imageAmount = Convert.ToInt32(numLimit.Value);
             tagDL.saveInfo = Settings.Default.saveInfo;
             tagDL.blacklistedTags = Settings.Default.blacklist;
+            tagDL.zblacklistedTags = Settings.Default.zeroToleranceBlacklist;
             tagDL.ratings = ratings.Split(' ');
             tagDL.Show();
 
@@ -297,14 +312,9 @@ namespace aphrodite {
             txtSender.Text = Regex.Replace(txtSender.Text, "[^0-9]", "");
             txtSender.SelectionStart = curPos;
         }
-        private void txtTags_KeyPress(object sender, KeyPressEventArgs e) {
-            // Enforce 6 tag limit
-            if (txtTags.Text.Count(x => x == ' ') >= 5 && e.KeyChar != (char)8 && e.KeyChar == (char)Keys.Space && txtTags.SelectionLength != txtTags.TextLength) {
-                e.Handled = true;
-            }
-            else {
-                e.Handled = false;
-            }
+        private void txtID_KeyDown(object sender, KeyEventArgs e) {
+            if (e.KeyCode == Keys.Enter)
+                btnDownloadPool_Click(this, new EventArgs());
         }
 
         private void btnDownloadPool_Click(object sender, EventArgs e) {
