@@ -52,6 +52,7 @@
             this.chkMerge = new System.Windows.Forms.CheckBox();
             this.chkPoolName = new System.Windows.Forms.CheckBox();
             this.tbImages = new System.Windows.Forms.TabPage();
+            this.chkSeparateBlacklist = new System.Windows.Forms.CheckBox();
             this.chkSeparateImages = new System.Windows.Forms.CheckBox();
             this.rbMD5 = new System.Windows.Forms.RadioButton();
             this.label9 = new System.Windows.Forms.Label();
@@ -67,7 +68,7 @@
             this.btnImagesProtocol = new System.Windows.Forms.Button();
             this.btnBlacklist = new System.Windows.Forms.Button();
             this.JustTheTips = new System.Windows.Forms.ToolTip(this.components);
-            this.chkSeparateBlacklist = new System.Windows.Forms.CheckBox();
+            this.chkUseForm = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tbGeneral.SuspendLayout();
             this.tbTags.SuspendLayout();
@@ -403,6 +404,7 @@
             // 
             // tbImages
             // 
+            this.tbImages.Controls.Add(this.chkUseForm);
             this.tbImages.Controls.Add(this.chkSeparateBlacklist);
             this.tbImages.Controls.Add(this.chkSeparateImages);
             this.tbImages.Controls.Add(this.rbMD5);
@@ -417,12 +419,25 @@
             this.tbImages.Text = "Images";
             this.tbImages.UseVisualStyleBackColor = true;
             // 
+            // chkSeparateBlacklist
+            // 
+            this.chkSeparateBlacklist.AutoSize = true;
+            this.chkSeparateBlacklist.Checked = true;
+            this.chkSeparateBlacklist.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkSeparateBlacklist.Location = new System.Drawing.Point(186, 72);
+            this.chkSeparateBlacklist.Name = "chkSeparateBlacklist";
+            this.chkSeparateBlacklist.Size = new System.Drawing.Size(157, 17);
+            this.chkSeparateBlacklist.TabIndex = 10;
+            this.chkSeparateBlacklist.Text = "Separate blacklisted images";
+            this.JustTheTips.SetToolTip(this.chkSeparateBlacklist, "Separates blacklisted images into separate folder.");
+            this.chkSeparateBlacklist.UseVisualStyleBackColor = true;
+            // 
             // chkSeparateImages
             // 
             this.chkSeparateImages.AutoSize = true;
             this.chkSeparateImages.Checked = true;
             this.chkSeparateImages.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkSeparateImages.Location = new System.Drawing.Point(59, 72);
+            this.chkSeparateImages.Location = new System.Drawing.Point(67, 72);
             this.chkSeparateImages.Name = "chkSeparateImages";
             this.chkSeparateImages.Size = new System.Drawing.Size(102, 17);
             this.chkSeparateImages.TabIndex = 9;
@@ -433,11 +448,11 @@
             // rbMD5
             // 
             this.rbMD5.AutoSize = true;
-            this.rbMD5.Location = new System.Drawing.Point(178, 38);
+            this.rbMD5.Location = new System.Drawing.Point(222, 38);
             this.rbMD5.Name = "rbMD5";
-            this.rbMD5.Size = new System.Drawing.Size(90, 17);
+            this.rbMD5.Size = new System.Drawing.Size(126, 17);
             this.rbMD5.TabIndex = 8;
-            this.rbMD5.Text = "Save as \'md5\'";
+            this.rbMD5.Text = "Save images as \'md5\'";
             this.JustTheTips.SetToolTip(this.rbMD5, "Saves files as the MD5 hash of the image\r\nex: 7ec39fcc0afe7b237d61b1afdfb9b927.jp" +
         "g");
             this.rbMD5.UseVisualStyleBackColor = true;
@@ -464,7 +479,7 @@
             // 
             this.rbArtist.AutoSize = true;
             this.rbArtist.Checked = true;
-            this.rbArtist.Location = new System.Drawing.Point(18, 38);
+            this.rbArtist.Location = new System.Drawing.Point(62, 38);
             this.rbArtist.Name = "rbArtist";
             this.rbArtist.Size = new System.Drawing.Size(154, 17);
             this.rbArtist.TabIndex = 0;
@@ -571,17 +586,16 @@
             this.btnBlacklist.UseVisualStyleBackColor = true;
             this.btnBlacklist.Click += new System.EventHandler(this.btnBlacklist_Click);
             // 
-            // chkSeparateBlacklist
+            // chkUseForm
             // 
-            this.chkSeparateBlacklist.AutoSize = true;
-            this.chkSeparateBlacklist.Checked = true;
-            this.chkSeparateBlacklist.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkSeparateBlacklist.Location = new System.Drawing.Point(178, 72);
-            this.chkSeparateBlacklist.Name = "chkSeparateBlacklist";
-            this.chkSeparateBlacklist.Size = new System.Drawing.Size(157, 17);
-            this.chkSeparateBlacklist.TabIndex = 10;
-            this.chkSeparateBlacklist.Text = "Separate blacklisted images";
-            this.chkSeparateBlacklist.UseVisualStyleBackColor = true;
+            this.chkUseForm.AutoSize = true;
+            this.chkUseForm.Location = new System.Drawing.Point(94, 100);
+            this.chkUseForm.Name = "chkUseForm";
+            this.chkUseForm.Size = new System.Drawing.Size(223, 17);
+            this.chkUseForm.TabIndex = 11;
+            this.chkUseForm.Text = "Use download form for download progress";
+            this.JustTheTips.SetToolTip(this.chkUseForm, "Shows a form when downloading images that will report progress");
+            this.chkUseForm.UseVisualStyleBackColor = true;
             // 
             // frmSettings
             // 
@@ -663,6 +677,7 @@
         private System.Windows.Forms.CheckBox chkIgnoreFinish;
         private System.Windows.Forms.CheckBox chkSeparateImages;
         private System.Windows.Forms.CheckBox chkSeparateBlacklist;
+        private System.Windows.Forms.CheckBox chkUseForm;
 
     }
 }

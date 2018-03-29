@@ -367,6 +367,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "aphrodite";
             this.Load += new System.EventHandler(this.frmMain_Load);
+            this.Shown += new System.EventHandler(this.frmMain_Shown);
             this.tbMain.ResumeLayout(false);
             this.tbTags.ResumeLayout(false);
             this.tbTags.PerformLayout();

@@ -17,7 +17,6 @@ using System.Windows.Forms;
 namespace aphrodite {
     public partial class frmMain : Form {
         #region Variables
-        frmAbout frAbout = new frmAbout();
         bool isAdmin = false;
         #endregion
 
@@ -93,18 +92,29 @@ namespace aphrodite {
                     Environment.Exit(0);
                 }
                 else if (arg.StartsWith("images:") && isValidImageLink(arg.Replace("images:", ""))) {
-                    ImageDownloader imgdl = new ImageDownloader();
-                    imgdl.saveInfo = Settings.Default.saveInfo;
-                    imgdl.saveTo = Settings.Default.saveLocation + "\\Images";
-                    imgdl.header = Program.UserAgent;
-                    if (imgdl.downloadImage(arg.Replace("images:", ""))) {
-                        if (!Settings.Default.ignoreFinish)
-                            MessageBox.Show("Image has finished downloading.");
+                    if (Images.Default.useForm) {
+                        frmImageDownloader imgdl = new frmImageDownloader();
+                        imgdl.saveInfo = Settings.Default.saveInfo;
+                        imgdl.saveTo = Settings.Default.saveLocation + "\\Images";
+                        imgdl.header = Program.UserAgent;
+                        imgdl.url = arg.Replace("images:", "");
+                        imgdl.ShowDialog();
                         Environment.Exit(0);
                     }
                     else {
-                        MessageBox.Show("An error occured while downloading the image.");
-                        Environment.Exit(0);
+                        ImageDownloader imgdl = new ImageDownloader();
+                        imgdl.saveInfo = Settings.Default.saveInfo;
+                        imgdl.saveTo = Settings.Default.saveLocation + "\\Images";
+                        imgdl.header = Program.UserAgent;
+                        if (imgdl.downloadImage(arg.Replace("images:", ""))) {
+                            if (!Settings.Default.ignoreFinish)
+                                MessageBox.Show("Image has finished downloading.");
+                            Environment.Exit(0);
+                        }
+                        else {
+                            MessageBox.Show("An error occured while downloading the image.");
+                            Environment.Exit(0);
+                        }
                     }
                 }
                 else if (arg.StartsWith("tags:")) {
@@ -145,6 +155,9 @@ namespace aphrodite {
                 mProtocol.Enabled = true;
             }
         }
+        private void frmMain_Shown(object sender, EventArgs e) {
+            txtTags.Focus();
+        }
         private void tbMain_SelectedIndexChanged(object sender, EventArgs e) {
             if (tbMain.SelectedTab == tbTags) {
                 txtTags.Focus();
@@ -173,6 +186,7 @@ namespace aphrodite {
             blackList.ShowDialog();
         }
         private void mAbout_Click(object sender, EventArgs e) {
+            frmAbout frAbout = new frmAbout();
             frAbout.Show();
         }
         private void mProtocol_Click(object sender, EventArgs e) {

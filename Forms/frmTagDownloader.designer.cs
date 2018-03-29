@@ -56,8 +56,11 @@
             // pbDownloadStatus
             // 
             this.pbDownloadStatus.Location = new System.Drawing.Point(12, 121);
+            this.pbDownloadStatus.MarqueeAnimationSpeed = 50;
+            this.pbDownloadStatus.Maximum = 101;
             this.pbDownloadStatus.Name = "pbDownloadStatus";
             this.pbDownloadStatus.Size = new System.Drawing.Size(268, 18);
+            this.pbDownloadStatus.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
             this.pbDownloadStatus.TabIndex = 3;
             // 
             // lbPercentage
@@ -94,7 +97,8 @@
             this.lbBlacklist.Name = "lbBlacklist";
             this.lbBlacklist.Size = new System.Drawing.Size(268, 55);
             this.lbBlacklist.TabIndex = 7;
-            this.lbBlacklist.Text = "0 posts\r\n0 blacklisted\r\n0 zero-toleranced\r\n0 in total";
+            this.lbBlacklist.Text = "0 posts (0 e, 0 q, 0 s)\r\n0 blacklisted (0 e, 0 q, 0 s)\r\n0 zero-toleranced\r\n0 in t" +
+    "otal";
             this.lbBlacklist.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // tmrTitle

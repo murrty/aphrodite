@@ -70,5 +70,17 @@ namespace aphrodite {
                 this["separateBlacklisted"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool useForm {
+            get {
+                return ((bool)(this["useForm"]));
+            }
+            set {
+                this["useForm"] = value;
+            }
+        }
     }
 }

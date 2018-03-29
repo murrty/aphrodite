@@ -115,6 +115,7 @@ namespace aphrodite {
             Images.Default.MD5 = rbMD5.Checked;
             Images.Default.separateRatings = chkSeparateImages.Checked;
             Images.Default.separateBlacklisted = chkSeparateBlacklist.Checked;
+            Images.Default.useForm = chkUseForm.Checked;
 
             // Save all 4
             Settings.Default.Save();
@@ -148,6 +149,7 @@ namespace aphrodite {
             rbMD5.Checked = Images.Default.MD5;
             chkSeparateImages.Checked = Images.Default.separateRatings;
             chkSeparateBlacklist.Checked = Images.Default.separateBlacklisted;
+            chkUseForm.Checked = Images.Default.useForm;
         }
         private void checkAdmin() {
             if (!isAdmin) {

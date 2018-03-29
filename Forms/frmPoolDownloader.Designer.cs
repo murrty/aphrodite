@@ -23,6 +23,7 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmPoolDownloader));
             this.lbID = new System.Windows.Forms.Label();
             this.lbName = new System.Windows.Forms.Label();
@@ -31,6 +32,7 @@
             this.lbPercentage = new System.Windows.Forms.Label();
             this.status = new System.Windows.Forms.StatusBar();
             this.lbTotal = new System.Windows.Forms.Label();
+            this.tmrTitle = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // lbID
@@ -63,8 +65,10 @@
             // pbDownloadStatus
             // 
             this.pbDownloadStatus.Location = new System.Drawing.Point(12, 107);
+            this.pbDownloadStatus.MarqueeAnimationSpeed = 50;
             this.pbDownloadStatus.Name = "pbDownloadStatus";
             this.pbDownloadStatus.Size = new System.Drawing.Size(244, 18);
+            this.pbDownloadStatus.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
             this.pbDownloadStatus.TabIndex = 3;
             // 
             // lbPercentage
@@ -94,6 +98,12 @@
             this.lbTotal.TabIndex = 6;
             this.lbTotal.Text = "? posts\r\n? blacklisted\r\n? total";
             this.lbTotal.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // tmrTitle
+            // 
+            this.tmrTitle.Enabled = true;
+            this.tmrTitle.Interval = 1000;
+            this.tmrTitle.Tick += new System.EventHandler(this.tmrTitle_Tick);
             // 
             // frmPoolDownloader
             // 
@@ -132,5 +142,6 @@
         private System.Windows.Forms.Label lbPercentage;
         private System.Windows.Forms.StatusBar status;
         private System.Windows.Forms.Label lbTotal;
+        private System.Windows.Forms.Timer tmrTitle;
     }
 }

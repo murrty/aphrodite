@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -13,15 +16,19 @@ using System.Xml;
 using System.Xml.Linq;
 
 namespace aphrodite {
-    class ImageDownloader {
+    public partial class frmImageDownloader : Form {
         #region Variables
+        public string url = string.Empty;
         public string header = Program.UserAgent;
         public string saveTo = Settings.Default.saveLocation + "\\Images";
         public List<string> blacklist = new List<string>(Settings.Default.blacklist.Split(' '));
         //public List<string> ztb = new List<string>(Settings.Default.zeroToleranceBlacklist.Split(' '));
         public bool saveInfo = false;
+        public bool fromURL = false;
 
         public readonly string json = "https://e621.net/post/show.json?id=";
+
+        Thread imageDownload;
         #endregion
 
         #region Downloader
@@ -87,8 +94,9 @@ namespace aphrodite {
                 throw ex;
             }
         }
-        
-        public bool downloadImage(string url) {
+
+        public bool downloadImage() {
+            this.Invoke((MethodInvoker)(() => status.Text = "Preparing to download..."));
             string dlURL = string.Empty;
             string postID = string.Empty;
             string staticDir = saveTo;
@@ -99,6 +107,7 @@ namespace aphrodite {
                 url = "https://" + url;
 
             postID = url.Split('/')[5];
+            this.Invoke((MethodInvoker)(() => lbInfo.Text = "Downloading image id " + postID));
 
             try {
                 string imageinfo = string.Empty;
@@ -108,10 +117,12 @@ namespace aphrodite {
                 string xml = getJSON(json + postID, header);
 
                 if (xml == emptyXML || string.IsNullOrWhiteSpace(xml)) {
+                    this.Invoke((MethodInvoker)(() => status.Text = "The image's json returned empty or null. Aborting."));
                     Debug.Print("xml is empty, aborting");
                     return false;
                 }
                 Debug.Print("Loading xml");
+                this.Invoke((MethodInvoker)(() => status.Text = "Parsing image json..."));
                 XmlDocument doc = new XmlDocument();
                 doc.LoadXml(xml);
                 Debug.Print("Gathering post information");
@@ -283,6 +294,22 @@ namespace aphrodite {
                 }
 
                 using (WebClient wc = new WebClient()) {
+                    wc.DownloadProgressChanged += (s, e) => {
+                        if (!this.Disposing || !this.IsDisposed) {
+                            //this.Invoke((MethodInvoker)(() => lbFile.Text += " " + (e.TotalBytesToReceive / 1024) + " KB"));
+                            this.Invoke((MethodInvoker)(() => pbDownloadStatus.Value = e.ProgressPercentage));
+                            this.Invoke((MethodInvoker)(() => lbPercentage.Text = e.ProgressPercentage.ToString() + "%"));
+                        }
+                    };
+                    wc.DownloadFileCompleted += (s, e) => {
+                        if (!this.Disposing || !this.IsDisposed) {
+                            lock (e.UserState) {
+                                this.Invoke((MethodInvoker)(() => pbDownloadStatus.Value = 100));
+                                this.Invoke((MethodInvoker)(() => lbPercentage.Text = "Done"));
+                                Monitor.Pulse(e.UserState);
+                            }
+                        }
+                    };
                     wc.Headers.Add(header);
                     Debug.Print("Header set, starting download of image");
 
@@ -318,7 +345,7 @@ namespace aphrodite {
             }
         }
 
-        public static void webError(WebException WebE, string url = "Not defined.") {
+        private void webError(WebException WebE, string url = "Not defined.") {
             var resp = WebE.Response as HttpWebResponse;
             int respID = (int)resp.StatusCode;
             if (resp != null) {
@@ -344,9 +371,37 @@ namespace aphrodite {
                     MessageBox.Show(respID + " at " + url + "\nThe error is not documented in the source. It's either unrelated or not relevant.\nTry again, either now or later.");
                 }
             }
-
-            Debug.Print(url);
         }
         #endregion
+
+        private void startDownload() {
+            imageDownload = new Thread(() => {
+                Thread.CurrentThread.IsBackground = true;
+                string saveDir = Settings.Default.saveLocation;
+                if (downloadImage()) {
+                    this.Dispose();
+                }
+            });
+            tmrTitle.Start();
+            imageDownload.Start();
+        }
+
+
+        public frmImageDownloader() {
+            InitializeComponent();
+        }
+        private void frmImageDownloader_Load(object sender, EventArgs e) {
+            startDownload();
+        }
+
+        private void tmrTitle_Tick(object sender, EventArgs e) {
+            if (this.Text.EndsWith("....")) {
+                this.Text = this.Text.TrimEnd('.');
+            }
+            else {
+                this.Text += ".";
+            }
+        }
+
     }
 }

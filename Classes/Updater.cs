@@ -21,7 +21,6 @@ namespace aphrodite {
         public static string getJSON(string url) {
             try {
                 using (WebClient wc = new WebClient()) {
-                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                     wc.Headers.Add(Program.UserAgent);
                     string json = wc.DownloadString(url);
                     byte[] bytes = Encoding.ASCII.GetBytes(json);
@@ -66,7 +65,8 @@ namespace aphrodite {
         public static bool isUpdateAvailable(decimal cloudVersion) {
             try {
                 if (Properties.Settings.Default.currentVersion > cloudVersion) {
-                    MessageBox.Show("Wow, future version user!");
+                    if (cloudVersion != -1)
+                        MessageBox.Show("Wow, future version user!");
                     return false;
                 }
                 if (Properties.Settings.Default.currentVersion < cloudVersion)

@@ -61,6 +61,12 @@
     <Compile Include="Forms\frmBlacklist.Designer.cs">
       <DependentUpon>frmBlacklist.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\frmImageDownloader.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmImageDownloader.Designer.cs">
+      <DependentUpon>frmImageDownloader.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\frmPoolDownloader.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -119,6 +125,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmBlacklist.resx">
       <DependentUpon>frmBlacklist.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmImageDownloader.resx">
+      <DependentUpon>frmImageDownloader.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmPoolDownloader.resx">
       <DependentUpon>frmPoolDownloader.cs</DependentUpon>
