@@ -1,6 +1,6 @@
 # aphrodite
 ![bark bark, good dog.](https://raw.githubusercontent.com/murrty/aphrodite/master/Resources/Brad.png)  
-a(nother) e621 image/pool downloader
+a(nother), REALLY glorified, e621 image/pool downloader
 
 # Usage
 Run, enter tags or go enter a pool id, click download. easy.
