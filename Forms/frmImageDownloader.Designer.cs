@@ -24,6 +24,7 @@
         /// </summary>
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmImageDownloader));
             this.status = new System.Windows.Forms.StatusBar();
             this.tmrTitle = new System.Windows.Forms.Timer(this.components);
             this.lbPercentage = new System.Windows.Forms.Label();
@@ -83,6 +84,7 @@
             this.Controls.Add(this.lbPercentage);
             this.Controls.Add(this.pbDownloadStatus);
             this.Controls.Add(this.status);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximumSize = new System.Drawing.Size(292, 130);
             this.MinimumSize = new System.Drawing.Size(292, 130);
             this.Name = "frmImageDownloader";

@@ -52,6 +52,7 @@ namespace aphrodite {
                 Debug.Print("Starting pool json download");
                 using (WebClient wc = new WebClient()) {
                     ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                    wc.Proxy = WebProxy.GetDefaultProxy();
                     wc.Headers.Add(header);
                     string json = wc.DownloadString(url);
                     byte[] bytes = Encoding.ASCII.GetBytes(json);
@@ -200,6 +201,8 @@ namespace aphrodite {
                     for (int k = 0; k < xmlArtist[j].ChildNodes.Count; k++) {
                         artists += xmlArtist[j].ChildNodes[k].InnerText + "\n                   ";
                     }
+                    artists = artists.TrimEnd(' ');
+                    artists = artists.TrimEnd('\n');
 
                     if (blacklist.Count > 0) {
                         for (int k = 0; k < foundTags.Count; k++) {
@@ -287,6 +290,8 @@ namespace aphrodite {
                             for (int k = 0; k < xmlArtist[j].ChildNodes.Count; k++) {
                                 artists += xmlArtist[j].ChildNodes[k].InnerText + "\n                   ";
                             }
+                            artists = artists.TrimEnd(' ');
+                            artists = artists.TrimEnd('\n');
 
                             if (blacklist.Count > 0) {
                                 for (int k = 0; k < foundTags.Count; k++) {
@@ -377,6 +382,7 @@ namespace aphrodite {
                             }
                         }
                     };
+                    wc.Proxy = WebProxy.GetDefaultProxy();
                     wc.Headers.Add(header);
                     Debug.Print("Header has been set, starting download of all posts");
                     for (int y = 0; y < urls.Count; y++) {
@@ -541,6 +547,7 @@ namespace aphrodite {
                 string saveDir = Settings.Default.saveLocation;
                 Thread.CurrentThread.IsBackground = true;
                 if (fromURL) {
+                    // extract pool id from url
                     poolurl = poolurl.Replace("http://", "https://");
                     if (!poolurl.StartsWith("https://")) {
                         poolurl = "https://" + poolurl;
@@ -550,26 +557,38 @@ namespace aphrodite {
                         poolid = poolid.Split('?')[0];
                     }
                     this.Invoke((MethodInvoker)(() => lbID.Text = "Pool ID " + poolid));
+                    
                     if (downloadPool(poolid, saveDir, Settings.Default.saveInfo, Pools.Default.usePoolName, Program.UserAgent)) {
-                        if (!Settings.Default.ignoreFinish)
-                            MessageBox.Show("Pool " + poolid + " has finished downloading.");
-
+                        tmrTitle.Stop();
                         if (openAfter)
                             Process.Start(saveDir);
-                        this.DialogResult = DialogResult.OK;
+
+                        if (Settings.Default.ignoreFinish) {
+                            this.DialogResult = DialogResult.OK;
+                        }
+                        else {
+                            MessageBox.Show("Pool " + poolid + " has finished downloading.");
+                        }
                     }
                     else {
                         this.DialogResult = DialogResult.Abort;
                     }
-                    this.Dispose();
                 }
                 else {
                     if (downloadPool(id, saveDir, Settings.Default.saveInfo, Pools.Default.usePoolName, Program.UserAgent)) {
+                        tmrTitle.Stop();
                         if (!Settings.Default.ignoreFinish)
                             MessageBox.Show("Pool " + id + " has finished downloading.");
 
                         if (openAfter)
                             Process.Start(saveDir);
+
+                        if (Settings.Default.ignoreFinish) {
+                            this.DialogResult = DialogResult.OK;
+                        }
+                    }
+                    else {
+                        this.DialogResult = DialogResult.Abort;
                     }
                 }
             });
@@ -581,9 +600,6 @@ namespace aphrodite {
             this.lbPercentage.BackColor = System.Drawing.Color.Transparent;
             if (!fromURL) {
                 lbID.Text = "Pool ID " + id;
-            }
-            else {
-
             }
         }
         private void frmDownload_Shown(object sender, EventArgs e) {

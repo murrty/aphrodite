@@ -58,5 +58,29 @@ namespace aphrodite {
                 this["openAfter"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string wishlist {
+            get {
+                return ((string)(this["wishlist"]));
+            }
+            set {
+                this["wishlist"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string wishhlistNames {
+            get {
+                return ((string)(this["wishhlistNames"]));
+            }
+            set {
+                this["wishhlistNames"] = value;
+            }
+        }
     }
 }

@@ -41,6 +41,7 @@ namespace aphrodite {
                 Debug.Print("Starting tag json download");
                 using (WebClient wc = new WebClient()) {
                     ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                    wc.Proxy = WebProxy.GetDefaultProxy();
                     wc.Headers.Add(header);
                     string json = wc.DownloadString(url);
                     byte[] bytes = Encoding.ASCII.GetBytes(json);
@@ -283,6 +284,7 @@ namespace aphrodite {
                 }
 
                 using (WebClient wc = new WebClient()) {
+                    wc.Proxy = WebProxy.GetDefaultProxy();
                     wc.Headers.Add(header);
                     Debug.Print("Header set, starting download of image");
 

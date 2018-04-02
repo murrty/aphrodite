@@ -70,6 +70,7 @@ namespace aphrodite {
                 Debug.Print("Starting tag json download");
                 using (WebClient wc = new WebClient()) {
                     ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                    wc.Proxy = WebProxy.GetDefaultProxy();
                     wc.Headers.Add(header);
                     string json = wc.DownloadString(url);
                     byte[] bytes = Encoding.ASCII.GetBytes(json);
@@ -146,8 +147,8 @@ namespace aphrodite {
             string[] tagLength;
             string pagestr = string.Empty;
             List<string> urls = new List<string>();
-            string taginfo = string.Empty;
-            string blacklistinfo = "Blacklisted tags: " + blacklistedTags + "\n\n";
+            string taginfo = "TAGS: " + tags + "\n\n";
+            string blacklistinfo = "TAGS: " + tags + "\nBLACKLISTED TAGS: " + blacklistedTags + "\n\n";
             tagLength  = tags.Split(' ');
             if (tagLength.Length > 6){
                 MessageBox.Show("6 tags is the maximum length you're allowed to download from e621. If your tag has a space between words, be sure to add an underscore. (_)");
@@ -171,8 +172,8 @@ namespace aphrodite {
                     pagestr = url.Split('/')[5];
                     dlURL = tagJson + tags + pageJson + pagestr;
                     string xml = getJSON(tagJson + tags + pageJson + pagestr, header);
-                    taginfo = string.Empty;
-                    blacklistinfo = "Blacklisted tags: " + blacklistedTags + "\n\n";
+                    taginfo = "Tags: " + tags + "\n\n";
+                    blacklistinfo = "Tags: " + tags + "\nBlacklisted tags: " + blacklistedTags + "\n\n";
 
                     if (xml == emptyXML || string.IsNullOrWhiteSpace(xml)) {
                         Debug.Print("xml is empty, aborting");
@@ -788,6 +789,7 @@ namespace aphrodite {
                             }
                         }
                     };
+                    wc.Proxy = WebProxy.GetDefaultProxy();
                     wc.Headers.Add(header);
                     Debug.Print("Header set, starting download of all " + urls.Count + " posts.");
 
@@ -1070,15 +1072,14 @@ namespace aphrodite {
                     tags = url.Split('/')[6].TrimEnd('#');
                     txtTags.Text = tags;
                     if (downloadTags(true, url)) {
-                        if (!Settings.Default.ignoreFinish)
-                            MessageBox.Show("Tags have finished downloading");
+                        if (Settings.Default.ignoreFinish)
+                            this.DialogResult = DialogResult.OK;
                     }
-                    this.Dispose();
                 }
                 else {
                     if (downloadTags(false, string.Empty)) {
-                        if (!Settings.Default.ignoreFinish)
-                            MessageBox.Show("Tags have finished downloading");
+                        if (Settings.Default.ignoreFinish)
+                            this.DialogResult = DialogResult.OK;
                     }
                 }
             });

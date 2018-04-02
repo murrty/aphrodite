@@ -73,6 +73,12 @@
     <Compile Include="Forms\frmPoolDownloader.Designer.cs">
       <DependentUpon>frmPoolDownloader.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\frmPoolWishlist.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmPoolWishlist.Designer.cs">
+      <DependentUpon>frmPoolWishlist.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\frmTagDownloader.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -91,13 +97,19 @@
     <Compile Include="Forms\frmSettings.Designer.cs">
       <DependentUpon>frmSettings.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\frmTechnicals.cs">
+    <Compile Include="Classes\ImageDownloader.cs" />
+    <Compile Include="Forms\frmRedownloader.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\frmTechnicals.Designer.cs">
-      <DependentUpon>frmTechnicals.cs</DependentUpon>
+    <Compile Include="Forms\frmRedownloader.Designer.cs">
+      <DependentUpon>frmRedownloader.cs</DependentUpon>
     </Compile>
-    <Compile Include="Classes\ImageDownloader.cs" />
+    <Compile Include="Forms\frmIndexer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmIndexer.designer.cs">
+      <DependentUpon>frmIndexer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Images.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -132,6 +144,9 @@
     <EmbeddedResource Include="Forms\frmPoolDownloader.resx">
       <DependentUpon>frmPoolDownloader.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmPoolWishlist.resx">
+      <DependentUpon>frmPoolWishlist.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmSettings.resx">
       <DependentUpon>frmSettings.cs</DependentUpon>
     </EmbeddedResource>
@@ -141,8 +156,11 @@
     <EmbeddedResource Include="Forms\frmMain.resx">
       <DependentUpon>frmMain.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\frmTechnicals.resx">
-      <DependentUpon>frmTechnicals.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\frmRedownloader.resx">
+      <DependentUpon>frmRedownloader.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmIndexer.resx">
+      <DependentUpon>frmIndexer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -181,7 +199,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\aphrodite.images.user.js" />

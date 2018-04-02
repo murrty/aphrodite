@@ -167,6 +167,10 @@ namespace aphrodite {
             }
         }
 
+        private void btnHLQ_Click(object sender, EventArgs e) {
+            Process.Start("https://iqdb.harry.lu/");
+        }
+
         private void mSettings_Click(object sender, EventArgs e) {
             frmSettings settings = new frmSettings();
             settings.isAdmin = isAdmin;
@@ -185,6 +189,21 @@ namespace aphrodite {
             frmBlacklist blackList = new frmBlacklist();
             blackList.ShowDialog();
         }
+
+        private void mWishlist_Click(object sender, EventArgs e) {
+            frmPoolWishlist wl = new frmPoolWishlist();
+            wl.ShowDialog();
+            wl.Dispose();
+        }
+        private void mRedownloader_Click(object sender, EventArgs e) {
+            frmRedownloader rd = new frmRedownloader();
+            rd.Show();
+        }
+        private void mIndexer_Click(object sender, EventArgs e) {
+            frmIndexer idx = new frmIndexer();
+            idx.Show();
+        }
+
         private void mAbout_Click(object sender, EventArgs e) {
             frmAbout frAbout = new frmAbout();
             frAbout.Show();
@@ -194,9 +213,6 @@ namespace aphrodite {
             settings.isAdmin = isAdmin;
             settings.protocol = true;
             settings.ShowDialog();
-        }
-        private void btnHLQ_Click(object sender, EventArgs e) {
-            Process.Start("https://iqdb.harry.lu/");
         }
         #endregion
 
@@ -333,7 +349,7 @@ namespace aphrodite {
 
         private void btnDownloadPool_Click(object sender, EventArgs e) {
             if (string.IsNullOrWhiteSpace(txtID.Text)) {
-                MessageBox.Show("Please specify tags to download.");
+                MessageBox.Show("Please specify pool ID to download.");
                 return;
             }
             if (string.IsNullOrWhiteSpace(Settings.Default.saveLocation)) {
@@ -364,5 +380,6 @@ namespace aphrodite {
             }
         }
         #endregion
+
     }
 }

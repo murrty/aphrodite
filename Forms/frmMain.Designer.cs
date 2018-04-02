@@ -52,6 +52,10 @@
             this.mBlacklist = new System.Windows.Forms.MenuItem();
             this.mAbout = new System.Windows.Forms.MenuItem();
             this.mProtocol = new System.Windows.Forms.MenuItem();
+            this.mTools = new System.Windows.Forms.MenuItem();
+            this.mWishlist = new System.Windows.Forms.MenuItem();
+            this.mRedownloader = new System.Windows.Forms.MenuItem();
+            this.mIndexer = new System.Windows.Forms.MenuItem();
             this.tbMain.SuspendLayout();
             this.tbTags.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numLimit)).BeginInit();
@@ -322,6 +326,7 @@
             this.mainMenu1.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.mSettings,
             this.mBlacklist,
+            this.mTools,
             this.mAbout,
             this.mProtocol});
             // 
@@ -339,17 +344,44 @@
             // 
             // mAbout
             // 
-            this.mAbout.Index = 2;
+            this.mAbout.Index = 3;
             this.mAbout.Text = "About";
             this.mAbout.Click += new System.EventHandler(this.mAbout_Click);
             // 
             // mProtocol
             // 
             this.mProtocol.Enabled = false;
-            this.mProtocol.Index = 3;
+            this.mProtocol.Index = 4;
             this.mProtocol.Text = "Protocol";
             this.mProtocol.Visible = false;
             this.mProtocol.Click += new System.EventHandler(this.mProtocol_Click);
+            // 
+            // mTools
+            // 
+            this.mTools.Index = 2;
+            this.mTools.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.mWishlist,
+            this.mRedownloader,
+            this.mIndexer});
+            this.mTools.Text = "Tools";
+            // 
+            // mWishlist
+            // 
+            this.mWishlist.Index = 0;
+            this.mWishlist.Text = "Pool Wishlist";
+            this.mWishlist.Click += new System.EventHandler(this.mWishlist_Click);
+            // 
+            // mRedownloader
+            // 
+            this.mRedownloader.Index = 1;
+            this.mRedownloader.Text = "Redownloader";
+            this.mRedownloader.Click += new System.EventHandler(this.mRedownloader_Click);
+            // 
+            // mIndexer
+            // 
+            this.mIndexer.Index = 2;
+            this.mIndexer.Text = "Indexer";
+            this.mIndexer.Click += new System.EventHandler(this.mIndexer_Click);
             // 
             // frmMain
             // 
@@ -410,6 +442,10 @@
         private System.Windows.Forms.TabPage tbSearch;
         private System.Windows.Forms.Button btnHLQ;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.MenuItem mTools;
+        private System.Windows.Forms.MenuItem mWishlist;
+        private System.Windows.Forms.MenuItem mRedownloader;
+        private System.Windows.Forms.MenuItem mIndexer;
     }
 }
 
