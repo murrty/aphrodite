@@ -106,9 +106,15 @@ namespace aphrodite {
         private void chkUpdate_CheckedChanged(object sender, EventArgs e) {
             if (chkUpdate.Checked) {
                 btnAdd.Text = "Update";
+                if (lbWish.SelectedIndex > -1) {
+                    txtName.Text = PoolNames[lbWish.SelectedIndex];
+                    txtURL.Text = PoolURLS[lbWish.SelectedIndex];
+                }
             }
             else {
                 btnAdd.Text = "Add";
+                txtName.Clear();
+                txtURL.Clear();
             }
         }
 
