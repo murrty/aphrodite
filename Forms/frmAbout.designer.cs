@@ -72,8 +72,8 @@
             this.lbBody.Name = "lbBody";
             this.lbBody.Size = new System.Drawing.Size(240, 79);
             this.lbBody.TabIndex = 3;
-            this.lbBody.Text = "aphrodite  by murrty\r\nicon is brad the bread.\r\ncoded in VisualStudio 2013\r\n\r\n\r\nLi" +
-    "kulau.";
+            this.lbBody.Text = "aphrodite  by murrty\r\nicon is brad the bread.\r\ncredit to fuz for being fuz\r\ncoded" +
+    " in VisualStudio 2013\r\n\r\nLikulau.";
             this.lbBody.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // pbIcon

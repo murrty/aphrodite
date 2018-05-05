@@ -82,5 +82,17 @@ namespace aphrodite {
                 this["wishhlistNames"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool addWishlistSilent {
+            get {
+                return ((bool)(this["addWishlistSilent"]));
+            }
+            set {
+                this["addWishlistSilent"] = value;
+            }
+        }
     }
 }

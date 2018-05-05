@@ -51,27 +51,79 @@ namespace aphrodite {
             if (string.IsNullOrWhiteSpace(Settings.Default.saveLocation) || string.IsNullOrEmpty(Settings.Default.saveLocation))
                 Settings.Default.saveLocation = Environment.CurrentDirectory;
 
-            for (int i = 1; i < Environment.GetCommandLineArgs().Length; i++) {
-                string arg = Environment.GetCommandLineArgs()[i];
-                if (arg.StartsWith("installProtocol")) {
-                    frmSettings settings = new frmSettings();
+            for (int i = 1; i < Environment.GetCommandLineArgs().Length; i++) { // count each runtime argument, int 0 = boot directory.
+                string arg = Environment.GetCommandLineArgs()[i]; // buffer for the arg
+                if (arg.StartsWith("installProtocol")) { // if the argument is installProtocol
+                    frmSettings settings = new frmSettings(); // start the protocol section of the settings.
                     settings.isAdmin = isAdmin;
                     settings.protocol = true;
                     settings.ShowDialog();
                 }
-                if (arg.StartsWith("pools:configuresettings") || arg.StartsWith("tags:configuresettings") || arg.StartsWith("images:configuresettings") || arg.StartsWith("configuresettings")) {
-                    frmSettings settings = new frmSettings();
-                    settings.pluginChange = true;
-                    settings.isAdmin = isAdmin;
-                    if (arg.StartsWith("tags:"))
+                if (arg.StartsWith("pools:configuresettings") || arg.StartsWith("tags:configuresettings") || arg.StartsWith("images:configuresettings") || arg.StartsWith("configuresettings")) { // check for configure settings argument
+                    frmSettings settings = new frmSettings(); // configure settings argument was passed
+                    settings.pluginChange = true; // boolean to switch to the tab on load
+                    settings.isAdmin = isAdmin; // sets isAdmin for the protocol.
+                    if (arg.StartsWith("tags:")) // if it's changing tag settings
                         settings.plugin = 1;
-                    else if (arg.StartsWith("pools:"))
+                    else if (arg.StartsWith("pools:")) // if it's changing pool settings
                         settings.plugin = 2;
-                    else if (arg.StartsWith("images:"))
+                    else if (arg.StartsWith("images:")) // if it's changing image settings
                         settings.plugin = 3;
-                    else
+                    else // otherwise just use the first tab
                         settings.plugin = 0;
                     settings.ShowDialog();
+                    Environment.Exit(0);
+                }
+                if (arg.StartsWith("poolwl:")) {
+                    // Add to pool wishlist
+                    if (Pools.Default.addWishlistSilent) {
+                        string[] split = arg.Split('$');
+                        string url = split[0].Replace("poolwl:", "");
+                        if (Pools.Default.wishlist.Contains(url)) {
+                            Environment.Exit(0);
+                        }
+                        string title = string.Empty;
+
+                        if (split.Length > 2) {
+                            for (int j = 1; j < split.Length; j++) {
+                                title += split[j] + "$";
+                            }
+                            title = title.TrimEnd('$');
+                            title = title.Replace("%20", " ");
+                            title = title.TrimEnd(' ');
+                        }
+                        else {
+                            title = split[1].Replace("%20", " ");
+                            title = title.TrimEnd(' ');
+                        }
+
+                        Pools.Default.wishhlistNames += "|" + title;
+                        Pools.Default.wishlist += "|" + url;
+                        Pools.Default.Save();
+                    }
+                    else {
+                        frmPoolWishlist wl = new frmPoolWishlist();
+                        wl.addToWishlist = true;
+                        string[] split = arg.Split('$'); // Split into an array using the split identifier
+                        wl.addURL = split[0].Replace("poolwl:", ""); // set the url from the first split
+                        string title = string.Empty; // buffer for pool name
+
+                        if (split.Length > 2) { // there is more than 1 split identifier in the argument
+                            for (int j = 1; j < split.Length; j++) { // start count at int 1, as int 0 is the first split
+                                title += split[j] + "$"; // join the identified parts past the initial split, for any pools with "$" in the title.
+                            }
+                            title = title.TrimEnd('$'); // trim the excess
+                            title = title.Replace("%20", " "); // replace the %20 with spaces
+                            title = title.TrimEnd(' '); // trim the excess
+                        }
+                        else { // only 1 split, for the url and title
+                            title = split[1].Replace("%20", " "); // replace the %20 with spaces
+                            title = title.TrimEnd(' '); // trim the excess
+                        }
+
+                        wl.addTitle = title; // set the title
+                        wl.ShowDialog();
+                    }
                     Environment.Exit(0);
                 }
                 if (arg.StartsWith("pools:") && isValidPoolLink(arg.Replace("pools:", ""))) {
@@ -87,7 +139,17 @@ namespace aphrodite {
                     tagDL.url = arg.Replace("tags:", "");
                     tagDL.saveInfo = Settings.Default.saveInfo;
                     tagDL.blacklistedTags = Settings.Default.blacklist;
-                    tagDL.ratings = "e q s".Split(' ');
+                    string ratings = string.Empty;
+                    if (Tags.Default.Explicit)
+                        ratings += "e ";
+                    if (Tags.Default.Questionable)
+                        ratings += "q ";
+                    if (Tags.Default.Safe)
+                        ratings += "s ";
+                    ratings.TrimEnd(' ');
+                    tagDL.ratings = ratings.Split(' ');
+                    tagDL.useMinimumScore = Tags.Default.enableScoreMin;
+                    tagDL.minimumScore = Tags.Default.scoreMin;
                     tagDL.ShowDialog();
                     Environment.Exit(0);
                 }
@@ -149,8 +211,9 @@ namespace aphrodite {
             chkMerge.Checked = Pools.Default.mergeBlacklisted;
 
             RegistryKey keyPools = Registry.ClassesRoot.OpenSubKey("pools\\shell\\open\\command", false);
+            RegistryKey keyPoolWl = Registry.ClassesRoot.OpenSubKey("poolwl\\shell\\open\\command", false);
             RegistryKey keyTags = Registry.ClassesRoot.OpenSubKey("tags\\shell\\open\\command", false);
-            if (keyPools == null || keyTags == null) {
+            if (keyPools == null || keyPoolWl == null || keyTags == null) {
                 mProtocol.Visible = true;
                 mProtocol.Enabled = true;
             }
@@ -165,10 +228,6 @@ namespace aphrodite {
             else if (tbMain.SelectedTab == tbPools) {
                 txtID.Focus();
             }
-        }
-
-        private void btnHLQ_Click(object sender, EventArgs e) {
-            Process.Start("https://iqdb.harry.lu/");
         }
 
         private void mSettings_Click(object sender, EventArgs e) {
@@ -190,6 +249,9 @@ namespace aphrodite {
             blackList.ShowDialog();
         }
 
+        private void mReverseSearch_Click(object sender, EventArgs e) {
+            Process.Start("https://iqdb.harry.lu/");
+        }
         private void mWishlist_Click(object sender, EventArgs e) {
             frmPoolWishlist wl = new frmPoolWishlist();
             wl.ShowDialog();
@@ -380,6 +442,5 @@ namespace aphrodite {
             }
         }
         #endregion
-
     }
 }

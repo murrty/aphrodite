@@ -64,6 +64,25 @@ namespace aphrodite {
             else
                 return tagLine.Replace("TAGS: ", "");
         }
+        private string getTagMinimum(string nfoLocation) {
+            if (!nfoLocation.EndsWith("tags.nfo") && !nfoLocation.EndsWith("tags.blacklisted.nfo")) {
+                if (File.Exists(nfoLocation + "\\tags.nfo"))
+                    nfoLocation = nfoLocation + "\\tags.nfo";
+                else if (File.Exists(nfoLocation + "\\tags.blacklisted.nfo"))
+                    nfoLocation = nfoLocation + "\\tags.blacklisted.nfo";
+                else
+                    return null;
+            }
+            string tagLine;
+            using (StreamReader sr = new StreamReader(nfoLocation)) {
+                sr.ReadLine();
+                tagLine = sr.ReadLine();
+            }
+            if (tagLine.StartsWith("MINIMUM SCORE: n/a") || !tagLine.StartsWith("MINIMUM SCORE: "))
+                return null;
+            else
+                return tagLine.Replace("MINIMUM SCORE: ", "");
+        }
 
         private void frmTagRedownloader_Load(object sender, EventArgs e) {
             loadDownloads();
@@ -117,15 +136,16 @@ namespace aphrodite {
                 tagDL.tags = tags;
                 tagDL.openAfter = false;
                 tagDL.fromURL = false;
-                if (Tags.Default.enableScoreMin) {
-                    tagDL.useMinimumScore = true;
-                    if (Tags.Default.scoreMin > 0) {
-                        tagDL.minimumScore = Tags.Default.scoreMin;
-                    }
-                    else {
-                        tagDL.minimumScore = 0;
+                if (lbTags.GetItemText(lbTags.SelectedItem).Contains(" (scores ")) {
+                    string min = getTagMinimum(Settings.Default.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem));
+                    if (min != null) {
+                        int extractedScore;
+                        Int32.TryParse(min, out extractedScore);
+                        tagDL.useMinimumScore = true;
+                        tagDL.minimumScore = extractedScore;
                     }
                 }
+
                 tagDL.imageAmount = Convert.ToInt32(Tags.Default.imageLimit);
                 tagDL.saveInfo = Settings.Default.saveInfo;
                 tagDL.blacklistedTags = Settings.Default.blacklist;

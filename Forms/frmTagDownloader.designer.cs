@@ -46,7 +46,7 @@
             // 
             // lbFile
             // 
-            this.lbFile.Location = new System.Drawing.Point(12, 102);
+            this.lbFile.Location = new System.Drawing.Point(12, 127);
             this.lbFile.Name = "lbFile";
             this.lbFile.Size = new System.Drawing.Size(268, 18);
             this.lbFile.TabIndex = 2;
@@ -55,7 +55,7 @@
             // 
             // pbDownloadStatus
             // 
-            this.pbDownloadStatus.Location = new System.Drawing.Point(12, 121);
+            this.pbDownloadStatus.Location = new System.Drawing.Point(12, 146);
             this.pbDownloadStatus.MarqueeAnimationSpeed = 50;
             this.pbDownloadStatus.Maximum = 101;
             this.pbDownloadStatus.Name = "pbDownloadStatus";
@@ -66,7 +66,7 @@
             // lbPercentage
             // 
             this.lbPercentage.BackColor = System.Drawing.Color.Transparent;
-            this.lbPercentage.Location = new System.Drawing.Point(126, 123);
+            this.lbPercentage.Location = new System.Drawing.Point(126, 148);
             this.lbPercentage.Name = "lbPercentage";
             this.lbPercentage.Size = new System.Drawing.Size(41, 14);
             this.lbPercentage.TabIndex = 4;
@@ -75,7 +75,7 @@
             // 
             // status
             // 
-            this.status.Location = new System.Drawing.Point(0, 148);
+            this.status.Location = new System.Drawing.Point(0, 168);
             this.status.Name = "status";
             this.status.Size = new System.Drawing.Size(292, 22);
             this.status.SizingGrip = false;
@@ -95,10 +95,10 @@
             // 
             this.lbBlacklist.Location = new System.Drawing.Point(12, 45);
             this.lbBlacklist.Name = "lbBlacklist";
-            this.lbBlacklist.Size = new System.Drawing.Size(268, 55);
+            this.lbBlacklist.Size = new System.Drawing.Size(268, 81);
             this.lbBlacklist.TabIndex = 7;
             this.lbBlacklist.Text = "0 posts (0 e, 0 q, 0 s)\r\n0 blacklisted (0 e, 0 q, 0 s)\r\n0 zero-toleranced\r\n0 in t" +
-    "otal";
+    "otal\r\n\r\nminimum score: n/a";
             this.lbBlacklist.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // tmrTitle
@@ -112,7 +112,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(292, 170);
+            this.ClientSize = new System.Drawing.Size(292, 190);
             this.Controls.Add(this.txtTags);
             this.Controls.Add(this.status);
             this.Controls.Add(this.lbPercentage);

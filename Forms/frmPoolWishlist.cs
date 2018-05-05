@@ -13,6 +13,10 @@ using System.Windows.Forms;
 namespace aphrodite {
     public partial class frmPoolWishlist : Form {
 
+        public bool addToWishlist = false;
+        public string addURL = string.Empty;
+        public string addTitle = string.Empty;
+
         List<string>PoolNames = new List<string>();
         List<string>PoolURLS = new List<string>();
 
@@ -34,6 +38,11 @@ namespace aphrodite {
                 lbWish.Items.AddRange(Pools.Default.wishhlistNames.Split('|'));
                 PoolNames.AddRange(Pools.Default.wishhlistNames.Split('|'));
                 PoolURLS.AddRange(Pools.Default.wishlist.Split('|'));
+            }
+
+            if (addToWishlist) {
+                txtName.Text = addTitle;
+                txtURL.Text = addURL;
             }
         }
 

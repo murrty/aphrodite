@@ -41,11 +41,16 @@ namespace aphrodite {
         }
         private void frmDownload_Shown(object sender, EventArgs e) {
             if (fromURL) {
-                txtTags.Text = url.Split('/')[6];
+                txtTags.Text = url.Split('/')[6].Replace("%20", " ");
             }
             else {
                 txtTags.Text = tags.Replace("%25-2F", "/");
             }
+            string min = "disabled";
+            if (useMinimumScore) {
+                min = (minimumScore).ToString();
+            }
+            lbBlacklist.Text = "0 posts (0 e, 0 q, 0 s)\n0 blacklisted (0 e,0 q, 0 s)\n0 zero-toleranced (skipped)\n0 in total" + "\n\nScore minimum: " + min;
             startDownload();
         }
         private void frmDownload_FormClosing(object sender, FormClosingEventArgs e) {
@@ -147,8 +152,16 @@ namespace aphrodite {
             string[] tagLength;
             string pagestr = string.Empty;
             List<string> urls = new List<string>();
-            string taginfo = "TAGS: " + tags + "\n\n";
-            string blacklistinfo = "TAGS: " + tags + "\nBLACKLISTED TAGS: " + blacklistedTags + "\n\n";
+            string taginfo = string.Empty;
+            string blacklistinfo = string.Empty;
+            if (useMinimumScore) {
+                taginfo = "TAGS: " + tags + "\nMINIMUM SCORE: " + minimumScore + "\n\n";
+                blacklistinfo = "TAGS: " + tags + "\nBLACKLISTED TAGS: " + blacklistedTags + "\nMINIMUM SCORE: " + minimumScore + "\n\n";
+            }
+            else {
+                taginfo = "TAGS: " + tags + "\nMINIMUM SCORE: n/a\n\n";
+                blacklistinfo = "TAGS: " + tags + "\nBLACKLISTED TAGS: " + blacklistedTags + "\nMINIMUM SCORE: n/a\n\n";
+            }
             tagLength  = tags.Split(' ');
             if (tagLength.Length > 6){
                 MessageBox.Show("6 tags is the maximum length you're allowed to download from e621. If your tag has a space between words, be sure to add an underscore. (_)");
@@ -161,8 +174,19 @@ namespace aphrodite {
             if (!string.IsNullOrEmpty(zblacklistedTags) && !string.IsNullOrWhiteSpace(zblacklistedTags))
                 zblacklist = new List<string>(zblacklistedTags.Split(' '));
 
-            if (!saveTo.EndsWith("\\Tags"))
-                saveTo += "\\Tags";
+            if (!this.saveTo.EndsWith("\\Tags"))
+                this.saveTo += "\\Tags";
+
+            string[] badchars = new string[] { "\\", "/", ":", "*", "?", "\"", "<", ">", "|" };
+            Debug.Print("Changing output directory to " + this.saveTo + "\\" + tagName);
+            string outputFolderName = tagName.Replace("%20", " ");
+            for (int i = 0; i < badchars.Length; i++) {
+                outputFolderName = outputFolderName.Replace(badchars[i], "_");
+            }
+            this.saveTo += "\\" + outputFolderName;
+            if (useMinimumScore) {
+                this.saveTo += " (scores " + (minimumScore) + "+)";
+            }
             
             try {
                 if (isUrl) {
@@ -172,17 +196,14 @@ namespace aphrodite {
                     pagestr = url.Split('/')[5];
                     dlURL = tagJson + tags + pageJson + pagestr;
                     string xml = getJSON(tagJson + tags + pageJson + pagestr, header);
-                    taginfo = "Tags: " + tags + "\n\n";
-                    blacklistinfo = "Tags: " + tags + "\nBlacklisted tags: " + blacklistedTags + "\n\n";
+                    taginfo = "Tags: " + tags.Replace("%20", " ") + "\n\n";
+                    blacklistinfo = "Tags: " + tags.Replace("%20", " ") + "\nBlacklisted tags: " + blacklistedTags + "\n\n";
 
                     if (xml == emptyXML || string.IsNullOrWhiteSpace(xml)) {
                         Debug.Print("xml is empty, aborting");
                         this.Invoke((MethodInvoker)(() => status.Text = "The tag's json returned empty or null. Aborting."));
                         return false;
                     }
-
-                    Debug.Print("Changing output directory to " + saveTo + "\\" + tagName);
-                    saveTo += "\\" + tagName;
 
                     Debug.Print("Loading xml");
                     this.Invoke((MethodInvoker)(() => status.Text = "Parsing json..."));
@@ -371,10 +392,6 @@ namespace aphrodite {
                         Debug.Print("Multiple pages are possible");
                         page++;
                     }
-
-                    // Set saveTo
-                    Debug.Print("Changing output directory to " + saveTo + "\\" + tagName);
-                    saveTo += "\\" + tagName;
 
                     Debug.Print("Gathering list of URLs from the page");
                     XmlNodeList xmlMD5 = doc.DocumentElement.SelectNodes("/root/item/md5");
@@ -706,11 +723,11 @@ namespace aphrodite {
                         total = rExplicit.Count + rQuestionable.Count + rSafe.Count;
                     }
                     this.Invoke((MethodInvoker)(() => lbFile.Text = "File 0 of " + (total)));
-                    this.Invoke((MethodInvoker)(() => lbBlacklist.Text = (rExplicit.Count + rQuestionable.Count + rSafe.Count) + " posts (" + (rExplicit.Count) + " e, " + (rQuestionable.Count) + " q, " + (rSafe.Count) + " s)\n" + (rbExplicit.Count + rbQuestionable.Count + rbSafe.Count) + " blacklisted (" + (rbExplicit.Count) + " e, " + (rbQuestionable.Count) + " q, " + (rbSafe.Count) + " s)\n" + (skippedposts) + " zero-toleranced (skipped)\n" + (rExplicit.Count + rQuestionable.Count + rSafe.Count + rbExplicit.Count + rbQuestionable.Count + rbSafe.Count + skippedposts) + " in total"));
+                    this.Invoke((MethodInvoker)(() => lbBlacklist.Text = (rExplicit.Count + rQuestionable.Count + rSafe.Count) + " posts (" + (rExplicit.Count) + " e, " + (rQuestionable.Count) + " q, " + (rSafe.Count) + " s)\n" + (rbExplicit.Count + rbQuestionable.Count + rbSafe.Count) + " blacklisted (" + (rbExplicit.Count) + " e, " + (rbQuestionable.Count) + " q, " + (rbSafe.Count) + " s)\n" + (skippedposts) + " zero-toleranced (skipped)\n" + (rExplicit.Count + rQuestionable.Count + rSafe.Count + rbExplicit.Count + rbQuestionable.Count + rbSafe.Count + skippedposts) + " in total" + "\n\nscore minimum: " + (minimumScore)));
                 }
                 else {
                     this.Invoke((MethodInvoker)(() => lbFile.Text = "File 0 of " + urls.Count));
-                    this.Invoke((MethodInvoker)(() => lbBlacklist.Text = (urls.Count) + " posts\n" + (blacklistCount) + " blacklisted\n" + (skippedposts) + " zero-toleranced (skipped)\n" + (urls.Count + blacklistCount + skippedposts) + " in total"));
+                    this.Invoke((MethodInvoker)(() => lbBlacklist.Text = (urls.Count) + " posts\n" + (blacklistCount) + " blacklisted\n" + (skippedposts) + " zero-toleranced (skipped)\n" + (urls.Count + blacklistCount + skippedposts) + " in total" + "\n\nscore minimum: " + (minimumScore)));
                 }
 
                 if (!Directory.Exists(saveTo)) {
@@ -1070,7 +1087,6 @@ namespace aphrodite {
                 Thread.CurrentThread.IsBackground = true;
                 if (fromURL) {
                     tags = url.Split('/')[6].TrimEnd('#');
-                    txtTags.Text = tags;
                     if (downloadTags(true, url)) {
                         if (Settings.Default.ignoreFinish)
                             this.DialogResult = DialogResult.OK;

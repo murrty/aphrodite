@@ -44,36 +44,33 @@
             this.btnDownloadPool = new System.Windows.Forms.Button();
             this.txtID = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.tbSearch = new System.Windows.Forms.TabPage();
-            this.btnHLQ = new System.Windows.Forms.Button();
-            this.label4 = new System.Windows.Forms.Label();
             this.mainMenu1 = new System.Windows.Forms.MainMenu(this.components);
             this.mSettings = new System.Windows.Forms.MenuItem();
             this.mBlacklist = new System.Windows.Forms.MenuItem();
-            this.mAbout = new System.Windows.Forms.MenuItem();
-            this.mProtocol = new System.Windows.Forms.MenuItem();
             this.mTools = new System.Windows.Forms.MenuItem();
             this.mWishlist = new System.Windows.Forms.MenuItem();
             this.mRedownloader = new System.Windows.Forms.MenuItem();
+            this.mSep = new System.Windows.Forms.MenuItem();
+            this.mReverseSearch = new System.Windows.Forms.MenuItem();
             this.mIndexer = new System.Windows.Forms.MenuItem();
+            this.mAbout = new System.Windows.Forms.MenuItem();
+            this.mProtocol = new System.Windows.Forms.MenuItem();
             this.tbMain.SuspendLayout();
             this.tbTags.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numLimit)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numScore)).BeginInit();
             this.tbPools.SuspendLayout();
-            this.tbSearch.SuspendLayout();
             this.SuspendLayout();
             // 
             // tbMain
             // 
             this.tbMain.Controls.Add(this.tbTags);
             this.tbMain.Controls.Add(this.tbPools);
-            this.tbMain.Controls.Add(this.tbSearch);
             this.tbMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tbMain.Location = new System.Drawing.Point(0, 0);
             this.tbMain.Name = "tbMain";
             this.tbMain.SelectedIndex = 0;
-            this.tbMain.Size = new System.Drawing.Size(282, 203);
+            this.tbMain.Size = new System.Drawing.Size(282, 244);
             this.tbMain.TabIndex = 12;
             this.tbMain.SelectedIndexChanged += new System.EventHandler(this.tbMain_SelectedIndexChanged);
             // 
@@ -93,7 +90,7 @@
             this.tbTags.Location = new System.Drawing.Point(4, 22);
             this.tbTags.Name = "tbTags";
             this.tbTags.Padding = new System.Windows.Forms.Padding(3);
-            this.tbTags.Size = new System.Drawing.Size(274, 177);
+            this.tbTags.Size = new System.Drawing.Size(274, 218);
             this.tbTags.TabIndex = 0;
             this.tbTags.Text = "Tags";
             this.tbTags.UseVisualStyleBackColor = true;
@@ -289,38 +286,6 @@
             this.label3.TabIndex = 13;
             this.label3.Text = "Pool ID:";
             // 
-            // tbSearch
-            // 
-            this.tbSearch.Controls.Add(this.btnHLQ);
-            this.tbSearch.Controls.Add(this.label4);
-            this.tbSearch.Location = new System.Drawing.Point(4, 22);
-            this.tbSearch.Name = "tbSearch";
-            this.tbSearch.Padding = new System.Windows.Forms.Padding(3);
-            this.tbSearch.Size = new System.Drawing.Size(274, 177);
-            this.tbSearch.TabIndex = 2;
-            this.tbSearch.Text = "Reverse image search";
-            this.tbSearch.UseVisualStyleBackColor = true;
-            // 
-            // btnHLQ
-            // 
-            this.btnHLQ.Location = new System.Drawing.Point(99, 89);
-            this.btnHLQ.Name = "btnHLQ";
-            this.btnHLQ.Size = new System.Drawing.Size(76, 23);
-            this.btnHLQ.TabIndex = 0;
-            this.btnHLQ.Text = "go there";
-            this.btnHLQ.UseVisualStyleBackColor = true;
-            this.btnHLQ.Click += new System.EventHandler(this.btnHLQ_Click);
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(29, 65);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(216, 13);
-            this.label4.TabIndex = 1;
-            this.label4.Text = "There\'s a site to reverse image search e621.";
-            this.label4.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            // 
             // mainMenu1
             // 
             this.mainMenu1.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
@@ -342,26 +307,14 @@
             this.mBlacklist.Text = "Blacklist";
             this.mBlacklist.Click += new System.EventHandler(this.mBlacklist_Click);
             // 
-            // mAbout
-            // 
-            this.mAbout.Index = 3;
-            this.mAbout.Text = "About";
-            this.mAbout.Click += new System.EventHandler(this.mAbout_Click);
-            // 
-            // mProtocol
-            // 
-            this.mProtocol.Enabled = false;
-            this.mProtocol.Index = 4;
-            this.mProtocol.Text = "Protocol";
-            this.mProtocol.Visible = false;
-            this.mProtocol.Click += new System.EventHandler(this.mProtocol_Click);
-            // 
             // mTools
             // 
             this.mTools.Index = 2;
             this.mTools.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.mWishlist,
             this.mRedownloader,
+            this.mSep,
+            this.mReverseSearch,
             this.mIndexer});
             this.mTools.Text = "Tools";
             // 
@@ -377,18 +330,43 @@
             this.mRedownloader.Text = "Redownloader";
             this.mRedownloader.Click += new System.EventHandler(this.mRedownloader_Click);
             // 
+            // mSep
+            // 
+            this.mSep.Index = 2;
+            this.mSep.Text = "-";
+            // 
+            // mReverseSearch
+            // 
+            this.mReverseSearch.Index = 3;
+            this.mReverseSearch.Text = "Reverse image search";
+            this.mReverseSearch.Click += new System.EventHandler(this.mReverseSearch_Click);
+            // 
             // mIndexer
             // 
-            this.mIndexer.Index = 2;
+            this.mIndexer.Index = 4;
             this.mIndexer.Text = "Indexer";
             this.mIndexer.Click += new System.EventHandler(this.mIndexer_Click);
+            // 
+            // mAbout
+            // 
+            this.mAbout.Index = 3;
+            this.mAbout.Text = "About";
+            this.mAbout.Click += new System.EventHandler(this.mAbout_Click);
+            // 
+            // mProtocol
+            // 
+            this.mProtocol.Enabled = false;
+            this.mProtocol.Index = 4;
+            this.mProtocol.Text = "Protocol";
+            this.mProtocol.Visible = false;
+            this.mProtocol.Click += new System.EventHandler(this.mProtocol_Click);
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(282, 203);
+            this.ClientSize = new System.Drawing.Size(282, 244);
             this.Controls.Add(this.tbMain);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
@@ -407,8 +385,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.numScore)).EndInit();
             this.tbPools.ResumeLayout(false);
             this.tbPools.PerformLayout();
-            this.tbSearch.ResumeLayout(false);
-            this.tbSearch.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -439,13 +415,12 @@
         private System.Windows.Forms.TextBox txtID;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.MenuItem mProtocol;
-        private System.Windows.Forms.TabPage tbSearch;
-        private System.Windows.Forms.Button btnHLQ;
-        private System.Windows.Forms.Label label4;
         private System.Windows.Forms.MenuItem mTools;
         private System.Windows.Forms.MenuItem mWishlist;
         private System.Windows.Forms.MenuItem mRedownloader;
         private System.Windows.Forms.MenuItem mIndexer;
+        private System.Windows.Forms.MenuItem mReverseSearch;
+        private System.Windows.Forms.MenuItem mSep;
     }
 }
 

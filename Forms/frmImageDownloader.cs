@@ -280,7 +280,10 @@ namespace aphrodite {
                         }
                         else {
                             blacklistInfo = "\n\n" + blacklistInfo;
-                            File.AppendAllText(staticDir + "\\images.blacklisted.nfo", blacklistInfo, Encoding.UTF8);
+
+                            string fileBuffer = File.ReadAllText(staticDir + "\\images.blacklisted.nfo");
+                            if (!fileBuffer.Contains("MD5: " + xmlMD5[0].InnerText))
+                                File.AppendAllText(staticDir + "\\images.blacklisted.nfo", blacklistInfo, Encoding.UTF8);
                         }
                     }
                     else {
@@ -289,7 +292,10 @@ namespace aphrodite {
                         }
                         else {
                             imageinfo = "\n\n" + imageinfo;
-                            File.AppendAllText(staticDir + "\\images.nfo", imageinfo, Encoding.UTF8);
+
+                            string fileBuffer = File.ReadAllText(staticDir + "\\images.nfo");
+                            if (!fileBuffer.Contains("MD5: " + xmlMD5[0].InnerText))
+                                File.AppendAllText(staticDir + "\\images.nfo", imageinfo, Encoding.UTF8);
                         }
                     }
                 }

@@ -48,10 +48,12 @@
             this.label2 = new System.Windows.Forms.Label();
             this.chkSeparate = new System.Windows.Forms.CheckBox();
             this.tbPools = new System.Windows.Forms.TabPage();
+            this.chkAddWishlistSilent = new System.Windows.Forms.CheckBox();
             this.chkOpen = new System.Windows.Forms.CheckBox();
             this.chkMerge = new System.Windows.Forms.CheckBox();
             this.chkPoolName = new System.Windows.Forms.CheckBox();
             this.tbImages = new System.Windows.Forms.TabPage();
+            this.chkUseForm = new System.Windows.Forms.CheckBox();
             this.chkSeparateBlacklist = new System.Windows.Forms.CheckBox();
             this.chkSeparateImages = new System.Windows.Forms.CheckBox();
             this.rbMD5 = new System.Windows.Forms.RadioButton();
@@ -68,7 +70,6 @@
             this.btnImagesProtocol = new System.Windows.Forms.Button();
             this.btnBlacklist = new System.Windows.Forms.Button();
             this.JustTheTips = new System.Windows.Forms.ToolTip(this.components);
-            this.chkUseForm = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tbGeneral.SuspendLayout();
             this.tbTags.SuspendLayout();
@@ -269,6 +270,7 @@
             this.chkMinimumScore.Text = "Use a minimum score";
             this.JustTheTips.SetToolTip(this.chkMinimumScore, "Only downloads images with a score equal to or greater than provided");
             this.chkMinimumScore.UseVisualStyleBackColor = true;
+            this.chkMinimumScore.CheckedChanged += new System.EventHandler(this.chkMinimumScore_CheckedChanged);
             // 
             // numScore
             // 
@@ -353,6 +355,7 @@
             // 
             // tbPools
             // 
+            this.tbPools.Controls.Add(this.chkAddWishlistSilent);
             this.tbPools.Controls.Add(this.chkOpen);
             this.tbPools.Controls.Add(this.chkMerge);
             this.tbPools.Controls.Add(this.chkPoolName);
@@ -364,10 +367,21 @@
             this.tbPools.Text = "Pools";
             this.tbPools.UseVisualStyleBackColor = true;
             // 
+            // chkAddWishlistSilent
+            // 
+            this.chkAddWishlistSilent.AutoSize = true;
+            this.chkAddWishlistSilent.Location = new System.Drawing.Point(67, 117);
+            this.chkAddWishlistSilent.Name = "chkAddWishlistSilent";
+            this.chkAddWishlistSilent.Size = new System.Drawing.Size(154, 17);
+            this.chkAddWishlistSilent.TabIndex = 20;
+            this.chkAddWishlistSilent.Text = "Add pools to wishlist silently";
+            this.JustTheTips.SetToolTip(this.chkAddWishlistSilent, "Add the pool to your wishlist without showing the application.");
+            this.chkAddWishlistSilent.UseVisualStyleBackColor = true;
+            // 
             // chkOpen
             // 
             this.chkOpen.AutoSize = true;
-            this.chkOpen.Location = new System.Drawing.Point(67, 99);
+            this.chkOpen.Location = new System.Drawing.Point(67, 74);
             this.chkOpen.Name = "chkOpen";
             this.chkOpen.Size = new System.Drawing.Size(138, 17);
             this.chkOpen.TabIndex = 19;
@@ -380,7 +394,7 @@
             this.chkMerge.AutoSize = true;
             this.chkMerge.Checked = true;
             this.chkMerge.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkMerge.Location = new System.Drawing.Point(67, 76);
+            this.chkMerge.Location = new System.Drawing.Point(67, 51);
             this.chkMerge.Name = "chkMerge";
             this.chkMerge.Size = new System.Drawing.Size(276, 17);
             this.chkMerge.TabIndex = 13;
@@ -394,7 +408,7 @@
             this.chkPoolName.AutoSize = true;
             this.chkPoolName.Checked = true;
             this.chkPoolName.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkPoolName.Location = new System.Drawing.Point(67, 53);
+            this.chkPoolName.Location = new System.Drawing.Point(67, 28);
             this.chkPoolName.Name = "chkPoolName";
             this.chkPoolName.Size = new System.Drawing.Size(178, 17);
             this.chkPoolName.TabIndex = 4;
@@ -418,6 +432,17 @@
             this.tbImages.TabIndex = 4;
             this.tbImages.Text = "Images";
             this.tbImages.UseVisualStyleBackColor = true;
+            // 
+            // chkUseForm
+            // 
+            this.chkUseForm.AutoSize = true;
+            this.chkUseForm.Location = new System.Drawing.Point(94, 100);
+            this.chkUseForm.Name = "chkUseForm";
+            this.chkUseForm.Size = new System.Drawing.Size(223, 17);
+            this.chkUseForm.TabIndex = 11;
+            this.chkUseForm.Text = "Use download form for download progress";
+            this.JustTheTips.SetToolTip(this.chkUseForm, "Shows a form when downloading images that will report progress");
+            this.chkUseForm.UseVisualStyleBackColor = true;
             // 
             // chkSeparateBlacklist
             // 
@@ -561,7 +586,7 @@
             this.btnPoolsProtocol.Name = "btnPoolsProtocol";
             this.btnPoolsProtocol.Size = new System.Drawing.Size(151, 23);
             this.btnPoolsProtocol.TabIndex = 1;
-            this.btnPoolsProtocol.Text = "Install \'pools:\' protocol";
+            this.btnPoolsProtocol.Text = "Install pool protocols";
             this.btnPoolsProtocol.UseVisualStyleBackColor = true;
             this.btnPoolsProtocol.Click += new System.EventHandler(this.btnPoolsProtocol_Click);
             // 
@@ -585,17 +610,6 @@
             this.JustTheTips.SetToolTip(this.btnBlacklist, "Manage your blacklist");
             this.btnBlacklist.UseVisualStyleBackColor = true;
             this.btnBlacklist.Click += new System.EventHandler(this.btnBlacklist_Click);
-            // 
-            // chkUseForm
-            // 
-            this.chkUseForm.AutoSize = true;
-            this.chkUseForm.Location = new System.Drawing.Point(94, 100);
-            this.chkUseForm.Name = "chkUseForm";
-            this.chkUseForm.Size = new System.Drawing.Size(223, 17);
-            this.chkUseForm.TabIndex = 11;
-            this.chkUseForm.Text = "Use download form for download progress";
-            this.JustTheTips.SetToolTip(this.chkUseForm, "Shows a form when downloading images that will report progress");
-            this.chkUseForm.UseVisualStyleBackColor = true;
             // 
             // frmSettings
             // 
@@ -678,6 +692,7 @@
         private System.Windows.Forms.CheckBox chkSeparateImages;
         private System.Windows.Forms.CheckBox chkSeparateBlacklist;
         private System.Windows.Forms.CheckBox chkUseForm;
+        private System.Windows.Forms.CheckBox chkAddWishlistSilent;
 
     }
 }

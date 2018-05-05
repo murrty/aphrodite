@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
-// @name        aphrodite
-// @namespace   https://github.com/murrty/aphrodite
-// @version     1.0
+// @name        Aphrodite
+// @namespace   https://github.com/murrty/Aphrodite
+// @version     1.1
 // @description e621 general downloader (pools & images based on tags)
 // @run-at      document-end
 // @include     http*://e621.net/pool/show/*
@@ -60,6 +60,7 @@ if (document.URL.indexOf("e621.net/post/index/") > -1 || document.URL.indexOf("e
 if (document.URL.indexOf("e621.net/post/show/") > -1 || document.URL.indexOf("e621.net/pool/show/") > -1) {
     var poolDiv = document.createElement('div');
     var poolLink = document.createElement('a');
+    var poolWish = document.createElement('a');
     var poolSettings = document.createElement('a');
     var fPoolElement = document.getElementById('del-mode');
     var fPoolSidebar = document.getElementsByClassName('post-sidebar-header')[0];
@@ -88,6 +89,10 @@ if (document.URL.indexOf("e621.net/post/show/") > -1 || document.URL.indexOf("e6
     poolLink.appendChild(document.createTextNode('download pool'));
     poolDiv.appendChild(poolLink);
 
+    poolWish.id = "pool-add-to-wishlist";
+    poolWish.title = "Add pool to wishlist";
+    poolWish.appendChild(document.createTextNode('add to wishlist'));
+    poolDiv.appendChild(poolWish);
 
     poolSettings.id = "pool-settings";
     poolSettings.href = "pools:configuresettings";
@@ -107,6 +112,7 @@ if (document.URL.indexOf("e621.net/post/show/") > -1 || document.URL.indexOf("e6
         poolDiv.style = "display: normal; text-align: left; padding: 0px 0px 0px;"
         poolDiv.className = "pageination";
         poolLink.href = "pools:" + document.URL;
+        poolWish.href = "poolwl:" + document.URL + "$" + document.title.substring(6, document.title.length - 7);
         fPoolElement.parentNode.insertBefore(poolDiv, fPoolElement);
     }
 }

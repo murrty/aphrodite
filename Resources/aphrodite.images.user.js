@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name        aphrodite images
 // @namespace   https://github.com/murrty/aphrodite
-// @version     1.0
+// @version     1.1
 // @description e621 image downloader
 // @run-at      document-end
 // @include     http*://e621.net/post/show/*
