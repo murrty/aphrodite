@@ -65,6 +65,7 @@
             this.lbTags.Name = "lbTags";
             this.lbTags.Size = new System.Drawing.Size(270, 173);
             this.lbTags.TabIndex = 0;
+            this.lbTags.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.lbTags_MouseDoubleClick);
             // 
             // tbPools
             // 

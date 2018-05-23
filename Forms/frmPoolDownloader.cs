@@ -367,17 +367,29 @@ namespace aphrodite {
                 // Finally, download them. (URL .Split('/')[6] = FileName)
                 using (WebClient wc = new WebClient()) {
                     wc.DownloadProgressChanged += (s, e) => {
-                        if (!this.Disposing || !this.IsDisposed) {
-                            //this.Invoke((MethodInvoker)(() => lbFile.Text += " " + (e.TotalBytesToReceive / 1024) + " KB"));
-                            this.Invoke((MethodInvoker)(() => pbDownloadStatus.Value = e.ProgressPercentage));
-                            this.Invoke((MethodInvoker)(() => lbPercentage.Text = e.ProgressPercentage.ToString() + "%"));
+                        if (!this.IsDisposed) {
+                            //if (!sizeRecieved) {
+                            //    //this.Invoke((MethodInvoker)(() => pbDownloadStatus.Maximum = 101));
+                            //    if (!lbFile.Text.Contains(("(" + e.TotalBytesToReceive / 1024) + "kb)"))
+                            //        this.Invoke((MethodInvoker)(() => lbFile.Text += " (" + (e.TotalBytesToReceive / 1024) + "kb)"));
+                            //    sizeRecieved = true;
+                            //    Debug.Print((e.TotalBytesToReceive / 1024).ToString());
+                            //}
+                            this.BeginInvoke(new MethodInvoker(() => {
+                                pbDownloadStatus.Value = e.ProgressPercentage;
+                                pbDownloadStatus.Value++;
+                                pbDownloadStatus.Value--;
+                                lbPercentage.Text = e.ProgressPercentage.ToString() + "%";
+                            }));
                         }
                     };
                     wc.DownloadFileCompleted += (s, e) => {
                         if (!this.Disposing || !this.IsDisposed) {
                             lock (e.UserState) {
-                                this.Invoke((MethodInvoker)(() => pbDownloadStatus.Value = 0));
-                                this.Invoke((MethodInvoker)(() => lbPercentage.Text = "0%"));
+                                this.BeginInvoke(new MethodInvoker(() => {
+                                    pbDownloadStatus.Value = 0;
+                                    lbPercentage.Text = "0%";
+                                }));
                                 Monitor.Pulse(e.UserState);
                             }
                         }
@@ -469,14 +481,15 @@ namespace aphrodite {
                     }
                 }
 
-                this.Invoke((MethodInvoker)(() => lbFile.Text = "All " + (urls.Count) + " pages downloaded."));
-                this.Invoke((MethodInvoker)(() => pbDownloadStatus.Value = 100));
-                this.Invoke((MethodInvoker)(() => lbPercentage.Text = "Done"));
-
+                this.BeginInvoke(new MethodInvoker(() => {
+                    lbPercentage.Text = "Done";
+                    lbFile.Text = "All " + (urls.Count) + " pages downloaded.";
+                    pbDownloadStatus.Value = 101;
+                    status.Text = "Finished downloading pool " + poolID;
+                    this.Text = "Pool downloaded";
+                }));
 
                 Debug.Print("Pool has been downloaded successfully, returning");
-                this.Invoke((MethodInvoker)(() => status.Text = "Finished downloading pool " + poolID));
-                this.Invoke((MethodInvoker)(() => this.Text = "Pool downloaded"));
                 return true;
             }
             catch (ThreadAbortException thrEx) {
@@ -486,13 +499,6 @@ namespace aphrodite {
                 Debug.Print("==========END THREADABORTEXCEPTION==========");
                 return false;
                 throw thrEx;
-            }
-            catch (ObjectDisposedException disEx) {
-                Debug.Print("Seems like the object got disposed.");
-                Debug.Print("==========BEGIN OBJDISPOSEDEXCEPTION==========");
-                Debug.Print(disEx.ToString());
-                Debug.Print("==========END OBJDISPOSEDEXCEPTION==========");
-                return false;
             }
             catch (WebException WebE) {
                 Debug.Print("A WebException has occured.");

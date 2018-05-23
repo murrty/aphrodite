@@ -106,5 +106,41 @@ namespace aphrodite {
                 this["separateRatings"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool usePageLimit {
+            get {
+                return ((bool)(this["usePageLimit"]));
+            }
+            set {
+                this["usePageLimit"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int pageLimit {
+            get {
+                return ((int)(this["pageLimit"]));
+            }
+            set {
+                this["pageLimit"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool scoreAsTag {
+            get {
+                return ((bool)(this["scoreAsTag"]));
+            }
+            set {
+                this["scoreAsTag"] = value;
+            }
+        }
     }
 }

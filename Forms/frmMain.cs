@@ -76,7 +76,12 @@ namespace aphrodite {
                 }
                 if (arg.StartsWith("poolwl:")) {
                     // Add to pool wishlist
-                    if (Pools.Default.addWishlistSilent) {
+                    if (arg.StartsWith("poolwl:showwl")) {
+                        frmPoolWishlist wl = new frmPoolWishlist();
+                        wl.ShowDialog();
+                        Environment.Exit(0);
+                    }
+                    else if (Pools.Default.addWishlistSilent) {
                         string[] split = arg.Split('$');
                         string url = split[0].Replace("poolwl:", "");
                         if (Pools.Default.wishlist.Contains(url)) {
@@ -148,8 +153,12 @@ namespace aphrodite {
                         ratings += "s ";
                     ratings.TrimEnd(' ');
                     tagDL.ratings = ratings.Split(' ');
+                    tagDL.separateRatings = Tags.Default.separateRatings;
                     tagDL.useMinimumScore = Tags.Default.enableScoreMin;
+                    tagDL.scoreAsTag = Tags.Default.scoreAsTag;
                     tagDL.minimumScore = Tags.Default.scoreMin;
+                    tagDL.usePageLimit = Tags.Default.usePageLimit;
+                    tagDL.pageLimit = Tags.Default.pageLimit;
                     tagDL.ShowDialog();
                     Environment.Exit(0);
                 }
@@ -203,9 +212,13 @@ namespace aphrodite {
             chkExplicit.Checked = Tags.Default.Explicit;
             chkQuestionable.Checked = Tags.Default.Questionable;
             chkSafe.Checked = Tags.Default.Safe;
+            chkSeparateRatings.Checked = Tags.Default.separateRatings;
             chkMinimumScore.Checked = Tags.Default.enableScoreMin;
+            chkScoreAsTag.Checked = Tags.Default.scoreAsTag;
             numScore.Value = Convert.ToDecimal(Tags.Default.scoreMin);
             numLimit.Value = Convert.ToDecimal(Tags.Default.imageLimit);
+            chkPageLimit.Checked = Tags.Default.usePageLimit;
+            numPageLimit.Value = Convert.ToDecimal(Tags.Default.pageLimit);
 
             chkOpen.Checked = Pools.Default.openAfter;
             chkMerge.Checked = Pools.Default.mergeBlacklisted;
@@ -237,9 +250,13 @@ namespace aphrodite {
             chkExplicit.Checked = Tags.Default.Explicit;
             chkQuestionable.Checked = Tags.Default.Questionable;
             chkSafe.Checked = Tags.Default.Safe;
+            chkSeparateRatings.Checked = Tags.Default.separateRatings;
             chkMinimumScore.Checked = Tags.Default.enableScoreMin;
+            chkScoreAsTag.Checked = Tags.Default.scoreAsTag;
             numScore.Value = Convert.ToDecimal(Tags.Default.scoreMin);
             numLimit.Value = Convert.ToDecimal(Tags.Default.imageLimit);
+            chkPageLimit.Checked = Tags.Default.usePageLimit;
+            numPageLimit.Value = Convert.ToDecimal(Tags.Default.pageLimit);
 
             chkOpen.Checked = Pools.Default.openAfter;
             chkMerge.Checked = Pools.Default.mergeBlacklisted;
@@ -313,7 +330,7 @@ namespace aphrodite {
             }
 
             if (numLimit.Value == 0) {
-                if (MessageBox.Show("Downloading won't be limited. This may take a long while or even blacklist you. Continue anyway?", "TagDownloader", MessageBoxButtons.YesNo) == DialogResult.No) {
+                if (MessageBox.Show("Downloading won't be limited. This may take a long while or even blacklist you. Continue anyway?", "aphrodite", MessageBoxButtons.YesNo) == DialogResult.No) {
                     return;
                 }
             }
@@ -352,20 +369,13 @@ namespace aphrodite {
             if (ratings.EndsWith(" "))
                 ratings = ratings.TrimEnd(' ');
 
-            Tags.Default.Explicit = chkExplicit.Checked;
-            Tags.Default.Questionable = chkQuestionable.Checked;
-            Tags.Default.Safe = chkSafe.Checked;
-            Tags.Default.enableScoreMin = chkMinimumScore.Checked;
-            Tags.Default.scoreMin = Convert.ToInt32(numScore.Value);
-            Tags.Default.imageLimit = Convert.ToInt32(numLimit.Value);
-            Tags.Default.Save();
-
             frmTagDownloader tagDL = new frmTagDownloader();
             tagDL.tags = txtTags.Text;
             tagDL.openAfter = false;
             tagDL.fromURL = false;
             if (chkMinimumScore.Checked) {
                 tagDL.useMinimumScore = true;
+                tagDL.scoreAsTag = chkScoreAsTag.Checked;
                 if (numScore.Value > 0) {
                     tagDL.minimumScore = Convert.ToInt32(numScore.Value);
                 }
@@ -378,6 +388,11 @@ namespace aphrodite {
             tagDL.blacklistedTags = Settings.Default.blacklist;
             tagDL.zblacklistedTags = Settings.Default.zeroToleranceBlacklist;
             tagDL.ratings = ratings.Split(' ');
+            tagDL.separateRatings = chkSeparateRatings.Checked;
+            if (chkPageLimit.Checked && numPageLimit.Value > 0) {
+                tagDL.usePageLimit = chkPageLimit.Checked;
+                tagDL.pageLimit = Convert.ToInt32(numPageLimit.Value);
+            }
             tagDL.Show();
 
             txtTags.Clear();
@@ -385,6 +400,9 @@ namespace aphrodite {
 
         private void chkMinimumScore_CheckedChanged(object sender, EventArgs e) {
             numScore.Enabled = chkMinimumScore.Checked;
+        }
+        private void chkPageLimit_CheckedChanged(object sender, EventArgs e) {
+            numPageLimit.Enabled = chkPageLimit.Checked;
         }
         #endregion
 
@@ -442,5 +460,6 @@ namespace aphrodite {
             }
         }
         #endregion
+
     }
 }

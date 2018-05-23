@@ -25,7 +25,7 @@ namespace aphrodite.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1.5")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1.6")]
         public decimal currentVersion {
             get {
                 return ((decimal)(this["currentVersion"]));

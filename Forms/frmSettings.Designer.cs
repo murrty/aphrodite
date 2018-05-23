@@ -37,16 +37,20 @@
             this.txtSaveTo = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.tbTags = new System.Windows.Forms.TabPage();
+            this.gbTagDownloadLimit = new System.Windows.Forms.GroupBox();
             this.numLimit = new System.Windows.Forms.NumericUpDown();
-            this.label6 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.chkMinimumScore = new System.Windows.Forms.CheckBox();
-            this.numScore = new System.Windows.Forms.NumericUpDown();
-            this.chkSafe = new System.Windows.Forms.CheckBox();
-            this.chkQuestionable = new System.Windows.Forms.CheckBox();
+            this.gbTagRatings = new System.Windows.Forms.GroupBox();
             this.chkExplicit = new System.Windows.Forms.CheckBox();
-            this.label2 = new System.Windows.Forms.Label();
             this.chkSeparate = new System.Windows.Forms.CheckBox();
+            this.chkQuestionable = new System.Windows.Forms.CheckBox();
+            this.chkSafe = new System.Windows.Forms.CheckBox();
+            this.gbTagScoreLimit = new System.Windows.Forms.GroupBox();
+            this.chkScoreAsTag = new System.Windows.Forms.CheckBox();
+            this.numScore = new System.Windows.Forms.NumericUpDown();
+            this.chkMinimumScore = new System.Windows.Forms.CheckBox();
+            this.gbTagPageLimit = new System.Windows.Forms.GroupBox();
+            this.chkPageLimit = new System.Windows.Forms.CheckBox();
+            this.numPageLimit = new System.Windows.Forms.NumericUpDown();
             this.tbPools = new System.Windows.Forms.TabPage();
             this.chkAddWishlistSilent = new System.Windows.Forms.CheckBox();
             this.chkOpen = new System.Windows.Forms.CheckBox();
@@ -73,8 +77,13 @@
             this.tabControl1.SuspendLayout();
             this.tbGeneral.SuspendLayout();
             this.tbTags.SuspendLayout();
+            this.gbTagDownloadLimit.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numLimit)).BeginInit();
+            this.gbTagRatings.SuspendLayout();
+            this.gbTagScoreLimit.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numScore)).BeginInit();
+            this.gbTagPageLimit.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numPageLimit)).BeginInit();
             this.tbPools.SuspendLayout();
             this.tbImages.SuspendLayout();
             this.tbProtocol.SuspendLayout();
@@ -209,16 +218,10 @@
             // 
             // tbTags
             // 
-            this.tbTags.Controls.Add(this.numLimit);
-            this.tbTags.Controls.Add(this.label6);
-            this.tbTags.Controls.Add(this.label4);
-            this.tbTags.Controls.Add(this.chkMinimumScore);
-            this.tbTags.Controls.Add(this.numScore);
-            this.tbTags.Controls.Add(this.chkSafe);
-            this.tbTags.Controls.Add(this.chkQuestionable);
-            this.tbTags.Controls.Add(this.chkExplicit);
-            this.tbTags.Controls.Add(this.label2);
-            this.tbTags.Controls.Add(this.chkSeparate);
+            this.tbTags.Controls.Add(this.gbTagDownloadLimit);
+            this.tbTags.Controls.Add(this.gbTagRatings);
+            this.tbTags.Controls.Add(this.gbTagScoreLimit);
+            this.tbTags.Controls.Add(this.gbTagPageLimit);
             this.tbTags.Location = new System.Drawing.Point(4, 22);
             this.tbTags.Name = "tbTags";
             this.tbTags.Padding = new System.Windows.Forms.Padding(3);
@@ -227,9 +230,19 @@
             this.tbTags.Text = "Tags";
             this.tbTags.UseVisualStyleBackColor = true;
             // 
+            // gbTagDownloadLimit
+            // 
+            this.gbTagDownloadLimit.Controls.Add(this.numLimit);
+            this.gbTagDownloadLimit.Location = new System.Drawing.Point(210, 96);
+            this.gbTagDownloadLimit.Name = "gbTagDownloadLimit";
+            this.gbTagDownloadLimit.Size = new System.Drawing.Size(143, 57);
+            this.gbTagDownloadLimit.TabIndex = 44;
+            this.gbTagDownloadLimit.TabStop = false;
+            this.gbTagDownloadLimit.Text = "Download limit (0 = off)";
+            // 
             // numLimit
             // 
-            this.numLimit.Location = new System.Drawing.Point(165, 134);
+            this.numLimit.Location = new System.Drawing.Point(31, 23);
             this.numLimit.Maximum = new decimal(new int[] {
             9999999,
             0,
@@ -241,41 +254,101 @@
             this.numLimit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.JustTheTips.SetToolTip(this.numLimit, "Limits downloads to a certain amount of images");
             // 
-            // label6
+            // gbTagRatings
             // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(104, 102);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(202, 26);
-            this.label6.TabIndex = 37;
-            this.label6.Text = "Image download limit (0 = off)\r\n(0 and/or high values isn\'t recommended)";
-            this.label6.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.gbTagRatings.Controls.Add(this.chkExplicit);
+            this.gbTagRatings.Controls.Add(this.chkSeparate);
+            this.gbTagRatings.Controls.Add(this.chkQuestionable);
+            this.gbTagRatings.Controls.Add(this.chkSafe);
+            this.gbTagRatings.Location = new System.Drawing.Point(57, 13);
+            this.gbTagRatings.Name = "gbTagRatings";
+            this.gbTagRatings.Size = new System.Drawing.Size(143, 67);
+            this.gbTagRatings.TabIndex = 43;
+            this.gbTagRatings.TabStop = false;
+            this.gbTagRatings.Text = "Ratings";
             // 
-            // label4
+            // chkExplicit
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(244, 13);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(78, 13);
-            this.label4.TabIndex = 36;
-            this.label4.Text = "Score minimum";
+            this.chkExplicit.AutoSize = true;
+            this.chkExplicit.Checked = true;
+            this.chkExplicit.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkExplicit.Location = new System.Drawing.Point(17, 19);
+            this.chkExplicit.Name = "chkExplicit";
+            this.chkExplicit.Size = new System.Drawing.Size(32, 17);
+            this.chkExplicit.TabIndex = 31;
+            this.chkExplicit.Text = "E";
+            this.JustTheTips.SetToolTip(this.chkExplicit, "Download images rated Explicit");
+            this.chkExplicit.UseVisualStyleBackColor = true;
             // 
-            // chkMinimumScore
+            // chkSeparate
             // 
-            this.chkMinimumScore.AutoSize = true;
-            this.chkMinimumScore.Location = new System.Drawing.Point(247, 63);
-            this.chkMinimumScore.Name = "chkMinimumScore";
-            this.chkMinimumScore.Size = new System.Drawing.Size(125, 17);
-            this.chkMinimumScore.TabIndex = 35;
-            this.chkMinimumScore.Text = "Use a minimum score";
-            this.JustTheTips.SetToolTip(this.chkMinimumScore, "Only downloads images with a score equal to or greater than provided");
-            this.chkMinimumScore.UseVisualStyleBackColor = true;
-            this.chkMinimumScore.CheckedChanged += new System.EventHandler(this.chkMinimumScore_CheckedChanged);
+            this.chkSeparate.AutoSize = true;
+            this.chkSeparate.Checked = true;
+            this.chkSeparate.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkSeparate.Location = new System.Drawing.Point(20, 42);
+            this.chkSeparate.Name = "chkSeparate";
+            this.chkSeparate.Size = new System.Drawing.Size(102, 17);
+            this.chkSeparate.TabIndex = 26;
+            this.chkSeparate.Text = "Separate ratings";
+            this.JustTheTips.SetToolTip(this.chkSeparate, "Separates ratings into different folders");
+            this.chkSeparate.UseVisualStyleBackColor = true;
+            // 
+            // chkQuestionable
+            // 
+            this.chkQuestionable.AutoSize = true;
+            this.chkQuestionable.Checked = true;
+            this.chkQuestionable.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkQuestionable.Location = new System.Drawing.Point(55, 18);
+            this.chkQuestionable.Name = "chkQuestionable";
+            this.chkQuestionable.Size = new System.Drawing.Size(33, 17);
+            this.chkQuestionable.TabIndex = 32;
+            this.chkQuestionable.Text = "Q";
+            this.JustTheTips.SetToolTip(this.chkQuestionable, "Download images rated Questionable");
+            this.chkQuestionable.UseVisualStyleBackColor = true;
+            // 
+            // chkSafe
+            // 
+            this.chkSafe.AutoSize = true;
+            this.chkSafe.Checked = true;
+            this.chkSafe.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkSafe.Location = new System.Drawing.Point(94, 18);
+            this.chkSafe.Name = "chkSafe";
+            this.chkSafe.Size = new System.Drawing.Size(32, 17);
+            this.chkSafe.TabIndex = 33;
+            this.chkSafe.Text = "S";
+            this.JustTheTips.SetToolTip(this.chkSafe, "Download images rated Safe");
+            this.chkSafe.UseVisualStyleBackColor = true;
+            // 
+            // gbTagScoreLimit
+            // 
+            this.gbTagScoreLimit.Controls.Add(this.chkScoreAsTag);
+            this.gbTagScoreLimit.Controls.Add(this.numScore);
+            this.gbTagScoreLimit.Controls.Add(this.chkMinimumScore);
+            this.gbTagScoreLimit.Location = new System.Drawing.Point(210, 13);
+            this.gbTagScoreLimit.Name = "gbTagScoreLimit";
+            this.gbTagScoreLimit.Size = new System.Drawing.Size(143, 82);
+            this.gbTagScoreLimit.TabIndex = 41;
+            this.gbTagScoreLimit.TabStop = false;
+            this.gbTagScoreLimit.Text = "Score limit";
+            // 
+            // chkScoreAsTag
+            // 
+            this.chkScoreAsTag.AutoSize = true;
+            this.chkScoreAsTag.Enabled = false;
+            this.chkScoreAsTag.Location = new System.Drawing.Point(19, 60);
+            this.chkScoreAsTag.Name = "chkScoreAsTag";
+            this.chkScoreAsTag.Size = new System.Drawing.Size(105, 17);
+            this.chkScoreAsTag.TabIndex = 36;
+            this.chkScoreAsTag.Text = "Include with tags";
+            this.JustTheTips.SetToolTip(this.chkScoreAsTag, "If checked, uses the score minimum as a tag (ex: \"gay score:>25\").\r\nThis widly in" +
+        "creases the images that will be downloaded.\r\nOnly used if there are 5 or less ta" +
+        "gs being queried");
+            this.chkScoreAsTag.UseVisualStyleBackColor = true;
             // 
             // numScore
             // 
             this.numScore.Enabled = false;
-            this.numScore.Location = new System.Drawing.Point(270, 34);
+            this.numScore.Location = new System.Drawing.Point(40, 19);
             this.numScore.Maximum = new decimal(new int[] {
             99999,
             0,
@@ -292,66 +365,61 @@
             this.numScore.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.JustTheTips.SetToolTip(this.numScore, "The minimum score that will be downloaded");
             // 
-            // chkSafe
+            // chkMinimumScore
             // 
-            this.chkSafe.AutoSize = true;
-            this.chkSafe.Checked = true;
-            this.chkSafe.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkSafe.Location = new System.Drawing.Point(124, 35);
-            this.chkSafe.Name = "chkSafe";
-            this.chkSafe.Size = new System.Drawing.Size(32, 17);
-            this.chkSafe.TabIndex = 33;
-            this.chkSafe.Text = "S";
-            this.JustTheTips.SetToolTip(this.chkSafe, "Download images rated Safe");
-            this.chkSafe.UseVisualStyleBackColor = true;
+            this.chkMinimumScore.AutoSize = true;
+            this.chkMinimumScore.Location = new System.Drawing.Point(18, 43);
+            this.chkMinimumScore.Name = "chkMinimumScore";
+            this.chkMinimumScore.Size = new System.Drawing.Size(107, 17);
+            this.chkMinimumScore.TabIndex = 35;
+            this.chkMinimumScore.Text = "Enable score limit";
+            this.JustTheTips.SetToolTip(this.chkMinimumScore, "Only downloads images with a score equal to or greater than provided");
+            this.chkMinimumScore.UseVisualStyleBackColor = true;
+            this.chkMinimumScore.CheckedChanged += new System.EventHandler(this.chkMinimumScore_CheckedChanged);
             // 
-            // chkQuestionable
+            // gbTagPageLimit
             // 
-            this.chkQuestionable.AutoSize = true;
-            this.chkQuestionable.Checked = true;
-            this.chkQuestionable.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkQuestionable.Location = new System.Drawing.Point(85, 35);
-            this.chkQuestionable.Name = "chkQuestionable";
-            this.chkQuestionable.Size = new System.Drawing.Size(33, 17);
-            this.chkQuestionable.TabIndex = 32;
-            this.chkQuestionable.Text = "Q";
-            this.JustTheTips.SetToolTip(this.chkQuestionable, "Download images rated Questionable");
-            this.chkQuestionable.UseVisualStyleBackColor = true;
+            this.gbTagPageLimit.Controls.Add(this.chkPageLimit);
+            this.gbTagPageLimit.Controls.Add(this.numPageLimit);
+            this.gbTagPageLimit.Location = new System.Drawing.Point(57, 86);
+            this.gbTagPageLimit.Name = "gbTagPageLimit";
+            this.gbTagPageLimit.Size = new System.Drawing.Size(143, 67);
+            this.gbTagPageLimit.TabIndex = 42;
+            this.gbTagPageLimit.TabStop = false;
+            this.gbTagPageLimit.Text = "Page limit";
             // 
-            // chkExplicit
+            // chkPageLimit
             // 
-            this.chkExplicit.AutoSize = true;
-            this.chkExplicit.Checked = true;
-            this.chkExplicit.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkExplicit.Location = new System.Drawing.Point(47, 36);
-            this.chkExplicit.Name = "chkExplicit";
-            this.chkExplicit.Size = new System.Drawing.Size(32, 17);
-            this.chkExplicit.TabIndex = 31;
-            this.chkExplicit.Text = "E";
-            this.JustTheTips.SetToolTip(this.chkExplicit, "Download images rated Explicit");
-            this.chkExplicit.UseVisualStyleBackColor = true;
+            this.chkPageLimit.AutoSize = true;
+            this.chkPageLimit.Location = new System.Drawing.Point(19, 45);
+            this.chkPageLimit.Name = "chkPageLimit";
+            this.chkPageLimit.Size = new System.Drawing.Size(105, 17);
+            this.chkPageLimit.TabIndex = 40;
+            this.chkPageLimit.Text = "Enable page limit";
+            this.JustTheTips.SetToolTip(this.chkPageLimit, "Limits the pages that get loaded when downloading tags.\r\nUseful for limiting larg" +
+        "e tags.");
+            this.chkPageLimit.UseVisualStyleBackColor = true;
+            this.chkPageLimit.CheckedChanged += new System.EventHandler(this.chkPageLimit_CheckedChanged);
             // 
-            // label2
+            // numPageLimit
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(38, 13);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(104, 13);
-            this.label2.TabIndex = 30;
-            this.label2.Text = "Ratings to download";
-            // 
-            // chkSeparate
-            // 
-            this.chkSeparate.AutoSize = true;
-            this.chkSeparate.Checked = true;
-            this.chkSeparate.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkSeparate.Location = new System.Drawing.Point(47, 63);
-            this.chkSeparate.Name = "chkSeparate";
-            this.chkSeparate.Size = new System.Drawing.Size(102, 17);
-            this.chkSeparate.TabIndex = 26;
-            this.chkSeparate.Text = "Separate ratings";
-            this.JustTheTips.SetToolTip(this.chkSeparate, "Separate ratings into different folders");
-            this.chkSeparate.UseVisualStyleBackColor = true;
+            this.numPageLimit.Enabled = false;
+            this.numPageLimit.Location = new System.Drawing.Point(40, 19);
+            this.numPageLimit.Maximum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            0});
+            this.numPageLimit.Minimum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            -2147483648});
+            this.numPageLimit.Name = "numPageLimit";
+            this.numPageLimit.Size = new System.Drawing.Size(63, 20);
+            this.numPageLimit.TabIndex = 39;
+            this.numPageLimit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.JustTheTips.SetToolTip(this.numPageLimit, "The amount of pages that will be downloaded (320 images per page)");
             // 
             // tbPools
             // 
@@ -633,9 +701,16 @@
             this.tbGeneral.ResumeLayout(false);
             this.tbGeneral.PerformLayout();
             this.tbTags.ResumeLayout(false);
-            this.tbTags.PerformLayout();
+            this.gbTagDownloadLimit.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.numLimit)).EndInit();
+            this.gbTagRatings.ResumeLayout(false);
+            this.gbTagRatings.PerformLayout();
+            this.gbTagScoreLimit.ResumeLayout(false);
+            this.gbTagScoreLimit.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numScore)).EndInit();
+            this.gbTagPageLimit.ResumeLayout(false);
+            this.gbTagPageLimit.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numPageLimit)).EndInit();
             this.tbPools.ResumeLayout(false);
             this.tbPools.PerformLayout();
             this.tbImages.ResumeLayout(false);
@@ -665,12 +740,9 @@
         private System.Windows.Forms.CheckBox chkSafe;
         private System.Windows.Forms.CheckBox chkQuestionable;
         private System.Windows.Forms.CheckBox chkExplicit;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label4;
         private System.Windows.Forms.CheckBox chkMinimumScore;
         private System.Windows.Forms.NumericUpDown numScore;
         private System.Windows.Forms.NumericUpDown numLimit;
-        private System.Windows.Forms.Label label6;
         private System.Windows.Forms.CheckBox chkMerge;
         private System.Windows.Forms.CheckBox chkPoolName;
         private System.Windows.Forms.CheckBox chkOpen;
@@ -693,6 +765,13 @@
         private System.Windows.Forms.CheckBox chkSeparateBlacklist;
         private System.Windows.Forms.CheckBox chkUseForm;
         private System.Windows.Forms.CheckBox chkAddWishlistSilent;
+        private System.Windows.Forms.CheckBox chkPageLimit;
+        private System.Windows.Forms.NumericUpDown numPageLimit;
+        private System.Windows.Forms.GroupBox gbTagScoreLimit;
+        private System.Windows.Forms.GroupBox gbTagPageLimit;
+        private System.Windows.Forms.GroupBox gbTagDownloadLimit;
+        private System.Windows.Forms.GroupBox gbTagRatings;
+        private System.Windows.Forms.CheckBox chkScoreAsTag;
 
     }
 }

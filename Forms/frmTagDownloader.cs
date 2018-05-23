@@ -21,12 +21,18 @@ namespace aphrodite {
         public bool openAfter = false;
         public int minimumScore = 0;
         public bool useMinimumScore = false;
+        public bool scoreAsTag = false;
         public int imageAmount = 0;
+        public bool usePageLimit = false;
+        public int pageLimit = 0;
         public bool saveInfo = false;
         public string blacklistedTags = string.Empty;
         public string zblacklistedTags = string.Empty;
         public string saveTo = Settings.Default.saveLocation + "\\Tags";
         public string[] ratings = null;
+        public bool separateRatings = true;
+
+        public bool abortThread = false;
 
         public bool fromURL = false;
         public string url = string.Empty;
@@ -55,6 +61,7 @@ namespace aphrodite {
         }
         private void frmDownload_FormClosing(object sender, FormClosingEventArgs e) {
             tagDownload.Abort();
+            abortThread = true;
             this.Dispose();
         }
 
@@ -168,6 +175,10 @@ namespace aphrodite {
                 return false;
             }
 
+            if (tagLength.Length < 6 && scoreAsTag) {
+                tags = tags + " score:>" + (minimumScore - 1);
+            }
+
             if (!string.IsNullOrEmpty(blacklistedTags) && !string.IsNullOrWhiteSpace(blacklistedTags))
                 blacklist = new List<string>(blacklistedTags.Split(' '));
 
@@ -178,10 +189,23 @@ namespace aphrodite {
                 this.saveTo += "\\Tags";
 
             string[] badchars = new string[] { "\\", "/", ":", "*", "?", "\"", "<", ">", "|" };
+            string[] newchars = new string[] { "%5C", "%2F", "%3A", "%2A", "%3F", "%22", "%3C", "%3E", "%7C" };
+
+            // \ = %5C
+            // / = %2F
+            // : = %3A
+            // * = %2A
+            // ? = %3F
+            // " = %22
+            // < = %3C
+            // > = %3E
+            // | = %7C
+            // (space) = %20
+
             Debug.Print("Changing output directory to " + this.saveTo + "\\" + tagName);
             string outputFolderName = tagName.Replace("%20", " ");
             for (int i = 0; i < badchars.Length; i++) {
-                outputFolderName = outputFolderName.Replace(badchars[i], "_");
+                outputFolderName = outputFolderName.Replace(badchars[i], newchars[i]);
             }
             this.saveTo += "\\" + outputFolderName;
             if (useMinimumScore) {
@@ -317,7 +341,7 @@ namespace aphrodite {
                         //artists = artists.TrimEnd('\n');
 
                         if (!blacklisted) {
-                            if (Tags.Default.separateRatings) {
+                            if (separateRatings) {
                                 if (xmlRating[j].InnerText == "e") {
                                     rExplicit.Add(xmlURL[j].InnerText);
                                 }
@@ -336,7 +360,7 @@ namespace aphrodite {
                             taginfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n    DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n\n";
                         }
                         else if (blacklisted) {
-                            if (Tags.Default.separateRatings) {
+                            if (separateRatings) {
                                 if (xmlRating[j].InnerText == "e") {
                                     rbExplicit.Add(xmlURL[j].InnerText);
                                 }
@@ -371,7 +395,7 @@ namespace aphrodite {
 
                     dlURL = tagJson + tags;
                     Debug.Print("Calling getJson for " + tags);
-                    this.Invoke((MethodInvoker)(() => status.Text = "Downloading tag information..."));
+                    this.Invoke((MethodInvoker)(() => status.Text = "Downloading tag information for page 1..."));
 
                     string xml = getJSON(tagJson + tags, header);
                     if (xml == emptyXML || string.IsNullOrWhiteSpace(xml)) {
@@ -500,7 +524,7 @@ namespace aphrodite {
                         //artists = artists.TrimEnd('\n');
 
                         if (!blacklisted) {
-                            if (Tags.Default.separateRatings) {
+                            if (separateRatings) {
                                 if (xmlRating[j].InnerText == "e") {
                                     rExplicit.Add(xmlURL[j].InnerText);
                                 }
@@ -519,7 +543,7 @@ namespace aphrodite {
                             taginfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n    DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n\n";
                         }
                         else if (blacklisted) {
-                            if (Tags.Default.separateRatings) {
+                            if (separateRatings) {
                                 if (xmlRating[j].InnerText == "e") {
                                     rbExplicit.Add(xmlURL[j].InnerText);
                                 }
@@ -552,6 +576,10 @@ namespace aphrodite {
                             dlURL = tagJson + tags + pageJson + page;
                             xml = getJSON(tagJson + tags + pageJson + page, header);
                             page++;
+
+                            if (usePageLimit && page == pageLimit + 1)
+                                break;
+
                             if (xml == emptyXML) {
                                 PageDead = true;
                                 break;
@@ -665,7 +693,7 @@ namespace aphrodite {
                                     //artists = artists.TrimEnd('\n');
 
                                     if (!blacklisted) {
-                                        if (Tags.Default.separateRatings) {
+                                        if (separateRatings) {
                                             if (xmlRating[j].InnerText == "e") {
                                                 rExplicit.Add(xmlURL[j].InnerText);
                                             }
@@ -684,7 +712,7 @@ namespace aphrodite {
                                         taginfo += "POST " + xmlID[j].InnerText + ":\n    MD5: " + xmlMD5[j].InnerText + "\n    URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n    ARTIST(S): " + artists + "\n    TAGS: " + xmlTags[j].InnerText + "\n    SCORE: " + xmlScore[j].InnerText + "\n    RATING: " + rating + "\n    DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n\n";
                                     }
                                     else if (blacklisted) {
-                                        if (Tags.Default.separateRatings) {
+                                        if (separateRatings) {
                                             if (xmlRating[j].InnerText == "e") {
                                                 rbExplicit.Add(xmlURL[j].InnerText);
                                             }
@@ -714,7 +742,7 @@ namespace aphrodite {
                 }
 
 
-                if (Tags.Default.separateRatings) {
+                if (separateRatings) {
                     int total = 0;
                     if (Settings.Default.saveBlacklisted) {
                         total = rExplicit.Count + rQuestionable.Count + rSafe.Count + rbExplicit.Count + rbQuestionable.Count + rbSafe.Count;
@@ -733,11 +761,11 @@ namespace aphrodite {
                 if (!Directory.Exists(saveTo)) {
                     Debug.Print("Save directory does not exist, creating...");
                     Directory.CreateDirectory(saveTo);
-                    if (Settings.Default.saveBlacklisted && blacklistCount > 0 && !Tags.Default.separateRatings)
+                    if (Settings.Default.saveBlacklisted && blacklistCount > 0 && !separateRatings)
                         Directory.CreateDirectory(saveTo + "\\blacklisted");
                 }
 
-                if (Tags.Default.separateRatings) {
+                if (separateRatings) {
                     if (rExplicit.Count > 0 || rbExplicit.Count > 0) {
                         if (!Directory.Exists(saveTo + "\\explicit"))
                             Directory.CreateDirectory(saveTo + "\\explicit");
@@ -770,7 +798,7 @@ namespace aphrodite {
                     if (Settings.Default.saveBlacklisted && blacklistCount > 0) {
                         blacklistinfo.TrimEnd('\n');
                         this.Invoke((MethodInvoker)(() => status.Text = "Saving tags.blacklisted.nfo"));
-                        if (Tags.Default.separateRatings)
+                        if (separateRatings)
                             File.WriteAllText(saveTo + "\\tags.blacklisted.nfo", blacklistinfo, Encoding.UTF8);
                         else
                             File.WriteAllText(saveTo + "\\blacklisted\\tags.blacklisted.nfo", blacklistinfo, Encoding.UTF8);
@@ -782,7 +810,7 @@ namespace aphrodite {
                 using (WebClient wc = new WebClient()) {
                     //bool sizeRecieved = false;
                     wc.DownloadProgressChanged += (s, e) => {
-                        if (!this.Disposing || !this.IsDisposed) {
+                        if (!this.IsDisposed) {
                             //if (!sizeRecieved) {
                             //    //this.Invoke((MethodInvoker)(() => pbDownloadStatus.Maximum = 101));
                             //    if (!lbFile.Text.Contains(("(" + e.TotalBytesToReceive / 1024) + "kb)"))
@@ -790,18 +818,21 @@ namespace aphrodite {
                             //    sizeRecieved = true;
                             //    Debug.Print((e.TotalBytesToReceive / 1024).ToString());
                             //}
-
-                            this.Invoke((MethodInvoker)(() => pbDownloadStatus.Value = e.ProgressPercentage));
-                            this.Invoke((MethodInvoker)(() => lbPercentage.Text = e.ProgressPercentage.ToString() + "%"));
+                            this.BeginInvoke(new MethodInvoker(() => {
+                                pbDownloadStatus.Value = e.ProgressPercentage;
+                                pbDownloadStatus.Value++;
+                                pbDownloadStatus.Value--;
+                                lbPercentage.Text = e.ProgressPercentage.ToString() + "%";
+                            }));
                         }
                     };
                     wc.DownloadFileCompleted += (s, e) => {
-                        if (!this.Disposing || !this.IsDisposed){
+                        if (!pbDownloadStatus.IsDisposed && !lbPercentage.IsDisposed) {
                             lock (e.UserState) {
-                                //this.Invoke((MethodInvoker)(() => pbDownloadStatus.Maximum = 100));
-                                this.Invoke((MethodInvoker)(() => pbDownloadStatus.Value = 0));
-                                this.Invoke((MethodInvoker)(() => lbPercentage.Text = "0%"));
-                                //sizeRecieved = false;
+                                this.BeginInvoke(new MethodInvoker(() => {
+                                    pbDownloadStatus.Value = 0;
+                                    lbPercentage.Text = "0%";
+                                }));
                                 Monitor.Pulse(e.UserState);
                             }
                         }
@@ -810,7 +841,7 @@ namespace aphrodite {
                     wc.Headers.Add(header);
                     Debug.Print("Header set, starting download of all " + urls.Count + " posts.");
 
-                    if (Tags.Default.separateRatings) {
+                    if (separateRatings) {
                         if (rExplicit.Count > 0) {
                             for (int y = 0; y < rExplicit.Count; y++) {
                                 dlURL = rExplicit[y];
@@ -995,7 +1026,7 @@ namespace aphrodite {
                 }
 
                 int imageCount = 0;
-                if (Tags.Default.separateRatings) {
+                if (separateRatings) {
                     imageCount += (rExplicit.Count + rQuestionable.Count + rSafe.Count);
                     if (Settings.Default.saveBlacklisted)
                         imageCount += (rbExplicit.Count + rbQuestionable.Count + rbSafe.Count);
@@ -1006,16 +1037,22 @@ namespace aphrodite {
                         imageCount += blacklistedURLS.Count;
                 }
 
-                this.Invoke((MethodInvoker)(() => lbFile.Text = "All " + (imageCount) + " files downloaded."));
-                this.Invoke((MethodInvoker)(() => pbDownloadStatus.Value = 101));
-                this.Invoke((MethodInvoker)(() => lbPercentage.Text = "Done"));
-
                 Debug.Print("Tags have been downloaded successfully, returning");
-                this.Invoke(((MethodInvoker)(() => tmrTitle.Stop())));
-                this.Invoke((MethodInvoker)(() => status.Text = "Finished downloading tags."));
-                this.Invoke((MethodInvoker)(() => this.Text = "Tags downloaded"));
+
+                this.BeginInvoke(new MethodInvoker(() => {
+                    lbFile.Text = "All " + (imageCount) + " files downloaded.";
+                    pbDownloadStatus.Value = 101;
+                    lbPercentage.Text = "Done";
+                    tmrTitle.Stop();
+                    status.Text = "Finished downloading tags.";
+                    this.Text = "Tags downloaded";
+                }));
                 return true;
             }
+            //catch (InvalidOperationException IOex) {
+            //    MessageBox.Show("Tricked");
+            //    throw IOex;
+            //}
             catch (ThreadAbortException thrEx) {
                 Debug.Print("Thread was requested to be, and has been, aborted.");
                 Debug.Print("==========BEGIN THREADABORTEXCEPTION==========");
@@ -1023,13 +1060,6 @@ namespace aphrodite {
                 Debug.Print("==========END THREADABORTEXCEPTION==========");
                 return false;
                 throw thrEx;
-            }
-            catch (ObjectDisposedException disEx) {
-                Debug.Print("Seems like the object got disposed.");
-                Debug.Print("==========BEGIN OBJDISPOSEDEXCEPTION==========");
-                Debug.Print(disEx.ToString());
-                Debug.Print("==========END OBJDISPOSEDEXCEPTION==========");
-                return false;
             }
             catch (WebException WebE) {
                 Debug.Print("A WebException has occured.");
@@ -1082,25 +1112,31 @@ namespace aphrodite {
         #endregion
 
         private void startDownload() {
-            tagDownload = new Thread(() => {
-                string saveDir = Settings.Default.saveLocation;
-                Thread.CurrentThread.IsBackground = true;
-                if (fromURL) {
-                    tags = url.Split('/')[6].TrimEnd('#');
-                    if (downloadTags(true, url)) {
-                        if (Settings.Default.ignoreFinish)
-                            this.DialogResult = DialogResult.OK;
+            try {
+                tagDownload = new Thread(() => {
+                    string saveDir = Settings.Default.saveLocation;
+                    Thread.CurrentThread.IsBackground = true;
+                    if (fromURL) {
+                        tags = url.Split('/')[6].TrimEnd('#');
+                        if (downloadTags(true, url)) {
+                            if (Settings.Default.ignoreFinish)
+                                this.DialogResult = DialogResult.OK;
+                        }
                     }
-                }
-                else {
-                    if (downloadTags(false, string.Empty)) {
-                        if (Settings.Default.ignoreFinish)
-                            this.DialogResult = DialogResult.OK;
+                    else {
+                        if (downloadTags(false, string.Empty)) {
+                            if (Settings.Default.ignoreFinish)
+                                this.DialogResult = DialogResult.OK;
+                        }
                     }
-                }
-            });
-            tagDownload.Start();
-            tmrTitle.Start();
+                });
+                tagDownload.Start();
+                tmrTitle.Start();
+            }
+            catch (ObjectDisposedException obDis) {
+                MessageBox.Show("Caught");
+            }
+            
         }
         private void tmrTitle_Tick(object sender, EventArgs e) {
             if (this.Text.EndsWith("....")) {

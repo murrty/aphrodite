@@ -302,17 +302,29 @@ namespace aphrodite {
 
                 using (WebClient wc = new WebClient()) {
                     wc.DownloadProgressChanged += (s, e) => {
-                        if (!this.Disposing || !this.IsDisposed) {
-                            //this.Invoke((MethodInvoker)(() => lbFile.Text += " " + (e.TotalBytesToReceive / 1024) + " KB"));
-                            this.Invoke((MethodInvoker)(() => pbDownloadStatus.Value = e.ProgressPercentage));
-                            this.Invoke((MethodInvoker)(() => lbPercentage.Text = e.ProgressPercentage.ToString() + "%"));
+                        if (!this.IsDisposed) {
+                            //if (!sizeRecieved) {
+                            //    //this.Invoke((MethodInvoker)(() => pbDownloadStatus.Maximum = 101));
+                            //    if (!lbFile.Text.Contains(("(" + e.TotalBytesToReceive / 1024) + "kb)"))
+                            //        this.Invoke((MethodInvoker)(() => lbFile.Text += " (" + (e.TotalBytesToReceive / 1024) + "kb)"));
+                            //    sizeRecieved = true;
+                            //    Debug.Print((e.TotalBytesToReceive / 1024).ToString());
+                            //}
+                            this.BeginInvoke(new MethodInvoker(() => {
+                                pbDownloadStatus.Value = e.ProgressPercentage;
+                                pbDownloadStatus.Value++;
+                                pbDownloadStatus.Value--;
+                                lbPercentage.Text = e.ProgressPercentage.ToString() + "%";
+                            }));
                         }
                     };
                     wc.DownloadFileCompleted += (s, e) => {
                         if (!this.Disposing || !this.IsDisposed) {
                             lock (e.UserState) {
-                                this.Invoke((MethodInvoker)(() => pbDownloadStatus.Value = 100));
-                                this.Invoke((MethodInvoker)(() => lbPercentage.Text = "Done"));
+                                this.BeginInvoke(new MethodInvoker(() => {
+                                    pbDownloadStatus.Value = 100;
+                                    lbPercentage.Text = "Done";
+                                }));
                                 Monitor.Pulse(e.UserState);
                             }
                         }

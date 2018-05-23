@@ -66,6 +66,7 @@
             // 
             this.pbDownloadStatus.Location = new System.Drawing.Point(12, 107);
             this.pbDownloadStatus.MarqueeAnimationSpeed = 50;
+            this.pbDownloadStatus.Maximum = 101;
             this.pbDownloadStatus.Name = "pbDownloadStatus";
             this.pbDownloadStatus.Size = new System.Drawing.Size(244, 18);
             this.pbDownloadStatus.Style = System.Windows.Forms.ProgressBarStyle.Marquee;

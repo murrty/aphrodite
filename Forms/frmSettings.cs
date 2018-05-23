@@ -103,8 +103,11 @@ namespace aphrodite {
             Tags.Default.Safe = chkSafe.Checked;
             Tags.Default.separateRatings = chkSeparate.Checked;
             Tags.Default.enableScoreMin = chkMinimumScore.Checked;
+            Tags.Default.scoreAsTag = chkScoreAsTag.Checked;
             Tags.Default.scoreMin = Convert.ToInt32(numScore.Value);
             Tags.Default.imageLimit = Convert.ToInt32(numLimit.Value);
+            Tags.Default.usePageLimit = chkPageLimit.Checked;
+            Tags.Default.pageLimit = Convert.ToInt32(numPageLimit.Value);
 
             // Pools
             Pools.Default.usePoolName = chkPoolName.Checked;
@@ -138,8 +141,11 @@ namespace aphrodite {
             chkSafe.Checked = Tags.Default.Safe;
             chkSeparate.Checked = Tags.Default.separateRatings;
             chkMinimumScore.Checked = Tags.Default.enableScoreMin;
+            chkScoreAsTag.Checked = Tags.Default.scoreAsTag;
             numScore.Value = Convert.ToDecimal(Tags.Default.scoreMin);
             numLimit.Value = Convert.ToDecimal(Tags.Default.imageLimit);
+            chkPageLimit.Checked = Tags.Default.usePageLimit;
+            numPageLimit.Value = Convert.ToDecimal(Tags.Default.pageLimit);
 
             // Pools
             chkPoolName.Checked = Pools.Default.usePoolName;
@@ -259,10 +265,11 @@ namespace aphrodite {
         }
 
         private void chkMinimumScore_CheckedChanged(object sender, EventArgs e) {
-            if (chkMinimumScore.Checked)
-                numScore.Enabled = true;
-            else
-                numScore.Enabled = false;
+            numScore.Enabled = chkMinimumScore.Checked;
+            chkScoreAsTag.Enabled = chkMinimumScore.Checked;
+        }
+        private void chkPageLimit_CheckedChanged(object sender, EventArgs e) {
+            numPageLimit.Enabled = chkPageLimit.Checked;
         }
 
         private void btnBlacklist_Click(object sender, EventArgs e) {
@@ -441,5 +448,7 @@ namespace aphrodite {
         private void btnImagesUserscript_Click(object sender, EventArgs e) {
             Process.Start("https://github.com/murrty/aphrodite/raw/master/Resources/aphrodite.images.user.js");
         }
+
+        
     }
 }
