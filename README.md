@@ -1,5 +1,5 @@
 # aphrodite
-![bark bark, good dog.](https://raw.githubusercontent.com/murrty/aphrodite/master/Resources/Brad.png)  
+![bark bark, good dog.](https://raw.githubusercontent.com/murrty/aphrodite/master/brad.png)  
 a(nother), REALLY glorified, e621 image/pool downloader
 
 # Usage
