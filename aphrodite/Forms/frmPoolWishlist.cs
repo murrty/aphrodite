@@ -96,9 +96,30 @@ namespace aphrodite {
         }
 
         private void txtOpen_Click(object sender, EventArgs e) {
+            string poolID = PoolURLS[lbWish.SelectedIndex].Replace("http://", "https://").Replace("www.", "");
+            if (!poolID.StartsWith("https://"))
+                poolID = "https://" + poolID;
+            if (poolID.Contains("?"))
+                poolID = poolID.Split('?')[0];
+            poolID = poolID.Split('/')[5];
+
             frmPoolDownloader poolDL = new frmPoolDownloader();
-            poolDL.id = PoolURLS[lbWish.SelectedIndex];
-            poolDL.Show();
+            poolDL.poolID = poolID;
+
+            poolDL.header = Program.UserAgent;
+            poolDL.saveTo = Settings.Default.saveLocation;
+            poolDL.graylist = Settings.Default.blacklist;
+            poolDL.blacklist = Settings.Default.zeroToleranceBlacklist;
+
+            poolDL.saveInfo = Settings.Default.saveInfo;
+            poolDL.ignoreFinish = Settings.Default.ignoreFinish;
+            poolDL.saveBlacklisted = Settings.Default.saveBlacklisted;
+
+            poolDL.usePoolName = Pools.Default.usePoolName;
+            poolDL.mergeBlacklisted = Pools.Default.mergeBlacklisted;
+            poolDL.openAfter = Pools.Default.openAfter;
+
+            poolDL.ShowDialog();
         }
 
         private void lbWish_SelectedIndexChanged(object sender, EventArgs e) {

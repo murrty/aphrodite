@@ -1,5 +1,5 @@
 # aphrodite
-![bark bark, good dog.](https://raw.githubusercontent.com/murrty/aphrodite/master/brad.png)  
+![bark bark, good dog.](https://raw.githubusercontent.com/murrty/aphrodite/master/Resources/brad.png)  
 a(nother), REALLY glorified, e621 image/pool downloader
 
 # Usage
@@ -16,6 +16,9 @@ There are 2 blacklists, 1 is a "graylist" so to speak, which will download any f
 This supports a, essentially infinite sized, blacklist. Just add the tags you dislike into the Blacklist form and click save. You also have an option to save the blacklisted images, and pools have the option to merge it with the rest of the images.
 
 The blacklist is mutual between tags and pools.
+
+# aphrodite_min
+Aphrodite min is a command-line version of aphrodite, supposed to minimize application size while maintaining full functionality of aphrodite. Because it's a command line application, there's no need to have extra classes and coding for visual forms. Though, because of this, it's not the prettiest.
 
 # Brad
 bark, mr bread dog.

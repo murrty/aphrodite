@@ -6,7 +6,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="graylist" Type="System.String" Scope="User">
-      <Value Profile="(Default)">female dickgirl</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="blacklist" Type="System.String" Scope="User">
       <Value Profile="(Default)" />

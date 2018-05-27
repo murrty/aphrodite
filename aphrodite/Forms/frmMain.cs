@@ -16,11 +16,17 @@ using System.Windows.Forms;
 
 namespace aphrodite {
     public partial class frmMain : Form {
-        #region Variables
-        bool isAdmin = false;
-        #endregion
 
-        #region Methods
+    #region Variables
+        bool isAdmin = false;
+
+        // Valid protocols:
+        //                  'pools:'
+        //                  'tags:'
+        //                  'images:'
+    #endregion
+
+    #region Methods
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
         private static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wp, string lp);
         private void SetTextBoxHint(IntPtr TextboxHandle, string Hint) {
@@ -34,9 +40,9 @@ namespace aphrodite {
             btn.FlatStyle = System.Windows.Forms.FlatStyle.System;
             SendMessage(btn.Handle, BCM_SETSHIELD, 0, 1);
         }
-        #endregion
+    #endregion
 
-        #region Form
+    #region Form
         public frmMain() {
             InitializeComponent();
             if (!(new WindowsPrincipal(WindowsIdentity.GetCurrent())).IsInRole(WindowsBuiltInRole.Administrator))
@@ -131,73 +137,115 @@ namespace aphrodite {
                     }
                     Environment.Exit(0);
                 }
-                if (arg.StartsWith("pools:") && isValidPoolLink(arg.Replace("pools:", ""))) {
+                if (arg.StartsWith("pools:") && apiTools.isValidPoolLink(arg.Replace("pools:", ""))) {
+                    string poolID = arg.Replace("pools:", "").Replace("http://","https://").Replace("www.","");
+                    if (!poolID.StartsWith("https://"))
+                        poolID = "https://" + poolID;
+                    if (poolID.Contains("?"))
+                        poolID = poolID.Split('?')[0];
+                    poolID = poolID.Split('/')[5];
+
                     frmPoolDownloader poolDL = new frmPoolDownloader();
-                    poolDL.fromURL = true;
-                    poolDL.poolurl = arg.Replace("pools:", "");
+                    poolDL.poolID = poolID;
+
+                    poolDL.header = Program.UserAgent;
+                    poolDL.saveTo = Settings.Default.saveLocation;
+                    poolDL.graylist = Settings.Default.blacklist;
+                    poolDL.blacklist = Settings.Default.zeroToleranceBlacklist;
+
+                    poolDL.saveInfo = Settings.Default.saveInfo;
+                    poolDL.ignoreFinish = Settings.Default.ignoreFinish;
+                    poolDL.saveBlacklisted = Settings.Default.saveBlacklisted;
+
+                    poolDL.usePoolName = Pools.Default.usePoolName;
+                    poolDL.mergeBlacklisted = Pools.Default.mergeBlacklisted;
+                    poolDL.openAfter = Pools.Default.openAfter;
+
                     poolDL.ShowDialog();
                     Environment.Exit(0);
                 }
-                else if (arg.StartsWith("tags:") && isValidTagLink(arg.Replace("tags:", ""))) {
-                    frmTagDownloader tagDL = new frmTagDownloader();
-                    tagDL.fromURL = true;
-                    tagDL.url = arg.Replace("tags:", "");
-                    tagDL.saveInfo = Settings.Default.saveInfo;
-                    tagDL.blacklistedTags = Settings.Default.blacklist;
-                    string ratings = string.Empty;
-                    if (Tags.Default.Explicit)
-                        ratings += "e ";
-                    if (Tags.Default.Questionable)
-                        ratings += "q ";
-                    if (Tags.Default.Safe)
-                        ratings += "s ";
-                    ratings.TrimEnd(' ');
-                    tagDL.ratings = ratings.Split(' ');
-                    tagDL.separateRatings = Tags.Default.separateRatings;
-                    tagDL.useMinimumScore = Tags.Default.enableScoreMin;
-                    tagDL.scoreAsTag = Tags.Default.scoreAsTag;
-                    tagDL.minimumScore = Tags.Default.scoreMin;
-                    tagDL.usePageLimit = Tags.Default.usePageLimit;
-                    tagDL.pageLimit = Tags.Default.pageLimit;
-                    tagDL.ShowDialog();
-                    Environment.Exit(0);
-                }
-                else if (arg.StartsWith("images:") && isValidImageLink(arg.Replace("images:", ""))) {
-                    if (Images.Default.useForm) {
-                        frmImageDownloader imgdl = new frmImageDownloader();
-                        imgdl.saveInfo = Settings.Default.saveInfo;
-                        imgdl.saveTo = Settings.Default.saveLocation + "\\Images";
-                        imgdl.header = Program.UserAgent;
-                        imgdl.url = arg.Replace("images:", "");
-                        imgdl.ShowDialog();
+                else if (arg.StartsWith("tags:")) {
+                    if (apiTools.isValidPostLink(arg.Replace("tags:", ""))) {
+                        frmTagDownloader tagDL = new frmTagDownloader();
+                        tagDL.fromURL = true;
+                        tagDL.downloadUrl = arg.Replace("tags:", "");
+                        tagDL.graylist = Settings.Default.blacklist;
+                        tagDL.blacklist = Settings.Default.zeroToleranceBlacklist;
+                        tagDL.saveTo = Settings.Default.saveLocation;
+                        tagDL.saveInfo = Settings.Default.saveInfo;
+                        tagDL.openAfter = false;
+                        tagDL.saveBlacklistedFiles = Settings.Default.saveBlacklisted;
+                        tagDL.ignoreFinish = Settings.Default.ignoreFinish;
+                        tagDL.useMinimumScore = Tags.Default.enableScoreMin;
+                        if (tagDL.useMinimumScore) {
+                            tagDL.minimumScore = Tags.Default.scoreMin;
+                            tagDL.scoreAsTag = Tags.Default.scoreAsTag;
+                        }
+                        if (Tags.Default.imageLimit > 0)
+                            tagDL.imageLimit = Tags.Default.imageLimit;
+                        tagDL.usePageLimit = Tags.Default.usePageLimit;
+                        if (tagDL.usePageLimit)
+                            tagDL.pageLimit = Tags.Default.pageLimit;
+                        tagDL.separateRatings = Tags.Default.separateRatings;
+                        if (tagDL.separateRatings) {
+                            string ratings = string.Empty;
+                            if (Tags.Default.Explicit)
+                                ratings += "e ";
+                            if (Tags.Default.Questionable)
+                                ratings += "q ";
+                            if (Tags.Default.Safe)
+                                ratings += "s ";
+                            ratings.TrimEnd(' ');
+                            tagDL.ratings = ratings.Split(' ');
+                        }
+                        tagDL.webHeader = Program.UserAgent;
+                        tagDL.ShowDialog();
                         Environment.Exit(0);
                     }
                     else {
-                        ImageDownloader imgdl = new ImageDownloader();
-                        imgdl.saveInfo = Settings.Default.saveInfo;
-                        imgdl.saveTo = Settings.Default.saveLocation + "\\Images";
-                        imgdl.header = Program.UserAgent;
-                        if (imgdl.downloadImage(arg.Replace("images:", ""))) {
-                            if (!Settings.Default.ignoreFinish)
-                                MessageBox.Show("Image has finished downloading.");
-                            Environment.Exit(0);
-                        }
-                        else {
-                            MessageBox.Show("An error occured while downloading the image.");
-                            Environment.Exit(0);
-                        }
+                        txtTags.Text = getTags(Environment.GetCommandLineArgs());
                     }
                 }
-                else if (arg.StartsWith("tags:")) {
-                    txtTags.Text += arg.Replace("tags:", "").Replace("%20", " ") + " ";
-                }
-                else {
-                    if (File.Exists(arg)) {
-                        tbMain.SelectedIndex = 2;
+                else if (arg.StartsWith("images:") && apiTools.isValidImageLink(arg.Replace("images:", ""))) {
+                    if (Images.Default.useForm) {
+                        frmImageDownloader imageDL = new frmImageDownloader();
+                        imageDL.url = arg.Replace("images:", "");
+                        imageDL.header = Program.UserAgent;
+                        imageDL.saveTo = Settings.Default.saveLocation;
+                        imageDL.graylist = Settings.Default.blacklist;
+                        imageDL.blacklist = Settings.Default.zeroToleranceBlacklist;
+                        imageDL.separateRatings = Images.Default.separateRatings;
+                        imageDL.separateBlacklisted = Images.Default.separateBlacklisted;
+                        imageDL.saveInfo = Settings.Default.saveInfo;
+                        imageDL.ignoreFinish = Settings.Default.ignoreFinish;
+                        imageDL.fileNameCode = Images.Default.fileNameCode;
+                        imageDL.ShowDialog();
+                        Environment.Exit(0);
                     }
                     else {
-                        txtTags.Text += arg.Replace("%20", " ") + " ";
+                        ImageDownloader imageDL = new ImageDownloader();
+                        imageDL.url = arg.Replace("images:", "");
+                        imageDL.header = Program.UserAgent;
+                        imageDL.saveTo = Settings.Default.saveLocation;
+                        imageDL.graylist = Settings.Default.blacklist;
+                        imageDL.blacklist = Settings.Default.zeroToleranceBlacklist;
+                        imageDL.separateRatings = Images.Default.separateRatings;
+                        imageDL.separateBlacklisted = Images.Default.separateBlacklisted;
+                        imageDL.saveInfo = Settings.Default.saveInfo;
+                        imageDL.ignoreFinish = Settings.Default.ignoreFinish;
+                        imageDL.fileNameCode = Images.Default.fileNameCode;
+                        if (imageDL.downloadImage()) {
+                            if (!Settings.Default.ignoreFinish)
+                                MessageBox.Show("Image " + imageDL.postID + " has finished downloading.");
+                        }
+                        else {
+                            MessageBox.Show("An error occured when trying to download the image.");
+                        }
+                        Environment.Exit(0);
                     }
+                }
+                else {
+                    txtTags.Text += arg.Replace("%20", " ") + " ";
                 }
 
                 if (txtTags.Text.StartsWith(" ")) {
@@ -265,7 +313,6 @@ namespace aphrodite {
             frmBlacklist blackList = new frmBlacklist();
             blackList.ShowDialog();
         }
-
         private void mReverseSearch_Click(object sender, EventArgs e) {
             Process.Start("https://iqdb.harry.lu/");
         }
@@ -293,16 +340,18 @@ namespace aphrodite {
             settings.protocol = true;
             settings.ShowDialog();
         }
-        #endregion
+    #endregion
 
-        #region Tags
-        public static bool isValidTagLink(string url) {
-            if (url.StartsWith("http://e621.net/post/index/") || url.StartsWith("https://e621.net/post/index/") || url.StartsWith("http://www.e621.net/post/index/") || url.StartsWith("https://www.e621.net/post/index/") || url.StartsWith("e621.net/post/index/") || url.StartsWith("www.e621.net/post/index/") || url.StartsWith("https://e621.net/post?tags=") || url.StartsWith("https://e621.net/post?tags=") || url.StartsWith("http://www.e621.net/post?tags=") || url.StartsWith("https://www.e621.net/post?tags=") || url.StartsWith("e621.net/post?tags=") || url.StartsWith("www.e621.net/post?tags=")) {
-                return true;
+    #region Tags
+        public static string getTags(string[] args) {
+            string tags = null;
+            for (int i =0; i < args.Length; i++) {
+                if (args[i].StartsWith("tags:") || args[i].StartsWith("tag:")) {
+                    tags += args[i].Replace("tags:", "").Replace("tag:", "") + " ";
+                }
             }
-            else {
-                return false;
-            }
+            tags = tags.TrimEnd(' ');
+            return tags;
         }
 
         private void txtTags_KeyPress(object sender, KeyPressEventArgs e) {
@@ -370,31 +419,42 @@ namespace aphrodite {
                 ratings = ratings.TrimEnd(' ');
 
             frmTagDownloader tagDL = new frmTagDownloader();
-            tagDL.tags = txtTags.Text;
-            tagDL.openAfter = false;
-            tagDL.fromURL = false;
-            if (chkMinimumScore.Checked) {
-                tagDL.useMinimumScore = true;
-                tagDL.scoreAsTag = chkScoreAsTag.Checked;
-                if (numScore.Value > 0) {
-                    tagDL.minimumScore = Convert.ToInt32(numScore.Value);
-                }
-                else {
-                    tagDL.minimumScore = 0;
-                }
-            }
-            tagDL.imageAmount = Convert.ToInt32(numLimit.Value);
+        // Global settings first
+            tagDL.webHeader = Program.UserAgent;
+            tagDL.graylist = Settings.Default.blacklist;
+            tagDL.blacklist = Settings.Default.zeroToleranceBlacklist;
+            tagDL.saveTo = Settings.Default.saveLocation;
             tagDL.saveInfo = Settings.Default.saveInfo;
-            tagDL.blacklistedTags = Settings.Default.blacklist;
-            tagDL.zblacklistedTags = Settings.Default.zeroToleranceBlacklist;
-            tagDL.ratings = ratings.Split(' ');
-            tagDL.separateRatings = chkSeparateRatings.Checked;
-            if (chkPageLimit.Checked && numPageLimit.Value > 0) {
-                tagDL.usePageLimit = chkPageLimit.Checked;
+            tagDL.openAfter = false;
+            tagDL.saveBlacklistedFiles = Settings.Default.saveBlacklisted;
+            tagDL.ignoreFinish = Settings.Default.ignoreFinish;
+
+        // Form settings next
+            tagDL.tags = txtTags.Text;
+            tagDL.useMinimumScore = chkMinimumScore.Checked;
+            if (tagDL.useMinimumScore) {
+                tagDL.scoreAsTag = chkScoreAsTag.Checked;
+                tagDL.minimumScore = Convert.ToInt32(numScore.Value);
+            }
+            if (numLimit.Value > 0) {
+                tagDL.imageLimit = Convert.ToInt32(numLimit.Value);
+            }
+            tagDL.usePageLimit = chkPageLimit.Checked;
+            if (tagDL.usePageLimit)
                 tagDL.pageLimit = Convert.ToInt32(numPageLimit.Value);
+            tagDL.separateRatings = chkSeparateRatings.Checked;
+            if (tagDL.separateRatings) {
+                string rates = string.Empty;
+                if (chkExplicit.Checked)
+                    rates += "e ";
+                if (chkQuestionable.Checked)
+                    rates += "q ";
+                if (chkSafe.Checked)
+                    rates += "s ";
+                rates = rates.TrimEnd(' ');
+                tagDL.ratings = rates.Split(' ');
             }
             tagDL.Show();
-
             txtTags.Clear();
         }
 
@@ -404,18 +464,9 @@ namespace aphrodite {
         private void chkPageLimit_CheckedChanged(object sender, EventArgs e) {
             numPageLimit.Enabled = chkPageLimit.Checked;
         }
-        #endregion
+    #endregion
 
-        #region Pools
-        public static bool isValidPoolLink(string url) {
-            if (url.StartsWith("http://e621.net/pool/show/") || url.StartsWith("https://e621.net/pool/show/") || url.StartsWith("http://www.e621.net/pool/show/") || url.StartsWith("https://www.e621.net/pool/show/") || url.StartsWith("e621.net/pool/show/") || url.StartsWith("www.e621.net/pool/show/")) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-        
+    #region Pools
         private void txtID_TextChanged(object sender, EventArgs e) {
             var txtSender = (TextBox)sender;
             var curPos = txtSender.SelectionStart;
@@ -442,24 +493,25 @@ namespace aphrodite {
             Pools.Default.Save();
 
             frmPoolDownloader poolDL = new frmPoolDownloader();
-            poolDL.id = txtID.Text;
-            poolDL.openAfter = chkOpen.Checked;
-            poolDL.Show();
+            poolDL.poolID = txtID.Text;
+
+            poolDL.header = Program.UserAgent;
+            poolDL.saveTo = Settings.Default.saveLocation;
+            poolDL.graylist = Settings.Default.blacklist;
+            poolDL.blacklist = Settings.Default.zeroToleranceBlacklist;
+
+            poolDL.saveInfo = Settings.Default.saveInfo;
+            poolDL.ignoreFinish = Settings.Default.ignoreFinish;
+            poolDL.saveBlacklisted = Settings.Default.saveBlacklisted;
+
+            poolDL.usePoolName = Pools.Default.usePoolName;
+            poolDL.mergeBlacklisted = Pools.Default.mergeBlacklisted;
+            poolDL.openAfter = Pools.Default.openAfter;
+
+            poolDL.ShowDialog();
 
             txtID.Clear();
         }
-        #endregion
-
-        #region Images
-        public static bool isValidImageLink(string url) {
-            if (url.StartsWith("http://e621.net/post/show/") || url.StartsWith("https://e621.net/post/show/") || url.StartsWith("http://www.e621.net/post/show/") || url.StartsWith("https://www.e621.net/post/show/") || url.StartsWith("e621.net/post/show/") || url.StartsWith("www.e621.net/post/show/")) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-        #endregion
-
+    #endregion
     }
 }

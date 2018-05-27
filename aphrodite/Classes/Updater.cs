@@ -18,39 +18,9 @@ namespace aphrodite {
         public static string githubURL = "https://github.com/murrty/aphrodite";
         public static string githubJSON = "https://api.github.com/repos/murrty/aphrodite/releases/latest";
 
-        public static string getJSON(string url) {
-            try {
-                using (WebClient wc = new WebClient()) {
-                    wc.Headers.Add(Program.UserAgent);
-                    string json = wc.DownloadString(url);
-                    byte[] bytes = Encoding.ASCII.GetBytes(json);
-                    using (var stream = new MemoryStream(bytes)) {
-                        var quotas = new XmlDictionaryReaderQuotas();
-                        var jsonReader = JsonReaderWriterFactory.CreateJsonReader(stream, quotas);
-                        var xml = XDocument.Load(jsonReader);
-                        stream.Flush();
-                        stream.Close();
-                        return xml.ToString();
-                    }
-                }
-            }
-            catch (WebException WebE) {
-                Debug.Print(WebE.ToString());
-                MessageBox.Show(WebE.ToString());
-                return null;
-                throw WebE;
-            }
-            catch (Exception ex) {
-                Debug.Print(ex.ToString());
-                MessageBox.Show(ex.ToString());
-                return null;
-                throw ex;
-            }
-        }
-
         public static decimal getCloudVersion() {
             try {
-                string xml = getJSON(githubJSON);
+                string xml = apiTools.getJSON(githubJSON, Program.UserAgent);
                 XmlDocument doc = new XmlDocument();
                 doc.LoadXml(xml);
                 XmlNodeList xmlTag = doc.DocumentElement.SelectNodes("/root/tag_name");
@@ -69,7 +39,7 @@ namespace aphrodite {
                         MessageBox.Show("Wow, future version user!");
                     return false;
                 }
-                if (Properties.Settings.Default.currentVersion < cloudVersion)
+                else if (Properties.Settings.Default.currentVersion < cloudVersion)
                     return true;
                 else
                     return false;
@@ -79,5 +49,6 @@ namespace aphrodite {
                 return false;
             }
         }
+
     }
 }

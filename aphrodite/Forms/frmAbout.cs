@@ -25,7 +25,7 @@ namespace aphrodite {
                 decimal cV = Updater.getCloudVersion();
 
                 if (Updater.isUpdateAvailable(cV)) {
-                    if (MessageBox.Show("An update is available. \nNew verison: " + cV.ToString() + " | Your version: " + Properties.Settings.Default.currentVersion.ToString() + "\n\nWould you like to update?", "TagDownloader", MessageBoxButtons.YesNo) == System.Windows.Forms.DialogResult.Yes) {
+                    if (MessageBox.Show("An update is available. \nNew verison: " + cV.ToString() + " | Your version: " + Properties.Settings.Default.currentVersion.ToString() + "\n\nWould you like to update?", "aphrodite", MessageBoxButtons.YesNo) == System.Windows.Forms.DialogResult.Yes) {
                         Process.Start(Updater.githubURL + "/releases/lates");
                     }
                 }
@@ -41,7 +41,7 @@ namespace aphrodite {
             thr.Add(checkUpdates);
         }
 
-        private void pbIcon_Click(object sender, EventArgs e) { Process.Start("https://github.com/murrty/e621-image-downloader/"); }
+        private void pbIcon_Click(object sender, EventArgs e) { Process.Start("https://github.com/murrty/aphrodite/"); }
 
         private void About_FormClosing(object sender, FormClosingEventArgs e) {
             this.Dispose();

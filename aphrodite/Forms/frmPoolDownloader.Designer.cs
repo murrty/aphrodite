@@ -97,7 +97,7 @@
             this.lbTotal.Name = "lbTotal";
             this.lbTotal.Size = new System.Drawing.Size(244, 38);
             this.lbTotal.TabIndex = 6;
-            this.lbTotal.Text = "? posts\r\n? blacklisted\r\n? total";
+            this.lbTotal.Text = "? clean pages\r\n? blacklisted pages\r\n? total pages";
             this.lbTotal.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // tmrTitle

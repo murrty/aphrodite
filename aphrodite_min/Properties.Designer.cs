@@ -25,7 +25,7 @@ namespace aphrodite_min {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1.0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1.7")]
         public string currentVersion {
             get {
                 return ((string)(this["currentVersion"]));

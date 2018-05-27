@@ -34,6 +34,9 @@
   <PropertyGroup>
     <ApplicationIcon>Resources\Brad.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>aphrodite.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -48,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\apiTools.cs" />
     <Compile Include="Classes\Updater.cs" />
     <Compile Include="Forms\frmAbout.cs">
       <SubType>Form</SubType>

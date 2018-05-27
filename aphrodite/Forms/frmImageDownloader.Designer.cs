@@ -69,12 +69,12 @@
             // 
             // lbInfo
             // 
-            this.lbInfo.Location = new System.Drawing.Point(12, 15);
+            this.lbInfo.Location = new System.Drawing.Point(12, 13);
             this.lbInfo.Name = "lbInfo";
             this.lbInfo.Size = new System.Drawing.Size(260, 25);
             this.lbInfo.TabIndex = 7;
             this.lbInfo.Text = "Waiting for parse";
-            this.lbInfo.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.lbInfo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // frmImageDownloader
             // 
@@ -89,6 +89,7 @@
             this.MaximumSize = new System.Drawing.Size(292, 130);
             this.MinimumSize = new System.Drawing.Size(292, 130);
             this.Name = "frmImageDownloader";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Downloading image ....";
             this.Load += new System.EventHandler(this.frmImageDownloader_Load);
             this.ResumeLayout(false);

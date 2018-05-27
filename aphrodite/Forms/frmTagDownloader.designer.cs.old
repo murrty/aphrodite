@@ -33,13 +33,10 @@
             this.txtTags = new System.Windows.Forms.TextBox();
             this.lbBlacklist = new System.Windows.Forms.Label();
             this.tmrTitle = new System.Windows.Forms.Timer(this.components);
-            this.lbLimits = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // lbID
             // 
-            this.lbID.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.lbID.Location = new System.Drawing.Point(115, 2);
             this.lbID.Name = "lbID";
             this.lbID.Size = new System.Drawing.Size(62, 16);
@@ -49,9 +46,7 @@
             // 
             // lbFile
             // 
-            this.lbFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbFile.Location = new System.Drawing.Point(12, 157);
+            this.lbFile.Location = new System.Drawing.Point(12, 127);
             this.lbFile.Name = "lbFile";
             this.lbFile.Size = new System.Drawing.Size(268, 18);
             this.lbFile.TabIndex = 2;
@@ -60,9 +55,7 @@
             // 
             // pbDownloadStatus
             // 
-            this.pbDownloadStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.pbDownloadStatus.Location = new System.Drawing.Point(12, 176);
+            this.pbDownloadStatus.Location = new System.Drawing.Point(12, 146);
             this.pbDownloadStatus.MarqueeAnimationSpeed = 50;
             this.pbDownloadStatus.Maximum = 101;
             this.pbDownloadStatus.Name = "pbDownloadStatus";
@@ -72,10 +65,8 @@
             // 
             // lbPercentage
             // 
-            this.lbPercentage.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.lbPercentage.BackColor = System.Drawing.Color.Transparent;
-            this.lbPercentage.Location = new System.Drawing.Point(126, 178);
+            this.lbPercentage.Location = new System.Drawing.Point(126, 148);
             this.lbPercentage.Name = "lbPercentage";
             this.lbPercentage.Size = new System.Drawing.Size(41, 14);
             this.lbPercentage.TabIndex = 4;
@@ -84,7 +75,7 @@
             // 
             // status
             // 
-            this.status.Location = new System.Drawing.Point(0, 198);
+            this.status.Location = new System.Drawing.Point(0, 168);
             this.status.Name = "status";
             this.status.Size = new System.Drawing.Size(292, 22);
             this.status.SizingGrip = false;
@@ -93,8 +84,6 @@
             // 
             // txtTags
             // 
-            this.txtTags.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.txtTags.Location = new System.Drawing.Point(12, 20);
             this.txtTags.Name = "txtTags";
             this.txtTags.ReadOnly = true;
@@ -104,14 +93,12 @@
             // 
             // lbBlacklist
             // 
-            this.lbBlacklist.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbBlacklist.Location = new System.Drawing.Point(12, 48);
+            this.lbBlacklist.Location = new System.Drawing.Point(12, 45);
             this.lbBlacklist.Name = "lbBlacklist";
-            this.lbBlacklist.Size = new System.Drawing.Size(268, 53);
+            this.lbBlacklist.Size = new System.Drawing.Size(268, 81);
             this.lbBlacklist.TabIndex = 7;
-            this.lbBlacklist.Text = "0 posts (0 e, 0 q, 0 s)\r\n0 blacklisted (0 e, 0 q, 0 s)\r\n0 skipped (zero-tolerance" +
-    ")\r\n0 in total";
+            this.lbBlacklist.Text = "0 posts (0 e, 0 q, 0 s)\r\n0 blacklisted (0 e, 0 q, 0 s)\r\n0 zero-toleranced\r\n0 in t" +
+    "otal\r\n\r\nminimum score: n/a";
             this.lbBlacklist.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // tmrTitle
@@ -120,22 +107,12 @@
             this.tmrTitle.Interval = 1000;
             this.tmrTitle.Tick += new System.EventHandler(this.tmrTitle_Tick);
             // 
-            // lbLimits
-            // 
-            this.lbLimits.Location = new System.Drawing.Point(15, 102);
-            this.lbLimits.Name = "lbLimits";
-            this.lbLimits.Size = new System.Drawing.Size(265, 55);
-            this.lbLimits.TabIndex = 8;
-            this.lbLimits.Text = "Minimum score: disabled\r\nImage limit: disabled\r\nPage limit: disabled\r\nRatings: e," +
-    " q, s (separating)";
-            this.lbLimits.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
             // frmTagDownloader
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(292, 220);
+            this.ClientSize = new System.Drawing.Size(292, 190);
             this.Controls.Add(this.txtTags);
             this.Controls.Add(this.status);
             this.Controls.Add(this.lbPercentage);
@@ -143,14 +120,13 @@
             this.Controls.Add(this.lbFile);
             this.Controls.Add(this.lbID);
             this.Controls.Add(this.lbBlacklist);
-            this.Controls.Add(this.lbLimits);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(300, 184);
             this.Name = "frmTagDownloader";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Downloading tags ";
+            this.Text = "Downloading tags ....";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmDownload_FormClosing);
             this.Load += new System.EventHandler(this.frmDownload_Load);
             this.Shown += new System.EventHandler(this.frmDownload_Shown);
@@ -169,6 +145,5 @@
         private System.Windows.Forms.TextBox txtTags;
         private System.Windows.Forms.Label lbBlacklist;
         private System.Windows.Forms.Timer tmrTitle;
-        private System.Windows.Forms.Label lbLimits;
     }
 }

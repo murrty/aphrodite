@@ -8,10 +8,11 @@ using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace aphrodite_min {
+namespace aphrodite {
     class apiTools {
         public static readonly string emptyXML = "<root type=\"array\"></root>";
 
@@ -92,27 +93,29 @@ namespace aphrodite_min {
             int respID = (int)resp.StatusCode;
             if (resp != null) {
                 if (respID == 404) {
-                    Console.WriteLine("404 at " + url + "\nThe item was not found.");
+                    MessageBox.Show("404 at " + url + "\nThe item was not found.");
                 }
                 else if (respID == 403) {
-                    Console.WriteLine("403 at " + url + "\nYou do not have access to this.");
+                    MessageBox.Show("403 at " + url + "\nYou do not have access to this.");
                 }
                 else if (respID == 421) {
-                    Console.WriteLine("421 at " + url + "\nYou are throttled. Try again later.");
+                    MessageBox.Show("421 at " + url + "\nYou are throttled. Try again later.");
                 }
                 else if (respID == 500) {
-                    Console.WriteLine("500 at " + url + "\nAn error occured on the server. Try again later.");
+                    MessageBox.Show("500 at " + url + "\nAn error occured on the server. Try again later.");
                 }
                 else if (respID == 502) {
-                    Console.WriteLine("502 at " + url + "\ne621 sent an invalid response. Try again later.");
+                    MessageBox.Show("502 at " + url + "\ne621 sent an invalid response. Try again later.");
                 }
                 else if (respID == 503) {
-                    Console.WriteLine("503 at " + url + "\ne621 cannot handle your request or you have exceeded the request limit.\nTry again later, or decrease your downloads");
+                    MessageBox.Show("503 at " + url + "\ne621 cannot handle your request or you have exceeded the request limit.\nTry again later, or decrease your downloads");
                 }
                 else {
-                    Console.WriteLine(respID + " at " + url + "\nThe error is not documented in the source. It's either unrelated or not relevant.\nTry again, either now or later.");
+                    MessageBox.Show(respID + " at " + url + "\nThe error is not documented in the source. It's either unrelated or not relevant.\nTry again, either now or later.");
                 }
             }
+
+            Debug.Print(url);
         }
 
         public static void debugMessage(string message) {

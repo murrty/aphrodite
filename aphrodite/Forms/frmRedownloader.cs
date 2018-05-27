@@ -11,10 +11,8 @@ using System.Windows.Forms;
 
 namespace aphrodite {
     public partial class frmRedownloader : Form {
-        public frmRedownloader() {
-            InitializeComponent();
-        }
 
+    #region Methods
         private void loadDownloads() {
             lbTags.Items.Clear();
             lbPools.Items.Clear();
@@ -41,11 +39,12 @@ namespace aphrodite {
                 return -1;
             else
                 poolLine = poolLine.Replace("POOL: ", "");
-            
+
             int poolID = -1;
             Int32.TryParse(poolLine, out poolID);
             return poolID;
         }
+
         private string getTags(string nfoLocation) {
             if (!nfoLocation.EndsWith("tags.nfo") && !nfoLocation.EndsWith("tags.blacklisted.nfo")) {
                 if (File.Exists(nfoLocation + "\\tags.nfo"))
@@ -83,7 +82,7 @@ namespace aphrodite {
             else
                 return true;
         }
-        private string getTagMinimum(string nfoLocation) {
+        private string getMinimumScore(string nfoLocation) {
             if (!nfoLocation.EndsWith("tags.nfo") && !nfoLocation.EndsWith("tags.blacklisted.nfo")) {
                 if (File.Exists(nfoLocation + "\\tags.nfo"))
                     nfoLocation = nfoLocation + "\\tags.nfo";
@@ -102,6 +101,12 @@ namespace aphrodite {
             else
                 return tagLine.Replace("MINIMUM SCORE: ", "");
         }
+    #endregion
+
+    #region Form
+        public frmRedownloader() {
+            InitializeComponent();
+        }
 
         private void frmTagRedownloader_Load(object sender, EventArgs e) {
             loadDownloads();
@@ -111,8 +116,14 @@ namespace aphrodite {
             if (tcMain.SelectedIndex == 0) {
                 // tags
                 string tags = getTags(Settings.Default.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem));
+                bool minimumScore = false;
+                int minScore = 0;
                 if (string.IsNullOrWhiteSpace(tags)) {
                     tags = lbTags.GetItemText(lbTags.SelectedItem);
+                }
+                if (hasMinimumScore(Settings.Default.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem))) {
+                    minimumScore = true;
+                    minScore = Int32.Parse(getMinimumScore(Settings.Default.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem)));
                 }
                 if (Tags.Default.imageLimit == 0) {
                     if (MessageBox.Show("Redownloading tags \"" + tags + "\"\nDownloading won't be limited. This may take a long while or even blacklist you. Continue anyway?", "aphrodite", MessageBoxButtons.YesNo) == DialogResult.No) {
@@ -137,43 +148,38 @@ namespace aphrodite {
                     return;
                 }
 
-                string ratings = string.Empty;
-                if (Tags.Default.Explicit)
-                    ratings += "e ";
-                if (Tags.Default.Questionable)
-                    ratings += "q ";
-                if (Tags.Default.Safe)
-                    ratings += "s ";
-                if (string.IsNullOrWhiteSpace(ratings)) {
-                    MessageBox.Show("Please specify the ratings you want for images in the settings");
-                    return;
-                }
-                if (ratings.EndsWith(" "))
-                    ratings = ratings.TrimEnd(' ');
-
                 frmTagDownloader tagDL = new frmTagDownloader();
                 tagDL.tags = tags;
-                tagDL.openAfter = false;
-                tagDL.fromURL = false;
-                // TODO: Instead of doing it this way, read the tags.nfo file to determine if there's a score instead of using the folder name.
-                if (hasMinimumScore(Settings.Default.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem))) {
-                    string min = getTagMinimum(Settings.Default.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem));
-                    if (min != null) {
-                        int extractedScore;
-                        Int32.TryParse(min, out extractedScore);
-                        tagDL.useMinimumScore = true;
-                        tagDL.minimumScore = extractedScore;
-                        tagDL.scoreAsTag = Tags.Default.scoreAsTag;
-                    }
-                }
-                tagDL.imageAmount = Convert.ToInt32(Tags.Default.imageLimit);
+                tagDL.graylist = Settings.Default.blacklist;
+                tagDL.blacklist = Settings.Default.zeroToleranceBlacklist;
+                tagDL.saveTo = Settings.Default.saveLocation;
                 tagDL.saveInfo = Settings.Default.saveInfo;
-                tagDL.blacklistedTags = Settings.Default.blacklist;
-                tagDL.zblacklistedTags = Settings.Default.zeroToleranceBlacklist;
-                tagDL.ratings = ratings.Split(' ');
-                tagDL.separateRatings = Tags.Default.separateRatings;
+                tagDL.openAfter = false;
+                tagDL.saveBlacklistedFiles = Settings.Default.saveBlacklisted;
+                tagDL.ignoreFinish = Settings.Default.ignoreFinish;
+                tagDL.useMinimumScore = minimumScore;
+                if (tagDL.useMinimumScore) {
+                    tagDL.minimumScore = minScore;
+                    tagDL.scoreAsTag = Tags.Default.scoreAsTag;
+                }
+                if (Tags.Default.imageLimit > 0)
+                    tagDL.imageLimit = Tags.Default.imageLimit;
                 tagDL.usePageLimit = Tags.Default.usePageLimit;
-                tagDL.pageLimit = Convert.ToInt32(Tags.Default.pageLimit);
+                if (tagDL.usePageLimit)
+                    tagDL.pageLimit = Tags.Default.pageLimit;
+                tagDL.separateRatings = Tags.Default.separateRatings;
+                if (tagDL.separateRatings) {
+                    string ratings = string.Empty;
+                    if (Tags.Default.Explicit)
+                        ratings += "e ";
+                    if (Tags.Default.Questionable)
+                        ratings += "q ";
+                    if (Tags.Default.Safe)
+                        ratings += "s ";
+                    ratings.TrimEnd(' ');
+                    tagDL.ratings = ratings.Split(' ');
+                }
+                tagDL.webHeader = Program.UserAgent;
                 tagDL.Show();
             }
             else if (tcMain.SelectedIndex == 1) {
@@ -184,9 +190,22 @@ namespace aphrodite {
                 }
 
                 frmPoolDownloader poolDL = new frmPoolDownloader();
-                poolDL.id = (poolid).ToString();
+                poolDL.poolID = (poolid).ToString();
+
+                poolDL.header = Program.UserAgent;
+                poolDL.saveTo = Settings.Default.saveLocation;
+                poolDL.graylist = Settings.Default.blacklist;
+                poolDL.blacklist = Settings.Default.zeroToleranceBlacklist;
+
+                poolDL.saveInfo = Settings.Default.saveInfo;
+                poolDL.ignoreFinish = Settings.Default.ignoreFinish;
+                poolDL.saveBlacklisted = Settings.Default.saveBlacklisted;
+
+                poolDL.usePoolName = Pools.Default.usePoolName;
+                poolDL.mergeBlacklisted = Pools.Default.mergeBlacklisted;
                 poolDL.openAfter = Pools.Default.openAfter;
-                poolDL.Show();
+
+                poolDL.ShowDialog();
             }
         }
         private void lbTags_MouseDoubleClick(object sender, MouseEventArgs e) {
@@ -194,8 +213,14 @@ namespace aphrodite {
                 if (tcMain.SelectedIndex == 0) {
                     // tags
                     string tags = getTags(Settings.Default.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem));
+                    bool minimumScore = false;
+                    int minScore = 0;
                     if (string.IsNullOrWhiteSpace(tags)) {
                         tags = lbTags.GetItemText(lbTags.SelectedItem);
+                    }
+                    if (hasMinimumScore(Settings.Default.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem))) {
+                        minimumScore = true;
+                        minScore = Int32.Parse(getMinimumScore(Settings.Default.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem)));
                     }
                     if (Tags.Default.imageLimit == 0) {
                         if (MessageBox.Show("Redownloading tags \"" + tags + "\"\nDownloading won't be limited. This may take a long while or even blacklist you. Continue anyway?", "aphrodite", MessageBoxButtons.YesNo) == DialogResult.No) {
@@ -220,43 +245,38 @@ namespace aphrodite {
                         return;
                     }
 
-                    string ratings = string.Empty;
-                    if (Tags.Default.Explicit)
-                        ratings += "e ";
-                    if (Tags.Default.Questionable)
-                        ratings += "q ";
-                    if (Tags.Default.Safe)
-                        ratings += "s ";
-                    if (string.IsNullOrWhiteSpace(ratings)) {
-                        MessageBox.Show("Please specify the ratings you want for images in the settings");
-                        return;
-                    }
-                    if (ratings.EndsWith(" "))
-                        ratings = ratings.TrimEnd(' ');
-
                     frmTagDownloader tagDL = new frmTagDownloader();
                     tagDL.tags = tags;
-                    tagDL.openAfter = false;
-                    tagDL.fromURL = false;
-                    // TODO: Instead of doing it this way, read the tags.nfo file to determine if there's a score instead of using the folder name.
-                    if (hasMinimumScore(Settings.Default.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem))) {
-                        string min = getTagMinimum(Settings.Default.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem));
-                        if (min != null) {
-                            int extractedScore;
-                            Int32.TryParse(min, out extractedScore);
-                            tagDL.useMinimumScore = true;
-                            tagDL.minimumScore = extractedScore;
-                            tagDL.scoreAsTag = Tags.Default.scoreAsTag;
-                        }
-                    }
-                    tagDL.imageAmount = Convert.ToInt32(Tags.Default.imageLimit);
+                    tagDL.graylist = Settings.Default.blacklist;
+                    tagDL.blacklist = Settings.Default.zeroToleranceBlacklist;
+                    tagDL.saveTo = Settings.Default.saveLocation;
                     tagDL.saveInfo = Settings.Default.saveInfo;
-                    tagDL.blacklistedTags = Settings.Default.blacklist;
-                    tagDL.zblacklistedTags = Settings.Default.zeroToleranceBlacklist;
-                    tagDL.ratings = ratings.Split(' ');
-                    tagDL.separateRatings = Tags.Default.separateRatings;
+                    tagDL.openAfter = false;
+                    tagDL.saveBlacklistedFiles = Settings.Default.saveBlacklisted;
+                    tagDL.ignoreFinish = Settings.Default.ignoreFinish;
+                    tagDL.useMinimumScore = minimumScore;
+                    if (tagDL.useMinimumScore) {
+                        tagDL.minimumScore = minScore;
+                        tagDL.scoreAsTag = Tags.Default.scoreAsTag;
+                    }
+                    if (Tags.Default.imageLimit > 0)
+                        tagDL.imageLimit = Tags.Default.imageLimit;
                     tagDL.usePageLimit = Tags.Default.usePageLimit;
-                    tagDL.pageLimit = Convert.ToInt32(Tags.Default.pageLimit);
+                    if (tagDL.usePageLimit)
+                        tagDL.pageLimit = Tags.Default.pageLimit;
+                    tagDL.separateRatings = Tags.Default.separateRatings;
+                    if (tagDL.separateRatings) {
+                        string ratings = string.Empty;
+                        if (Tags.Default.Explicit)
+                            ratings += "e ";
+                        if (Tags.Default.Questionable)
+                            ratings += "q ";
+                        if (Tags.Default.Safe)
+                            ratings += "s ";
+                        ratings.TrimEnd(' ');
+                        tagDL.ratings = ratings.Split(' ');
+                    }
+                    tagDL.webHeader = Program.UserAgent;
                     tagDL.Show();
                 }
                 else if (tcMain.SelectedIndex == 1) {
@@ -267,9 +287,22 @@ namespace aphrodite {
                     }
 
                     frmPoolDownloader poolDL = new frmPoolDownloader();
-                    poolDL.id = (poolid).ToString();
+                    poolDL.poolID = (poolid).ToString();
+
+                    poolDL.header = Program.UserAgent;
+                    poolDL.saveTo = Settings.Default.saveLocation;
+                    poolDL.graylist = Settings.Default.blacklist;
+                    poolDL.blacklist = Settings.Default.zeroToleranceBlacklist;
+
+                    poolDL.saveInfo = Settings.Default.saveInfo;
+                    poolDL.ignoreFinish = Settings.Default.ignoreFinish;
+                    poolDL.saveBlacklisted = Settings.Default.saveBlacklisted;
+
+                    poolDL.usePoolName = Pools.Default.usePoolName;
+                    poolDL.mergeBlacklisted = Pools.Default.mergeBlacklisted;
                     poolDL.openAfter = Pools.Default.openAfter;
-                    poolDL.Show();
+
+                    poolDL.ShowDialog();
                 }
             }
         }
@@ -277,6 +310,7 @@ namespace aphrodite {
         private void btnRenumerate_Click(object sender, EventArgs e) {
             loadDownloads();
         }
+    #endregion
 
     }
 }

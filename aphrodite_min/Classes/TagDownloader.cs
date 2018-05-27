@@ -57,47 +57,54 @@ namespace aphrodite_min {
         //       > = %3E
         //       | = %7C
         // (space) = %20
+
+        int cleanTotalCount = 0;            // Will be the count of how many files that are set for download.
+        int cleanExplicitCount = 0;         // Will be the count of how many explicit files that are set for download.
+        int cleanQuestionableCount = 0;     // Will be the count of how many questionable files that are set for download.
+        int cleanSafeCount = 0;             // Will be the count of how many safe files that are set for download.
+
+        int graylistTotalCount = 0;         // Will be the count of how many graylisted files that are set for download.
+        int graylistExplicitCount = 0;      // Will be the count of how many explicit graylisted files that are set for download.
+        int graylistQuestionableCount = 0;  // Will be the count of how many questionable graylisted files that are set for download.
+        int graylistSafeCount = 0;          // Will be the count of how many safe graylisted files that are set for download.
+
+        int blacklistCount = 0;             // Will be the count of how many blacklisted files that will be skipped.
+        int totalCount = 0;                 // Will be the count of how many files that were parsed.
         #endregion
 
         public bool downloadTags() {
             if (minMode)
                 Console.Clear();
 
-            staticTags = tags;
+                writeToConsole("Awaiting API call");
+
+            staticTags = tags;                                              // Static tags, set once.
+            string url = string.Empty;                                      // The URL being accessed, changes per API call/File download.
+            string tagInfo = string.Empty;                                  // The buffer for the 'tag.nfo' file that will be created.
+            string blacklistInfo = string.Empty;                            // The buffer for the 'tag.blacklisted.nfo' file that will be created.
+
+            string xml = string.Empty;                                      // The XML string.
+
+            List<string> GraylistedTags = new List<string>();               // The list of files that will be downloaded into a separate folder (if saveBlacklisted = true).
+            List<string> BlacklistedTags = new List<string>();              // The list of files that will be skipped entirely.
+
+            List<string> URLs = new List<string>();                         // The URLs that will be downloaded (if separateRatings = false).
+            List<string> GraylistedURLs = new List<string>();              // The Blacklisted URLs that will be downloaded (if separateRatings = false).
+
+            List<string> ExplicitURLs = new List<string>();                 // The list of Explicit files.
+            List<string> QuestionableURLs = new List<string>();             // The list of Questionable files.
+            List<string> SafeURLs = new List<string>();                     // The list of Safe files.
+            List<string> GraylistedExplicitURLs = new List<string>();       // The list of Graylisted Explicit files.
+            List<string> GraylistedQuestionableURLs = new List<string>();   // The list of Graylisted Questionable files.
+            List<string> GraylistedSafeURLs = new List<string>();           // The list of Graylisted Safe files.
+
+            int tagLength = 0;                                              // Will be the count of tags being downloaded (1-6).
+            int itemCount = 0;                                              // Will be the count of the images on a page.
+            int pageCount = 1;                                              // Will be the count of pages. 1 = the first page.
+
+            bool morePages = false;                                         // Will determine if there are more than 1 page.
 
             try {
-                writeToConsole("Awaiting API call");
-                string url = string.Empty;                                      // The URL being accessed, changes per API call/File download.
-
-                string tagInfo = string.Empty;                                  // The buffer for the 'tag.nfo' file that will be created.
-                string blacklistInfo = string.Empty;                            // The buffer for the 'tag.blacklisted.nfo' file that will be created.
-
-                string xml = string.Empty;                                      // The XML string.
-
-                List<string> GraylistedTags = new List<string>();               // The list of files that will be downloaded into a separate folder (if saveBlacklisted = true).
-                List<string> BlacklistedTags = new List<string>();              // The list of files that will be skipped entirely.
-
-                List<string> URLs = new List<string>();                         // The URLs that will be downloaded (if separateRatings = false).
-                List<string> GraylistedURLs = new List<string>();              // The Blacklisted URLs that will be downloaded (if separateRatings = false).
-
-                List<string> ExplicitURLs = new List<string>();                 // The list of Explicit files.
-                List<string> QuestionableURLs = new List<string>();             // The list of Questionable files.
-                List<string> SafeURLs = new List<string>();                     // The list of Safe files.
-                List<string> GraylistedExplicitURLs = new List<string>();       // The list of Graylisted Explicit files.
-                List<string> GraylistedQuestionableURLs = new List<string>();   // The list of Graylisted Questionable files.
-                List<string> GraylistedSafeURLs = new List<string>();           // The list of Graylisted Safe files.
-
-                int tagLength = 0;                                              // Will be the count of tags being downloaded (1-6).
-                int itemCount = 0;                                              // Will be the count of the images on a page.
-                int pageCount = 1;                                              // Will be the count of pages. 1 = the first page.
-
-                bool morePages = false;                                         // Will determine if there are more than 1 page.
-
-            //int fileCount = 0;                                              // Will be the count of how many files that are set for download.
-                int graylistCount = 0;                                          // Will be the count of how many graylisted files that are set for download.
-                int blacklistCount = 0;                                         // Will be the count of the files that are skipped entirely.
-                int totalCount = 0;                                             // Will be the count of how many files that were parsed.
-
             // Set the saveTo.
                 string newTagName = tags;
                 for (int i = 0; i < badFolderChars.Length; i++)                                        // Replace bad characters (if present).
@@ -162,8 +169,6 @@ namespace aphrodite_min {
 
             // Begin parsing the XML for tag information per item.
                 for (int i = 0; i < xmlID.Count; i++) {
-                    totalCount++;   // Add to the total count.
-
                     string artists = string.Empty;                                          // The artists that worked on the file.
                     string rating = xmlRating[i].InnerText;                                 // Get the rating of the current file.
                     bool isGraylisted = false;                                              // Will determine if the file is graylisted.
@@ -197,14 +202,13 @@ namespace aphrodite_min {
                             for (int k = 0; k < BlacklistedTags.Count; k++) {
                                 if (foundTags[j] == BlacklistedTags[k]) {
                                     isBlacklisted = true;
-                                    blacklistCount++;
                                     break;
                                 }
                             }
                         }
 
                         if (isBlacklisted)
-                            break;
+                            continue;
 
                         if (GraylistedTags.Count > 0) {
                             for (int k = 0; k < GraylistedTags.Count; k++) {
@@ -216,13 +220,46 @@ namespace aphrodite_min {
                         }
                     }
 
+                // Add to the counts (and break for blacklisted)
+                    if (isBlacklisted) {
+                        blacklistCount++;
+                    }
+                    else if (isGraylisted) {
+                        graylistTotalCount++;
+                        switch (xmlRating[i].InnerText.ToLower()) {
+                            case "e":
+                                graylistExplicitCount++;
+                                break;
+                            case "q":
+                                graylistQuestionableCount++;
+                                break;
+                            case "s":
+                                graylistSafeCount++;
+                                break;
+                        }
+                    }
+                    else {
+                        cleanTotalCount++;
+                        switch (xmlRating[i].InnerText.ToLower()) {
+                            case "e":
+                                cleanExplicitCount++;
+                                break;
+                            case "q":
+                                cleanQuestionableCount++;
+                                break;
+                            case "s":
+                                cleanSafeCount++;
+                                break;
+                        }
+                    }
+                    totalCount++;
+
                 // There's a blacklisted tag, so skip it.
                     if (isBlacklisted)
-                        break;
+                        continue;
 
                 // Graylist check & options check
                     if (isGraylisted) {
-                        graylistCount++;
                         if (saveBlacklistedFiles) {
                             if (useMinimumScore && Int32.Parse(xmlScore[i].InnerText) < minimumScore)
                                 continue;
@@ -303,8 +340,6 @@ namespace aphrodite_min {
                         xmlDescription = doc.DocumentElement.SelectNodes("/root/item/description");
 
                         for (int i = 0; i < xmlID.Count; i++) {
-                            totalCount++;
-
                             string artists = string.Empty;
                             string rating = xmlRating[i].InnerText;
                             bool isGraylisted = false;
@@ -333,7 +368,6 @@ namespace aphrodite_min {
                                     for (int k = 0; k < BlacklistedTags.Count; k++) {
                                         if (foundTags[j] == BlacklistedTags[k]) {
                                             isBlacklisted = true;
-                                            blacklistCount++;
                                             break;
                                         }
                                     }
@@ -352,11 +386,43 @@ namespace aphrodite_min {
                                 }
                             }
 
+                            if (isBlacklisted) {
+                                blacklistCount++;
+                            }
+                            else if (isGraylisted) {
+                                graylistTotalCount++;
+                                switch (xmlRating[i].InnerText.ToLower()) {
+                                    case "e":
+                                        graylistExplicitCount++;
+                                        break;
+                                    case "q":
+                                        graylistQuestionableCount++;
+                                        break;
+                                    case "s":
+                                        graylistSafeCount++;
+                                        break;
+                                }
+                            }
+                            else {
+                                cleanTotalCount++;
+                                switch (xmlRating[i].InnerText.ToLower()) {
+                                    case "e":
+                                        cleanExplicitCount++;
+                                        break;
+                                    case "q":
+                                        cleanQuestionableCount++;
+                                        break;
+                                    case "s":
+                                        cleanSafeCount++;
+                                        break;
+                                }
+                            }
+                            totalCount++;
+
                             if (isBlacklisted)
-                                break;
+                                continue;
 
                             if (isGraylisted) {
-                                graylistCount++;
                                 if (saveBlacklistedFiles) {
                                     if (useMinimumScore && Int32.Parse(xmlScore[i].InnerText) < minimumScore)
                                         continue;
@@ -411,52 +477,20 @@ namespace aphrodite_min {
                     }
                 }
 
-            // Count totals for the form
+            // Set the file count for the console.
+                string countBuffer = "";
                 if (separateRatings) {
-                    int cleanFiles = itemCount;
-                    int graylistedFiles = graylistCount;
-                    int blacklistedFiles = blacklistCount;
+                    object[] counts = new object[] { cleanTotalCount.ToString(), cleanExplicitCount.ToString(), cleanQuestionableCount.ToString(), cleanSafeCount.ToString(), graylistTotalCount.ToString(), graylistExplicitCount.ToString(), graylistQuestionableCount.ToString(), graylistSafeCount.ToString(), blacklistCount.ToString(), totalCount.ToString() };
 
-                    int cleanExplicit = 0;
-                    int cleanQuestionable = 0;
-                    int cleanSafe = 0;
-
-                    int graylistedExplicit = 0;
-                    int graylistedQuestionable = 0;
-                    int graylistedSafe = 0;
-
-                    int totalFiles = 0;
-
-                    if (separateRatings) {
-                        cleanExplicit = ExplicitURLs.Count;
-                        cleanQuestionable = QuestionableURLs.Count;
-                        cleanSafe = SafeURLs.Count;
-
-                        graylistedExplicit = GraylistedExplicitURLs.Count;
-                        graylistedQuestionable = GraylistedQuestionableURLs.Count;
-                        graylistedSafe = GraylistedSafeURLs.Count;
-
-                        totalFiles = cleanExplicit + cleanQuestionable + cleanSafe + graylistedExplicit + graylistedQuestionable + graylistedSafe + blacklistedFiles;
-                    }
-                    else {
-                        cleanFiles = URLs.Count;
-                        graylistedFiles = GraylistedURLs.Count;
-
-                        totalFiles = cleanFiles + graylistedFiles + blacklistedFiles;
-                    }
-
-                    string output = string.Empty;
-
-                    if (separateRatings) {
-                        output = (cleanExplicit + cleanQuestionable + cleanSafe) + " posts (" + (cleanExplicit) + " e, " + (cleanQuestionable) + " q, " + (cleanSafe) + " s)\n";
-                        output += (graylistedExplicit + graylistedQuestionable + graylistedSafe) + " blacklisted (" + (graylistedExplicit) + " e, " + (graylistedQuestionable) + " q, " + (graylistedSafe) + " s)\n";
-                        output += (blacklistedFiles) + " skipped (zero-tolerance)\n";
-                        output += (totalFiles) + " in total";
-                    }
-                    else {
-                        output = (cleanFiles) + " posts\n" + (graylistedFiles) + " blacklisted\n" + (blacklistedFiles) + " skipped (zero-tolerance)\n" + (totalFiles) + " in total";
-                    }
+                    countBuffer = string.Format("\n{0} files, {1} explicited, {2} questionable, {3} safe\n{4} blacklisted files, {5} explicit, {6} questionable, {7} safe\n{8} skipped (has zero-tolerance tags)\n{9} files in total", counts);
                 }
+                else {
+                    object[] counts = new object[] { cleanTotalCount.ToString(), graylistTotalCount.ToString(), blacklistCount.ToString(), totalCount.ToString() };
+
+                    countBuffer = string.Format("\n{0} files\n{1} on the graylist\n{2} on the blacklist (zero-tolerance)\n{3} files in total", counts);
+                }
+                writeToConsole(countBuffer, true);
+
 
             // Create output folders
                 if (separateRatings) {
@@ -701,51 +735,69 @@ namespace aphrodite_min {
                 Console.ReadKey();
                 return true;
             }
-            catch {
+            catch (ThreadAbortException thrEx) {
+                Debug.Print("Thread was requested to be, and has been, aborted.");
+                Debug.Print("========== BEGIN THREADABORTEXCEPTION ==========");
+                Debug.Print(thrEx.ToString());
+                Debug.Print("========== END THREADABORTEXCEPTION ==========");
                 return false;
+                throw thrEx;
+            }
+            catch (WebException WebE) {
+                Debug.Print("A WebException has occured.");
+                Debug.Print("========== BEGIN WEBEXCEPTION ==========");
+                Debug.Print(WebE.ToString());
+                Debug.Print("========== END WEBEXCEPTION ==========");
+                apiTools.webError(WebE, url);
+                return false;
+                throw WebE;
+            }
+            catch (Exception ex) {
+                Debug.Print("A gneral exception has occured.");
+                Debug.Print("========== BEGIN EXCEPTION ==========");
+                Debug.Print(ex.ToString());
+                Debug.Print("========== END EXCEPTION ==========");
+                return false;
+                throw ex;
             }
         }
         public bool downloadPage(string pageURL) {
             string pageNumber = pageURL.Split('/')[5];
-            tags = pageURL.Split('/')[6].Split('#')[0];
+            tags = pageURL.Split('/')[6].Split('#')[0].Replace("%20", " ");
+            staticTags = tags;
+
+            writeToConsole("Awaiting API call");
+            string url = string.Empty;                                      // The URL being accessed, changes per API call/File download.
+
+            string tagInfo = string.Empty;                                  // The buffer for the 'tag.nfo' file that will be created.
+            string blacklistInfo = string.Empty;                            // The buffer for the 'tag.blacklisted.nfo' file that will be created.
+
+            string xml = string.Empty;                                      // The XML string.
+
+            List<string> GraylistedTags = new List<string>();               // The list of files that will be downloaded into a separate folder (if saveBlacklisted = true).
+            List<string> BlacklistedTags = new List<string>();              // The list of files that will be skipped entirely.
+
+            List<string> URLs = new List<string>();                         // The URLs that will be downloaded (if separateRatings = false).
+            List<string> GraylistedURLs = new List<string>();              // The Blacklisted URLs that will be downloaded (if separateRatings = false).
+
+            List<string> ExplicitURLs = new List<string>();                 // The list of Explicit files.
+            List<string> QuestionableURLs = new List<string>();             // The list of Questionable files.
+            List<string> SafeURLs = new List<string>();                     // The list of Safe files.
+            List<string> GraylistedExplicitURLs = new List<string>();       // The list of Graylisted Explicit files.
+            List<string> GraylistedQuestionableURLs = new List<string>();   // The list of Graylisted Questionable files.
+            List<string> GraylistedSafeURLs = new List<string>();           // The list of Graylisted Safe files.
+
+            int tagLength = 0;                                              // Will be the count of tags being downloaded (1-6).
 
             try {
-                writeToConsole("Awaiting API call");
-                string url = string.Empty;                                      // The URL being accessed, changes per API call/File download.
-
-                string tagInfo = string.Empty;                                  // The buffer for the 'tag.nfo' file that will be created.
-                string blacklistInfo = string.Empty;                            // The buffer for the 'tag.blacklisted.nfo' file that will be created.
-
-                string xml = string.Empty;                                      // The XML string.
-
-                List<string> GraylistedTags = new List<string>();               // The list of files that will be downloaded into a separate folder (if saveBlacklisted = true).
-                List<string> BlacklistedTags = new List<string>();              // The list of files that will be skipped entirely.
-
-                List<string> URLs = new List<string>();                         // The URLs that will be downloaded (if separateRatings = false).
-                List<string> GraylistedURLs = new List<string>();              // The Blacklisted URLs that will be downloaded (if separateRatings = false).
-
-                List<string> ExplicitURLs = new List<string>();                 // The list of Explicit files.
-                List<string> QuestionableURLs = new List<string>();             // The list of Questionable files.
-                List<string> SafeURLs = new List<string>();                     // The list of Safe files.
-                List<string> GraylistedExplicitURLs = new List<string>();       // The list of Graylisted Explicit files.
-                List<string> GraylistedQuestionableURLs = new List<string>();   // The list of Graylisted Questionable files.
-                List<string> GraylistedSafeURLs = new List<string>();           // The list of Graylisted Safe files.
-
-                int tagLength = 0;                                              // Will be the count of tags being downloaded (1-6).
-
-                int fileCount = 0;                                              // Will be the count of how many files that are set for download.
-                int graylistCount = 0;                                          // Will be the count of how many graylisted files that are set for download.
-                int blacklistCount = 0;                                         // Will be the count of the files that are skipped entirely.
-                int totalCount = 0;                                             // Will be the count of how many files that were parsed.
-
                 // Set the saveTo.
                 string newTagName = tags;
                 for (int i = 0; i < badFolderChars.Length; i++)                                             // Replace bad characters (if present).
                     newTagName = newTagName.Replace(badFolderChars[i], replacementFolderChars[i]);
                 if (useMinimumScore)                                                                        // Add minimum score to folder name.
                     newTagName += " (scores " + (minimumScore) + "+)";
-                if (!this.saveTo.EndsWith("\\Pages\\Tags\\" + newTagName + " (page " + pageNumber + ")"))   // Set the output folder.
-                    this.saveTo += "\\Pages\\Tags\\" + newTagName + " (page " + pageNumber + ")";
+                if (!this.saveTo.EndsWith("\\Pages\\" + newTagName + " (page " + pageNumber + ")"))   // Set the output folder.
+                    this.saveTo += "\\Pages\\" + newTagName + " (page " + pageNumber + ")";
 
             // Start the buffer for the .nfo files.
                 if (useMinimumScore) {
@@ -772,7 +824,7 @@ namespace aphrodite_min {
                     BlacklistedTags = blacklist.Split(' ').ToList();
 
             // Get XML of page.
-                writeToConsole("Downloading tag information...");
+                writeToConsole("Downloading page information...", true);
                 url = tagJson + tags + pageJson + pageNumber;
                 xml = apiTools.getJSON(url, webHeader);
                 if (xml == null)
@@ -792,8 +844,6 @@ namespace aphrodite_min {
 
             // Begin parsing the XML for tag information per item.
                 for (int i = 0; i < xmlID.Count; i++) {
-                    totalCount++;   // Add to the total count.
-
                     string artists = string.Empty;                                          // The artists that worked on the file.
                     string rating = xmlRating[i].InnerText;                                 // Get the rating of the current file.
                     bool isGraylisted = false;                                              // Will determine if the file is graylisted.
@@ -827,7 +877,6 @@ namespace aphrodite_min {
                             for (int k = 0; k < BlacklistedTags.Count; k++) {
                                 if (foundTags[j] == BlacklistedTags[k]) {
                                     isBlacklisted = true;
-                                    blacklistCount++;
                                     break;
                                 }
                             }
@@ -846,13 +895,46 @@ namespace aphrodite_min {
                         }
                     }
 
+                // Add to the counts (and break for blacklisted)
+                    if (isBlacklisted) {
+                        blacklistCount++;
+                    }
+                    else if (isGraylisted) {
+                        graylistTotalCount++;
+                        switch (xmlRating[i].InnerText.ToLower()) {
+                            case "e":
+                                graylistExplicitCount++;
+                                break;
+                            case "q":
+                                graylistQuestionableCount++;
+                                break;
+                            case "s":
+                                graylistSafeCount++;
+                                break;
+                        }
+                    }
+                    else {
+                        cleanTotalCount++;
+                        switch (xmlRating[i].InnerText.ToLower()) {
+                            case "e":
+                                cleanExplicitCount++;
+                                break;
+                            case "q":
+                                cleanQuestionableCount++;
+                                break;
+                            case "s":
+                                cleanSafeCount++;
+                                break;
+                        }
+                    }
+                    totalCount++;
+
                 // There's a blacklisted tag, so skip it.
                     if (isBlacklisted)
-                        break;
+                        continue;
 
                 // Graylist check & options check
                     if (isGraylisted) {
-                        graylistCount++;
                         if (saveBlacklistedFiles) {
                             if (useMinimumScore && Int32.Parse(xmlScore[i].InnerText) < minimumScore)
                                 continue;
@@ -905,52 +987,19 @@ namespace aphrodite_min {
                     }
                 }
 
-            // Count totals for the form
+            // Set the file count for the console.
+                string countBuffer = "";
                 if (separateRatings) {
-                    int cleanFiles = fileCount;
-                    int graylistedFiles = graylistCount;
-                    int blacklistedFiles = blacklistCount;
+                    object[] counts = new object[] { cleanTotalCount.ToString(), cleanExplicitCount.ToString(), cleanQuestionableCount.ToString(), cleanSafeCount.ToString(), graylistTotalCount.ToString(), graylistExplicitCount.ToString(), graylistQuestionableCount.ToString(), graylistSafeCount.ToString(), blacklistCount.ToString(), totalCount.ToString() };
 
-                    int cleanExplicit = 0;
-                    int cleanQuestionable = 0;
-                    int cleanSafe = 0;
-
-                    int graylistedExplicit = 0;
-                    int graylistedQuestionable = 0;
-                    int graylistedSafe = 0;
-
-                    int totalFiles = 0;
-
-                    if (separateRatings) {
-                        cleanExplicit = ExplicitURLs.Count;
-                        cleanQuestionable = QuestionableURLs.Count;
-                        cleanSafe = SafeURLs.Count;
-
-                        graylistedExplicit = GraylistedExplicitURLs.Count;
-                        graylistedQuestionable = GraylistedQuestionableURLs.Count;
-                        graylistedSafe = GraylistedSafeURLs.Count;
-
-                        totalFiles = cleanExplicit + cleanQuestionable + cleanSafe + graylistedExplicit + graylistedQuestionable + graylistedSafe + blacklistCount;
-                    }
-                    else {
-                        cleanFiles = URLs.Count;
-                        graylistedFiles = GraylistedURLs.Count;
-
-                        totalFiles = cleanFiles + graylistedFiles + blacklistedFiles;
-                    }
-
-                    string output = string.Empty;
-
-                    if (separateRatings) {
-                        output = (cleanExplicit + cleanQuestionable + cleanSafe) + " posts (" + (cleanExplicit) + " e, " + (cleanQuestionable) + " q, " + (cleanSafe) + " s)\n";
-                        output += (graylistedExplicit + graylistedQuestionable + graylistedSafe) + " blacklisted (" + (graylistedExplicit) + " e, " + (graylistedQuestionable) + " q, " + (graylistedSafe) + " s)\n";
-                        output += (blacklistedFiles) + " skipped (zero-tolerance)\n";
-                        output += (totalFiles) + " in total";
-                    }
-                    else {
-                        output = (cleanFiles) + " posts\n" + (graylistedFiles) + " blacklisted\n" + (blacklistedFiles) + " skipped (zero-tolerance)\n" + (totalFiles) + " in total";
-                    }
+                    countBuffer = string.Format("\n{0} files, {1} explicited, {2} questionable, {3} safe\n{4} blacklisted files, {5} explicit, {6} questionable, {7} safe\n{8} skipped (has zero-tolerance tags)\n{9} files in total", counts);
                 }
+                else {
+                    object[] counts = new object[] { cleanTotalCount.ToString(), graylistTotalCount.ToString(), blacklistCount.ToString(), totalCount.ToString() };
+
+                    countBuffer = string.Format("\n{0} files\n{1} on the graylist\n{2} on the blacklist (zero-tolerance)\n{3} files in total", counts);
+                }
+                writeToConsole(countBuffer, true);
 
             // Create output folders
                 if (separateRatings) {
@@ -1191,12 +1240,34 @@ namespace aphrodite_min {
                         count += GraylistedURLs.Count;
                 }
 
-                Console.WriteLine("\n\nTags \"" + staticTags + "\" downloaded succesfully.\nPress any key to return to the menu...");
+                Console.WriteLine("\n\nPage {0} of tags \"{1}\" downloaded succesfully.\nPress any key to return to the menu...", pageNumber, staticTags);
                 Console.ReadKey();
                 return true;
             }
-            catch {
+            catch (ThreadAbortException thrEx) {
+                Debug.Print("Thread was requested to be, and has been, aborted.");
+                Debug.Print("========== BEGIN THREADABORTEXCEPTION ==========");
+                Debug.Print(thrEx.ToString());
+                Debug.Print("========== END THREADABORTEXCEPTION ==========");
                 return false;
+                throw thrEx;
+            }
+            catch (WebException WebE) {
+                Debug.Print("A WebException has occured.");
+                Debug.Print("========== BEGIN WEBEXCEPTION ==========");
+                Debug.Print(WebE.ToString());
+                Debug.Print("========== END WEBEXCEPTION ==========");
+                apiTools.webError(WebE, url);
+                return false;
+                throw WebE;
+            }
+            catch (Exception ex) {
+                Debug.Print("A gneral exception has occured.");
+                Debug.Print("========== BEGIN EXCEPTION ==========");
+                Debug.Print(ex.ToString());
+                Debug.Print("========== END EXCEPTION ==========");
+                return false;
+                throw ex;
             }
         }
 

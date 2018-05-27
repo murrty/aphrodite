@@ -25,25 +25,13 @@ namespace aphrodite {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool artistMD5 {
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int fileNameCode {
             get {
-                return ((bool)(this["artistMD5"]));
+                return ((int)(this["fileNameCode"]));
             }
             set {
-                this["artistMD5"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool MD5 {
-            get {
-                return ((bool)(this["MD5"]));
-            }
-            set {
-                this["MD5"] = value;
+                this["fileNameCode"] = value;
             }
         }
         

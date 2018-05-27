@@ -121,6 +121,7 @@
             this.MinimumSize = new System.Drawing.Size(300, 270);
             this.Name = "frmRedownloader";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Re-Downloader";
             this.Load += new System.EventHandler(this.frmTagRedownloader_Load);
             this.tcMain.ResumeLayout(false);

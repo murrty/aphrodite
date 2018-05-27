@@ -31,7 +31,7 @@ namespace aphrodite_min {
                                                 // 0 = MD5
                                                 // 1 = artist_MD5
 
-        public readonly string postJsonBase = "https://e621.net/post/show.json?id=";    // Json base url
+        public static readonly string postJsonBase = "https://e621.net/post/show.json?id=";    // Json base url
         #endregion
 
         public bool downloadImage(string url) {

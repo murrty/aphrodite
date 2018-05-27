@@ -116,8 +116,12 @@ namespace aphrodite {
             Pools.Default.addWishlistSilent = chkAddWishlistSilent.Checked;
 
             // Images
-            Images.Default.artistMD5 = rbArtist.Checked;
-            Images.Default.MD5 = rbMD5.Checked;
+            if (rbArtist.Checked) {
+                Images.Default.fileNameCode = 1;
+            }
+            else if (rbMD5.Checked) {
+                Images.Default.fileNameCode = 0;
+            }
             Images.Default.separateRatings = chkSeparateImages.Checked;
             Images.Default.separateBlacklisted = chkSeparateBlacklist.Checked;
             Images.Default.useForm = chkUseForm.Checked;
@@ -154,8 +158,17 @@ namespace aphrodite {
             chkAddWishlistSilent.Checked = Pools.Default.addWishlistSilent;
 
             // Images
-            rbArtist.Checked = Images.Default.artistMD5;
-            rbMD5.Checked = Images.Default.MD5;
+            switch (Images.Default.fileNameCode) {
+                case 0:
+                    rbMD5.Checked = true;
+                    break;
+                case 1:
+                    rbArtist.Checked = true;
+                    break;
+                default:
+                    rbArtist.Checked = true;
+                    break;
+            }
             chkSeparateImages.Checked = Images.Default.separateRatings;
             chkSeparateBlacklist.Checked = Images.Default.separateBlacklisted;
             chkUseForm.Checked = Images.Default.useForm;

@@ -8,12 +8,13 @@ using System.Threading.Tasks;
 
 namespace aphrodite_min {
     class Program {
-        #region variables
+
+    #region variables
         public static readonly string UserAgent = "User-Agent: aphrodite-min/" + (Properties.Default.currentVersion) + " (Contact: https://github.com/murrty/aphrodite ... open an issue)";                               // User agent used for the application.
 
-        static readonly bool debugMode = false;     // Debug mode.
+        static readonly bool debugMode = true;     // Debug mode.
         static bool hasArg = false;                 // Determine if there's an argument to perform an action.
-        #endregion
+    #endregion
 
         static void Main(string[] args) {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
@@ -25,7 +26,6 @@ namespace aphrodite_min {
 
             if (readArguments(args))
                 Environment.Exit(0);
-
 
 START:
             Console.Clear();
@@ -114,27 +114,32 @@ START:
                     }
                 }
                 else if (args[i].StartsWith("pools:")) {
-                    if (isValidPoolLink(args[i].Replace("pools:", ""))) {
+                    if (apiTools.isValidPoolLink(args[i].Replace("pools:", ""))) {
                         downloadPool(args[i].Replace("pools:", ""));
                     }
                     return true;
                 }
-                else if (args[i].StartsWith("tags:") || args[i].StartsWith("tag:")) {
-                    string tags = getTags(args);
-                    if (string.IsNullOrWhiteSpace(tags))
-                        return false;
-
-                    Console.WriteLine("Would you like to download the tags \"{0}\"?", tags);
-                    if (askYesOrNo()) {
-                        downloadTag(args[i].Replace("tags:", ""));
+                else if (args[i].StartsWith("images:")) {
+                    if (apiTools.isValidImageLink(args[i].Replace("images:", ""))) {
+                        downloadImage(args[i].Replace("images:", "").Split('/')[5]);
                     }
-
                     return true;
                 }
-                else if (args[i].StartsWith("images:")) {
-                    if (isValidE621Link(args[i].Replace("images:", ""))) {
-
+                else if (args[i].StartsWith("tags:") || args[i].StartsWith("tag:")) {
+                    if (apiTools.isValidPostLink(args[i].Replace("tags:", ""))) {
+                        downloadPage(args[i].Replace("tags:", ""));
                     }
+                    else {
+                        string tags = getTags(args);
+                        if (string.IsNullOrWhiteSpace(tags))
+                            return false;
+
+                        Console.WriteLine("Would you like to download the tags \"{0}\"?", tags);
+                        if (askYesOrNo()) {
+                            downloadTag(args[i].Replace("tags:", ""));
+                        }
+                    }
+
                     return true;
                 }
                 else
@@ -144,7 +149,7 @@ START:
             return false;
         }
 
-        #region download methods
+    #region download methods
         static void downloadTag(string tags = "") {
 retry:
             Console.Clear();
@@ -345,29 +350,9 @@ retry:
 
             return;
         }
-        #endregion
+    #endregion
 
-        #region check methods
-        static bool isValidPoolLink(string url) {
-            if (url.StartsWith("http://"))
-                url = url.Replace("http://", "https://");
-            url = url.Replace("www.", "");
-
-            if (url.IndexOf("https://e621.net/pool/show/") == 0)
-                return true;
-            else
-                return false;
-        }
-        static bool isValidE621Link(string url) {
-            if (url.StartsWith("http://"))
-                url = url.Replace("http://", "https://");
-            url = url.Replace("www.", "");
-
-            if (url.IndexOf("https://e621.net/") == 0)
-                return true;
-            else
-                return false;
-        }
+    #region check methods
         static string getTags(string[] args) {
             string tags = null;
             for (int i =0; i < args.Length; i++) {
@@ -378,9 +363,9 @@ retry:
             tags = tags.TrimEnd(' ');
             return tags;
         }
-        #endregion
+    #endregion
 
-        #region settings
+    #region settings
         static void firstTimeSetup() {
             Console.Clear();
             addLinedLines(36);
@@ -418,27 +403,25 @@ settingsMain:
             Console.WriteLine("Alternatively, press any key to return to the menu.\n");
             Console.Write("Option: ");
             string answer = Console.ReadLine();
-            int outp;
-            Int32.TryParse(answer, out outp);
-            switch (outp) {
-                case 1:
+            switch (answer.ToUpper()) {
+                case "1": case "GLOBAL":
                     loadGlobalSettings();
                     goto settingsMain;
-                case 2:
+                case "2": case "TAG": case "TAGS":
                     loadTagSettings();
                     goto settingsMain;
-                case 3:
+                case "3": case "POOL": case "POOLS":
                     loadPoolSettings();
                     goto settingsMain;
-                case 4:
+                case "4": case "IMAGE": case "IMAGES":
                     loadImageSettings();
                     goto settingsMain;
-                case 5:
+                case "5": case "BLACKLIST": case "BLACKLISTS":
                     changeBlacklist();
                     goto settingsMain;
-                case 7:
+                case "7": case "DEFAULT":
                     goto settingsMain;
-                case 9:
+                case "9": case "MENU": case "EXIT":
                     Settings.Default.Save();
                     Tags.Default.Save();
                     Pools.Default.Save();
@@ -797,9 +780,9 @@ settingMain:
             blacklist = blacklist.Replace("  ", " ");
             Settings.Default.blacklist = blacklist;
         }
-        #endregion
+    #endregion
 
-        #region aesthetic methods
+    #region aesthetic methods
         static void showAbout() {
             Console.Clear();
             Console.WriteLine("---------------------------");
@@ -810,6 +793,8 @@ settingMain:
             Console.WriteLine("|      this program.      |");
             Console.WriteLine("|           < 3           |");
             Console.WriteLine("---------------------------");
+            Console.WriteLine("Source code available at:");
+            Console.WriteLine("https://github.com/murrty/aphrodite");
             Console.WriteLine("\nPress any key to return to the menu...");
             Console.ReadKey();
         }
@@ -852,9 +837,9 @@ retry:
             Int32.TryParse(answer, out output);
             return output;
         }
-        #endregion
+    #endregion
 
-        #region debug methods
+    #region debug methods
         static void readArgumentsDebug(string[] args) {
             if (args.Length <= 0)
                 return;
@@ -934,6 +919,6 @@ retry:
             }
             return;
         }
-        #endregion
+    #endregion
     }
 }

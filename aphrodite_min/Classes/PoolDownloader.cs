@@ -30,8 +30,8 @@ namespace aphrodite_min {
         public bool mergeBlacklisted;           // Setting for merging blacklisted pages with regular pages.
         public bool openAfter;                  // Setting for opening the folder after download.
 
-        public static string poolJson = "https://e621.net/pool/show.json?id=";
-        public static string poolPageJson = "&page=";
+        public static readonly string poolJson = "https://e621.net/pool/show.json?id=";
+        public static readonly string poolPageJson = "&page=";
         #endregion
 
         public bool downloadPool(string poolID) {
