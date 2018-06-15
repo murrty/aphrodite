@@ -1,7 +1,7 @@
-﻿// ==UserScript==
+// ==UserScript==
 // @name        Aphrodite
-// @namespace   https://github.com/murrty/Aphrodite
-// @version     1.1
+// @namespace   https://github.com/murrty/aphrodite
+// @version     1.3
 // @description e621 general downloader (pools & images based on tags)
 // @run-at      document-end
 // @include     http*://e621.net/pool/show/*
@@ -34,15 +34,15 @@ if (document.URL.indexOf("e621.net/post/index/") > -1 || document.URL.indexOf("e
 
     tagDownloadLink.id = "download-page";
     tagDownloadLink.href = "tags:" + document.URL;
-    tagDownloadLink.title = "Download this page using Tag Downloader";
+    tagDownloadLink.title = "Download this page using aphrodite";
     tagDownloadLink.appendChild(document.createTextNode('download this page'));
     tagDiv.appendChild(tagDownloadLink);
     tagDiv.appendChild(tagSpacer);
     tagDiv.appendChild(tagSpacerTwo);
 
     tagDownloadTags.id = "download-tag";
-    tagDownloadTags.href = "tags:" + document.getElementsByName('tags')[0].value
-    tagDownloadTags.title = "Download searched tag(s) using Tag Downloader (does not automatically start)";
+    tagDownloadTags.href = "tags:" + document.getElementsByName('tags')[0].value.replace(" ", " tags:");
+    tagDownloadTags.title = "Download searched tag(s) using aphrodite";
     tagDownloadTags.appendChild(document.createTextNode('download searched tag(s)'));
     tagDiv.appendChild(tagDownloadTags);
     tagDiv.appendChild(tagSpacerThree);
@@ -50,7 +50,7 @@ if (document.URL.indexOf("e621.net/post/index/") > -1 || document.URL.indexOf("e
 
     tagSettings.id = "download-settings";
     tagSettings.href = "tags:configuresettings";
-    tagSettings.title = "Change the Tag Downloader settings";
+    tagSettings.title = "Change aphrodite's tag downloading settings";
     tagSettings.appendChild(document.createTextNode('change downloader settings'));
     tagDiv.appendChild(tagSettings);
     tagElement.parentNode.insertBefore(tagDiv, tagElement);
@@ -85,23 +85,22 @@ if (document.URL.indexOf("e621.net/post/show/") > -1 || document.URL.indexOf("e6
     }
 
     poolLink.id = "download-pool";
-    poolLink.title = "Download this pool";
+    poolLink.title = "Download this pool using aphrodite";
     poolLink.appendChild(document.createTextNode('download pool'));
     poolDiv.appendChild(poolLink);
 
     poolWish.id = "pool-add-to-wishlist";
-    poolWish.title = "Add pool to wishlist";
+    poolWish.title = "Add pool to aphrodite's wishlist";
     poolWish.appendChild(document.createTextNode('add to wishlist'));
-    poolDiv.appendChild(poolWish);
 
     poolSettings.id = "pool-settings";
     poolSettings.href = "pools:configuresettings";
-    poolSettings.title = "Change the Pool Downloader settings";
+    poolSettings.title = "Change aphrodite's pool downloading settings";
     poolSettings.appendChild(document.createTextNode('settings'));
     poolDiv.appendChild(poolSettings);
 
     if (document.URL.indexOf("e621.net/post/show/") > -1) {
-        poolDiv.style = "display: normal; text-align: left; padding: 1em 25px 1em;"
+        poolDiv.style = "display: normal; text-align: left; padding: 1em 23px 1em;"
         poolDiv.className = "status-notice";
         poolLink.href = "pools:https://e621.net/pool/show/" + poolID;
         if (tag.id.lastIndexOf("pool", 0) === 0) {
@@ -113,6 +112,7 @@ if (document.URL.indexOf("e621.net/post/show/") > -1 || document.URL.indexOf("e6
         poolDiv.className = "pageination";
         poolLink.href = "pools:" + document.URL;
         poolWish.href = "poolwl:" + document.URL + "$" + document.title.substring(6, document.title.length - 7);
+        poolDiv.appendChild(poolWish);
         fPoolElement.parentNode.insertBefore(poolDiv, fPoolElement);
     }
 }
