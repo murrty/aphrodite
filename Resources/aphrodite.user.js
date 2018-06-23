@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Aphrodite
 // @namespace   https://github.com/murrty/aphrodite
-// @version     1.3
+// @version     1.4
 // @description e621 general downloader (pools & images based on tags)
 // @run-at      document-end
 // @include     http*://e621.net/pool/show/*
@@ -12,6 +12,7 @@
 // @include     http*://e621.net/post/index/*/*
 // @include     http*://*.e621.net/post?tags=*
 // @include     http*://e621.net/post?tags=*
+// @downloadURL https://github.com/murrty/aphrodite/raw/master/Resources/aphrodite.user.js
 // @updateURL   https://github.com/murrty/aphrodite/raw/master/Resources/aphrodite.user.js
 // @grant       none
 // ==/UserScript==
