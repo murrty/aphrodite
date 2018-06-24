@@ -79,7 +79,10 @@ namespace aphrodite_min {
                 XmlNodeList xmlName = xmlDoc.DocumentElement.SelectNodes("/root/name");
                 XmlNodeList xmlDescription = xmlDoc.DocumentElement.SelectNodes("/root/description");
                 XmlNodeList xmlCount = xmlDoc.DocumentElement.SelectNodes("/root/post_count");
-                poolInfo += "POOL: " + poolID + "\n    NAME: " + xmlName[0].InnerText + "\n    PAGES: " + xmlCount[0].InnerText + "\n    URL: https://e621.net/pool/show/" + poolID + "\n    DESCRIPTION:\n\"" + xmlDescription[0].InnerText + "\"\n\n";
+
+                poolInfo += "POOL: " + poolID + "\nDOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\n    NAME: " + xmlName[0].InnerText + "\n    PAGES: " + xmlCount[0].InnerText + "\n    URL: https://e621.net/pool/show/" + poolID + "\n    DESCRIPTION:\n\"" + xmlDescription[0].InnerText + "\"\n\n";
+
+                blacklistInfo += "POOL: " + poolID + "\nDOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\n    NAME: " + xmlName[0].InnerText + "\n    PAGES: " + xmlCount[0].InnerText + "\n    URL: https://e621.net/pool/show/" + poolID + "\n    DESCRIPTION:\n\"" + xmlDescription[0].InnerText + "\"\n    BLACKLISTED TAGS: " + graylist + "\n\n";
 
             // Count the image count and do math for pages.
                 int pages = 1;
@@ -310,7 +313,7 @@ namespace aphrodite_min {
                 writeToConsole("Starting pool download...", true);
                 string outputBar = string.Empty;
                 currentPage = 0;
-                using (WebClient wc = new WebClient()) {
+                using (ExWebClient wc = new ExWebClient()) {
                     wc.DownloadProgressChanged += (s, e) => {
                         int prog = e.ProgressPercentage;
                         if (prog < 1)
@@ -344,6 +347,7 @@ namespace aphrodite_min {
 
                     wc.Proxy = WebRequest.GetSystemWebProxy();
                     wc.Headers.Add(header);
+                    wc.Method = "GET";
 
                     for (int y = 0; y < URLs.Count; y++) {
                         url = URLs[y].Replace("www.", "");

@@ -134,6 +134,7 @@ namespace aphrodite {
         }
         private void frmDownload_Shown(object sender, EventArgs e) {
             startDownload();
+            this.CenterToScreen();
         }
         private void frmDownload_FormClosing(object sender, FormClosingEventArgs e) {
             tagDownload.Abort();
@@ -220,12 +221,14 @@ namespace aphrodite {
 
                 // Start the buffer for the .nfo files.
                 if (useMinimumScore) {
-                    tagInfo = "TAGS: " + tags + "\nMINIMUM SCORE: " + minimumScore + "\n\n";
-                    blacklistInfo = "TAGS: " + tags + "\nBLACKLISTED TAGS: " + graylist + "\nMINIMUM SCORE: " + minimumScore + "\n\n";
+                    tagInfo = "TAGS: " + tags + "\nMINIMUM SCORE: " + minimumScore + "\nDOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\n\n";
+
+                    blacklistInfo = "TAGS: " + tags + "\nMINIMUM SCORE: " + minimumScore + "\nDOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\nBLACKLISTED TAGS: " + graylist + "\n\n";
                 }
                 else {
-                    tagInfo = "TAGS: " + tags + "\nMINIMUM SCORE: n/a\n\n";
-                    blacklistInfo = "TAGS: " + tags + "\nBLACKLISTED TAGS: " + graylist + "\nMINIMUM SCORE: n/a\n\n";
+                    tagInfo = "TAGS: " + tags + "\nMINIMUM SCORE: n/a\nDOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\n\n";
+
+                    blacklistInfo = "TAGS: " + tags + "\nMINIMUM SCORE: n/a\nDOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\nBLACKLISTED TAGS: " + graylist + "\n\n";
                 }
 
                 // Get the tag length.
@@ -249,8 +252,14 @@ namespace aphrodite {
                 changeTask("Downloading tag information for page 1...");
                 url = tagJson + tags;
                 xml = apiTools.getJSON(url, webHeader);
-                if (apiTools.isXmlDead(xml))
+                if (apiTools.isXmlDead(xml)) {
+                    this.BeginInvoke(new MethodInvoker(() => {
+                        pbDownloadStatus.Value = 0;
+                        lbPercentage.Text = "0%";
+                        status.Text = "API returned null.";
+                    }));
                     return false;
+                }
 
                 // Parse the XML file.
                 XmlDocument doc = new XmlDocument();
@@ -648,7 +657,7 @@ namespace aphrodite {
                     tagInfo.TrimEnd('\n');
                     File.WriteAllText(saveTo + "\\tags.nfo", tagInfo, Encoding.UTF8);
 
-                    if (saveBlacklistedFiles) {
+                    if (saveBlacklistedFiles && graylistTotalCount > 0) {
                         blacklistInfo.TrimEnd('\n');
                         if (separateRatings)
                             File.WriteAllText(saveTo + "\\tags.blacklisted.nfo", blacklistInfo, Encoding.UTF8);
@@ -658,7 +667,6 @@ namespace aphrodite {
                 }
 
                 // Set the progressbar style.
-                this.Invoke((MethodInvoker)(() => pbDownloadStatus.Style = ProgressBarStyle.Continuous));
 
                 this.BeginInvoke(new MethodInvoker(() => {
                     string labelBuffer = "";
@@ -672,11 +680,19 @@ namespace aphrodite {
 
                         labelBuffer = string.Format("{0} posts\n{1} blacklisted\n{2} skipped (zero-tolerance)\n{3} total files", counts);
                     }
+
                     lbBlacklist.Text = labelBuffer;
+
+                    if (saveBlacklistedFiles)
+                        pbTotalStatus.Maximum = cleanTotalCount + graylistTotalCount;
+                    else
+                        pbTotalStatus.Maximum = cleanTotalCount;
+
+                    pbDownloadStatus.Style = ProgressBarStyle.Blocks;
                 }));
 
                 // Start the download
-                using (WebClient wc = new WebClient()) {
+                using (ExWebClient wc = new ExWebClient()) {
                     wc.DownloadProgressChanged += (s, e) => {
                         if (!this.IsDisposed) {
                             //if (!sizeRecieved) {
@@ -700,6 +716,7 @@ namespace aphrodite {
                                 this.BeginInvoke(new MethodInvoker(() => {
                                     pbDownloadStatus.Value = 0;
                                     lbPercentage.Text = "0%";
+                                    pbTotalStatus.Value++;
                                 }));
                                 Monitor.Pulse(e.UserState);
                             }
@@ -708,6 +725,7 @@ namespace aphrodite {
 
                     wc.Proxy = WebRequest.GetSystemWebProxy();
                     wc.Headers.Add(webHeader);
+                    wc.Method = "GET";
 
                     if (separateRatings) {
                         if (ExplicitURLs.Count > 0) {
@@ -910,6 +928,11 @@ namespace aphrodite {
                 Debug.Print("========== BEGIN WEBEXCEPTION ==========");
                 Debug.Print(WebE.ToString());
                 Debug.Print("========== END WEBEXCEPTION ==========");
+                this.BeginInvoke(new MethodInvoker(() => {
+                    status.Text = "A WebException has occured";
+                    pbDownloadStatus.State = ProgressBarState.Error;
+                    pbTotalStatus.State = ProgressBarState.Error;
+                }));
                 apiTools.webError(WebE, url);
                 return false;
                 throw WebE;
@@ -919,6 +942,11 @@ namespace aphrodite {
                 Debug.Print("========== BEGIN EXCEPTION ==========");
                 Debug.Print(ex.ToString());
                 Debug.Print("========== END EXCEPTION ==========");
+                this.BeginInvoke(new MethodInvoker(() => {
+                    status.Text = "A Exception has occured";
+                    pbDownloadStatus.State = ProgressBarState.Error;
+                    pbTotalStatus.State = ProgressBarState.Error;
+                }));
                 return false;
                 throw ex;
             }
@@ -962,12 +990,14 @@ namespace aphrodite {
 
             // Start the buffer for the .nfo files.
                 if (useMinimumScore) {
-                    tagInfo = "TAGS: " + tags + "\nMINIMUM SCORE: " + minimumScore + "\n\n";
-                    blacklistInfo = "TAGS: " + tags + "\nBLACKLISTED TAGS: " + graylist + "\nMINIMUM SCORE: " + minimumScore + "\n\n";
+                    tagInfo = "TAGS: " + tags + "\nMINIMUM SCORE: " + minimumScore + "\nDOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\n\n";
+
+                    blacklistInfo = "TAGS: " + tags + "\nMINIMUM SCORE: " + minimumScore + "\nDOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\nBLACKLISTED TAGS: " + graylist + "\n\n";
                 }
                 else {
-                    tagInfo = "TAGS: " + tags + "\nMINIMUM SCORE: n/a\n\n";
-                    blacklistInfo = "TAGS: " + tags + "\nBLACKLISTED TAGS: " + graylist + "\nMINIMUM SCORE: n/a\n\n";
+                    tagInfo = "TAGS: " + tags + "\nMINIMUM SCORE: n/a\nDOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\n\n";
+
+                    blacklistInfo = "TAGS: " + tags + "\nMINIMUM SCORE: n/a\nDOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\nBLACKLISTED TAGS: " + graylist + "\n\n";
                 }
 
             // Get the tag length.
@@ -1202,7 +1232,7 @@ namespace aphrodite {
                     tagInfo.TrimEnd('\n');
                     File.WriteAllText(saveTo + "\\tags.nfo", tagInfo, Encoding.UTF8);
 
-                    if (saveBlacklistedFiles) {
+                    if (saveBlacklistedFiles && graylistTotalCount > 0) {
                         blacklistInfo.TrimEnd('\n');
                         if (separateRatings)
                             File.WriteAllText(saveTo + "\\tags.blacklisted.nfo", blacklistInfo, Encoding.UTF8);
@@ -1230,7 +1260,7 @@ namespace aphrodite {
                 }));
 
             // Start the download
-                using (WebClient wc = new WebClient()) {
+                using (ExWebClient wc = new ExWebClient()) {
                     wc.DownloadProgressChanged += (s, e) => {
                         if (!this.IsDisposed) {
                             this.BeginInvoke(new MethodInvoker(() => {
@@ -1255,6 +1285,7 @@ namespace aphrodite {
 
                     wc.Proxy = WebRequest.GetSystemWebProxy();
                     wc.Headers.Add("user-agent", webHeader);
+                    wc.Method = "GET";
 
                     if (separateRatings) {
                         if (ExplicitURLs.Count > 0) {

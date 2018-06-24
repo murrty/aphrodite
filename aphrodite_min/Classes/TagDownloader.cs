@@ -543,7 +543,7 @@ namespace aphrodite_min {
             // Start the download
                 string outputBar = "";  // The progress bar on the webclient download.
                 int TotalFiles = (ExplicitURLs.Count + QuestionableURLs.Count + SafeURLs.Count + GraylistedExplicitURLs.Count + GraylistedQuestionableURLs.Count + GraylistedSafeURLs.Count + URLs.Count + GraylistedURLs.Count) - 1;
-                using (WebClient wc = new WebClient()) {
+                using (ExWebClient wc = new ExWebClient()) {
                     wc.DownloadProgressChanged += (s, e) => {
                         int prog = e.ProgressPercentage;
                         if (prog < 1)
@@ -577,6 +577,7 @@ namespace aphrodite_min {
 
                     wc.Proxy = WebRequest.GetSystemWebProxy();
                     wc.Headers.Add(webHeader);
+                    wc.Method = "GET";
 
                     if (separateRatings) {
                         if (ExplicitURLs.Count > 0) {
@@ -801,12 +802,14 @@ namespace aphrodite_min {
 
             // Start the buffer for the .nfo files.
                 if (useMinimumScore) {
-                    tagInfo = "TAGS: " + tags + "\nMINIMUM SCORE: " + minimumScore + "\n\n";
-                    blacklistInfo = "TAGS: " + tags + "\nBLACKLISTED TAGS: " + graylist + "\nMINIMUM SCORE: " + minimumScore + "\n\n";
+                    tagInfo = "TAGS: " + tags + "\nMINIMUM SCORE: " + minimumScore + "\nDOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\n\n";
+
+                    blacklistInfo = "TAGS: " + tags + "\nMINIMUM SCORE: " + minimumScore + "\nDOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\nBLACKLISTED TAGS: " + graylist + "\n\n";
                 }
                 else {
-                    tagInfo = "TAGS: " + tags + "\nMINIMUM SCORE: n/a\n\n";
-                    blacklistInfo = "TAGS: " + tags + "\nBLACKLISTED TAGS: " + graylist + "\nMINIMUM SCORE: n/a\n\n";
+                    tagInfo = "TAGS: " + tags + "\nMINIMUM SCORE: n/a\nDOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\n\n";
+
+                    blacklistInfo = "TAGS: " + tags + "\nMINIMUM SCORE: n/a\nDOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\nBLACKLISTED TAGS: " + graylist + "\n\n";
                 }
 
             // Get the tag length.
@@ -1039,7 +1042,7 @@ namespace aphrodite_min {
                     tagInfo.TrimEnd('\n');
                     File.WriteAllText(saveTo + "\\tags.nfo", tagInfo, Encoding.UTF8);
 
-                    if (saveBlacklistedFiles) {
+                    if (saveBlacklistedFiles && graylistTotalCount > 0) {
                         blacklistInfo.TrimEnd('\n');
                         if (separateRatings)
                             File.WriteAllText(saveTo + "\\tags.blacklisted.nfo", blacklistInfo, Encoding.UTF8);
@@ -1051,7 +1054,7 @@ namespace aphrodite_min {
             // Start the download
                 string outputBar = "";  // The progress bar on the webclient download.
                 int TotalFiles = (ExplicitURLs.Count + QuestionableURLs.Count + SafeURLs.Count + GraylistedExplicitURLs.Count + GraylistedQuestionableURLs.Count + GraylistedSafeURLs.Count + URLs.Count + GraylistedURLs.Count) - 1;
-                using (WebClient wc = new WebClient()) {
+                using (ExWebClient wc = new ExWebClient()) {
                     wc.DownloadProgressChanged += (s, e) => {
                         int prog = e.ProgressPercentage;
                         if (prog < 1)
@@ -1085,6 +1088,7 @@ namespace aphrodite_min {
 
                     wc.Proxy = WebRequest.GetSystemWebProxy();
                     wc.Headers.Add(webHeader);
+                    wc.Method = "GET";
 
                     if (separateRatings) {
                         if (ExplicitURLs.Count > 0) {

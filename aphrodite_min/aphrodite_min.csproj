@@ -48,7 +48,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\apiTools.cs" />
+    <Compile Include="Classes\ExWebClient.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Classes\ImageDownloader.cs" />
+    <Compile Include="Classes\IniFile.cs" />
     <Compile Include="Classes\PoolDownloader.cs" />
     <Compile Include="Classes\TagDownloader.cs" />
     <Compile Include="Images.Designer.cs">

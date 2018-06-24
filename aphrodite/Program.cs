@@ -13,10 +13,16 @@ namespace aphrodite {
         /// </summary>
         [STAThread]
         static void Main() {
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new frmMain());
+            if (!TaskbarProgress.Windows7OrGreater) {
+                MessageBox.Show("Windows 7 is required to run this application.");
+                Environment.Exit(0);
+            }
+            else {
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                Application.Run(new frmMain());
+            }
         }
     }
 }

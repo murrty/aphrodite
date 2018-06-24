@@ -31,7 +31,8 @@ namespace aphrodite {
         public bool saveInfo;                   // Global setting for saving images.nfo file.
         public bool ignoreFinish;               // Global setting for exiting after finishing.
 
-        public int fileNameCode;                // How the file names will be named. 
+        public bool separateArtists = false;    // Setting to separate files by artist.
+        public int fileNameCode;                // How the file names will be named.
                                                 // 0 = MD5
                                                 // 1 = artist_MD5
 
@@ -165,14 +166,15 @@ namespace aphrodite {
                     }
                 }
 
-                if (isBlacklisted && separateBlacklisted) {
+                if (isBlacklisted && separateBlacklisted)
                     saveTo += "\\blacklisted";
-                }
+                if (separateArtists)
+                    saveTo += "\\" + xmlArtist[0].InnerText;
 
             // Create output directory.
-                if (!Directory.Exists(saveTo)) {
+                if (!Directory.Exists(saveTo))
                     Directory.CreateDirectory(saveTo);
-                }
+                    
 
             // Work on the filename
                 string fileName = string.Empty;
@@ -219,8 +221,9 @@ namespace aphrodite {
 
             // Download file.
                 url = xmlURL[0].InnerText;
-                using (WebClient wc = new WebClient()) {
+                using (ExWebClient wc = new ExWebClient()) {
                     wc.Proxy = WebRequest.GetSystemWebProxy();
+                    wc.Method = "GET";
                     wc.Headers.Add(header);
                     Debug.Print("Beginning download of file " + xmlURL[0].InnerText);
 

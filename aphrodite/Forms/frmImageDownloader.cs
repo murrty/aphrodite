@@ -34,7 +34,8 @@ namespace aphrodite {
         public bool saveInfo;                   // Global setting for saving images.nfo file.
         public bool ignoreFinish;               // Global setting for exiting after finishing.
 
-        public int fileNameCode;                // How the file names will be named. 
+        public bool separateArtists = false;    // Setting to separate files by artist.
+        public int fileNameCode;                // How the file names will be named.
                                                 // 0 = MD5
                                                 // 1 = artist_MD5
 
@@ -206,11 +207,12 @@ namespace aphrodite {
                     }
                 }
 
-                if (isBlacklisted && separateBlacklisted) {
+                if (isBlacklisted && separateBlacklisted)
                     saveTo += "\\blacklisted";
-                }
+                if (separateArtists)
+                    saveTo += "\\" + xmlArtist[0].InnerText;
 
-            // Create output directory.
+                // Create output directory.
                 if (!Directory.Exists(saveTo)) {
                     Directory.CreateDirectory(saveTo);
                 }
@@ -258,11 +260,16 @@ namespace aphrodite {
                     }
                 }
 
-                this.Invoke((MethodInvoker)(() => status.Text = "Downloading image..."));
+                this.BeginInvoke(new MethodInvoker(() => {
+                    status.Text = "Downloading image...";
+                    pbDownloadStatus.Value = 0;
+                    pbDownloadStatus.Style = ProgressBarStyle.Blocks;
+                    pbDownloadStatus.State = ProgressBarState.Normal;
+                }));
 
             // Download file.
                 url = xmlURL[0].InnerText;
-                using (WebClient wc = new WebClient()) {
+                using (ExWebClient wc = new ExWebClient()) {
                     wc.DownloadProgressChanged += (s, e) => {
                         this.BeginInvoke(new MethodInvoker(() => {
                             pbDownloadStatus.Value = e.ProgressPercentage;
@@ -283,6 +290,7 @@ namespace aphrodite {
 
                     wc.Proxy = WebRequest.GetSystemWebProxy();
                     wc.Headers.Add(header);
+                    wc.Method = "GET";
                     Debug.Print("Beginning download of file " + xmlURL[0].InnerText);
 
                     wc.DownloadFile(xmlURL[0].InnerText, saveTo + "\\" + fileName);
@@ -304,6 +312,10 @@ namespace aphrodite {
                 Debug.Print("========== BEGIN WEBEXCEPTION ==========");
                 Debug.Print(WebE.ToString());
                 Debug.Print("========== END WEBEXCEPTION ==========");
+                this.BeginInvoke(new MethodInvoker(() => {
+                    status.Text = "A WebException has occured";
+                    pbDownloadStatus.State = ProgressBarState.Error;
+                }));
                 apiTools.webError(WebE, url);
                 return false;
                 throw WebE;
@@ -313,6 +325,11 @@ namespace aphrodite {
                 Debug.Print("========== BEGIN EXCEPTION ==========");
                 Debug.Print(ex.ToString());
                 Debug.Print("========== END EXCEPTION ==========");
+                this.BeginInvoke(new MethodInvoker(() => {
+                    status.Text = "A Exception has occured";
+                    pbDownloadStatus.State = ProgressBarState.Error;
+                }));
+                MessageBox.Show(ex.ToString());
                 return false;
                 throw ex;
             }

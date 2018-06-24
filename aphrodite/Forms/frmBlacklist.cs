@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -11,13 +12,29 @@ using System.Windows.Forms;
 
 namespace aphrodite {
     public partial class frmBlacklist : Form {
+        public bool useIni = false;
+        IniFile ini = new IniFile();
+
         public frmBlacklist() {
             InitializeComponent();
         }
 
         private void frmBlacklist_Load(object sender, EventArgs e) {
-            rtbBlacklist.Text = Settings.Default.blacklist.Replace(' ', '\n');
-            rtbZTB.Text = Settings.Default.zeroToleranceBlacklist.Replace(' ', '\n');
+            if (useIni) {
+                if (File.Exists(Environment.CurrentDirectory + "\\graylist.cfg"))
+                    rtbBlacklist.Text = File.ReadAllText(Environment.CurrentDirectory + "\\graylist.cfg").Replace(' ', '\n');
+
+                if (File.Exists(Environment.CurrentDirectory + "\\blacklist.cfg"))
+                    rtbZTB.Text = File.ReadAllText(Environment.CurrentDirectory + "\\blacklist.cfg").Replace(' ', '\n');
+
+                lbMutual.Location = new Point(12, 25);
+                lbIni.Visible = true;
+            }
+            else {
+                Settings.Default.Reload();
+                rtbBlacklist.Text = Settings.Default.blacklist.Replace(' ', '\n');
+                rtbZTB.Text = Settings.Default.zeroToleranceBlacklist.Replace(' ', '\n');
+            }
         }
 
         private void rtbBlacklist_TextChanged(object sender, EventArgs e) {
@@ -65,9 +82,22 @@ namespace aphrodite {
         }
 
         private void btnSave_Click(object sender, EventArgs e) {
-            Settings.Default.blacklist = rtbBlacklist.Text.Replace('\n', ' ');
-            Settings.Default.zeroToleranceBlacklist = rtbZTB.Text.Replace('\n', ' ');
-            Settings.Default.Save();
+            if (useIni) {
+                if (rtbBlacklist.TextLength > 0)
+                    File.WriteAllText(Environment.CurrentDirectory + "\\graylist.cfg", rtbBlacklist.Text.Replace('\n', ' '));
+                else
+                    File.Delete(Environment.CurrentDirectory + "\\graylist.cfg");
+
+                if (rtbZTB.TextLength > 0)
+                    File.WriteAllText(Environment.CurrentDirectory + "\\blacklist.cfg", rtbZTB.Text.Replace('\n', ' '));
+                else
+                    File.Delete(Environment.CurrentDirectory + "\\blacklist.cfg");
+            }
+            else {
+                Settings.Default.blacklist = rtbBlacklist.Text.Replace('\n', ' ');
+                Settings.Default.zeroToleranceBlacklist = rtbZTB.Text.Replace('\n', ' ');
+                Settings.Default.Save();
+            }
             this.DialogResult = DialogResult.OK;
         }
         private void btnCancel_Click(object sender, EventArgs e) {

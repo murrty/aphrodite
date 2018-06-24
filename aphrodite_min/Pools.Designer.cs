@@ -61,7 +61,7 @@ namespace aphrodite_min {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Item 1|Item 2|Item 3|Item 4")]
         public string wishlist {
             get {
                 return ((string)(this["wishlist"]));
@@ -73,7 +73,7 @@ namespace aphrodite_min {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1|2|3|4")]
         public string wishlistNames {
             get {
                 return ((string)(this["wishlistNames"]));

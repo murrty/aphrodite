@@ -10,10 +10,12 @@ namespace aphrodite_min {
     class Program {
 
     #region variables
-        public static readonly string UserAgent = "User-Agent: aphrodite-min/" + (Properties.Default.currentVersion) + " (Contact: https://github.com/murrty/aphrodite ... open an issue)";                               // User agent used for the application.
+        public static readonly string UserAgent = "User-Agent: aphrodite-min/" + (Properties.Default.currentVersion) + " (Contact: https://github.com/murrty/aphrodite ... open an issue)";                                  // User agent used for the application.
 
-        static readonly bool debugMode = true;     // Debug mode.
+        static readonly bool debugMode = true;      // Debug mode.
         static bool hasArg = false;                 // Determine if there's an argument to perform an action.
+        static bool useIni = false;                 // Determine if the INI file should be used.
+        static IniFile ini = new IniFile();
     #endregion
 
         static void Main(string[] args) {
@@ -23,6 +25,12 @@ namespace aphrodite_min {
             if (Settings.Default.firstTimeSetup && !debugMode) {
                 firstTimeSetup();
             }
+            //else if (!debugMode) {
+            //    if (File.Exists(Environment.CurrentDirectory + "\\aphrodite.ini"))
+            //        if (ini.KeyExists("useIni"))
+            //            if (ini.ReadBool("useIni"))
+            //                useIni = true;
+            //}
 
             if (readArguments(args))
                 Environment.Exit(0);
@@ -37,10 +45,14 @@ START:
             if (!hasArg) {
                 Console.WriteLine("------- aphrodite min -------");
                 Console.WriteLine("| Please select your option |");
+                if (useIni)
+                    Console.WriteLine("|   Portable mode enabled   |");
                 addLinedLines(29);
                 Console.WriteLine("(1)   Download a pool from ID");
                 Console.WriteLine("(2)   Download images from tags");
                 Console.WriteLine("(3)   Download an image from post ID");
+                if (!useIni)
+                    Console.WriteLine("(7)   Pool wishlist");
                 Console.WriteLine("(8)   Change settings");
                 Console.WriteLine("(9)   About aphrodite");
                 Console.WriteLine("(X)   Exit");
@@ -51,9 +63,6 @@ START:
                     Console.WriteLine("(POOL)  (Debug) Test pool downloader");
                     Console.WriteLine("(IMAGE) (Debug) Test image downloader");
                     addLinedLines(29);
-                }
-                else {
-                    addBlankLines(1);
                 }
                 addBlankLines(1);
                 Console.Write("Your choice: ");
@@ -68,14 +77,16 @@ START:
                     case "3": case "IMAGE": case "IMAGES": case "DOWNLOADIMAGE": case "DOWNLOADIMAGES":
                         downloadImage();
                         goto START;
-                    case "8": case "SETTINGS": case "CHANGESETTINGS": case "SETTING":
+                    case "7": case "W": case "WISHLIST": case "PW":
+                        if (!useIni)
+                            loadWishlist();
+                        goto START;
+                    case "8": case "SETTINGS": case "SETTING": case "CHANGESETTINGS":
                         changeSettings();
                         goto START;
                     case "9": case "ABOUT":
                         showAbout();
                         goto START;
-                    case "a":
-                        break;
                     case "TESTTAG":
                         testTagDownloader();
                         goto START;
@@ -126,7 +137,7 @@ START:
                     return true;
                 }
                 else if (args[i].StartsWith("tags:") || args[i].StartsWith("tag:")) {
-                    if (apiTools.isValidPostLink(args[i].Replace("tags:", ""))) {
+                    if (apiTools.isValidPageLink(args[i].Replace("tags:", ""))) {
                         downloadPage(args[i].Replace("tags:", ""));
                     }
                     else {
@@ -181,36 +192,114 @@ retry:
 
             tagDL.tags = tags;
             tagDL.webHeader = UserAgent;
+            string rates = "";
 
-            tagDL.graylist = Settings.Default.graylist;
-            tagDL.blacklist = Settings.Default.blacklist;
+            if (useIni) {
+                tagDL.saveTo = Environment.CurrentDirectory;
+                if (File.Exists(File.ReadAllText(Environment.CurrentDirectory + "\\graylist.cfg")))
+                    tagDL.graylist = File.ReadAllText(Environment.CurrentDirectory + "\\graylist.cfg");
+                else
+                    tagDL.graylist = string.Empty;
 
-            tagDL.saveTo = Settings.Default.saveLocation;
-            tagDL.saveInfo = Settings.Default.saveInfo;
-            tagDL.saveBlacklistedFiles = Settings.Default.saveBlacklisted;
-            tagDL.ignoreFinish = Settings.Default.exitOnComplete;
+                if (File.Exists(Environment.CurrentDirectory + "\\blacklist.cfg"))
+                    tagDL.blacklist = File.ReadAllText(Environment.CurrentDirectory + "\\blacklist.cfg");
+                else
+                    tagDL.blacklist = string.Empty;
+                if (ini.KeyExists("saveInfo", "Global"))
+                    tagDL.saveInfo = ini.ReadBool("saveInfo", "Global");
+                else
+                    tagDL.saveInfo = true;
 
-            tagDL.useMinimumScore = Tags.Default.useScoreMin;
-            if (tagDL.useMinimumScore) {
-                tagDL.scoreAsTag = Tags.Default.scoreAsTag;
-                tagDL.minimumScore = Tags.Default.scoreMin;
-            }
-            tagDL.imageLimit = Tags.Default.imageLimit;
-            tagDL.usePageLimit = Tags.Default.usePageLimit;
-            if (tagDL.usePageLimit)
-                tagDL.pageLimit = Tags.Default.pageLimit;
-            tagDL.separateRatings = Tags.Default.separateRatings;
-            if (tagDL.separateRatings) {
-                string rates = "";
-                if (Tags.Default.Explicit)
-                    rates += "e ";
-                if (Tags.Default.Questionable)
-                    rates += "q ";
-                if (Tags.Default.Safe)
-                    rates += "s";
+                if (ini.KeyExists("openAfter", "Global"))
+                    tagDL.openAfter = false; //ini.ReadBool("openAfter", "Global");
+                else
+                    tagDL.openAfter = false;
 
+                if (ini.KeyExists("saveBlacklisted", "Global"))
+                    tagDL.saveBlacklistedFiles = ini.ReadBool("saveBlacklisted", "Global");
+                else
+                    tagDL.saveBlacklistedFiles = true;
+
+                if (ini.KeyExists("ignoreFinish", "Global"))
+                    tagDL.ignoreFinish = ini.ReadBool("ignoreFinish", "Global");
+                else
+                    tagDL.ignoreFinish = false;
+
+
+
+                if (ini.KeyExists("useMinimumScore", "Tags"))
+                    tagDL.useMinimumScore = ini.ReadBool("useMinimumScore", "Tags");
+                else
+                    tagDL.useMinimumScore = false;
+
+                if (tagDL.useMinimumScore) {
+                    tagDL.scoreAsTag = ini.ReadBool("scoreAsTag", "Tags");
+                    tagDL.minimumScore = ini.ReadInt("scoreMin", "Tags");
+                }
+
+                if (ini.KeyExists("imageLimit", "Tags"))
+                    if (ini.ReadInt("imageLimit", "Tags") > 0)
+                        tagDL.imageLimit = ini.ReadInt("imageLimit", "Tags");
+                    else
+                        tagDL.imageLimit = 0;
+
+                if (ini.KeyExists("usePageLimit", "Tags"))
+                    tagDL.usePageLimit = ini.ReadBool("usePageLimit", "Tags");
+                else
+                    tagDL.usePageLimit = false;
+
+                if (tagDL.usePageLimit)
+                    tagDL.pageLimit = ini.ReadInt("pageLimit", "Tags");
+
+                if (ini.KeyExists("separateRatings", "Tags"))
+                    tagDL.separateRatings = ini.ReadBool("separateRatings", "Tags");
+                else
+                    tagDL.separateRatings = true;
+
+                if (ini.KeyExists("Explicit", "Tags"))
+                    if (ini.ReadBool("Explicit", "Tags"))
+                        rates += "e ";
+                if (ini.KeyExists("Questionable", "Tags"))
+                    if (ini.ReadBool("Questionable", "Tags"))
+                        rates += "q ";
+                if (ini.KeyExists("Safe", "Tags"))
+                    if (ini.ReadBool("Safe", "Tags"))
+                        rates += "s";
                 rates = rates.TrimEnd(' ');
-                tagDL.ratings = rates.Split(' ');
+
+                if (tagDL.separateRatings)
+                    tagDL.ratings = rates.Split(' ');
+            }
+            else {
+                tagDL.graylist = Settings.Default.graylist;
+                tagDL.blacklist = Settings.Default.blacklist;
+
+                tagDL.saveTo = Settings.Default.saveLocation;
+                tagDL.saveInfo = Settings.Default.saveInfo;
+                tagDL.saveBlacklistedFiles = Settings.Default.saveBlacklisted;
+                tagDL.ignoreFinish = Settings.Default.exitOnComplete;
+
+                tagDL.useMinimumScore = Tags.Default.useScoreMin;
+                if (tagDL.useMinimumScore) {
+                    tagDL.scoreAsTag = Tags.Default.scoreAsTag;
+                    tagDL.minimumScore = Tags.Default.scoreMin;
+                }
+                tagDL.imageLimit = Tags.Default.imageLimit;
+                tagDL.usePageLimit = Tags.Default.usePageLimit;
+                if (tagDL.usePageLimit)
+                    tagDL.pageLimit = Tags.Default.pageLimit;
+                tagDL.separateRatings = Tags.Default.separateRatings;
+                if (tagDL.separateRatings) {
+                    if (Tags.Default.Explicit)
+                        rates += "e ";
+                    if (Tags.Default.Questionable)
+                        rates += "q ";
+                    if (Tags.Default.Safe)
+                        rates += "s";
+
+                    rates = rates.TrimEnd(' ');
+                    tagDL.ratings = rates.Split(' ');
+                }
             }
 
             if (!tagDL.downloadTags()) {
@@ -230,38 +319,116 @@ retry:
 
             tagDL.downloadUrl = url;
             tagDL.webHeader = UserAgent;
+            string rates = "";
 
-            tagDL.graylist = Settings.Default.graylist;
-            tagDL.blacklist = Settings.Default.blacklist;
+            if (useIni) {
+                tagDL.saveTo = Environment.CurrentDirectory;
+                if (File.Exists(File.ReadAllText(Environment.CurrentDirectory + "\\graylist.cfg")))
+                    tagDL.graylist = File.ReadAllText(Environment.CurrentDirectory + "\\graylist.cfg");
+                else
+                    tagDL.graylist = string.Empty;
 
-            tagDL.fromURL = true;
+                if (File.Exists(Environment.CurrentDirectory + "\\blacklist.cfg"))
+                    tagDL.blacklist = File.ReadAllText(Environment.CurrentDirectory + "\\blacklist.cfg");
+                else
+                    tagDL.blacklist = string.Empty;
+                if (ini.KeyExists("saveInfo", "Global"))
+                    tagDL.saveInfo = ini.ReadBool("saveInfo", "Global");
+                else
+                    tagDL.saveInfo = true;
 
-            tagDL.saveTo = Settings.Default.saveLocation;
-            tagDL.saveInfo = Settings.Default.saveInfo;
-            tagDL.saveBlacklistedFiles = Settings.Default.saveBlacklisted;
-            tagDL.ignoreFinish = Settings.Default.exitOnComplete;
+                if (ini.KeyExists("openAfter", "Global"))
+                    tagDL.openAfter = false; //ini.ReadBool("openAfter", "Global");
+                else
+                    tagDL.openAfter = false;
 
-            tagDL.useMinimumScore = Tags.Default.useScoreMin;
-            if (tagDL.useMinimumScore) {
-                tagDL.scoreAsTag = Tags.Default.scoreAsTag;
-                tagDL.minimumScore = Tags.Default.scoreMin;
-            }
-            tagDL.imageLimit = Tags.Default.imageLimit;
-            tagDL.usePageLimit = Tags.Default.usePageLimit;
-            if (tagDL.usePageLimit)
-                tagDL.pageLimit = Tags.Default.pageLimit;
-            tagDL.separateRatings = Tags.Default.separateRatings;
-            if (tagDL.separateRatings) {
-                string rates = "";
-                if (Tags.Default.Explicit)
-                    rates += "e ";
-                if (Tags.Default.Questionable)
-                    rates += "q ";
-                if (Tags.Default.Safe)
-                    rates += "s";
+                if (ini.KeyExists("saveBlacklisted", "Global"))
+                    tagDL.saveBlacklistedFiles = ini.ReadBool("saveBlacklisted", "Global");
+                else
+                    tagDL.saveBlacklistedFiles = true;
 
+                if (ini.KeyExists("ignoreFinish", "Global"))
+                    tagDL.ignoreFinish = ini.ReadBool("ignoreFinish", "Global");
+                else
+                    tagDL.ignoreFinish = false;
+
+
+
+                if (ini.KeyExists("useMinimumScore", "Tags"))
+                    tagDL.useMinimumScore = ini.ReadBool("useMinimumScore", "Tags");
+                else
+                    tagDL.useMinimumScore = false;
+
+                if (tagDL.useMinimumScore) {
+                    tagDL.scoreAsTag = ini.ReadBool("scoreAsTag", "Tags");
+                    tagDL.minimumScore = ini.ReadInt("scoreMin", "Tags");
+                }
+
+                if (ini.KeyExists("imageLimit", "Tags"))
+                    if (ini.ReadInt("imageLimit", "Tags") > 0)
+                        tagDL.imageLimit = ini.ReadInt("imageLimit", "Tags");
+                    else
+                        tagDL.imageLimit = 0;
+
+                if (ini.KeyExists("usePageLimit", "Tags"))
+                    tagDL.usePageLimit = ini.ReadBool("usePageLimit", "Tags");
+                else
+                    tagDL.usePageLimit = false;
+
+                if (tagDL.usePageLimit)
+                    tagDL.pageLimit = ini.ReadInt("pageLimit", "Tags");
+
+                if (ini.KeyExists("separateRatings", "Tags"))
+                    tagDL.separateRatings = ini.ReadBool("separateRatings", "Tags");
+                else
+                    tagDL.separateRatings = true;
+
+                if (ini.KeyExists("Explicit", "Tags"))
+                    if (ini.ReadBool("Explicit", "Tags"))
+                        rates += "e ";
+                if (ini.KeyExists("Questionable", "Tags"))
+                    if (ini.ReadBool("Questionable", "Tags"))
+                        rates += "q ";
+                if (ini.KeyExists("Safe", "Tags"))
+                    if (ini.ReadBool("Safe", "Tags"))
+                        rates += "s";
                 rates = rates.TrimEnd(' ');
-                tagDL.ratings = rates.Split(' ');
+
+                if (tagDL.separateRatings)
+                    tagDL.ratings = rates.Split(' ');
+            }
+            else {
+                tagDL.graylist = Settings.Default.graylist;
+                tagDL.blacklist = Settings.Default.blacklist;
+
+                tagDL.fromURL = true;
+
+                tagDL.saveTo = Settings.Default.saveLocation;
+                tagDL.saveInfo = Settings.Default.saveInfo;
+                tagDL.saveBlacklistedFiles = Settings.Default.saveBlacklisted;
+                tagDL.ignoreFinish = Settings.Default.exitOnComplete;
+
+                tagDL.useMinimumScore = Tags.Default.useScoreMin;
+                if (tagDL.useMinimumScore) {
+                    tagDL.scoreAsTag = Tags.Default.scoreAsTag;
+                    tagDL.minimumScore = Tags.Default.scoreMin;
+                }
+                tagDL.imageLimit = Tags.Default.imageLimit;
+                tagDL.usePageLimit = Tags.Default.usePageLimit;
+                if (tagDL.usePageLimit)
+                    tagDL.pageLimit = Tags.Default.pageLimit;
+                tagDL.separateRatings = Tags.Default.separateRatings;
+                if (tagDL.separateRatings) {
+                    if (Tags.Default.Explicit)
+                        rates += "e ";
+                    if (Tags.Default.Questionable)
+                        rates += "q ";
+                    if (Tags.Default.Safe)
+                        rates += "s";
+
+                    rates = rates.TrimEnd(' ');
+                    tagDL.ratings = rates.Split(' ');
+                }
             }
 
             if (!tagDL.downloadPage(url)) {
@@ -294,17 +461,67 @@ retry:
             poolDl.minMode = true;
             
             poolDl.header = UserAgent;
-            poolDl.saveTo = Settings.Default.saveLocation;
-            poolDl.graylist = Settings.Default.graylist;
-            poolDl.blacklist = Settings.Default.blacklist;
 
-            poolDl.saveInfo = Settings.Default.saveInfo;
-            poolDl.ignoreFinish = Settings.Default.exitOnComplete;
-            poolDl.saveBlacklisted = Settings.Default.saveBlacklisted;
+            if (useIni) {
+                poolDl.saveTo = Environment.CurrentDirectory;
 
-            poolDl.usePoolName = Pools.Default.usePoolName;
-            poolDl.mergeBlacklisted = Pools.Default.mergeBlacklisted;
-            poolDl.openAfter = Pools.Default.openAfter;
+                if (File.Exists(File.ReadAllText(Environment.CurrentDirectory + "\\graylist.cfg")))
+                    poolDl.graylist = File.ReadAllText(Environment.CurrentDirectory + "\\graylist.cfg");
+                else
+                    poolDl.graylist = string.Empty;
+
+                if (File.Exists(Environment.CurrentDirectory + "\\blacklist.cfg"))
+                    poolDl.blacklist = File.ReadAllText(Environment.CurrentDirectory + "\\blacklist.cfg");
+                else
+                    poolDl.blacklist = string.Empty;
+
+
+
+                if (ini.KeyExists("saveInfo", "Global"))
+                    poolDl.saveInfo = ini.ReadBool("saveInfo", "Global");
+                else
+                    poolDl.saveInfo = true;
+
+                if (ini.KeyExists("saveBlacklisted", "Global"))
+                    poolDl.saveBlacklisted = ini.ReadBool("saveBlacklisted", "Global");
+                else
+                    poolDl.saveBlacklisted = true;
+
+                if (ini.KeyExists("ignoreFinish", "Global"))
+                    poolDl.ignoreFinish = ini.ReadBool("ignoreFinish", "Global");
+                else
+                    poolDl.ignoreFinish = false;
+
+
+
+                if (ini.KeyExists("usePoolName", "Pools"))
+                    poolDl.usePoolName = ini.ReadBool("usePoolName", "Pools");
+                else
+                    poolDl.usePoolName = true;
+
+                if (ini.KeyExists("mergeBlacklisted", "Pools"))
+                    poolDl.mergeBlacklisted = ini.ReadBool("mergeBlacklisted", "Pools");
+                else
+                    poolDl.mergeBlacklisted = true;
+
+                if (ini.KeyExists("openAfter", "Pools"))
+                    poolDl.openAfter = ini.ReadBool("openAfter", "Pools");
+                else
+                    poolDl.openAfter = false;
+            }
+            else {
+                poolDl.saveTo = Settings.Default.saveLocation;
+                poolDl.graylist = Settings.Default.graylist;
+                poolDl.blacklist = Settings.Default.blacklist;
+
+                poolDl.saveInfo = Settings.Default.saveInfo;
+                poolDl.ignoreFinish = Settings.Default.exitOnComplete;
+                poolDl.saveBlacklisted = Settings.Default.saveBlacklisted;
+
+                poolDl.usePoolName = Pools.Default.usePoolName;
+                poolDl.mergeBlacklisted = Pools.Default.mergeBlacklisted;
+                poolDl.openAfter = Pools.Default.openAfter;
+            }
 
             if (!poolDl.downloadPool(id)) {
                 Console.WriteLine("An error occured.");
@@ -332,17 +549,63 @@ retry:
             dlImage.minMode = true;
 
             dlImage.header = UserAgent;
-            dlImage.saveTo = Settings.Default.saveLocation;
-            dlImage.graylist = Settings.Default.graylist;
-            dlImage.blacklist = Settings.Default.blacklist;
 
-            dlImage.separateRatings = Images.Default.separateRatings;
-            dlImage.separateBlacklisted = Images.Default.separateBlacklisted;
+            if (useIni) {
+                dlImage.saveTo = Environment.CurrentDirectory;
 
-            dlImage.saveInfo = Settings.Default.saveInfo;
-            dlImage.ignoreFinish = Settings.Default.exitOnComplete;
+                if (ini.KeyExists("graylist"))
+                    dlImage.graylist = ini.ReadString("graylist");
+                else
+                    dlImage.graylist = string.Empty;
 
-            dlImage.fileNameCode = Images.Default.fileNameCode;
+                if (ini.KeyExists("blacklist"))
+                    dlImage.blacklist = ini.ReadString("blacklist");
+                else
+                    dlImage.blacklist = string.Empty;
+
+
+
+                if (ini.KeyExists("saveInfo", "Global"))
+                    dlImage.saveInfo = ini.ReadBool("saveInfo", "Global");
+                else
+                    dlImage.saveInfo = true;
+
+                if (ini.KeyExists("ignoreFinish", "Global"))
+                    dlImage.ignoreFinish = ini.ReadBool("ignoreFinish", "Global");
+                else
+                    dlImage.ignoreFinish = false;
+
+
+
+                if (ini.KeyExists("fileNameCode", "Images"))
+                    dlImage.fileNameCode = ini.ReadInt("fileNameCode", "Images");
+                else
+                    dlImage.fileNameCode = 1;
+
+                if (ini.KeyExists("separateRatings", "Images"))
+                    dlImage.separateRatings = ini.ReadBool("separateRatings", "Images");
+                else
+                    dlImage.separateRatings = true;
+
+                if (ini.KeyExists("separateBlacklisted", "Images"))
+                    dlImage.separateBlacklisted = ini.ReadBool("separateBlacklisted", "Images");
+                else
+                    dlImage.separateBlacklisted = true;
+            }
+            else {
+                dlImage.saveTo = Settings.Default.saveLocation;
+
+                dlImage.graylist = Settings.Default.graylist;
+                dlImage.blacklist = Settings.Default.blacklist;
+
+                dlImage.separateRatings = Images.Default.separateRatings;
+                dlImage.separateBlacklisted = Images.Default.separateBlacklisted;
+
+                dlImage.saveInfo = Settings.Default.saveInfo;
+                dlImage.ignoreFinish = Settings.Default.exitOnComplete;
+
+                dlImage.fileNameCode = Images.Default.fileNameCode;
+            }
             if (!dlImage.downloadImage("https://e621.net/post/show/" + id)) {
                 Console.WriteLine("An error occured.");
                 Console.ReadKey();
@@ -400,7 +663,7 @@ settingsMain:
             Console.WriteLine("(5)   Modify blacklists");
             Console.WriteLine("(7)   Restore default settings (Blacklists excluded)");
             Console.WriteLine("(9)   Save settings.");
-            Console.WriteLine("Alternatively, press any key to return to the menu.\n");
+            Console.WriteLine("Alternatively, press any key to return to the menu without saving.\n");
             Console.Write("Option: ");
             string answer = Console.ReadLine();
             switch (answer.ToUpper()) {
@@ -422,10 +685,12 @@ settingsMain:
                 case "7": case "DEFAULT":
                     goto settingsMain;
                 case "9": case "MENU": case "EXIT":
-                    Settings.Default.Save();
-                    Tags.Default.Save();
-                    Pools.Default.Save();
-                    Images.Default.Save();
+                    if (!useIni) {
+                        Settings.Default.Save();
+                        Tags.Default.Save();
+                        Pools.Default.Save();
+                        Images.Default.Save();
+                    }
                     break;
                 default:
                     break;
@@ -438,11 +703,19 @@ settingsMain:
             Console.WriteLine("Editing global settings");
             Console.WriteLine("Select which setting you'd like to toggle/change.");
             addLinedLines(42);
-            Console.WriteLine("(1)   Save directory:                    " + Settings.Default.saveLocation);
-            Console.WriteLine("(2)   Save .nfo files:                   " + Settings.Default.saveInfo);
-            Console.WriteLine("(3)   Save blacklisted images:           " + Settings.Default.saveBlacklisted);
-            Console.WriteLine("(4)   Don't notify finished downloads:   " + Settings.Default.exitOnComplete);
-            Console.WriteLine("(?)   Exit");
+            if (useIni) {
+                Console.WriteLine("(1)   Save directory:                    @");
+                Console.WriteLine("(2)   Save .nfo files:                   " + ini.ReadBool("saveInfo", "Global"));
+                Console.WriteLine("(3)   Save blacklisted images:           " + ini.ReadBool("saveBlacklisted", "Global"));
+                Console.WriteLine("(4)   Don't notify finished downloads:   " + ini.ReadBool("ignoreFinish", "Global"));
+            }
+            else {
+                Console.WriteLine("(1)   Save directory:                    " + Settings.Default.saveLocation);
+                Console.WriteLine("(2)   Save .nfo files:                   " + Settings.Default.saveInfo);
+                Console.WriteLine("(3)   Save blacklisted images:           " + Settings.Default.saveBlacklisted);
+                Console.WriteLine("(4)   Don't notify finished downloads:   " + Settings.Default.exitOnComplete);
+            }
+            Console.WriteLine("(*)   Exit");
             Console.WriteLine("(Notice: blacklisted tags are mutually shared.)\n");
             Console.Write("Option: ");
             string resp = Console.ReadLine();
@@ -452,16 +725,38 @@ settingsMain:
             Int32.TryParse(resp, out output);
             switch (output) {
                 case 1:
-                    configureSaveDirectory();
+                    if (!useIni)
+                        configureSaveDirectory();
                     goto settingsMain;
                 case 2:
-                    Settings.Default.saveInfo ^= true;
+                    if (useIni) {
+                        bool bOut = ini.ReadBool("saveInfo", "Global");
+                        bOut ^= true;
+                        ini.WriteBool("saveInfo", bOut, "Global");
+                    }
+                    else {
+                        Settings.Default.saveInfo ^= true;
+                    }
                     goto settingsMain;
                 case 3:
-                    Settings.Default.saveBlacklisted ^= true;
+                    if (useIni) {
+                        bool bOut = ini.ReadBool("saveBlacklisted", "Global");
+                        bOut ^= true;
+                        ini.WriteBool("saveBlacklisted", bOut, "Global");
+                    }
+                    else {
+                        Settings.Default.saveBlacklisted ^= true;
+                    }
                     goto settingsMain;
                 case 4:
-                    Settings.Default.exitOnComplete ^= true;
+                    if (useIni) {
+                        bool bOut = ini.ReadBool("ignoreFinish", "Global");
+                        bOut ^= true;
+                        ini.WriteBool("ignoreFinish", bOut, "Global");
+                    }
+                    else {
+                        Settings.Default.exitOnComplete ^= true;
+                    }
                     goto settingsMain;
                 default:
                     break;
@@ -474,16 +769,30 @@ settingsMain:
             Console.WriteLine("Explicit, Questionable, and Safe options don't matter if separate images is off.");
             Console.WriteLine("Select which setting you'd like to toggle/change.");
             addLinedLines(42);
-            Console.WriteLine("(1)   Separate ratings:               " + Tags.Default.separateRatings);
-            Console.WriteLine("(2)   Download explicit images:       " + Tags.Default.Explicit);
-            Console.WriteLine("(3)   Download questionable images:   " + Tags.Default.Questionable);
-            Console.WriteLine("(4)   Download safe images:           " + Tags.Default.Safe);
-            Console.WriteLine("(5)   Use score limit:                " + Tags.Default.useScoreMin);
-            Console.WriteLine("(6)   Score limit:                    " + Tags.Default.scoreMin);
-            Console.WriteLine("(7)   Use page limit:                 " + Tags.Default.usePageLimit);
-            Console.WriteLine("(8)   Page limit:                     " + Tags.Default.pageLimit);
-            Console.WriteLine("(9)   Image limit:                    " + Tags.Default.imageLimit);
-            Console.WriteLine("(?)   Exit");
+            if (useIni) {
+                Console.WriteLine("(1)   Separate ratings:               " + ini.ReadBool("separateRatings", "Tags"));
+                Console.WriteLine("(2)   Download explicit images:       " + ini.ReadBool("Explicit", "Tags"));
+                Console.WriteLine("(3)   Download questionable images:   " + ini.ReadBool("Questionable", "Tags"));
+                Console.WriteLine("(4)   Download safe images:           " + ini.ReadBool("Safe", "Tags"));
+                Console.WriteLine("(5)   Use score limit:                " + ini.ReadBool("useMinimumScore", "Tags"));
+                Console.WriteLine("(6)   Score limit:                    " + ini.ReadInt("scoreMin", "Tags"));
+                Console.WriteLine("(7)   Use page limit:                 " + ini.ReadBool("usePageLimit", "Tags"));
+                Console.WriteLine("(8)   Page limit:                     " + ini.ReadInt("pageLimit", "Tags"));
+                Console.WriteLine("(9)   Image limit:                    " + ini.ReadInt("imageLimit", "Tags"));
+                //Console.WriteLine("(10)  Score as tag");
+            }
+            else {
+                Console.WriteLine("(1)   Separate ratings:               " + Tags.Default.separateRatings);
+                Console.WriteLine("(2)   Download explicit images:       " + Tags.Default.Explicit);
+                Console.WriteLine("(3)   Download questionable images:   " + Tags.Default.Questionable);
+                Console.WriteLine("(4)   Download safe images:           " + Tags.Default.Safe);
+                Console.WriteLine("(5)   Use score limit:                " + Tags.Default.useScoreMin);
+                Console.WriteLine("(6)   Score limit:                    " + Tags.Default.scoreMin);
+                Console.WriteLine("(7)   Use page limit:                 " + Tags.Default.usePageLimit);
+                Console.WriteLine("(8)   Page limit:                     " + Tags.Default.pageLimit);
+                Console.WriteLine("(9)   Image limit:                    " + Tags.Default.imageLimit);
+            }
+            Console.WriteLine("(*)   Exit");
             Console.WriteLine("(Notice: blacklisted tags are mutually shared.)\n");
             Console.Write("Option: ");
             string resp = Console.ReadLine();
@@ -493,31 +802,88 @@ settingsMain:
             Int32.TryParse(resp, out output);
             switch (output) {
                 case 1:
-                    Tags.Default.separateRatings ^= true;
+                    if (useIni) {
+                        bool bOut = ini.ReadBool("separateRatings", "Tags");
+                        bOut ^= true;
+                        ini.WriteBool("separateRatings", bOut, "Tags");
+                    }
+                    else {
+                        Tags.Default.separateRatings ^= true;
+                    }
                     goto settingsMain;
                 case 2:
-                    Tags.Default.Explicit ^= true;
+                    if (useIni) {
+                        bool bOut = ini.ReadBool("Explicit", "Tags");
+                        bOut ^= true;
+                        ini.WriteBool("Explicit", bOut, "Tags");
+                    }
+                    else {
+                        Tags.Default.Explicit ^= true;
+                    }
                     goto settingsMain;
                 case 3:
-                    Tags.Default.Questionable ^= true;
+                    if (useIni) {
+                        bool bOut = ini.ReadBool("Questionable", "Tags");
+                        bOut ^= true;
+                        ini.WriteBool("Questionable", bOut, "Tags");
+                    }
+                    else {
+                        Tags.Default.Questionable ^= true;
+                    }
                     goto settingsMain;
                 case 4:
-                    Tags.Default.Safe ^= true;
+                    if (useIni) {
+                        bool bOut = ini.ReadBool("Safe", "Tags");
+                        bOut ^= true;
+                        ini.WriteBool("Safe", bOut, "Tags");
+                    }
+                    else {
+                        Tags.Default.Safe ^= true;
+                    }
                     goto settingsMain;
                 case 5:
-                    Tags.Default.useScoreMin ^= true;
+                    if (useIni) {
+                        bool bOut = ini.ReadBool("useMinimumScore", "Tags");
+                        bOut ^= true;
+                        ini.WriteBool("useMinimumScore", bOut, "Tags");
+                    }
+                    else {
+                        Tags.Default.useScoreMin ^= true;
+                    }
                     goto settingsMain;
                 case 6:
-                    Tags.Default.scoreMin = askForNumber();
+                    if (useIni) {
+                        ini.WriteInt("scoreMin", askForNumber(), "Tags");
+                    }
+                    else {
+                        Tags.Default.scoreMin = askForNumber();
+                    }
                     goto settingsMain;
                 case 7:
-                    Tags.Default.usePageLimit ^= true;
+                    if (useIni) {
+                        bool bOut = ini.ReadBool("usePageLimit", "Tags");
+                        bOut ^= true;
+                        ini.WriteBool("usePageLimit", bOut, "Tags");
+                    }
+                    else {
+                        Tags.Default.usePageLimit ^= true;
+                    }
                     goto settingsMain;
                 case 8:
-                    Tags.Default.pageLimit = askForNumber();
+                    if (useIni) {
+                        ini.WriteInt("pageLimit", askForNumber(), "Tags");
+                    }
+                    else {
+                        Tags.Default.pageLimit = askForNumber();
+                    }
                     goto settingsMain;
                 case 9:
-                    Tags.Default.imageLimit = askForNumber();
+                    if (useIni) {
+                        ini.WriteInt("imageLimit", askForNumber(), "Tags");
+                    }
+                    else {
+                        Tags.Default.imageLimit = askForNumber();
+                    }
                     goto settingsMain;
                 default:
                     break;
@@ -529,11 +895,19 @@ settingsMain:
             Console.WriteLine("Editing pools settings");
             Console.WriteLine("Select which setting you'd like to toggle/change.");
             addLinedLines(42);
-            Console.WriteLine("(1)   Save files as \"pool_####\":       " + Pools.Default.usePoolName);
-            Console.WriteLine("(2)   Merge blacklisted pages:         " + Pools.Default.mergeBlacklisted);
-            Console.WriteLine("(3)   Open folder after downloading:   " + Pools.Default.openAfter);
-            //Console.WriteLine("(4)   Add pools to the wishlist silently:   " + Pools.Default.addWishlistSilent);
-            Console.WriteLine("(?)   Exit");
+            if (useIni) {
+                Console.WriteLine("(1)   Save files as \"pool_####\":          " + ini.ReadBool("usePoolName", "Pools"));
+                Console.WriteLine("(2)   Merge blacklisted pages:              " + ini.ReadBool("mergeBlacklisted", "Pools"));
+                Console.WriteLine("(3)   Open folder after downloading:        " + ini.ReadBool("openAfter", "Pools"));
+                //Console.WriteLine("(4)   Add pools to the wishlist silently:   " + Pools.Default.addWishlistSilent);
+            }
+            else {
+                Console.WriteLine("(1)   Save files as \"pool_####\":          " + Pools.Default.usePoolName);
+                Console.WriteLine("(2)   Merge blacklisted pages:              " + Pools.Default.mergeBlacklisted);
+                Console.WriteLine("(3)   Open folder after downloading:        " + Pools.Default.openAfter);
+                Console.WriteLine("(4)   Add pools to the wishlist silently:   " + Pools.Default.addWishlistSilent);
+            }
+            Console.WriteLine("(*)   Exit");
             Console.WriteLine("(Notice: blacklisted tags are mutually shared.)\n");
             Console.Write("Option: ");
             string resp = Console.ReadLine();
@@ -543,18 +917,40 @@ settingsMain:
             Int32.TryParse(resp, out output);
             switch (output) {
                 case 1:
-                    Pools.Default.usePoolName ^= true;
+                    if (useIni) {
+                        bool bOut = ini.ReadBool("usePoolName", "Pools");
+                        bOut ^= true;
+                        ini.WriteBool("usePoolName", bOut, "Pools");
+                    }
+                    else {
+                        Pools.Default.usePoolName ^= true;
+                    }
                     goto settingsMain;
                 case 2:
-                    Pools.Default.mergeBlacklisted ^= true;
+                    if (useIni) {
+                        bool bOut = ini.ReadBool("mergeBlacklisted", "Pools");
+                        bOut ^= true;
+                        ini.WriteBool("mergeBlacklisted", bOut, "Pools");
+                    }
+                    else {
+                        Pools.Default.mergeBlacklisted ^= true;
+                    }
                     goto settingsMain;
                 case 3:
-                    Pools.Default.openAfter ^= true;
+                    if (useIni) {
+                        bool bOut = ini.ReadBool("openAfter", "Pools");
+                        bOut ^= true;
+                        ini.WriteBool("openAfter", bOut, "Pools");
+                    }
+                    else {
+                        Pools.Default.openAfter ^= true;
+                    }
                     goto settingsMain;
                 case 4:
-                    //Pools.Default.addWishlistSilent ^= true;
-                    //goto settingsMain;
-                    break;
+                    if (useIni)
+                        break;
+                    Pools.Default.addWishlistSilent ^= true;
+                    goto settingsMain;
                 default:
                     break;
             }
@@ -566,21 +962,39 @@ settingsMain:
             Console.WriteLine("Select which setting you'd like to toggle/change.");
             addLinedLines(42);
             string nameAs = "artist_md5";
-            switch (Images.Default.fileNameCode) {
-                case 0:
-                    nameAs = "md5";
-                    break;
-                case 1:
-                    nameAs = "artist_md5";
-                    break;
-                default:
-                    nameAs = "artist_md5";
-                    break;
+            if (useIni) {
+                switch (ini.ReadInt("fileNameCode", "Images")) {
+                    case 0:
+                        nameAs = "md5";
+                        break;
+                    case 1:
+                        nameAs = "artist_md5";
+                        break;
+                    default:
+                        nameAs = "artist_md5";
+                        break;
+                }
+                Console.WriteLine("(1)   Saving images as:              " + nameAs);
+                Console.WriteLine("(2)   Separate ratings:              " + ini.ReadBool("separateRatings", "Images"));
+                Console.WriteLine("(3)   Separate blacklisted images:   " + ini.ReadBool("separateBlacklisted", "Images"));
             }
-            Console.WriteLine("(1)   Saving images as:              " + nameAs);
-            Console.WriteLine("(2)   Separate ratings:              " + Images.Default.separateRatings);
-            Console.WriteLine("(3)   Separate blacklisted images:   " + Images.Default.separateBlacklisted);
-            Console.WriteLine("(?)   Exit");
+            else {
+                switch (Images.Default.fileNameCode) {
+                    case 0:
+                        nameAs = "md5";
+                        break;
+                    case 1:
+                        nameAs = "artist_md5";
+                        break;
+                    default:
+                        nameAs = "artist_md5";
+                        break;
+                }
+                Console.WriteLine("(1)   Saving images as:              " + nameAs);
+                Console.WriteLine("(2)   Separate ratings:              " + Images.Default.separateRatings);
+                Console.WriteLine("(3)   Separate blacklisted images:   " + Images.Default.separateBlacklisted);
+            }
+            Console.WriteLine("(*)   Exit");
             Console.WriteLine("(Notice: blacklisted tags are mutually shared.)\n");
             Console.Write("Option: ");
             string resp = Console.ReadLine();
@@ -591,13 +1005,32 @@ settingsMain:
             switch (output) {
                 case 1:
                     Console.WriteLine("\nSelect the file name for your downloaded files.\n0 = \"md5\"\n1 = \"artist_md5\"");
-                    Images.Default.fileNameCode = askForNumber();
+                    if (useIni) {
+                        ini.WriteInt("fileNameCode", askForNumber(), "Images");
+                    }
+                    else {
+                        Images.Default.fileNameCode = askForNumber();
+                    }
                     goto settingsMain;
                 case 2:
-                    Images.Default.separateRatings ^= true;
+                    if (useIni) {
+                        bool bOut = ini.ReadBool("separateRatings", "Images");
+                        bOut ^= true;
+                        ini.WriteBool("separateRatings", bOut, "Images");
+                    }
+                    else {
+                        Images.Default.separateRatings ^= true;
+                    }
                     goto settingsMain;
                 case 3:
-                    Images.Default.separateBlacklisted ^= true;
+                    if (useIni) {
+                        bool bOut = ini.ReadBool("separateBlacklisted", "Images");
+                        bOut ^= true;
+                        ini.WriteBool("separateBlacklisted", bOut, "Images");
+                    }
+                    else {
+                        Images.Default.separateBlacklisted ^= true;
+                    }
                     goto settingsMain;
                 default:
                     break;
@@ -671,7 +1104,7 @@ settingMain:
             Console.WriteLine("Would you like to add or remove tags?");
             Console.WriteLine("(1) Add tag(s)");
             Console.WriteLine("(2) Remove tag(s)");
-            Console.WriteLine("(x) Return to previous menu\n");
+            Console.WriteLine("(*) Return to previous menu\n");
             Console.Write("Option: ");
             string answer = Console.ReadLine();
             int outp;
@@ -731,7 +1164,7 @@ settingMain:
             Console.WriteLine("Would you like to add or remove tags?");
             Console.WriteLine("(1) Add tag(s)");
             Console.WriteLine("(2) Remove tag(s)");
-            Console.WriteLine("(x) Return to previous menu\n");
+            Console.WriteLine("(*) Return to previous menu\n");
             Console.Write("Option: ");
             string answer = Console.ReadLine();
             int outp;
@@ -782,6 +1215,82 @@ settingMain:
         }
     #endregion
 
+    #region pool wishlist
+        static void addToWishlist() {
+            Console.Clear();
+            Console.WriteLine("Enter the pool name to add to the wishlist.");
+            Console.Write("Pool name: ");
+            string poolName = Console.ReadLine().Replace("|", "\\");
+            Console.WriteLine("Enter the pool id of the pool");
+            Console.Write("Pool id: ");
+            string poolID = Console.ReadLine();
+
+
+        }
+        static void loadWishlist() {
+RETRY:
+            Console.Clear();
+            Console.WriteLine("Current pools in the wishlist:");
+
+            string[] wishlistNames = null;
+            string[] wishlistIds = null;
+
+            if (Pools.Default.wishlist.Length > 0) {
+                wishlistNames = Pools.Default.wishlistNames.Split('|');
+                wishlistIds = Pools.Default.wishlist.Split('|');
+            }
+            if (wishlistIds == null || wishlistIds.Length <= 0) {
+                Console.WriteLine("No pools in the wishlist at the moment.");
+                Console.WriteLine("Press any key to return to the menu.");
+                Console.ReadKey();
+                return;
+            }
+            else {
+                for (int i = 0; i < wishlistIds.Length; i++) {
+                    Console.WriteLine("(" + (i + 1) + ") " + wishlistIds[i] + " - " + wishlistIds[i]);
+                }
+
+                int wishItem;
+                Console.Write("Select wishlist item (or nothing to return to the menu): ");
+                Int32.TryParse(Console.ReadLine(), out wishItem);
+                if (wishItem == 0) {
+                    return;
+                }
+                if (wishItem > wishlistIds.Length)
+                    return;
+                else
+                    readWishlistItem(wishlistNames[wishItem - 1], wishlistIds[wishItem - 1]);
+            }
+        }
+
+        static void readWishlistItem(string poolName, string poolID) {
+            Console.Clear();
+            Console.WriteLine("Pool: " + poolName + ", ID: " + poolID);
+            Console.WriteLine("(1) - Download pool");
+            Console.WriteLine("(2) - Remove from wishlist");
+            Console.WriteLine("(*) - Return to previous menu");
+            Console.Write("Your choice: ");
+            string output = Console.ReadLine();
+
+            switch (output.ToLower()) {
+                case "1":
+                    downloadPool(poolID);
+                    loadWishlist();
+                    break;
+                case "2":
+                    if (askYesOrNo("Delete " + poolName + "?")) {
+                        Pools.Default.wishlistNames = Pools.Default.wishlistNames.Replace(poolName, "").Replace("||", "|").TrimEnd('|').TrimStart('|');
+                        Pools.Default.wishlist = Pools.Default.wishlist.Replace(poolID, "").Replace("||", "|").TrimEnd('|').TrimStart('|');
+                    }
+                    loadWishlist();
+                    break;
+                default:
+                    loadWishlist();
+                    break;
+            }
+        }
+    #endregion
+
     #region aesthetic methods
         static void showAbout() {
             Console.Clear();
@@ -817,8 +1326,11 @@ settingMain:
             }
             Console.WriteLine(bufferString);
         }
-        static bool askYesOrNo() {
+        static bool askYesOrNo(string inputMessage = "") {
 retry:
+            if (!string.IsNullOrEmpty(inputMessage))
+                Console.WriteLine(inputMessage);
+
             Console.Write("\rY/N: ");
             string answer = Console.ReadLine();
             switch (answer.ToUpper()) {

@@ -28,8 +28,8 @@
             this.status = new System.Windows.Forms.StatusBar();
             this.tmrTitle = new System.Windows.Forms.Timer(this.components);
             this.lbPercentage = new System.Windows.Forms.Label();
-            this.pbDownloadStatus = new System.Windows.Forms.ProgressBar();
             this.lbInfo = new System.Windows.Forms.Label();
+            this.pbDownloadStatus = new aphrodite.ExProgressBar();
             this.SuspendLayout();
             // 
             // status
@@ -57,16 +57,6 @@
             this.lbPercentage.Text = "0%";
             this.lbPercentage.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // pbDownloadStatus
-            // 
-            this.pbDownloadStatus.Location = new System.Drawing.Point(12, 50);
-            this.pbDownloadStatus.MarqueeAnimationSpeed = 50;
-            this.pbDownloadStatus.Maximum = 101;
-            this.pbDownloadStatus.Name = "pbDownloadStatus";
-            this.pbDownloadStatus.Size = new System.Drawing.Size(260, 18);
-            this.pbDownloadStatus.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
-            this.pbDownloadStatus.TabIndex = 5;
-            // 
             // lbInfo
             // 
             this.lbInfo.Location = new System.Drawing.Point(12, 13);
@@ -76,6 +66,16 @@
             this.lbInfo.Text = "Waiting for parse";
             this.lbInfo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // pbDownloadStatus
+            // 
+            this.pbDownloadStatus.ContainerControl = this;
+            this.pbDownloadStatus.Location = new System.Drawing.Point(12, 50);
+            this.pbDownloadStatus.Name = "pbDownloadStatus";
+            this.pbDownloadStatus.ShowInTaskbar = true;
+            this.pbDownloadStatus.Size = new System.Drawing.Size(260, 18);
+            this.pbDownloadStatus.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
+            this.pbDownloadStatus.TabIndex = 8;
+            // 
             // frmImageDownloader
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -83,8 +83,8 @@
             this.ClientSize = new System.Drawing.Size(284, 100);
             this.Controls.Add(this.lbInfo);
             this.Controls.Add(this.lbPercentage);
-            this.Controls.Add(this.pbDownloadStatus);
             this.Controls.Add(this.status);
+            this.Controls.Add(this.pbDownloadStatus);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximumSize = new System.Drawing.Size(292, 130);
             this.MinimumSize = new System.Drawing.Size(292, 130);
@@ -101,7 +101,7 @@
         private System.Windows.Forms.StatusBar status;
         private System.Windows.Forms.Timer tmrTitle;
         private System.Windows.Forms.Label lbPercentage;
-        private System.Windows.Forms.ProgressBar pbDownloadStatus;
         private System.Windows.Forms.Label lbInfo;
+        private ExProgressBar pbDownloadStatus;
     }
 }

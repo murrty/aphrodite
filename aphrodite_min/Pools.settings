@@ -12,10 +12,10 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="wishlist" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">Item 1|Item 2|Item 3|Item 4</Value>
     </Setting>
     <Setting Name="wishlistNames" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">1|2|3|4</Value>
     </Setting>
     <Setting Name="addWishlistSilent" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>

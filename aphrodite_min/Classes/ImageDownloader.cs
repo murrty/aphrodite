@@ -27,6 +27,8 @@ namespace aphrodite_min {
         public bool separateRatings;            // Setting for separating ratings.
         public bool separateBlacklisted;        // Setting for separating blacklisted files.
 
+
+        public bool separateArtists = false;    // Setting to separate files by artist.
         public int fileNameCode;                // How the file names will be named. 
                                                 // 0 = MD5
                                                 // 1 = artist_MD5
@@ -182,9 +184,10 @@ namespace aphrodite_min {
                     writeToConsole("Image has been separated to " + saveTo.Split('\\')[saveTo.Split('\\').Length - 1]);
                 }
 
-                if (isBlacklisted && separateBlacklisted) {
+                if (isBlacklisted && separateBlacklisted)
                     saveTo += "\\blacklisted";
-                }
+                if (separateArtists)
+                    saveTo += "\\" + xmlArtist[0].InnerText;
 
             // Create output directory.
                 if (!Directory.Exists(saveTo)) {
@@ -248,7 +251,7 @@ namespace aphrodite_min {
                 url = xmlURL[0].InnerText;
                 writeToConsole("Downloading url " + url + "\n", true);
                 string outputBar = "";  // The progress bar on the webclient download.
-                using (WebClient wc = new WebClient()) {
+                using (ExWebClient wc = new ExWebClient()) {
                     wc.DownloadProgressChanged += (s, e) => {
                         int prog = e.ProgressPercentage;
                         if (prog < 1)
@@ -283,6 +286,7 @@ namespace aphrodite_min {
 
                     wc.Proxy = WebRequest.GetSystemWebProxy();
                     wc.Headers.Add(header);
+                    wc.Method = "GET";
                     var sync = new Object();
                     lock (sync) {
                         wc.DownloadFileAsync(new Uri(xmlURL[0].InnerText), saveTo + "\\" + fileName, sync);

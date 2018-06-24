@@ -25,7 +25,7 @@
         private void InitializeComponent() {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmBlacklist));
             this.panel1 = new System.Windows.Forms.Panel();
-            this.label3 = new System.Windows.Forms.Label();
+            this.lbMutual = new System.Windows.Forms.Label();
             this.btnSave = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnSort = new System.Windows.Forms.Button();
@@ -34,12 +34,14 @@
             this.btnSortZTB = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.lbIni = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.label3);
+            this.panel1.Controls.Add(this.lbIni);
+            this.panel1.Controls.Add(this.lbMutual);
             this.panel1.Controls.Add(this.btnSave);
             this.panel1.Controls.Add(this.btnCancel);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
@@ -48,14 +50,14 @@
             this.panel1.Size = new System.Drawing.Size(502, 47);
             this.panel1.TabIndex = 0;
             // 
-            // label3
+            // lbMutual
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(12, 17);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(147, 13);
-            this.label3.TabIndex = 4;
-            this.label3.Text = "booze me up and get me high";
+            this.lbMutual.AutoSize = true;
+            this.lbMutual.Location = new System.Drawing.Point(12, 17);
+            this.lbMutual.Name = "lbMutual";
+            this.lbMutual.Size = new System.Drawing.Size(237, 13);
+            this.lbMutual.TabIndex = 21;
+            this.lbMutual.Text = "Blacklisted tags are mutual between pools && tags";
             // 
             // btnSave
             // 
@@ -135,6 +137,16 @@
             this.label2.TabIndex = 7;
             this.label2.Text = "Zero-tolerance blacklist (tags that are never saved)";
             // 
+            // lbIni
+            // 
+            this.lbIni.AutoSize = true;
+            this.lbIni.Location = new System.Drawing.Point(12, 9);
+            this.lbIni.Name = "lbIni";
+            this.lbIni.Size = new System.Drawing.Size(93, 13);
+            this.lbIni.TabIndex = 8;
+            this.lbIni.Text = "Editing ini blacklist";
+            this.lbIni.Visible = false;
+            // 
             // frmBlacklist
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -175,6 +187,7 @@
         private System.Windows.Forms.Button btnSortZTB;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label lbMutual;
+        private System.Windows.Forms.Label lbIni;
     }
 }

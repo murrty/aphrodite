@@ -27,10 +27,9 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmSettings));
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tbMain = new System.Windows.Forms.TabControl();
             this.tbGeneral = new System.Windows.Forms.TabPage();
             this.chkIgnoreFinish = new System.Windows.Forms.CheckBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.chkSaveBlacklisted = new System.Windows.Forms.CheckBox();
             this.chkSaveInfo = new System.Windows.Forms.CheckBox();
             this.btnBrws = new System.Windows.Forms.Button();
@@ -58,7 +57,7 @@
             this.chkPoolName = new System.Windows.Forms.CheckBox();
             this.tbImages = new System.Windows.Forms.TabPage();
             this.chkUseForm = new System.Windows.Forms.CheckBox();
-            this.chkSeparateBlacklist = new System.Windows.Forms.CheckBox();
+            this.chkSeparateBlacklisted = new System.Windows.Forms.CheckBox();
             this.chkSeparateImages = new System.Windows.Forms.CheckBox();
             this.rbMD5 = new System.Windows.Forms.RadioButton();
             this.label9 = new System.Windows.Forms.Label();
@@ -72,9 +71,12 @@
             this.btnTagsProtocol = new System.Windows.Forms.Button();
             this.btnPoolsProtocol = new System.Windows.Forms.Button();
             this.btnImagesProtocol = new System.Windows.Forms.Button();
+            this.tbPortable = new System.Windows.Forms.TabPage();
+            this.btnExportIni = new System.Windows.Forms.Button();
+            this.lbPortable = new System.Windows.Forms.Label();
             this.btnBlacklist = new System.Windows.Forms.Button();
             this.JustTheTips = new System.Windows.Forms.ToolTip(this.components);
-            this.tabControl1.SuspendLayout();
+            this.tbMain.SuspendLayout();
             this.tbGeneral.SuspendLayout();
             this.tbTags.SuspendLayout();
             this.gbTagDownloadLimit.SuspendLayout();
@@ -87,6 +89,7 @@
             this.tbPools.SuspendLayout();
             this.tbImages.SuspendLayout();
             this.tbProtocol.SuspendLayout();
+            this.tbPortable.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnCancel
@@ -109,24 +112,24 @@
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
-            // tabControl1
+            // tbMain
             // 
-            this.tabControl1.Controls.Add(this.tbGeneral);
-            this.tabControl1.Controls.Add(this.tbTags);
-            this.tabControl1.Controls.Add(this.tbPools);
-            this.tabControl1.Controls.Add(this.tbImages);
-            this.tabControl1.Controls.Add(this.tbProtocol);
-            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.tabControl1.Location = new System.Drawing.Point(0, 0);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(418, 194);
-            this.tabControl1.TabIndex = 2;
+            this.tbMain.Controls.Add(this.tbGeneral);
+            this.tbMain.Controls.Add(this.tbTags);
+            this.tbMain.Controls.Add(this.tbPools);
+            this.tbMain.Controls.Add(this.tbImages);
+            this.tbMain.Controls.Add(this.tbProtocol);
+            this.tbMain.Controls.Add(this.tbPortable);
+            this.tbMain.Dock = System.Windows.Forms.DockStyle.Top;
+            this.tbMain.Location = new System.Drawing.Point(0, 0);
+            this.tbMain.Name = "tbMain";
+            this.tbMain.SelectedIndex = 0;
+            this.tbMain.Size = new System.Drawing.Size(418, 194);
+            this.tbMain.TabIndex = 2;
             // 
             // tbGeneral
             // 
             this.tbGeneral.Controls.Add(this.chkIgnoreFinish);
-            this.tbGeneral.Controls.Add(this.label1);
             this.tbGeneral.Controls.Add(this.chkSaveBlacklisted);
             this.tbGeneral.Controls.Add(this.chkSaveInfo);
             this.tbGeneral.Controls.Add(this.btnBrws);
@@ -143,7 +146,7 @@
             // chkIgnoreFinish
             // 
             this.chkIgnoreFinish.AutoSize = true;
-            this.chkIgnoreFinish.Location = new System.Drawing.Point(120, 105);
+            this.chkIgnoreFinish.Location = new System.Drawing.Point(120, 120);
             this.chkIgnoreFinish.Name = "chkIgnoreFinish";
             this.chkIgnoreFinish.Size = new System.Drawing.Size(171, 17);
             this.chkIgnoreFinish.TabIndex = 21;
@@ -152,21 +155,12 @@
         "hed");
             this.chkIgnoreFinish.UseVisualStyleBackColor = true;
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(87, 136);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(237, 13);
-            this.label1.TabIndex = 20;
-            this.label1.Text = "Blacklisted tags are mutual between pools && tags";
-            // 
             // chkSaveBlacklisted
             // 
             this.chkSaveBlacklisted.AutoSize = true;
             this.chkSaveBlacklisted.Checked = true;
             this.chkSaveBlacklisted.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkSaveBlacklisted.Location = new System.Drawing.Point(121, 82);
+            this.chkSaveBlacklisted.Location = new System.Drawing.Point(121, 97);
             this.chkSaveBlacklisted.Name = "chkSaveBlacklisted";
             this.chkSaveBlacklisted.Size = new System.Drawing.Size(139, 17);
             this.chkSaveBlacklisted.TabIndex = 19;
@@ -180,7 +174,7 @@
             this.chkSaveInfo.AutoSize = true;
             this.chkSaveInfo.Checked = true;
             this.chkSaveInfo.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkSaveInfo.Location = new System.Drawing.Point(120, 59);
+            this.chkSaveInfo.Location = new System.Drawing.Point(120, 74);
             this.chkSaveInfo.Name = "chkSaveInfo";
             this.chkSaveInfo.Size = new System.Drawing.Size(122, 17);
             this.chkSaveInfo.TabIndex = 18;
@@ -487,7 +481,7 @@
             // tbImages
             // 
             this.tbImages.Controls.Add(this.chkUseForm);
-            this.tbImages.Controls.Add(this.chkSeparateBlacklist);
+            this.tbImages.Controls.Add(this.chkSeparateBlacklisted);
             this.tbImages.Controls.Add(this.chkSeparateImages);
             this.tbImages.Controls.Add(this.rbMD5);
             this.tbImages.Controls.Add(this.label9);
@@ -512,18 +506,18 @@
             this.JustTheTips.SetToolTip(this.chkUseForm, "Shows a form when downloading images that will report progress");
             this.chkUseForm.UseVisualStyleBackColor = true;
             // 
-            // chkSeparateBlacklist
+            // chkSeparateBlacklisted
             // 
-            this.chkSeparateBlacklist.AutoSize = true;
-            this.chkSeparateBlacklist.Checked = true;
-            this.chkSeparateBlacklist.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkSeparateBlacklist.Location = new System.Drawing.Point(186, 72);
-            this.chkSeparateBlacklist.Name = "chkSeparateBlacklist";
-            this.chkSeparateBlacklist.Size = new System.Drawing.Size(157, 17);
-            this.chkSeparateBlacklist.TabIndex = 10;
-            this.chkSeparateBlacklist.Text = "Separate blacklisted images";
-            this.JustTheTips.SetToolTip(this.chkSeparateBlacklist, "Separates blacklisted images into separate folder.");
-            this.chkSeparateBlacklist.UseVisualStyleBackColor = true;
+            this.chkSeparateBlacklisted.AutoSize = true;
+            this.chkSeparateBlacklisted.Checked = true;
+            this.chkSeparateBlacklisted.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkSeparateBlacklisted.Location = new System.Drawing.Point(186, 72);
+            this.chkSeparateBlacklisted.Name = "chkSeparateBlacklisted";
+            this.chkSeparateBlacklisted.Size = new System.Drawing.Size(157, 17);
+            this.chkSeparateBlacklisted.TabIndex = 10;
+            this.chkSeparateBlacklisted.Text = "Separate blacklisted images";
+            this.JustTheTips.SetToolTip(this.chkSeparateBlacklisted, "Separates blacklisted images into separate folder.");
+            this.chkSeparateBlacklisted.UseVisualStyleBackColor = true;
             // 
             // chkSeparateImages
             // 
@@ -668,6 +662,37 @@
             this.btnImagesProtocol.UseVisualStyleBackColor = true;
             this.btnImagesProtocol.Click += new System.EventHandler(this.btnImagesProtocol_Click);
             // 
+            // tbPortable
+            // 
+            this.tbPortable.Controls.Add(this.btnExportIni);
+            this.tbPortable.Controls.Add(this.lbPortable);
+            this.tbPortable.Location = new System.Drawing.Point(4, 22);
+            this.tbPortable.Name = "tbPortable";
+            this.tbPortable.Padding = new System.Windows.Forms.Padding(3);
+            this.tbPortable.Size = new System.Drawing.Size(410, 168);
+            this.tbPortable.TabIndex = 5;
+            this.tbPortable.Text = "Portable";
+            this.tbPortable.UseVisualStyleBackColor = true;
+            // 
+            // btnExportIni
+            // 
+            this.btnExportIni.Location = new System.Drawing.Point(162, 136);
+            this.btnExportIni.Name = "btnExportIni";
+            this.btnExportIni.Size = new System.Drawing.Size(86, 24);
+            this.btnExportIni.TabIndex = 1;
+            this.btnExportIni.Text = "Export";
+            this.btnExportIni.UseVisualStyleBackColor = true;
+            this.btnExportIni.Click += new System.EventHandler(this.btnExportIni_Click);
+            // 
+            // lbPortable
+            // 
+            this.lbPortable.Location = new System.Drawing.Point(8, 3);
+            this.lbPortable.Name = "lbPortable";
+            this.lbPortable.Size = new System.Drawing.Size(394, 133);
+            this.lbPortable.TabIndex = 0;
+            this.lbPortable.Text = resources.GetString("lbPortable.Text");
+            this.lbPortable.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
             // btnBlacklist
             // 
             this.btnBlacklist.Location = new System.Drawing.Point(4, 200);
@@ -689,7 +714,7 @@
             this.Controls.Add(this.btnBlacklist);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.btnCancel);
-            this.Controls.Add(this.tabControl1);
+            this.Controls.Add(this.tbMain);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "frmSettings";
@@ -697,7 +722,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "aphrodite settings";
             this.Load += new System.EventHandler(this.frmSettings_Load);
-            this.tabControl1.ResumeLayout(false);
+            this.tbMain.ResumeLayout(false);
             this.tbGeneral.ResumeLayout(false);
             this.tbGeneral.PerformLayout();
             this.tbTags.ResumeLayout(false);
@@ -717,6 +742,7 @@
             this.tbImages.PerformLayout();
             this.tbProtocol.ResumeLayout(false);
             this.tbProtocol.PerformLayout();
+            this.tbPortable.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -725,7 +751,7 @@
 
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Button btnSave;
-        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabControl tbMain;
         private System.Windows.Forms.TabPage tbGeneral;
         private System.Windows.Forms.TabPage tbTags;
         private System.Windows.Forms.TabPage tbPools;
@@ -735,7 +761,6 @@
         private System.Windows.Forms.CheckBox chkSaveInfo;
         private System.Windows.Forms.Button btnBlacklist;
         private System.Windows.Forms.CheckBox chkSaveBlacklisted;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox chkSeparate;
         private System.Windows.Forms.CheckBox chkSafe;
         private System.Windows.Forms.CheckBox chkQuestionable;
@@ -762,7 +787,7 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.CheckBox chkIgnoreFinish;
         private System.Windows.Forms.CheckBox chkSeparateImages;
-        private System.Windows.Forms.CheckBox chkSeparateBlacklist;
+        private System.Windows.Forms.CheckBox chkSeparateBlacklisted;
         private System.Windows.Forms.CheckBox chkUseForm;
         private System.Windows.Forms.CheckBox chkAddWishlistSilent;
         private System.Windows.Forms.CheckBox chkPageLimit;
@@ -772,6 +797,9 @@
         private System.Windows.Forms.GroupBox gbTagDownloadLimit;
         private System.Windows.Forms.GroupBox gbTagRatings;
         private System.Windows.Forms.CheckBox chkScoreAsTag;
+        private System.Windows.Forms.TabPage tbPortable;
+        private System.Windows.Forms.Button btnExportIni;
+        private System.Windows.Forms.Label lbPortable;
 
     }
 }

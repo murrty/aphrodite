@@ -31,6 +31,7 @@
             this.lbPools = new System.Windows.Forms.ListBox();
             this.btnRedownload = new System.Windows.Forms.Button();
             this.btnRenumerate = new System.Windows.Forms.Button();
+            this.lbDownloadedOn = new System.Windows.Forms.Label();
             this.tcMain.SuspendLayout();
             this.tbTags.SuspendLayout();
             this.tbPools.SuspendLayout();
@@ -65,6 +66,7 @@
             this.lbTags.Name = "lbTags";
             this.lbTags.Size = new System.Drawing.Size(270, 173);
             this.lbTags.TabIndex = 0;
+            this.lbTags.SelectedIndexChanged += new System.EventHandler(this.lbTags_SelectedIndexChanged);
             this.lbTags.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.lbTags_MouseDoubleClick);
             // 
             // tbPools
@@ -85,10 +87,12 @@
             this.lbPools.Name = "lbPools";
             this.lbPools.Size = new System.Drawing.Size(268, 173);
             this.lbPools.TabIndex = 0;
+            this.lbPools.SelectedIndexChanged += new System.EventHandler(this.lbPools_SelectedIndexChanged);
+            this.lbPools.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.lbPools_MouseDoubleClick);
             // 
             // btnRedownload
             // 
-            this.btnRedownload.Location = new System.Drawing.Point(159, 212);
+            this.btnRedownload.Location = new System.Drawing.Point(159, 233);
             this.btnRedownload.Name = "btnRedownload";
             this.btnRedownload.Size = new System.Drawing.Size(129, 23);
             this.btnRedownload.TabIndex = 1;
@@ -98,7 +102,7 @@
             // 
             // btnRenumerate
             // 
-            this.btnRenumerate.Location = new System.Drawing.Point(4, 212);
+            this.btnRenumerate.Location = new System.Drawing.Point(4, 233);
             this.btnRenumerate.Name = "btnRenumerate";
             this.btnRenumerate.Size = new System.Drawing.Size(76, 23);
             this.btnRenumerate.TabIndex = 2;
@@ -106,19 +110,29 @@
             this.btnRenumerate.UseVisualStyleBackColor = true;
             this.btnRenumerate.Click += new System.EventHandler(this.btnRenumerate_Click);
             // 
+            // lbDownloadedOn
+            // 
+            this.lbDownloadedOn.AutoSize = true;
+            this.lbDownloadedOn.Location = new System.Drawing.Point(12, 214);
+            this.lbDownloadedOn.Name = "lbDownloadedOn";
+            this.lbDownloadedOn.Size = new System.Drawing.Size(105, 13);
+            this.lbDownloadedOn.TabIndex = 3;
+            this.lbDownloadedOn.Text = "Downloaded on: n/a";
+            // 
             // frmRedownloader
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(292, 240);
+            this.ClientSize = new System.Drawing.Size(292, 260);
+            this.Controls.Add(this.lbDownloadedOn);
             this.Controls.Add(this.btnRenumerate);
             this.Controls.Add(this.btnRedownload);
             this.Controls.Add(this.tcMain);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(300, 270);
-            this.MinimumSize = new System.Drawing.Size(300, 270);
+            this.MaximumSize = new System.Drawing.Size(300, 290);
+            this.MinimumSize = new System.Drawing.Size(300, 290);
             this.Name = "frmRedownloader";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -128,6 +142,7 @@
             this.tbTags.ResumeLayout(false);
             this.tbPools.ResumeLayout(false);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -140,5 +155,6 @@
         private System.Windows.Forms.Button btnRedownload;
         private System.Windows.Forms.Button btnRenumerate;
         private System.Windows.Forms.ListBox lbPools;
+        private System.Windows.Forms.Label lbDownloadedOn;
     }
 }

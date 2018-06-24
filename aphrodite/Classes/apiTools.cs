@@ -25,10 +25,11 @@ namespace aphrodite {
 
             try {
                 Debug.Print("Starting tag json download");
-                using (WebClient wc = new WebClient()) {
+                using (ExWebClient wc = new ExWebClient()) {
                     ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                     wc.Proxy = WebRequest.GetSystemWebProxy();
                     wc.Headers.Add(header);
+                    wc.Method = "GET";
                     string json = wc.DownloadString(url);
                     byte[] bytes = Encoding.ASCII.GetBytes(json);
                     using (var stream = new MemoryStream(bytes)) {
@@ -150,7 +151,7 @@ namespace aphrodite {
             else
                 return false;
         }
-        public static bool isValidPostLink(string url) {
+        public static bool isValidPageLink(string url) {
             url = setUrlString(url);
 
             if (!isValidE621Link(url))

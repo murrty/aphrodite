@@ -41,9 +41,10 @@ namespace aphrodite {
 
             try {
                 Debug.Print("Starting tag json download");
-                using (WebClient wc = new WebClient()) {
+                using (ExWebClient wc = new ExWebClient()) {
                     wc.Headers.Add("User-Agent: Humina/1.0");
                     wc.Proxy = WebRequest.GetSystemWebProxy();
+                    wc.Method = "GET";
                     string json = wc.DownloadString(url);
                     byte[] bytes = Encoding.ASCII.GetBytes(json);
                     using (var stream = new MemoryStream(bytes)) {

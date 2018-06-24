@@ -134,7 +134,11 @@ namespace aphrodite {
                 XmlNodeList xmlName = xmlDoc.DocumentElement.SelectNodes("/root/name");
                 XmlNodeList xmlDescription = xmlDoc.DocumentElement.SelectNodes("/root/description");
                 XmlNodeList xmlCount = xmlDoc.DocumentElement.SelectNodes("/root/post_count");
-                poolInfo += "POOL: " + poolID + "\n    NAME: " + xmlName[0].InnerText + "\n    PAGES: " + xmlCount[0].InnerText + "\n    URL: https://e621.net/pool/show/" + poolID + "\n    DESCRIPTION:\n\"" + xmlDescription[0].InnerText + "\"\n\n";
+
+                poolInfo += "POOL: " + poolID + "\nDOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\n    NAME: " + xmlName[0].InnerText + "\n    PAGES: " + xmlCount[0].InnerText + "\n    URL: https://e621.net/pool/show/" + poolID + "\n    DESCRIPTION:\n\"" + xmlDescription[0].InnerText + "\"\n\n";
+
+                blacklistInfo += "POOL: " + poolID + "\nDOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\n    NAME: " + xmlName[0].InnerText + "\n    PAGES: " + xmlCount[0].InnerText + "\n    URL: https://e621.net/pool/show/" + poolID + "\n    DESCRIPTION:\n\"" + xmlDescription[0].InnerText + "\"\n    BLACKLISTED TAGS: " + graylist + "\n\n";
+
                 this.Invoke((MethodInvoker)(() => lbName.Text = xmlName[0].InnerText));
 
             // Count the image count and do math for pages.
@@ -374,14 +378,20 @@ namespace aphrodite {
                     }
                 }
 
-                this.Invoke((MethodInvoker)(() => pbDownloadStatus.Style = ProgressBarStyle.Blocks));
+                this.BeginInvoke(new MethodInvoker(() => {
+                    pbDownloadStatus.Style = ProgressBarStyle.Blocks;
+                    if (saveBlacklisted)
+                        pbTotalStatus.Maximum = pageCount + blacklistedPageCount;
+                    else
+                        pbTotalStatus.Maximum = pageCount;
+                }));
 
                 int currentDownloadFile = 1;
             // Download pool.
                 writeToConsole("Starting pool download...", true);
                 string outputBar = string.Empty;
                 currentPage = 0;
-                using (WebClient wc = new WebClient()) {
+                using (ExWebClient wc = new ExWebClient()) {
                     wc.DownloadProgressChanged += (s, e) => {
                         this.BeginInvoke(new MethodInvoker(() => {
                             lbFile.Text = "File " + (currentDownloadFile) + " of " + (pageCount + blacklistedPageCount);
@@ -396,6 +406,7 @@ namespace aphrodite {
                             this.BeginInvoke(new MethodInvoker(() => {
                                 pbDownloadStatus.Value = 0;
                                 lbPercentage.Text = "0%";
+                                pbTotalStatus.Value++;
                             }));
                             currentDownloadFile++;
                             Monitor.Pulse(e.UserState);
@@ -404,6 +415,7 @@ namespace aphrodite {
 
                     wc.Proxy = WebRequest.GetSystemWebProxy();
                     wc.Headers.Add(header);
+                    wc.Method = "GET";
 
                     for (int y = 0; y < URLs.Count; y++) {
                         url = URLs[y].Replace("www.", "");
@@ -470,6 +482,11 @@ namespace aphrodite {
                 Debug.Print("==========BEGIN WEBEXCEPTION==========");
                 Debug.Print(WebE.ToString());
                 Debug.Print("==========END WEBEXCEPTION==========");
+                this.BeginInvoke(new MethodInvoker(() => {
+                    status.Text = "A WebException has occured";
+                    pbDownloadStatus.State = ProgressBarState.Error;
+                    pbTotalStatus.State = ProgressBarState.Error;
+                }));
                 apiTools.webError(WebE, url);
                 return false;
                 throw WebE;
@@ -479,6 +496,11 @@ namespace aphrodite {
                 Debug.Print("==========BEGIN EXCEPTION==========");
                 Debug.Print(ex.ToString());
                 Debug.Print("==========END EXCEPTION==========");
+                this.BeginInvoke(new MethodInvoker(() => {
+                    status.Text = "A Exception has occured";
+                    pbDownloadStatus.State = ProgressBarState.Error;
+                    pbTotalStatus.State = ProgressBarState.Error;
+                }));
                 return false;
                 throw ex;
             }
