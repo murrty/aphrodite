@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -18,7 +19,13 @@ namespace aphrodite {
 
         public frmAbout() { InitializeComponent(); }
 
-        private void About_Shown(object sender, EventArgs e) { lbVersion.Text = "v" + Properties.Settings.Default.currentVersion.ToString(); }
+        private void About_Shown(object sender, EventArgs e) {
+            lbVersion.Text = "v" + Properties.Settings.Default.currentVersion.ToString();
+            if (Properties.Settings.Default.showDebugDates) {
+                lbVersion.Text += " (" + Properties.Settings.Default.debugDate + ")";
+                this.Text = "About aphrodite (debug)";
+            }
+        }
 
         private void llbCheckForUpdates_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
             Thread checkUpdates = new Thread(() => {

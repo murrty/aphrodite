@@ -440,8 +440,9 @@ namespace aphrodite {
                 // Check for null file url + fix for files that are auto blacklisted :)
                     string fileUrl = xmlURL[i].InnerText;
                     if (fileUrl == null) {
-                        if (xmlDeleted[i].InnerText == "false") {
-                            fileUrl = imgUrl + xmlMD5[i].InnerText.Substring(0, 2) + "/" + xmlMD5[i].InnerText.Substring(2, 2) + "." + xmlExt[i].InnerText;
+                        if (xmlDeleted[i].InnerText.ToLower() == "false") {
+                            //fileUrl = imgUrl + xmlMD5[i].InnerText.Substring(0, 2) + "/" + xmlMD5[i].InnerText.Substring(2, 2) + "." + xmlExt[i].InnerText;
+                            fileUrl = apiTools.getBlacklistedImageUrl(xmlMD5[i].InnerText, xmlExt[i].InnerText);
                         }
                     }
                     
@@ -880,8 +881,9 @@ namespace aphrodite {
 
                             string fileUrl = xmlURL[i].InnerText;
                             if (fileUrl == null) {
-                                if (xmlDeleted[i].InnerText == "false") {
-                                    fileUrl = imgUrl + xmlMD5[i].InnerText.Substring(0, 2) + "/" + xmlMD5[i].InnerText.Substring(2, 2) + "." + xmlExt[i].InnerText;
+                                if (xmlDeleted[i].InnerText.ToLower() == "false") {
+                                    //fileUrl = imgUrl + xmlMD5[i].InnerText.Substring(0, 2) + "/" + xmlMD5[i].InnerText.Substring(2, 2) + "." + xmlExt[i].InnerText;
+                                    fileUrl = apiTools.getBlacklistedImageUrl(xmlMD5[i].InnerText, xmlExt[i].InnerText);
                                 }
                             }
 

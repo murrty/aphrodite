@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -12,6 +13,9 @@ using System.Windows.Forms;
 
 namespace aphrodite {
     public partial class frmPoolWishlist : Form {
+
+        public bool useIni = false;
+        IniFile ini = new IniFile();
 
         public bool addToWishlist = false;
         public string addURL = string.Empty;
@@ -95,7 +99,7 @@ namespace aphrodite {
             }
         }
 
-        private void txtOpen_Click(object sender, EventArgs e) {
+        private void btnDownload_Click(object sender, EventArgs e) {
             string poolID = PoolURLS[lbWish.SelectedIndex].Replace("http://", "https://").Replace("www.", "");
             if (!poolID.StartsWith("https://"))
                 poolID = "https://" + poolID;
@@ -103,23 +107,7 @@ namespace aphrodite {
                 poolID = poolID.Split('?')[0];
             poolID = poolID.Split('/')[5];
 
-            frmPoolDownloader poolDL = new frmPoolDownloader();
-            poolDL.poolID = poolID;
-
-            poolDL.header = Program.UserAgent;
-            poolDL.saveTo = Settings.Default.saveLocation;
-            poolDL.graylist = Settings.Default.blacklist;
-            poolDL.blacklist = Settings.Default.zeroToleranceBlacklist;
-
-            poolDL.saveInfo = Settings.Default.saveInfo;
-            poolDL.ignoreFinish = Settings.Default.ignoreFinish;
-            poolDL.saveBlacklisted = Settings.Default.saveBlacklisted;
-
-            poolDL.usePoolName = Pools.Default.usePoolName;
-            poolDL.mergeBlacklisted = Pools.Default.mergeBlacklisted;
-            poolDL.openAfter = Pools.Default.openAfter;
-
-            poolDL.ShowDialog();
+            Downloader.downloadPool(poolID, useIni);
         }
 
         private void lbWish_SelectedIndexChanged(object sender, EventArgs e) {

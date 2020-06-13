@@ -92,7 +92,8 @@
             // 
             // btnRedownload
             // 
-            this.btnRedownload.Location = new System.Drawing.Point(159, 233);
+            this.btnRedownload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnRedownload.Location = new System.Drawing.Point(159, 243);
             this.btnRedownload.Name = "btnRedownload";
             this.btnRedownload.Size = new System.Drawing.Size(129, 23);
             this.btnRedownload.TabIndex = 1;
@@ -102,7 +103,8 @@
             // 
             // btnRenumerate
             // 
-            this.btnRenumerate.Location = new System.Drawing.Point(4, 233);
+            this.btnRenumerate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnRenumerate.Location = new System.Drawing.Point(4, 243);
             this.btnRenumerate.Name = "btnRenumerate";
             this.btnRenumerate.Size = new System.Drawing.Size(76, 23);
             this.btnRenumerate.TabIndex = 2;
@@ -112,27 +114,27 @@
             // 
             // lbDownloadedOn
             // 
+            this.lbDownloadedOn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lbDownloadedOn.AutoSize = true;
-            this.lbDownloadedOn.Location = new System.Drawing.Point(12, 214);
+            this.lbDownloadedOn.Location = new System.Drawing.Point(12, 213);
             this.lbDownloadedOn.Name = "lbDownloadedOn";
-            this.lbDownloadedOn.Size = new System.Drawing.Size(105, 13);
+            this.lbDownloadedOn.Size = new System.Drawing.Size(0, 13);
             this.lbDownloadedOn.TabIndex = 3;
-            this.lbDownloadedOn.Text = "Downloaded on: n/a";
             // 
             // frmRedownloader
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(292, 260);
+            this.ClientSize = new System.Drawing.Size(292, 270);
             this.Controls.Add(this.lbDownloadedOn);
             this.Controls.Add(this.btnRenumerate);
             this.Controls.Add(this.btnRedownload);
             this.Controls.Add(this.tcMain);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(300, 290);
-            this.MinimumSize = new System.Drawing.Size(300, 290);
+            this.MaximumSize = new System.Drawing.Size(300, 300);
+            this.MinimumSize = new System.Drawing.Size(300, 300);
             this.Name = "frmRedownloader";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

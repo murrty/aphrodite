@@ -105,7 +105,7 @@
             this.txtInput.Location = new System.Drawing.Point(26, 51);
             this.txtInput.Name = "txtInput";
             this.txtInput.Size = new System.Drawing.Size(193, 20);
-            this.txtInput.TabIndex = 4;
+            this.txtInput.TabIndex = 3;
             this.txtInput.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtInput_KeyPress);
             // 
             // tcTabs
@@ -138,7 +138,7 @@
             this.btnDisposeTab.Location = new System.Drawing.Point(344, 239);
             this.btnDisposeTab.Name = "btnDisposeTab";
             this.btnDisposeTab.Size = new System.Drawing.Size(75, 23);
-            this.btnDisposeTab.TabIndex = 14;
+            this.btnDisposeTab.TabIndex = 2;
             this.btnDisposeTab.Text = "dispose tab";
             this.btnDisposeTab.UseVisualStyleBackColor = true;
             this.btnDisposeTab.Click += new System.EventHandler(this.btnDisposeTab_Click);
@@ -149,7 +149,7 @@
             this.btnDisposeAll.Location = new System.Drawing.Point(329, 268);
             this.btnDisposeAll.Name = "btnDisposeAll";
             this.btnDisposeAll.Size = new System.Drawing.Size(90, 23);
-            this.btnDisposeAll.TabIndex = 13;
+            this.btnDisposeAll.TabIndex = 3;
             this.btnDisposeAll.Text = "dispose all tabs";
             this.btnDisposeAll.UseVisualStyleBackColor = true;
             this.btnDisposeAll.Click += new System.EventHandler(this.btnDisposeAll_Click);
@@ -160,7 +160,7 @@
             this.tcImages.Name = "tcImages";
             this.tcImages.SelectedIndex = 0;
             this.tcImages.Size = new System.Drawing.Size(420, 230);
-            this.tcImages.TabIndex = 12;
+            this.tcImages.TabIndex = 1;
             // 
             // tbPool
             // 
@@ -187,7 +187,7 @@
             this.txtPoolDesc.Name = "txtPoolDesc";
             this.txtPoolDesc.ReadOnly = true;
             this.txtPoolDesc.Size = new System.Drawing.Size(300, 20);
-            this.txtPoolDesc.TabIndex = 24;
+            this.txtPoolDesc.TabIndex = 4;
             // 
             // lbDesc
             // 
@@ -204,7 +204,7 @@
             this.txtPoolPages.Name = "txtPoolPages";
             this.txtPoolPages.ReadOnly = true;
             this.txtPoolPages.Size = new System.Drawing.Size(300, 20);
-            this.txtPoolPages.TabIndex = 22;
+            this.txtPoolPages.TabIndex = 3;
             // 
             // lbPoolPages
             // 
@@ -221,7 +221,7 @@
             this.txtPoolName.Name = "txtPoolName";
             this.txtPoolName.ReadOnly = true;
             this.txtPoolName.Size = new System.Drawing.Size(300, 20);
-            this.txtPoolName.TabIndex = 20;
+            this.txtPoolName.TabIndex = 2;
             // 
             // lbPoolName
             // 
@@ -247,7 +247,7 @@
             this.txtPoolId.Name = "txtPoolId";
             this.txtPoolId.ReadOnly = true;
             this.txtPoolId.Size = new System.Drawing.Size(300, 20);
-            this.txtPoolId.TabIndex = 17;
+            this.txtPoolId.TabIndex = 1;
             // 
             // tcPoolPages
             // 
@@ -255,7 +255,7 @@
             this.tcPoolPages.Name = "tcPoolPages";
             this.tcPoolPages.SelectedIndex = 0;
             this.tcPoolPages.Size = new System.Drawing.Size(420, 231);
-            this.tcPoolPages.TabIndex = 16;
+            this.tcPoolPages.TabIndex = 5;
             // 
             // tbTag
             // 
@@ -274,14 +274,14 @@
             this.tcTags.Name = "tcTags";
             this.tcTags.SelectedIndex = 0;
             this.tcTags.Size = new System.Drawing.Size(420, 230);
-            this.tcTags.TabIndex = 0;
+            this.tcTags.TabIndex = 1;
             // 
             // btnRetrieve
             // 
             this.btnRetrieve.Location = new System.Drawing.Point(225, 49);
             this.btnRetrieve.Name = "btnRetrieve";
             this.btnRetrieve.Size = new System.Drawing.Size(75, 23);
-            this.btnRetrieve.TabIndex = 6;
+            this.btnRetrieve.TabIndex = 4;
             this.btnRetrieve.Text = "retrieve info";
             this.btnRetrieve.UseVisualStyleBackColor = true;
             this.btnRetrieve.Click += new System.EventHandler(this.btnRetrieve_Click);

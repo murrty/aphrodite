@@ -63,6 +63,9 @@ namespace aphrodite {
         public frmMain() {
             InitializeComponent();
 
+            if (Properties.Settings.Default.showDebugDates)
+                this.Text += " (debug " + Properties.Settings.Default.debugDate + ")";
+
             List<JumpTask>taskList = new List<JumpTask>();
             taskList.Add(jStt);
             taskList.Add(jRdl);
@@ -84,12 +87,19 @@ namespace aphrodite {
                     if (ini.ReadBool("useIni"))
                         useIni = true;
 
+            if (useIni) {
+                if (ini.ReadInt("iniVersion") < Settings.Default.iniVersion) {
+                    MessageBox.Show("A new setting has been added to the program and your ini file is out of date.\nOpen the Settings form and save it to set it as the default, or change it if the new settings is not what you want to have enabled.");
+                }
+            }
+
             SetTextBoxHint(txtTags.Handle, "Tags to download...");
             SetTextBoxHint(txtID.Handle, "Pool ID...");
         }
         private void frmMain_Load(object sender, EventArgs e) {
-            if (string.IsNullOrWhiteSpace(Settings.Default.saveLocation) || string.IsNullOrEmpty(Settings.Default.saveLocation))
+            if (string.IsNullOrWhiteSpace(Settings.Default.saveLocation) || string.IsNullOrEmpty(Settings.Default.saveLocation)) {
                 Settings.Default.saveLocation = Environment.CurrentDirectory;
+            }
 
             for (int i = 1; i < Environment.GetCommandLineArgs().Length; i++) { // count each runtime argument, int 0 = boot directory.
                 string arg = Environment.GetCommandLineArgs()[i]; // buffer for the arg
@@ -100,18 +110,32 @@ namespace aphrodite {
                     settings.useIni = useIni;
                     settings.ShowDialog();
                 }
-                if (arg.StartsWith("pools:configuresettings") || arg.StartsWith("tags:configuresettings") || arg.StartsWith("images:configuresettings") || arg.StartsWith("configuresettings")) { // check for configure settings argument
+                if (arg.StartsWith("-settings") || arg.StartsWith("tags:configuresettings") || arg.StartsWith("pools:configuresettings") || arg.StartsWith("images:configuresettings") || arg.StartsWith("-protocol") || arg.StartsWith("-portable") || arg.StartsWith("-schema") || arg.StartsWith("configuresettings")) { // check for configure settings argument
                     frmSettings settings = new frmSettings(); // configure settings argument was passed
                     settings.pluginChange = true; // boolean to switch to the tab on load
                     settings.isAdmin = isAdmin; // sets isAdmin for the protocol.
+
+                    switch (arg.ToLower()) {
+                        case "-settings":
+                            settings.plugin = 0;
+                            break;
+                        case "-protocol":
+                            settings.plugin = 4;
+                            break;
+                        case "-portable":
+                            settings.plugin = 5;
+                            break;
+                        case "-schema":
+                            settings.plugin = 6;
+                            break;
+                    }
+
                     if (arg.StartsWith("tags:")) // if it's changing tag settings
                         settings.plugin = 1;
                     else if (arg.StartsWith("pools:")) // if it's changing pool settings
                         settings.plugin = 2;
                     else if (arg.StartsWith("images:")) // if it's changing image settings
                         settings.plugin = 3;
-                    else // otherwise just use the first tab
-                        settings.plugin = 0;
                     settings.ShowDialog();
                     Environment.Exit(0);
                 }
@@ -192,7 +216,7 @@ namespace aphrodite {
                         Environment.Exit(0);
                     }
                     else {
-                        txtTags.Text = getTags(Environment.GetCommandLineArgs());
+                        txtTags.Text = getTags(Environment.GetCommandLineArgs()).Replace("%20", " ");
                     }
                 }
                 else if (arg.StartsWith("images:") && apiTools.isValidImageLink(arg.Replace("images:", ""))) {
@@ -213,6 +237,9 @@ namespace aphrodite {
                     frmBlacklist bList = new frmBlacklist();
                     bList.ShowDialog();
                     Environment.Exit(0);
+                }
+                else if (arg.StartsWith("-ib") || arg.StartsWith("-inkbunny")) {
+                    // skip this arg. i could do this nicer, but eh.
                 }
                 else {
                     txtTags.Text += arg.Replace("%20", " ") + " ";
@@ -241,7 +268,6 @@ namespace aphrodite {
                 chkScoreAsTag.Checked = ini.ReadBool("scoreAsTag", "Tags");
                 numScore.Value = Convert.ToDecimal(ini.ReadInt("scoreMin", "Tags"));
                 numLimit.Value = Convert.ToDecimal(ini.ReadInt("imageLimit", "Tags"));
-                chkPageLimit.Checked = ini.ReadBool("usePageLimit", "Tags");
                 numPageLimit.Value = Convert.ToDecimal(ini.ReadInt("pageLimit", "Tags"));
 
                 chkPoolName.Checked = ini.ReadBool("usePoolName", "Pools");
@@ -273,10 +299,8 @@ namespace aphrodite {
                 chkScoreAsTag.Checked = Tags.Default.scoreAsTag;
                 numScore.Value = Convert.ToDecimal(Tags.Default.scoreMin);
                 numLimit.Value = Convert.ToDecimal(Tags.Default.imageLimit);
-                chkPageLimit.Checked = Tags.Default.usePageLimit;
                 numPageLimit.Value = Convert.ToDecimal(Tags.Default.pageLimit);
 
-                chkPoolName.Checked = Pools.Default.usePoolName;
                 chkMerge.Checked = Pools.Default.mergeBlacklisted;
                 chkOpen.Checked = Pools.Default.openAfter;
 
@@ -294,7 +318,15 @@ namespace aphrodite {
                     mProtocol.Enabled = true;
                 }
             }
-            
+
+            if (FormSettings.Default.frmMainX != -999999 && FormSettings.Default.frmMainY != -999999) {
+                if (useIni) {
+                    this.Location = new Point(ini.ReadInt("frmMainX", "Forms"), ini.ReadInt("frmMainY", "Forms"));
+                }
+                else {
+                    this.Location = new Point(FormSettings.Default.frmMainX, FormSettings.Default.frmMainY);
+                }
+            }
         }
         private void frmMain_Shown(object sender, EventArgs e) {
             txtTags.Focus();
@@ -329,7 +361,6 @@ namespace aphrodite {
                 chkScoreAsTag.Checked = ini.ReadBool("scoreAsTag", "Tags");
                 numScore.Value = Convert.ToDecimal(ini.ReadInt("scoreMin", "Tags"));
                 numLimit.Value = Convert.ToDecimal(ini.ReadInt("imageLimit", "Tags"));
-                chkPageLimit.Checked = ini.ReadBool("usePageLimit", "Tags");
                 numPageLimit.Value = Convert.ToDecimal(ini.ReadInt("pageLimit", "Tags"));
 
                 chkPoolName.Checked = ini.ReadBool("usePoolName", "Pools");
@@ -345,10 +376,8 @@ namespace aphrodite {
                 chkScoreAsTag.Checked = Tags.Default.scoreAsTag;
                 numScore.Value = Convert.ToDecimal(Tags.Default.scoreMin);
                 numLimit.Value = Convert.ToDecimal(Tags.Default.imageLimit);
-                chkPageLimit.Checked = Tags.Default.usePageLimit;
                 numPageLimit.Value = Convert.ToDecimal(Tags.Default.pageLimit);
 
-                chkPoolName.Checked = Pools.Default.usePoolName;
                 chkOpen.Checked = Pools.Default.openAfter;
                 chkMerge.Checked = Pools.Default.mergeBlacklisted;
             }
@@ -379,6 +408,10 @@ namespace aphrodite {
         private void mIndexer_Click(object sender, EventArgs e) {
             frmIndexer idx = new frmIndexer();
             idx.Show();
+        }
+        private void mParser_Click(object sender, EventArgs e) {
+            frmParser psr = new frmParser();
+            psr.ShowDialog();
         }
 
         private void mAbout_Click(object sender, EventArgs e) {
@@ -480,6 +513,7 @@ namespace aphrodite {
                 tagDL.saveInfo = ini.ReadBool("saveInfo", "Global");
                 tagDL.saveBlacklistedFiles = ini.ReadBool("saveBlacklisted", "Global");
                 tagDL.ignoreFinish = ini.ReadBool("ignoreFinish", "Global");
+                tagDL.fileNameSchema = ini.ReadString("fileNameSchema", "Tags");
             }
             else {
                 Settings.Default.Reload();
@@ -489,6 +523,7 @@ namespace aphrodite {
                 tagDL.saveInfo = Settings.Default.saveInfo;
                 tagDL.saveBlacklistedFiles = Settings.Default.saveBlacklisted;
                 tagDL.ignoreFinish = Settings.Default.ignoreFinish;
+                tagDL.fileNameSchema = Tags.Default.fileNameSchema;
             }
 
         // Form settings next
@@ -501,8 +536,7 @@ namespace aphrodite {
             if (numLimit.Value > 0) {
                 tagDL.imageLimit = Convert.ToInt32(numLimit.Value);
             }
-            tagDL.usePageLimit = chkPageLimit.Checked;
-            if (tagDL.usePageLimit)
+            if (Convert.ToInt32(numPageLimit.Value) > 0)
                 tagDL.pageLimit = Convert.ToInt32(numPageLimit.Value);
             tagDL.separateRatings = chkSeparateRatings.Checked;
             if (tagDL.separateRatings) {
@@ -524,7 +558,7 @@ namespace aphrodite {
             numScore.Enabled = chkMinimumScore.Checked;
         }
         private void chkPageLimit_CheckedChanged(object sender, EventArgs e) {
-            numPageLimit.Enabled = chkPageLimit.Checked;
+            //numPageLimit.Enabled = chkPageLimit.Checked;
         }
 
         private void downloadPageOfTags(string tags) {
@@ -587,13 +621,9 @@ namespace aphrodite {
                 else
                     tagDL.imageLimit = 0;
 
-                if (ini.KeyExists("usePageLimit", "Tags"))
-                    tagDL.usePageLimit = ini.ReadBool("usePageLimit", "Tags");
-                else
-                    tagDL.usePageLimit = false;
-
-                if (tagDL.usePageLimit)
-                    tagDL.pageLimit = ini.ReadInt("pageLimit", "Tags");
+                if (ini.KeyExists("pageLimit", "Tags"))
+                    if (ini.ReadInt("pageLimit", "Tags") > 0)
+                        tagDL.pageLimit = ini.ReadInt("pageLimit", "Tags");
 
                 if (ini.KeyExists("separateRatings", "Tags"))
                     tagDL.separateRatings = ini.ReadBool("separateRatings", "Tags");
@@ -613,6 +643,11 @@ namespace aphrodite {
 
                 if (tagDL.separateRatings)
                     tagDL.ratings = ratings.Split(' ');
+
+                if (ini.KeyExists("fileNameSchema", "Tags"))
+                    tagDL.fileNameSchema = ini.ReadString("fileNameSchema", "Tags").ToLower();
+                else
+                    tagDL.fileNameSchema = "%md5%";
             }
             else {
                 Settings.Default.Reload();
@@ -631,8 +666,7 @@ namespace aphrodite {
                 }
                 if (Tags.Default.imageLimit > 0)
                     tagDL.imageLimit = Tags.Default.imageLimit;
-                tagDL.usePageLimit = Tags.Default.usePageLimit;
-                if (tagDL.usePageLimit)
+                if (Tags.Default.pageLimit > 0)
                     tagDL.pageLimit = Tags.Default.pageLimit;
                 tagDL.separateRatings = Tags.Default.separateRatings;
                 if (tagDL.separateRatings) {
@@ -645,6 +679,7 @@ namespace aphrodite {
                     ratings = ratings.TrimEnd(' ');
                     tagDL.ratings = ratings.Split(' ');
                 }
+                tagDL.fileNameSchema = Tags.Default.fileNameSchema.ToLower();
             }
 
             tagDL.ShowDialog();
@@ -685,6 +720,12 @@ namespace aphrodite {
                 poolDL.saveInfo = ini.ReadBool("saveInfo", "Global");
                 poolDL.saveBlacklisted = ini.ReadBool("saveBlacklisted", "Global");
                 poolDL.ignoreFinish = ini.ReadBool("ignoreFinish", "Global");
+
+                poolDL.saveInfo = ini.ReadBool("saveMetadata", "Global");
+                poolDL.saveBlacklisted = ini.ReadBool("saveArtistMetadata", "Global");
+                poolDL.ignoreFinish = ini.ReadBool("saveTagMetadata", "Global");
+
+                poolDL.fileNameSchema = ini.ReadString("fileNameSchema", "Pools");
             }
             else {
                 Settings.Default.Reload();
@@ -695,9 +736,14 @@ namespace aphrodite {
                 poolDL.saveInfo = Settings.Default.saveInfo;
                 poolDL.saveBlacklisted = Settings.Default.saveBlacklisted;
                 poolDL.ignoreFinish = Settings.Default.ignoreFinish;
+
+                poolDL.saveMetadata = Settings.Default.saveMetadata;
+                poolDL.saveArtistMetadata = Settings.Default.saveArtistMetadata;
+                poolDL.saveTagMetadata = Settings.Default.saveTagMetadata;
+
+                poolDL.fileNameSchema = Pools.Default.fileNameSchema;
             }
 
-            poolDL.usePoolName = chkPoolName.Checked;
             poolDL.mergeBlacklisted = chkMerge.Checked;
             poolDL.openAfter = chkOpen.Checked;
 
@@ -750,10 +796,15 @@ namespace aphrodite {
 
 
 
-                if (ini.KeyExists("usePoolName", "Pools"))
-                    poolDL.usePoolName = ini.ReadBool("usePoolName", "Pools");
+                //if (ini.KeyExists("usePoolName", "Pools"))
+                //    poolDL.usePoolName = ini.ReadBool("usePoolName", "Pools");
+                //else
+                //    poolDL.usePoolName = true;
+
+                if (ini.KeyExists("fileNameSchema", "Pools"))
+                    poolDL.fileNameSchema = ini.ReadString("fileNameSchema", "Pools").ToLower();
                 else
-                    poolDL.usePoolName = true;
+                    poolDL.fileNameSchema = "%poolname%_%page%";
 
                 if (ini.KeyExists("mergeBlacklisted", "Pools"))
                     poolDL.mergeBlacklisted = ini.ReadBool("mergeBlacklisted", "Pools");
@@ -776,7 +827,8 @@ namespace aphrodite {
                 poolDL.ignoreFinish = Settings.Default.ignoreFinish;
                 poolDL.saveBlacklisted = Settings.Default.saveBlacklisted;
 
-                poolDL.usePoolName = Pools.Default.usePoolName;
+                //poolDL.usePoolName = Pools.Default.usePoolName;
+                poolDL.fileNameSchema = Pools.Default.fileNameSchema.ToLower();
                 poolDL.mergeBlacklisted = Pools.Default.mergeBlacklisted;
                 poolDL.openAfter = Pools.Default.openAfter;
             }
@@ -826,10 +878,14 @@ namespace aphrodite {
 
 
 
-                    if (ini.KeyExists("fileNameCode", "Images"))
-                        imageDL.fileNameCode = ini.ReadInt("fileNameCode", "Images");
+                    //if (ini.KeyExists("fileNameCode", "Images"))
+                    //    imageDL.fileNameCode = ini.ReadInt("fileNameCode", "Images");
+                    //else
+                    //    imageDL.fileNameCode = 1;
+                    if (ini.KeyExists("fileNameSchema", "Images"))
+                        imageDL.fileNameSchema = ini.ReadString("fileNameSchema", "Images").ToLower();
                     else
-                        imageDL.fileNameCode = 1;
+                        imageDL.fileNameSchema = "%artist%_%md5%";
 
                     if (ini.KeyExists("separateRatings", "Images"))
                         imageDL.separateRatings = ini.ReadBool("separateRatings", "Images");
@@ -840,6 +896,13 @@ namespace aphrodite {
                         imageDL.separateBlacklisted = ini.ReadBool("separateBlacklisted", "Images");
                     else
                         imageDL.separateBlacklisted = true;
+
+                    if (ini.KeyExists("separateArtists", "Images")) {
+                        imageDL.separateArtists = ini.ReadBool("separateArtists", "Images");
+                    }
+                    else {
+                        imageDL.separateArtists = false;
+                    }
                 }
                 else {
                     Settings.Default.Reload();
@@ -852,7 +915,8 @@ namespace aphrodite {
                     imageDL.separateBlacklisted = Images.Default.separateBlacklisted;
                     imageDL.saveInfo = Settings.Default.saveInfo;
                     imageDL.ignoreFinish = Settings.Default.ignoreFinish;
-                    imageDL.fileNameCode = Images.Default.fileNameCode;
+                    imageDL.fileNameSchema = Images.Default.fileNameSchema.ToLower();
+                    imageDL.separateArtists = Images.Default.separateArtists;
                 }
 
                 imageDL.ShowDialog();
@@ -889,11 +953,12 @@ namespace aphrodite {
                         imageDL.ignoreFinish = false;
 
 
-
-                    if (ini.KeyExists("fileNameCode", "Images"))
-                        imageDL.fileNameCode = ini.ReadInt("fileNameCode", "Images");
-                    else
-                        imageDL.fileNameCode = 1;
+                    if (ini.KeyExists("fileNameSchema", "Images")) {
+                        imageDL.fileNameSchema = ini.ReadString("fileNameSchema", "Images").ToLower();
+                    }
+                    else {
+                        imageDL.fileNameSchema = "%artist%_%md5%";
+                    }
 
                     if (ini.KeyExists("separateRatings", "Images"))
                         imageDL.separateRatings = ini.ReadBool("separateRatings", "Images");
@@ -904,6 +969,13 @@ namespace aphrodite {
                         imageDL.separateBlacklisted = ini.ReadBool("separateBlacklisted", "Images");
                     else
                         imageDL.separateBlacklisted = true;
+
+                    if (ini.KeyExists("separateArtists", "Images")) {
+                        imageDL.separateArtists = ini.ReadBool("separateArtists", "Images");
+                    }
+                    else {
+                        imageDL.separateArtists = false;
+                    }
                 }
                 else {
                     Settings.Default.Reload();
@@ -916,7 +988,8 @@ namespace aphrodite {
                     imageDL.separateBlacklisted = Images.Default.separateBlacklisted;
                     imageDL.saveInfo = Settings.Default.saveInfo;
                     imageDL.ignoreFinish = Settings.Default.ignoreFinish;
-                    imageDL.fileNameCode = Images.Default.fileNameCode;
+                    imageDL.fileNameSchema = Images.Default.fileNameSchema;
+                    imageDL.separateArtists = Images.Default.separateArtists;
                 }
 
                 imageDL.downloadImage();
@@ -924,10 +997,26 @@ namespace aphrodite {
         }
 
         private void btnDownloadImage_Click(object sender, EventArgs e) {
-            if (!string.IsNullOrEmpty(txtImageUrl.Text) && apiTools.isValidImageLink(txtImageUrl.Text))
-                downloadImage(txtImageUrl.Text, true);
-        } // ARGUMENT DOWNLOADS ONLY // Downloads image from URL.
+            if (string.IsNullOrEmpty(txtImageUrl.Text))
+                return;
+
+            string imageUrl = txtImageUrl.Text.Replace("http://", "https://").Replace("https://www.", "https://");
+
+            if (!imageUrl.StartsWith("https://e621.net/post/show/")) {
+                imageUrl = "https://e621.net/post/show/" + imageUrl;
+            }
+
+            if (apiTools.isValidImageLink(imageUrl))
+                downloadImage(imageUrl, true);
+        }
+        // ARGUMENT DOWNLOADS ONLY // Downloads image from URL.
     #endregion
 
+    #region Future work here, maybe
+        private void mInkBunnyDownloader_Click(object sender, EventArgs e) {
+            //frmInkMain ibDownloader = new frmInkMain();
+            //ibDownloader.Show();
+        }
+     #endregion
     }
 }

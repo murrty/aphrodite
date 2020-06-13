@@ -59,9 +59,6 @@ namespace aphrodite {
 
             if (pluginChange) {
                 switch (plugin) {
-                    case 0:
-                        tbMain.SelectedTab = tbGeneral;
-                        break;
                     case 1:
                         tbMain.SelectedTab = tbTags;
                         break;
@@ -70,6 +67,18 @@ namespace aphrodite {
                         break;
                     case 3:
                         tbMain.SelectedTab = tbImages;
+                        break;
+                    case 4:
+                        tbMain.SelectedTab = tbProtocol;
+                        break;
+                    case 5:
+                        tbMain.SelectedTab = tbPortable;
+                        break;
+                    case 6:
+                        tbMain.SelectedTab = tbSchemas;
+                        break;
+                    default:
+                        tbMain.SelectedTab = tbGeneral;
                         break;
                 }
             }
@@ -111,13 +120,19 @@ namespace aphrodite {
                 FileInfo fI = new FileInfo(Environment.CurrentDirectory + "\\aphrodite.ini");
                 fI.IsReadOnly = false;
 
-                // General
-                //ini.WriteString("saveTo", "@");
+                if (ini.ReadInt("iniVersion") != Settings.Default.iniVersion)
+                    ini.WriteInt("iniVersion", Settings.Default.iniVersion);
+
+              // General
                 ini.WriteBool("saveInfo", chkSaveInfo.Checked, "Global");
                 ini.WriteBool("saveBlacklisted", chkSaveBlacklisted.Checked, "Global");
                 ini.WriteBool("ignoreFinish", chkIgnoreFinish.Checked, "Global");
+                ini.WriteBool("saveMetadata", chkSaveMetadata.Checked, "Global");
+                ini.WriteBool("saveArtistMetadata", chkSaveArtistMetadata.Checked, "Global");
+                ini.WriteBool("saveTagMetadata", chkSaveTagMetadata.Checked, "Global");
 
-                // Tags
+              // Tags
+                ini.WriteString("fileNameSchema", apiTools.replaceIllegalCharacters(txtTagSchema.Text.ToLower()), "Tags");
                 ini.WriteBool("Explicit", chkExplicit.Checked, "Tags");
                 ini.WriteBool("Questionable", chkQuestionable.Checked, "Tags");
                 ini.WriteBool("Safe", chkSafe.Checked, "Tags");
@@ -126,31 +141,34 @@ namespace aphrodite {
                 ini.WriteBool("scoreAsTag", chkScoreAsTag.Checked, "Tags");
                 ini.WriteInt("scoreMin", Convert.ToInt32(numScore.Value), "Tags");
                 ini.WriteInt("imageLimit", Convert.ToInt32(numLimit.Value), "Tags");
-                ini.WriteBool("usePageLimit", chkPageLimit.Checked, "Tags");
                 ini.WriteInt("pageLimit", Convert.ToInt32(numLimit.Value), "Tags");
+                ini.WriteBool("skipExistingFiles", chkSkipExistingFiles.Checked, "Tags");
 
-                // Pools
-                ini.WriteBool("usePoolName", chkPoolName.Checked, "Pools");
+              // Pools
+                ini.WriteString("fileNameSchema", apiTools.replaceIllegalCharacters(txtPoolSchema.Text.ToLower()), "Pools");
                 ini.WriteBool("mergeBlacklisted", chkMerge.Checked, "Pools");
                 ini.WriteBool("openAfter", chkOpen.Checked, "Pools");
 
-                // Images
-                if (rbMD5.Checked)
-                    ini.WriteInt("fileNameCode", 0, "Images");
-                else
-                    ini.WriteInt("fileNameCode", 1, "Images");
+              // Images
+                ini.WriteString("fileNameSchema", apiTools.replaceIllegalCharacters(txtImageSchema.Text.ToLower()), "Images");
                 ini.WriteBool("separateRatings", chkSeparateImages.Checked, "Images");
                 ini.WriteBool("separateBlacklisted", chkSeparateBlacklisted.Checked, "Images");
+                ini.WriteBool("separateArtists", chkSepArtists.Checked, "Images");
                 ini.WriteBool("useForm", chkUseForm.Checked, "Images");
             }
             else {
-                // General
-                Settings.Default.saveLocation = txtSaveTo.Text;
+              // General
+                if (txtSaveTo.Text != Environment.CurrentDirectory)
+                    Settings.Default.saveLocation = txtSaveTo.Text;
                 Settings.Default.saveInfo = chkSaveInfo.Checked;
                 Settings.Default.saveBlacklisted = chkSaveBlacklisted.Checked;
                 Settings.Default.ignoreFinish = chkIgnoreFinish.Checked;
+                Settings.Default.saveMetadata = chkSaveMetadata.Checked;
+                Settings.Default.saveArtistMetadata = chkSaveArtistMetadata.Checked;
+                Settings.Default.saveTagMetadata = chkSaveTagMetadata.Checked;
 
-                // Tags
+              // Tags
+                Tags.Default.fileNameSchema = apiTools.replaceIllegalCharacters(txtTagSchema.Text.ToLower());
                 Tags.Default.Explicit = chkExplicit.Checked;
                 Tags.Default.Questionable = chkQuestionable.Checked;
                 Tags.Default.Safe = chkSafe.Checked;
@@ -159,25 +177,23 @@ namespace aphrodite {
                 Tags.Default.scoreAsTag = chkScoreAsTag.Checked;
                 Tags.Default.scoreMin = Convert.ToInt32(numScore.Value);
                 Tags.Default.imageLimit = Convert.ToInt32(numLimit.Value);
-                Tags.Default.usePageLimit = chkPageLimit.Checked;
                 Tags.Default.pageLimit = Convert.ToInt32(numPageLimit.Value);
+                Tags.Default.skipExistingFiles = chkSkipExistingFiles.Checked;
 
-                // Pools
-                Pools.Default.usePoolName = chkPoolName.Checked;
+              // Pools
+                Pools.Default.fileNameSchema = apiTools.replaceIllegalCharacters(txtPoolSchema.Text.ToLower());
                 Pools.Default.mergeBlacklisted = chkMerge.Checked;
                 Pools.Default.openAfter = chkOpen.Checked;
                 Pools.Default.addWishlistSilent = chkAddWishlistSilent.Checked;
 
-                // Images
-                if (rbMD5.Checked)
-                    Images.Default.fileNameCode = 0;
-                else
-                    Images.Default.fileNameCode = 1;
+              // Images
+                Images.Default.fileNameSchema = apiTools.replaceIllegalCharacters(txtImageSchema.Text.ToLower());
                 Images.Default.separateRatings = chkSeparateImages.Checked;
                 Images.Default.separateBlacklisted = chkSeparateBlacklisted.Checked;
+                Images.Default.separateArtists = chkSepArtists.Checked;
                 Images.Default.useForm = chkUseForm.Checked;
 
-                // Save all 4
+              // Save all 4
                 Settings.Default.Save();
                 Tags.Default.Save();
                 Pools.Default.Save();
@@ -186,15 +202,19 @@ namespace aphrodite {
         }
         private void loadSettings() {
             if (useIni) {
-                // General
+              // General
                 txtSaveTo.Text = Environment.CurrentDirectory;
                 txtSaveTo.Enabled = false;
                 btnBrws.Enabled = false;
                 chkSaveInfo.Checked = ini.ReadBool("saveInfo", "Global");
                 chkSaveBlacklisted.Checked = ini.ReadBool("saveBlacklisted", "Global");
                 chkIgnoreFinish.Checked = ini.ReadBool("ignoreFinish", "Global");
+                chkSaveMetadata.Checked = ini.ReadBool("saveMetadata", "Global");
+                chkSaveArtistMetadata.Checked = ini.ReadBool("saveArtistMetadata", "Global");
+                chkSaveTagMetadata.Checked = ini.ReadBool("saveTagMetadata", "Global");
 
-                // Tags
+              // Tags
+                txtTagSchema.Text = apiTools.replaceIllegalCharacters(ini.ReadString("fileNameSchema", "Tags").ToLower());
                 chkExplicit.Checked = ini.ReadBool("Explicit", "Tags");
                 chkQuestionable.Checked = ini.ReadBool("Questionable", "Tags");
                 chkSafe.Checked = ini.ReadBool("Safe", "Tags");
@@ -203,40 +223,35 @@ namespace aphrodite {
                 chkScoreAsTag.Checked = ini.ReadBool("scoreAsTag", "Tags");
                 numScore.Value = Convert.ToDecimal(ini.ReadInt("scoreMin", "Tags"));
                 numLimit.Value = Convert.ToDecimal(ini.ReadInt("imageLimit", "Tags"));
-                chkPageLimit.Checked = ini.ReadBool("usePageLimit", "Tags");
                 numPageLimit.Value = Convert.ToDecimal(ini.ReadInt("pageLimit", "Tags"));
+                chkSkipExistingFiles.Checked = ini.ReadBool("skipExistingFiles", "Tags");
 
-                // Pools
-                chkPoolName.Checked = ini.ReadBool("usePoolName", "Pools");
+              // Pools
+                txtPoolSchema.Text = apiTools.replaceIllegalCharacters(ini.ReadString("fileNameSchema", "Pools").ToLower());
                 chkMerge.Checked = ini.ReadBool("mergeBlacklisted", "Pools");
                 chkOpen.Checked = ini.ReadBool("openAfter", "Pools");
                 chkAddWishlistSilent.Checked = false;
                 chkAddWishlistSilent.Enabled = false;
 
-                // Images
-                switch (ini.ReadInt("fileNameCode", "Images")) {
-                    case 0:
-                        rbMD5.Checked = true;
-                        break;
-                    case 1:
-                        rbArtist.Checked = true;
-                        break;
-                    default:
-                        rbArtist.Checked = true;
-                        break;
-                }
+              // Images
+                txtImageSchema.Text = apiTools.replaceIllegalCharacters(ini.ReadString("fileNameSchema", "Images").ToLower());
                 chkSeparateImages.Checked = ini.ReadBool("separateRatings", "Images");
                 chkSeparateBlacklisted.Checked = ini.ReadBool("separateBlacklisted", "Images");
+                chkSepArtists.Checked = ini.ReadBool("separateArtists", "Images");
                 chkUseForm.Checked = ini.ReadBool("useForm", "Images");
             }
             else {
-                // General
+              // General
                 txtSaveTo.Text = Settings.Default.saveLocation;
                 chkSaveInfo.Checked = Settings.Default.saveInfo;
                 chkSaveBlacklisted.Checked = Settings.Default.saveBlacklisted;
                 chkIgnoreFinish.Checked = Settings.Default.ignoreFinish;
+                chkSaveMetadata.Checked = Settings.Default.saveMetadata;
+                chkSaveArtistMetadata.Checked = Settings.Default.saveArtistMetadata;
+                chkSaveTagMetadata.Checked = Settings.Default.saveTagMetadata;
 
-                // Tags
+              // Tags
+                txtTagSchema.Text = apiTools.replaceIllegalCharacters(Tags.Default.fileNameSchema.ToLower());
                 chkExplicit.Checked = Tags.Default.Explicit;
                 chkQuestionable.Checked = Tags.Default.Questionable;
                 chkSafe.Checked = Tags.Default.Safe;
@@ -245,29 +260,20 @@ namespace aphrodite {
                 chkScoreAsTag.Checked = Tags.Default.scoreAsTag;
                 numScore.Value = Convert.ToDecimal(Tags.Default.scoreMin);
                 numLimit.Value = Convert.ToDecimal(Tags.Default.imageLimit);
-                chkPageLimit.Checked = Tags.Default.usePageLimit;
                 numPageLimit.Value = Convert.ToDecimal(Tags.Default.pageLimit);
+                chkSkipExistingFiles.Checked = Tags.Default.skipExistingFiles;
 
-                // Pools
-                chkPoolName.Checked = Pools.Default.usePoolName;
+              // Pools
+                txtPoolSchema.Text = apiTools.replaceIllegalCharacters(Pools.Default.fileNameSchema.ToLower());
                 chkMerge.Checked = Pools.Default.mergeBlacklisted;
                 chkOpen.Checked = Pools.Default.openAfter;
                 chkAddWishlistSilent.Checked = Pools.Default.addWishlistSilent;
 
-                // Images
-                switch (Images.Default.fileNameCode) {
-                    case 0:
-                        rbMD5.Checked = true;
-                        break;
-                    case 1:
-                        rbArtist.Checked = true;
-                        break;
-                    default:
-                        rbArtist.Checked = true;
-                        break;
-                }
+              // Images
+                txtImageSchema.Text = apiTools.replaceIllegalCharacters(Images.Default.fileNameSchema.ToLower());
                 chkSeparateImages.Checked = Images.Default.separateRatings;
                 chkSeparateBlacklisted.Checked = Images.Default.separateBlacklisted;
+                chkSepArtists.Checked = Images.Default.separateArtists;
                 chkUseForm.Checked = Images.Default.useForm;
             }
         }
@@ -381,9 +387,6 @@ namespace aphrodite {
         private void chkMinimumScore_CheckedChanged(object sender, EventArgs e) {
             numScore.Enabled = chkMinimumScore.Checked;
             chkScoreAsTag.Enabled = chkMinimumScore.Checked;
-        }
-        private void chkPageLimit_CheckedChanged(object sender, EventArgs e) {
-            numPageLimit.Enabled = chkPageLimit.Checked;
         }
 
         private void btnBlacklist_Click(object sender, EventArgs e) {
@@ -564,40 +567,53 @@ namespace aphrodite {
             Process.Start("https://github.com/murrty/aphrodite/raw/master/Resources/aphrodite.images.user.js");
         }
 
+        private void btnSchemaUndesiredTags_Click(object sender, EventArgs e) {
+            frmUndesiredTags undesiredTags = new frmUndesiredTags();
+            undesiredTags.ShowDialog();
+
+            undesiredTags.Dispose();
+        }
+
         private void btnExportIni_Click(object sender, EventArgs e) {
-            MessageBox.Show("You can use the system-based settings for aphrodite by changing \"useIni\" to \"False\". That requires the ini to be unset as read-only.\nAlso, graylist & blacklist have spaces between tags and are separate files, so... keep that in mind.");
+            MessageBox.Show("You can use the system-based settings for aphrodite by changing \"useIni\" to \"False\".\nAlso, graylist & blacklist have spaces between tags and are separate files, so... keep that in mind.");
             string bufferINI = "[aphrodite]\nuseIni=True";
             File.WriteAllText(Environment.CurrentDirectory + "\\graylist.cfg", Settings.Default.blacklist);
             File.WriteAllText(Environment.CurrentDirectory + "\\blacklist.cfg", Settings.Default.zeroToleranceBlacklist);
-            //bufferINI += "\nsaveTo=@";
 
-            bufferINI += "\n[Global]";
+            bufferINI += "\n\n[Global]";
             bufferINI += "\nsaveInfo=" + Settings.Default.saveInfo;
             bufferINI += "\nsaveBlacklisted=" + Settings.Default.saveBlacklisted;
             bufferINI += "\nignoreFinish=" + Settings.Default.ignoreFinish;
+            bufferINI += "\nsaveMetadata=" + Settings.Default.saveMetadata;
+            bufferINI += "\nsaveArtistMetadata=" + Settings.Default.saveArtistMetadata;
+            bufferINI += "\nsaveTagMetadata=" + Settings.Default.saveTagMetadata;
 
-            bufferINI += "\n[Tags]";
+            bufferINI += "\n\n[Tags]";
+            bufferINI += "\nfileNameSchema=" + apiTools.replaceIllegalCharacters(Tags.Default.fileNameSchema);
             bufferINI += "\nuseMinimumScore=" + Tags.Default.enableScoreMin;
             bufferINI += "\nscoreAsTag=" + Tags.Default.scoreAsTag;
             bufferINI += "\nscoreMin=" + Tags.Default.scoreMin;
             bufferINI += "\nimageLimit=" + Tags.Default.imageLimit;
-            bufferINI += "\nusePageLimit=" + Tags.Default.usePageLimit;
             bufferINI += "\npageLimit=" + Tags.Default.pageLimit;
             bufferINI += "\nseparateRatings=" + Tags.Default.separateRatings;
             bufferINI += "\nExplicit=" + Tags.Default.Explicit;
             bufferINI += "\nQuestionable=" + Tags.Default.Questionable;
             bufferINI += "\nSafe=" + Tags.Default.Safe;
 
-            bufferINI += "\n[Pools]";
-            bufferINI += "\nusePoolName=" + Pools.Default.usePoolName;
+            bufferINI += "\n\n[Pools]";
+            bufferINI += "\nfileNameSchema=" + apiTools.replaceIllegalCharacters(Pools.Default.fileNameSchema);
             bufferINI += "\nmergeBlacklisted=" + Pools.Default.mergeBlacklisted;
             bufferINI += "\nopenAfter=" + Pools.Default.openAfter;
 
-            bufferINI += "\n[Images]";
-            bufferINI += "\nfileNameCode=" + Images.Default.fileNameCode;
+            bufferINI += "\n\n[Images]";
+            bufferINI += "\nfileNameSchema=" + apiTools.replaceIllegalCharacters(Images.Default.fileNameSchema);
             bufferINI += "\nseparateRatings=" + Images.Default.separateRatings;
             bufferINI += "\nseparateBlacklisted=" + Images.Default.separateBlacklisted;
             bufferINI += "\nuseForm=" + Images.Default.useForm;
+
+            bufferINI += "\n\n[Forms]";
+            bufferINI += "\nfrmMainX=" + FormSettings.Default.frmMainX;
+            bufferINI += "\nfrmMainY=" + FormSettings.Default.frmMainY;
 
             File.WriteAllText(Environment.CurrentDirectory + "\\aphrodite.ini", bufferINI);
 

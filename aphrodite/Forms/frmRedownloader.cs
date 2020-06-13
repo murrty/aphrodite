@@ -13,6 +13,7 @@ namespace aphrodite {
     public partial class frmRedownloader : Form {
         public bool useIni = false;
         IniFile ini = new IniFile();
+        string saveLocation = Environment.CurrentDirectory;
 
     #region Methods
         private void loadDownloads() {
@@ -128,9 +129,9 @@ namespace aphrodite {
                 sr.ReadLine();
                 tagLine = sr.ReadLine();
             }
-            if (tagLine.StartsWith("MINIMUM SCORE: n/a") || !tagLine.StartsWith("MINIMUM SCORE: "))
+            if (tagLine.StartsWith("MINIMUM SCORE: n/a") || !tagLine.StartsWith("MINIMUM SCORE: ")) 
                 return false;
-            else
+            else 
                 return true;
         }
         private string getMinimumScore(string nfoLocation) {
@@ -147,6 +148,7 @@ namespace aphrodite {
                 sr.ReadLine();
                 tagLine = sr.ReadLine();
             }
+
             if (tagLine.StartsWith("MINIMUM SCORE: ") || !tagLine.StartsWith("MINMIUM SCORE: n/a"))
                 return tagLine.Replace("MINIMUM SCORE: ", "");
             else
@@ -182,27 +184,19 @@ namespace aphrodite {
 
         private void frmTagRedownloader_Load(object sender, EventArgs e) {
             loadDownloads();
+            if (!useIni)
+                saveLocation = Settings.Default.saveLocation;
         }
 
         private void btnRedownload_Click(object sender, EventArgs e) {
             if (tcMain.SelectedIndex == 0) {
                 // tags
-                string tags = getTags(Settings.Default.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem));
+                string tags = getTags(saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem));
                 bool minimumScore = false;
                 int minScore = 0;
                 if (string.IsNullOrWhiteSpace(tags)) {
                     tags = lbTags.GetItemText(lbTags.SelectedItem);
                 }
-                if (hasMinimumScore(Settings.Default.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem))) {
-                    minimumScore = true;
-                    minScore = Int32.Parse(getMinimumScore(Settings.Default.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem)));
-                }
-                if (Tags.Default.imageLimit == 0) {
-                    if (MessageBox.Show("Redownloading tags \"" + tags + "\"\nDownloading won't be limited. This may take a long while or even blacklist you. Continue anyway?", "aphrodite", MessageBoxButtons.YesNo) == DialogResult.No) {
-                        return;
-                    }
-                }
-
                 if (tags.StartsWith(" ")) {
                     tags = tags.TrimStart(' ');
                 }
@@ -213,6 +207,15 @@ namespace aphrodite {
                 if (tags.Contains("/")) {
                     tags = tags.Replace("/", "%25-2F");
                 }
+                if (hasMinimumScore(saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem))) {
+                    minimumScore = true;
+                    minScore = Int32.Parse(getMinimumScore(saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem)));
+                }
+                if (Tags.Default.imageLimit == 0) {
+                    if (MessageBox.Show("Redownloading tags \"" + tags + "\"\nDownloading won't be limited. This may take a long while or even blacklist you. Continue anyway?", "aphrodite", MessageBoxButtons.YesNo) == DialogResult.No) {
+                        return;
+                    }
+                }
 
                 string[] length = tags.Split(' ');
                 if (length.Length > 6) {
@@ -220,126 +223,154 @@ namespace aphrodite {
                     return;
                 }
 
-                frmTagDownloader tagDL = new frmTagDownloader();
-                tagDL.tags = tags;
-                tagDL.useMinimumScore = minimumScore;
-                if (tagDL.useMinimumScore) {
-                    tagDL.minimumScore = minScore;
-                    if (useIni)
-                        tagDL.scoreAsTag = ini.ReadBool("scoreAsTag", "Tags");
-                    else
-                        tagDL.scoreAsTag = Tags.Default.scoreAsTag;
-                }
-                tagDL.openAfter = false;
-                if (useIni) {
-                    tagDL.graylist = File.ReadAllText(Environment.CurrentDirectory + "\\graylist.cfg");
-                    tagDL.blacklist = File.ReadAllText(Environment.CurrentDirectory + "\\blacklist.cfg");
-                    tagDL.saveTo = Environment.CurrentDirectory;
-                    tagDL.saveInfo = ini.ReadBool("saveInfo", "Global");
-                    tagDL.saveBlacklistedFiles = ini.ReadBool("saveBlacklisted", "Global");
-                    tagDL.ignoreFinish = ini.ReadBool("ignoreFinish", "Global");
-                    if (ini.ReadInt("imageLimit", "Tags") > 0)
-                        tagDL.imageLimit = ini.ReadInt("imageLimit", "Tags");
-                    tagDL.usePageLimit = ini.ReadBool("usePageLimit", "Tags");
-                    if (tagDL.usePageLimit)
-                        tagDL.pageLimit = ini.ReadInt("pageLimit", "Tags");
-                    tagDL.separateRatings = ini.ReadBool("separateRatings", "Tags");
-                    if (tagDL.separateRatings) {
-                        string ratings = string.Empty;
-                        if (ini.ReadBool("Explicit", "Tags"))
-                            ratings += "e ";
-                        if (ini.ReadBool("Questionable", "Tags"))
-                            ratings += "q ";
-                        if (ini.ReadBool("Safe", "Tags"))
-                            ratings += "s";
+                try {
+                    frmTagDownloader tagDL = new frmTagDownloader();
+                    tagDL.webHeader = Program.UserAgent;
+                    tagDL.tags = tags;
+                    string ratings = string.Empty;
+
+                    if (useIni) {
+                        tagDL.saveTo = Environment.CurrentDirectory;
+
+                        if (File.Exists(File.ReadAllText(Environment.CurrentDirectory + "\\graylist.cfg")))
+                            tagDL.graylist = File.ReadAllText(Environment.CurrentDirectory + "\\graylist.cfg");
+                        else
+                            tagDL.graylist = string.Empty;
+
+                        if (File.Exists(Environment.CurrentDirectory + "\\blacklist.cfg"))
+                            tagDL.blacklist = File.ReadAllText(Environment.CurrentDirectory + "\\blacklist.cfg");
+                        else
+                            tagDL.blacklist = string.Empty;
+
+
+                        if (ini.KeyExists("saveInfo", "Global"))
+                            tagDL.saveInfo = ini.ReadBool("saveInfo", "Global");
+                        else
+                            tagDL.saveInfo = true;
+
+                        if (ini.KeyExists("openAfter", "Global"))
+                            tagDL.openAfter = false; //ini.ReadBool("openAfter", "Global");
+                        else
+                            tagDL.openAfter = false;
+
+                        if (ini.KeyExists("saveBlacklisted", "Global"))
+                            tagDL.saveBlacklistedFiles = ini.ReadBool("saveBlacklisted", "Global");
+                        else
+                            tagDL.saveBlacklistedFiles = true;
+
+                        if (ini.KeyExists("ignoreFinish", "Global"))
+                            tagDL.ignoreFinish = ini.ReadBool("ignoreFinish", "Global");
+                        else
+                            tagDL.ignoreFinish = false;
+
+                        if (minimumScore) {
+                            tagDL.useMinimumScore = minimumScore;
+                            tagDL.scoreAsTag = ini.ReadBool("scoreAsTag", "Tags");
+                            tagDL.minimumScore = minScore;
+                        }
+
+                        if (ini.KeyExists("imageLimit", "Tags"))
+                            if (ini.ReadInt("imageLimit", "Tags") > 0)
+                                tagDL.imageLimit = ini.ReadInt("imageLimit", "Tags");
+                            else
+                                tagDL.imageLimit = 0;
+
+                        if (ini.KeyExists("pageLimit", "Tags"))
+                            if (ini.ReadInt("pageLimit", "Tags") > 0)
+                                tagDL.pageLimit = ini.ReadInt("pageLimit", "Tags");
+
+                        if (ini.KeyExists("separateRatings", "Tags"))
+                            tagDL.separateRatings = ini.ReadBool("separateRatings", "Tags");
+                        else
+                            tagDL.separateRatings = true;
+
+                        if (ini.KeyExists("Explicit", "Tags"))
+                            if (ini.ReadBool("Explicit", "Tags"))
+                                ratings += "e ";
+                        if (ini.KeyExists("Questionable", "Tags"))
+                            if (ini.ReadBool("Questionable", "Tags"))
+                                ratings += "q ";
+                        if (ini.KeyExists("Safe", "Tags"))
+                            if (ini.ReadBool("Safe", "Tags"))
+                                ratings += "s";
                         ratings = ratings.TrimEnd(' ');
-                        tagDL.ratings = ratings.Split(' ');
+
+                        if (tagDL.separateRatings)
+                            tagDL.ratings = ratings.Split(' ');
+
+                        if (ini.KeyExists("fileNameSchema", "Tags"))
+                            tagDL.fileNameSchema = apiTools.replaceIllegalCharacters(ini.ReadString("fileNameSchema", "Tags").ToLower());
+                        else
+                            tagDL.fileNameSchema = "%md5%";
                     }
-                }
-                else {
-                    Settings.Default.Reload();
-                    Tags.Default.Reload();
-                    tagDL.graylist = Settings.Default.blacklist;
-                    tagDL.blacklist = Settings.Default.zeroToleranceBlacklist;
-                    tagDL.saveTo = Settings.Default.saveLocation;
-                    tagDL.saveInfo = Settings.Default.saveInfo;
-                    tagDL.saveBlacklistedFiles = Settings.Default.saveBlacklisted;
-                    tagDL.ignoreFinish = Settings.Default.ignoreFinish;
-                    if (Tags.Default.imageLimit > 0)
-                        tagDL.imageLimit = Tags.Default.imageLimit;
-                    tagDL.usePageLimit = Tags.Default.usePageLimit;
-                    if (tagDL.usePageLimit)
-                        tagDL.pageLimit = Tags.Default.pageLimit;
-                    tagDL.separateRatings = Tags.Default.separateRatings;
-                    if (tagDL.separateRatings) {
-                        string ratings = string.Empty;
+                    else {
+                        Settings.Default.Reload();
+                        Tags.Default.Reload();
+
+                        tagDL.saveTo = Settings.Default.saveLocation;
+                        tagDL.graylist = Settings.Default.blacklist;
+                        tagDL.blacklist = Settings.Default.zeroToleranceBlacklist;
+
+                        tagDL.saveInfo = Settings.Default.saveInfo;
+                        tagDL.openAfter = false;
+                        tagDL.saveBlacklistedFiles = Settings.Default.saveBlacklisted;
+                        tagDL.ignoreFinish = Settings.Default.ignoreFinish;
+
+                        tagDL.useMinimumScore = minimumScore;
+                        if (minimumScore) {
+                            tagDL.scoreAsTag = Tags.Default.scoreAsTag;
+                            tagDL.minimumScore = minScore;
+                        }
+
+                        if (Tags.Default.imageLimit > 0)
+                            tagDL.imageLimit = Tags.Default.imageLimit;
+
+                        if (tagDL.pageLimit > 0)
+                            tagDL.pageLimit = Tags.Default.pageLimit;
+
+                        tagDL.separateRatings = Tags.Default.separateRatings;
+
                         if (Tags.Default.Explicit)
                             ratings += "e ";
                         if (Tags.Default.Questionable)
                             ratings += "q ";
                         if (Tags.Default.Safe)
-                            ratings += "s ";
+                            ratings += "s";
                         ratings = ratings.TrimEnd(' ');
                         tagDL.ratings = ratings.Split(' ');
+
+                        tagDL.fileNameSchema = apiTools.replaceIllegalCharacters(Tags.Default.fileNameSchema.ToLower());
                     }
+
+                    tagDL.ShowDialog();
+
                 }
-                tagDL.webHeader = Program.UserAgent;
-                tagDL.Show();
+                catch {
+                    return;
+                }
             }
             else if (tcMain.SelectedIndex == 1) {
                 // pools
-                int poolid = getPoolID(Settings.Default.saveLocation + "\\Pools\\" + lbPools.GetItemText(lbPools.SelectedItem));
+                int poolid = getPoolID(saveLocation + "\\Pools\\" + lbPools.GetItemText(lbPools.SelectedItem));
                 if (poolid == -1) {
                     return;
                 }
 
-                frmPoolDownloader poolDL = new frmPoolDownloader();
-                poolDL.poolID = (poolid).ToString();
-                poolDL.header = Program.UserAgent;
-                if (useIni) {
-                    poolDL.saveTo = Environment.CurrentDirectory;
-                    poolDL.graylist = File.ReadAllText(Environment.CurrentDirectory + "\\graylist.cfg");
-                    poolDL.blacklist = File.ReadAllText(Environment.CurrentDirectory + "\\blacklist.cfg");
-
-                    poolDL.saveInfo = ini.ReadBool("saveInfo", "Global");
-                    poolDL.saveBlacklisted = ini.ReadBool("saveBlacklisted", "Global");
-                    poolDL.ignoreFinish = ini.ReadBool("ignoreFinish", "Global");
-
-                    poolDL.usePoolName = ini.ReadBool("usePoolName", "Pools");
-                    poolDL.mergeBlacklisted = ini.ReadBool("mergeBlacklisted", "Pools");
-                    poolDL.openAfter = ini.ReadBool("openAfter", "Pools");
-                }
-                else {
-                    Settings.Default.Reload();
-                    Pools.Default.Reload();
-                    poolDL.saveTo = Settings.Default.saveLocation;
-                    poolDL.graylist = Settings.Default.blacklist;
-                    poolDL.blacklist = Settings.Default.zeroToleranceBlacklist;
-
-                    poolDL.saveInfo = Settings.Default.saveInfo;
-                    poolDL.ignoreFinish = Settings.Default.ignoreFinish;
-                    poolDL.saveBlacklisted = Settings.Default.saveBlacklisted;
-
-                    poolDL.usePoolName = Pools.Default.usePoolName;
-                    poolDL.mergeBlacklisted = Pools.Default.mergeBlacklisted;
-                    poolDL.openAfter = Pools.Default.openAfter;
-                }
-
-                poolDL.ShowDialog();
+                Downloader.downloadPool(poolid.ToString(), useIni);
             }
         }
         private void lbTags_MouseDoubleClick(object sender, MouseEventArgs e) {
             if (lbTags.IndexFromPoint(e.Location) != System.Windows.Forms.ListBox.NoMatches) {
                 // tags
-                string tags = getTags(Settings.Default.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem));
+                string tags = getTags(saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem));
                 bool minimumScore = false;
                 int minScore = 0;
                 if (string.IsNullOrWhiteSpace(tags)) {
                     tags = lbTags.GetItemText(lbTags.SelectedItem);
                 }
-                if (hasMinimumScore(Settings.Default.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem))) {
+                if (hasMinimumScore(saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem))) {
                     minimumScore = true;
-                    minScore = Int32.Parse(getMinimumScore(Settings.Default.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem)));
+                    minScore = Int32.Parse(getMinimumScore(saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem)));
                 }
                 if (Tags.Default.imageLimit == 0) {
                     if (MessageBox.Show("Redownloading tags \"" + tags + "\"\nDownloading won't be limited. This may take a long while or even blacklist you. Continue anyway?", "aphrodite", MessageBoxButtons.YesNo) == DialogResult.No) {
@@ -364,121 +395,154 @@ namespace aphrodite {
                     return;
                 }
 
-                frmTagDownloader tagDL = new frmTagDownloader();
-                tagDL.tags = tags;
-                tagDL.useMinimumScore = minimumScore;
-                if (tagDL.useMinimumScore) {
-                    tagDL.minimumScore = minScore;
-                    if (useIni)
-                        tagDL.scoreAsTag = ini.ReadBool("scoreAsTag", "Tags");
-                    else
-                        tagDL.scoreAsTag = Tags.Default.scoreAsTag;
-                }
-                tagDL.openAfter = false;
-                if (useIni) {
-                    tagDL.graylist = File.ReadAllText(Environment.CurrentDirectory + "\\graylist.cfg");
-                    tagDL.blacklist = File.ReadAllText(Environment.CurrentDirectory + "\\blacklist.cfg");
-                    tagDL.saveTo = Environment.CurrentDirectory;
-                    tagDL.saveInfo = ini.ReadBool("saveInfo", "Global");
-                    tagDL.saveBlacklistedFiles = ini.ReadBool("saveBlacklisted", "Global");
-                    tagDL.ignoreFinish = ini.ReadBool("ignoreFinish", "Global");
-                    if (ini.ReadInt("imageLimit", "Tags") > 0)
-                        tagDL.imageLimit = ini.ReadInt("imageLimit", "Tags");
-                    tagDL.usePageLimit = ini.ReadBool("usePageLimit", "Tags");
-                    if (tagDL.usePageLimit)
-                        tagDL.pageLimit = ini.ReadInt("pageLimit", "Tags");
-                    tagDL.separateRatings = ini.ReadBool("separateRatings", "Tags");
-                    if (tagDL.separateRatings) {
-                        string ratings = string.Empty;
-                        if (ini.ReadBool("Explicit", "Tags"))
-                            ratings += "e ";
-                        if (ini.ReadBool("Questionable", "Tags"))
-                            ratings += "q ";
-                        if (ini.ReadBool("Safe", "Tags"))
-                            ratings += "s";
+                try {
+                    frmTagDownloader tagDL = new frmTagDownloader();
+                    tagDL.webHeader = Program.UserAgent;
+                    tagDL.tags = tags;
+                    string ratings = string.Empty;
+
+                    if (useIni) {
+                        tagDL.saveTo = Environment.CurrentDirectory;
+
+                        if (File.Exists(File.ReadAllText(Environment.CurrentDirectory + "\\graylist.cfg")))
+                            tagDL.graylist = File.ReadAllText(Environment.CurrentDirectory + "\\graylist.cfg");
+                        else
+                            tagDL.graylist = string.Empty;
+
+                        if (File.Exists(Environment.CurrentDirectory + "\\blacklist.cfg"))
+                            tagDL.blacklist = File.ReadAllText(Environment.CurrentDirectory + "\\blacklist.cfg");
+                        else
+                            tagDL.blacklist = string.Empty;
+
+
+                        if (ini.KeyExists("saveInfo", "Global"))
+                            tagDL.saveInfo = ini.ReadBool("saveInfo", "Global");
+                        else
+                            tagDL.saveInfo = true;
+
+                        if (ini.KeyExists("openAfter", "Global"))
+                            tagDL.openAfter = false; //ini.ReadBool("openAfter", "Global");
+                        else
+                            tagDL.openAfter = false;
+
+                        if (ini.KeyExists("saveBlacklisted", "Global"))
+                            tagDL.saveBlacklistedFiles = ini.ReadBool("saveBlacklisted", "Global");
+                        else
+                            tagDL.saveBlacklistedFiles = true;
+
+                        if (ini.KeyExists("ignoreFinish", "Global"))
+                            tagDL.ignoreFinish = ini.ReadBool("ignoreFinish", "Global");
+                        else
+                            tagDL.ignoreFinish = false;
+
+                        if (minimumScore) {
+                            tagDL.useMinimumScore = minimumScore;
+                            tagDL.scoreAsTag = ini.ReadBool("scoreAsTag", "Tags");
+                            tagDL.minimumScore = minScore;
+                        }
+
+                        if (ini.KeyExists("imageLimit", "Tags"))
+                            if (ini.ReadInt("imageLimit", "Tags") > 0)
+                                tagDL.imageLimit = ini.ReadInt("imageLimit", "Tags");
+                            else
+                                tagDL.imageLimit = 0;
+
+                        if (ini.KeyExists("pageLimit", "Tags"))
+                            if (ini.ReadInt("pageLimit", "Tags") > 0)
+                                tagDL.pageLimit = ini.ReadInt("pageLimit", "Tags");
+
+                        if (ini.KeyExists("separateRatings", "Tags"))
+                            tagDL.separateRatings = ini.ReadBool("separateRatings", "Tags");
+                        else
+                            tagDL.separateRatings = true;
+
+                        if (ini.KeyExists("Explicit", "Tags"))
+                            if (ini.ReadBool("Explicit", "Tags"))
+                                ratings += "e ";
+                        if (ini.KeyExists("Questionable", "Tags"))
+                            if (ini.ReadBool("Questionable", "Tags"))
+                                ratings += "q ";
+                        if (ini.KeyExists("Safe", "Tags"))
+                            if (ini.ReadBool("Safe", "Tags"))
+                                ratings += "s";
                         ratings = ratings.TrimEnd(' ');
-                        tagDL.ratings = ratings.Split(' ');
+
+                        if (tagDL.separateRatings)
+                            tagDL.ratings = ratings.Split(' ');
+
+                        if (ini.KeyExists("fileNameSchema", "Tags"))
+                            tagDL.fileNameSchema = apiTools.replaceIllegalCharacters(ini.ReadString("fileNameSchema", "Tags").ToLower());
+                        else
+                            tagDL.fileNameSchema = "%md5%";
                     }
-                }
-                else {
-                    Settings.Default.Reload();
-                    Tags.Default.Reload();
-                    tagDL.graylist = Settings.Default.blacklist;
-                    tagDL.blacklist = Settings.Default.zeroToleranceBlacklist;
-                    tagDL.saveTo = Settings.Default.saveLocation;
-                    tagDL.saveInfo = Settings.Default.saveInfo;
-                    tagDL.saveBlacklistedFiles = Settings.Default.saveBlacklisted;
-                    tagDL.ignoreFinish = Settings.Default.ignoreFinish;
-                    if (Tags.Default.imageLimit > 0)
-                        tagDL.imageLimit = Tags.Default.imageLimit;
-                    tagDL.usePageLimit = Tags.Default.usePageLimit;
-                    if (tagDL.usePageLimit)
-                        tagDL.pageLimit = Tags.Default.pageLimit;
-                    tagDL.separateRatings = Tags.Default.separateRatings;
-                    if (tagDL.separateRatings) {
-                        string ratings = string.Empty;
+                    else {
+                        Settings.Default.Reload();
+                        Tags.Default.Reload();
+
+                        tagDL.saveTo = Settings.Default.saveLocation;
+                        tagDL.graylist = Settings.Default.blacklist;
+                        tagDL.blacklist = Settings.Default.zeroToleranceBlacklist;
+
+                        tagDL.saveInfo = Settings.Default.saveInfo;
+                        tagDL.openAfter = false;
+                        tagDL.saveBlacklistedFiles = Settings.Default.saveBlacklisted;
+                        tagDL.ignoreFinish = Settings.Default.ignoreFinish;
+
+                        tagDL.useMinimumScore = minimumScore;
+                        if (minimumScore) {
+                            tagDL.scoreAsTag = Tags.Default.scoreAsTag;
+                            tagDL.minimumScore = minScore;
+                        }
+
+                        if (Tags.Default.imageLimit > 0)
+                            tagDL.imageLimit = Tags.Default.imageLimit;
+
+                        if (tagDL.pageLimit > 0)
+                            tagDL.pageLimit = Tags.Default.pageLimit;
+
+                        tagDL.separateRatings = Tags.Default.separateRatings;
+
                         if (Tags.Default.Explicit)
                             ratings += "e ";
                         if (Tags.Default.Questionable)
                             ratings += "q ";
                         if (Tags.Default.Safe)
-                            ratings += "s ";
+                            ratings += "s";
                         ratings = ratings.TrimEnd(' ');
                         tagDL.ratings = ratings.Split(' ');
+
+                        tagDL.fileNameSchema = apiTools.replaceIllegalCharacters(Tags.Default.fileNameSchema.ToLower());
                     }
+
+                    tagDL.ShowDialog();
+
                 }
-                tagDL.webHeader = Program.UserAgent;
-                tagDL.Show();
+                catch {
+                    return;
+                }
             }
         }
         private void lbTags_SelectedIndexChanged(object sender, EventArgs e) {
-            lbDownloadedOn.Text = "Downloaded on: " + getTagDownloadOn(Settings.Default.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem));
+            if (lbTags.SelectedIndex == -1) {
+                return;
+            }
+            lbDownloadedOn.Text = "Selected tag: " + lbTags.GetItemText(lbTags.SelectedItem) + "\nDownloaded on: " + getTagDownloadOn(saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem));
         }
         private void lbPools_MouseDoubleClick(object sender, MouseEventArgs e) {
             if (lbTags.IndexFromPoint(e.Location) != System.Windows.Forms.ListBox.NoMatches) {
-                int poolid = getPoolID(Settings.Default.saveLocation + "\\Pools\\" + lbPools.GetItemText(lbPools.SelectedItem));
+                int poolid = getPoolID(saveLocation + "\\Pools\\" + lbPools.GetItemText(lbPools.SelectedItem));
                 if (poolid == -1) {
                     return;
                 }
 
-                frmPoolDownloader poolDL = new frmPoolDownloader();
-                poolDL.poolID = (poolid).ToString();
-                poolDL.header = Program.UserAgent;
-                if (useIni) {
-                    poolDL.saveTo = Environment.CurrentDirectory;
-                    poolDL.graylist = File.ReadAllText(Environment.CurrentDirectory + "\\graylist.cfg");
-                    poolDL.blacklist = File.ReadAllText(Environment.CurrentDirectory + "\\blacklist.cfg");
-
-                    poolDL.saveInfo = ini.ReadBool("saveInfo", "Global");
-                    poolDL.saveBlacklisted = ini.ReadBool("saveBlacklisted", "Global");
-                    poolDL.ignoreFinish = ini.ReadBool("ignoreFinish", "Global");
-
-                    poolDL.usePoolName = ini.ReadBool("usePoolName", "Pools");
-                    poolDL.mergeBlacklisted = ini.ReadBool("mergeBlacklisted", "Pools");
-                    poolDL.openAfter = ini.ReadBool("openAfter", "Pools");
-                }
-                else {
-                    Settings.Default.Reload();
-                    Pools.Default.Reload();
-
-                    poolDL.saveTo = Settings.Default.saveLocation;
-                    poolDL.graylist = Settings.Default.blacklist;
-                    poolDL.blacklist = Settings.Default.zeroToleranceBlacklist;
-
-                    poolDL.saveInfo = Settings.Default.saveInfo;
-                    poolDL.ignoreFinish = Settings.Default.ignoreFinish;
-                    poolDL.saveBlacklisted = Settings.Default.saveBlacklisted;
-
-                    poolDL.usePoolName = Pools.Default.usePoolName;
-                    poolDL.mergeBlacklisted = Pools.Default.mergeBlacklisted;
-                    poolDL.openAfter = Pools.Default.openAfter;
-                }
-
-                poolDL.ShowDialog();
+                Downloader.downloadPool(poolid.ToString(), useIni);
             }
         }
         private void lbPools_SelectedIndexChanged(object sender, EventArgs e) {
-            lbDownloadedOn.Text = "Downloaded on: " + getPoolDownloadOn(Settings.Default.saveLocation + "\\Pools\\" + lbPools.GetItemText(lbPools.SelectedItem));
+            if (lbPools.SelectedIndex == -1) {
+                return;
+            }
+            lbDownloadedOn.Text = "Selected pool: " + lbPools.GetItemText(lbPools.SelectedItem) + "\nDownloaded on: " + getPoolDownloadOn(saveLocation + "\\Pools\\" + lbPools.GetItemText(lbPools.SelectedItem));
         }
 
         private void btnRenumerate_Click(object sender, EventArgs e) {

@@ -28,7 +28,7 @@
             this.txtURL = new System.Windows.Forms.TextBox();
             this.btnAdd = new System.Windows.Forms.Button();
             this.btnRemove = new System.Windows.Forms.Button();
-            this.txtOpen = new System.Windows.Forms.Button();
+            this.btnDownload = new System.Windows.Forms.Button();
             this.txtName = new System.Windows.Forms.TextBox();
             this.chkUpdate = new System.Windows.Forms.CheckBox();
             this.lPoolLink = new System.Windows.Forms.LinkLabel();
@@ -40,7 +40,7 @@
             this.lbWish.Location = new System.Drawing.Point(12, 12);
             this.lbWish.Name = "lbWish";
             this.lbWish.Size = new System.Drawing.Size(286, 173);
-            this.lbWish.TabIndex = 0;
+            this.lbWish.TabIndex = 1;
             this.lbWish.SelectedIndexChanged += new System.EventHandler(this.lbWish_SelectedIndexChanged);
             // 
             // txtURL
@@ -48,14 +48,14 @@
             this.txtURL.Location = new System.Drawing.Point(12, 235);
             this.txtURL.Name = "txtURL";
             this.txtURL.Size = new System.Drawing.Size(212, 20);
-            this.txtURL.TabIndex = 2;
+            this.txtURL.TabIndex = 4;
             // 
             // btnAdd
             // 
             this.btnAdd.Location = new System.Drawing.Point(230, 233);
             this.btnAdd.Name = "btnAdd";
             this.btnAdd.Size = new System.Drawing.Size(68, 23);
-            this.btnAdd.TabIndex = 3;
+            this.btnAdd.TabIndex = 5;
             this.btnAdd.Text = "Add";
             this.btnAdd.UseVisualStyleBackColor = true;
             this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
@@ -65,27 +65,27 @@
             this.btnRemove.Location = new System.Drawing.Point(200, 260);
             this.btnRemove.Name = "btnRemove";
             this.btnRemove.Size = new System.Drawing.Size(98, 23);
-            this.btnRemove.TabIndex = 5;
+            this.btnRemove.TabIndex = 8;
             this.btnRemove.Text = "Remove selected";
             this.btnRemove.UseVisualStyleBackColor = true;
             this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
             // 
-            // txtOpen
+            // btnDownload
             // 
-            this.txtOpen.Location = new System.Drawing.Point(104, 260);
-            this.txtOpen.Name = "txtOpen";
-            this.txtOpen.Size = new System.Drawing.Size(94, 23);
-            this.txtOpen.TabIndex = 7;
-            this.txtOpen.Text = "Download pool";
-            this.txtOpen.UseVisualStyleBackColor = true;
-            this.txtOpen.Click += new System.EventHandler(this.txtOpen_Click);
+            this.btnDownload.Location = new System.Drawing.Point(104, 260);
+            this.btnDownload.Name = "btnDownload";
+            this.btnDownload.Size = new System.Drawing.Size(94, 23);
+            this.btnDownload.TabIndex = 7;
+            this.btnDownload.Text = "Download pool";
+            this.btnDownload.UseVisualStyleBackColor = true;
+            this.btnDownload.Click += new System.EventHandler(this.btnDownload_Click);
             // 
             // txtName
             // 
             this.txtName.Location = new System.Drawing.Point(12, 209);
             this.txtName.Name = "txtName";
             this.txtName.Size = new System.Drawing.Size(286, 20);
-            this.txtName.TabIndex = 1;
+            this.txtName.TabIndex = 3;
             // 
             // chkUpdate
             // 
@@ -93,7 +93,7 @@
             this.chkUpdate.Location = new System.Drawing.Point(12, 264);
             this.chkUpdate.Name = "chkUpdate";
             this.chkUpdate.Size = new System.Drawing.Size(89, 17);
-            this.chkUpdate.TabIndex = 4;
+            this.chkUpdate.TabIndex = 6;
             this.chkUpdate.Text = "Update mode";
             this.chkUpdate.UseVisualStyleBackColor = true;
             this.chkUpdate.CheckedChanged += new System.EventHandler(this.chkUpdate_CheckedChanged);
@@ -106,7 +106,7 @@
             this.lPoolLink.Location = new System.Drawing.Point(12, 190);
             this.lPoolLink.Name = "lPoolLink";
             this.lPoolLink.Size = new System.Drawing.Size(90, 13);
-            this.lPoolLink.TabIndex = 6;
+            this.lPoolLink.TabIndex = 2;
             this.lPoolLink.TabStop = true;
             this.lPoolLink.Text = "DEBUG ACCESS";
             this.lPoolLink.UseMnemonic = false;
@@ -121,7 +121,7 @@
             this.Controls.Add(this.lPoolLink);
             this.Controls.Add(this.chkUpdate);
             this.Controls.Add(this.txtName);
-            this.Controls.Add(this.txtOpen);
+            this.Controls.Add(this.btnDownload);
             this.Controls.Add(this.btnRemove);
             this.Controls.Add(this.btnAdd);
             this.Controls.Add(this.txtURL);
@@ -146,7 +146,7 @@
         private System.Windows.Forms.TextBox txtURL;
         private System.Windows.Forms.Button btnAdd;
         private System.Windows.Forms.Button btnRemove;
-        private System.Windows.Forms.Button txtOpen;
+        private System.Windows.Forms.Button btnDownload;
         private System.Windows.Forms.TextBox txtName;
         private System.Windows.Forms.CheckBox chkUpdate;
         private System.Windows.Forms.LinkLabel lPoolLink;

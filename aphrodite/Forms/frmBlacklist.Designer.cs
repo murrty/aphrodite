@@ -25,6 +25,7 @@
         private void InitializeComponent() {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmBlacklist));
             this.panel1 = new System.Windows.Forms.Panel();
+            this.lbIni = new System.Windows.Forms.Label();
             this.lbMutual = new System.Windows.Forms.Label();
             this.btnSave = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
@@ -34,7 +35,6 @@
             this.btnSortZTB = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.lbIni = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -49,6 +49,16 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(502, 47);
             this.panel1.TabIndex = 0;
+            // 
+            // lbIni
+            // 
+            this.lbIni.AutoSize = true;
+            this.lbIni.Location = new System.Drawing.Point(12, 9);
+            this.lbIni.Name = "lbIni";
+            this.lbIni.Size = new System.Drawing.Size(93, 13);
+            this.lbIni.TabIndex = 8;
+            this.lbIni.Text = "Editing ini blacklist";
+            this.lbIni.Visible = false;
             // 
             // lbMutual
             // 
@@ -65,7 +75,7 @@
             this.btnSave.Location = new System.Drawing.Point(334, 12);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(75, 23);
-            this.btnSave.TabIndex = 3;
+            this.btnSave.TabIndex = 5;
             this.btnSave.Text = "Save";
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
@@ -76,7 +86,7 @@
             this.btnCancel.Location = new System.Drawing.Point(415, 12);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
-            this.btnCancel.TabIndex = 2;
+            this.btnCancel.TabIndex = 6;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
@@ -86,7 +96,7 @@
             this.btnSort.Location = new System.Drawing.Point(12, 240);
             this.btnSort.Name = "btnSort";
             this.btnSort.Size = new System.Drawing.Size(60, 23);
-            this.btnSort.TabIndex = 1;
+            this.btnSort.TabIndex = 3;
             this.btnSort.Text = "Sort";
             this.btnSort.UseVisualStyleBackColor = true;
             this.btnSort.Click += new System.EventHandler(this.btnSort_Click);
@@ -96,7 +106,7 @@
             this.rtbBlacklist.Location = new System.Drawing.Point(10, 26);
             this.rtbBlacklist.Name = "rtbBlacklist";
             this.rtbBlacklist.Size = new System.Drawing.Size(231, 208);
-            this.rtbBlacklist.TabIndex = 3;
+            this.rtbBlacklist.TabIndex = 1;
             this.rtbBlacklist.Text = "";
             this.rtbBlacklist.TextChanged += new System.EventHandler(this.rtbBlacklist_TextChanged);
             // 
@@ -105,7 +115,7 @@
             this.rtbZTB.Location = new System.Drawing.Point(260, 26);
             this.rtbZTB.Name = "rtbZTB";
             this.rtbZTB.Size = new System.Drawing.Size(231, 208);
-            this.rtbZTB.TabIndex = 4;
+            this.rtbZTB.TabIndex = 2;
             this.rtbZTB.Text = "";
             this.rtbZTB.TextChanged += new System.EventHandler(this.rtbZTB_TextChanged);
             // 
@@ -114,7 +124,7 @@
             this.btnSortZTB.Location = new System.Drawing.Point(262, 240);
             this.btnSortZTB.Name = "btnSortZTB";
             this.btnSortZTB.Size = new System.Drawing.Size(60, 23);
-            this.btnSortZTB.TabIndex = 5;
+            this.btnSortZTB.TabIndex = 4;
             this.btnSortZTB.Text = "Sort";
             this.btnSortZTB.UseVisualStyleBackColor = true;
             this.btnSortZTB.Click += new System.EventHandler(this.btnSortZTB_Click);
@@ -136,16 +146,6 @@
             this.label2.Size = new System.Drawing.Size(247, 13);
             this.label2.TabIndex = 7;
             this.label2.Text = "Zero-tolerance blacklist (tags that are never saved)";
-            // 
-            // lbIni
-            // 
-            this.lbIni.AutoSize = true;
-            this.lbIni.Location = new System.Drawing.Point(12, 9);
-            this.lbIni.Name = "lbIni";
-            this.lbIni.Size = new System.Drawing.Size(93, 13);
-            this.lbIni.TabIndex = 8;
-            this.lbIni.Text = "Editing ini blacklist";
-            this.lbIni.Visible = false;
             // 
             // frmBlacklist
             // 

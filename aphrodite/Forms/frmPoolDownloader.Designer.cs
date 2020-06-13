@@ -34,6 +34,7 @@
             this.tmrTitle = new System.Windows.Forms.Timer(this.components);
             this.pbTotalStatus = new aphrodite.ExProgressBar();
             this.pbDownloadStatus = new aphrodite.ExProgressBar();
+            this.lbRemoved = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // lbID
@@ -120,12 +121,23 @@
             this.pbDownloadStatus.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
             this.pbDownloadStatus.TabIndex = 8;
             // 
+            // lbRemoved
+            // 
+            this.lbRemoved.AutoSize = true;
+            this.lbRemoved.Location = new System.Drawing.Point(67, 132);
+            this.lbRemoved.Name = "lbRemoved";
+            this.lbRemoved.Size = new System.Drawing.Size(134, 13);
+            this.lbRemoved.TabIndex = 12;
+            this.lbRemoved.Text = "Removed images detected";
+            this.lbRemoved.Visible = false;
+            // 
             // frmPoolDownloader
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(268, 176);
+            this.Controls.Add(this.lbRemoved);
             this.Controls.Add(this.pbTotalStatus);
             this.Controls.Add(this.status);
             this.Controls.Add(this.lbPercentage);
@@ -146,6 +158,7 @@
             this.Load += new System.EventHandler(this.frmDownload_Load);
             this.Shown += new System.EventHandler(this.frmDownload_Shown);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -160,5 +173,6 @@
         private System.Windows.Forms.Timer tmrTitle;
         private ExProgressBar pbTotalStatus;
         private ExProgressBar pbDownloadStatus;
+        private System.Windows.Forms.Label lbRemoved;
     }
 }

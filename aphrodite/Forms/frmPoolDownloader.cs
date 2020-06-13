@@ -30,16 +30,35 @@ namespace aphrodite {
         public bool saveInfo;                   // Global setting for saving images.nfo file.
         public bool ignoreFinish;               // Global setting for exiting after finishing.
         public bool saveBlacklisted;            // Global setting for saving blacklisted files.
+        public bool saveMetadata;               // Global setting for saving metadata to files
+        public bool saveArtistMetadata;         // Global setting for saving artists to the file's metadata
+        public bool saveTagMetadata;            // Global setting for saving tags to the file's metadata
 
         public bool usePoolName;                // Setting for using the pool name in the file name.
         public bool mergeBlacklisted;           // Setting for merging blacklisted pages with regular pages.
         public bool openAfter;                  // Setting for opening the folder after download.
+        public string fileNameSchema;           // The name of the files to be created
+                                                    // %poolname%   = the name of the pool
+                                                    // %poolid%     = the id of the pool
+                                                    // %page%       = the page number of the page
+                                                    // %md5%        = the md5 of the file
+                                                    // %id%         = the id of the page
+                                                    // %rating%     = the rating of the page (eg: safe)
+                                                    // %rating2%    = the lettered rating of the page (eg: s)
+                                                    // %artist%     = the first artist in the artists array
+                                                    // %ext%        = the extension
+                                                    // %fav_count%  = the amount of favorites the post has
+                                                    // %score%      = the score of the post
+                                                    // %author%     = the user who submitted the post to e621
 
         public int pageCount = 0;               // Will update the page count before download.
         public int blacklistedPageCount = 0;    // Will count the blacklisted pages before download.
 
-        public static readonly string poolJson = "https://e621.net/pool/show.json?id=";
+        //public static readonly string poolJson = "https://e621.net/pool/show.json?id=";
+        public static readonly string poolJson = "https://e621.net/posts?tags=pool:";
         public static readonly string poolPageJson = "&page=";
+
+        Metadata writeMetadata = new Metadata();
 
         Thread poolDownloader;
     #endregion
@@ -72,6 +91,8 @@ namespace aphrodite {
 
     #region Downloader
         private void startDownload() {
+            MessageBox.Show("Pool downloading is wip");
+            return;
             poolDownloader = new Thread(() => {
                 Thread.CurrentThread.IsBackground = true;
                 if (downloadPool()) {
@@ -99,6 +120,9 @@ namespace aphrodite {
 
             // New variables for the API parse
                 List<string> URLs = new List<string>();
+                List<string> FileNames = new List<string>();
+                List<string> MetadataArtists = new List<string>();
+                List<string> MetadataTags = new List<string>();
                 List<bool> urlBlacklisted = new List<bool>();
                 List<string> GraylistedTags = new List<string>(graylist.Split(' '));
                 List<string> BlacklistedTags = new List<string>(blacklist.Split(' '));
@@ -110,6 +134,7 @@ namespace aphrodite {
                 writeToConsole("Configured variables");
 
             // Begin the XML download
+                this.Invoke((MethodInvoker)(() => status.Text = "Getting pool information for page 1"));
                 writeToConsole("Starting JSON download for page 1...", true);
                 url = poolJson + poolID;
                 string postXML = apiTools.getJSON(poolJson + poolID, header);
@@ -135,9 +160,22 @@ namespace aphrodite {
                 XmlNodeList xmlDescription = xmlDoc.DocumentElement.SelectNodes("/root/description");
                 XmlNodeList xmlCount = xmlDoc.DocumentElement.SelectNodes("/root/post_count");
 
-                poolInfo += "POOL: " + poolID + "\nDOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\n    NAME: " + xmlName[0].InnerText + "\n    PAGES: " + xmlCount[0].InnerText + "\n    URL: https://e621.net/pool/show/" + poolID + "\n    DESCRIPTION:\n\"" + xmlDescription[0].InnerText + "\"\n\n";
+                poolInfo += "POOL: " + poolID + "\n" +
+                            "DOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\n" +
+                            "    NAME: " + xmlName[0].InnerText + "\n" +
+                            "    PAGES: " + xmlCount[0].InnerText + "\n" +
+                            "    URL: https://e621.net/pool/show/" + poolID + "\n" +
+                            "    DESCRIPTION:\n    \"" + xmlDescription[0].InnerText + "\"" +
+                            "\n\n";
 
-                blacklistInfo += "POOL: " + poolID + "\nDOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\n    NAME: " + xmlName[0].InnerText + "\n    PAGES: " + xmlCount[0].InnerText + "\n    URL: https://e621.net/pool/show/" + poolID + "\n    DESCRIPTION:\n\"" + xmlDescription[0].InnerText + "\"\n    BLACKLISTED TAGS: " + graylist + "\n\n";
+                blacklistInfo += "POOL: " + poolID + "\n" +
+                                 "DOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\n" +
+                                 "    NAME: " + xmlName[0].InnerText + "\n" +
+                                 "    PAGES: " + xmlCount[0].InnerText + "\n" +
+                                 "    URL: https://e621.net/pool/show/" + poolID + "\n" +
+                                 "    DESCRIPTION:\n    \"" + xmlDescription[0].InnerText + "\"\n" +
+                                 "    BLACKLISTED TAGS: " + graylist +
+                                 "\n\n";
 
                 this.Invoke((MethodInvoker)(() => lbName.Text = xmlName[0].InnerText));
 
@@ -167,14 +205,19 @@ namespace aphrodite {
                 XmlNodeList xmlArtist = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/artist");
                 XmlNodeList xmlScore = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/score");
                 XmlNodeList xmlRating = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/rating");
+                XmlNodeList xmlExt = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/file_ext");
+                XmlNodeList xmlFavCount = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/fav_count");
+                XmlNodeList xmlAuthor = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/author");
                 xmlDescription = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/description");
                 int currentPage = 0;
                 for (int i = 0; i < xmlID.Count; i++) {
                     string artists = string.Empty;
+                    string artistsMetadata = string.Empty;
                     bool isBlacklisted = false;
                     string foundBlacklistedTags = string.Empty;
                     string rating;
                     List<string> foundTags = xmlTags[i].InnerText.Split(' ').ToList();
+                    string tagsMetadata = xmlTags[i].InnerText;
                     currentPage++;
 
                     switch (xmlRating[i].InnerText) {
@@ -192,11 +235,75 @@ namespace aphrodite {
                             break;
                     }
 
-                    for (int j = 0; j < xmlArtist[i].ChildNodes.Count; j++) {
-                        artists += xmlArtist[i].ChildNodes[j].InnerText + "\n                   ";
+                    if (xmlArtist[i].ChildNodes.Count > 0) {
+                        for (int j = 0; j < xmlArtist[i].ChildNodes.Count; j++) {
+                            artists += xmlArtist[i].ChildNodes[j].InnerText + "\n                   ";
+                            artistsMetadata += xmlArtist[i].ChildNodes[j].InnerText + " ";
+                        }
+                        artists = artists.TrimEnd(' ');
+                        artists = artists.TrimEnd('\n');
+                        artistsMetadata = artistsMetadata.TrimEnd(' ');
                     }
-                    artists = artists.TrimEnd(' ');
-                    artists = artists.TrimEnd('\n');
+                    else {
+                        artists = "(none)";
+                        artistsMetadata = "(no artist)";
+                    }
+
+                // Add to the metadata list
+                    if (saveMetadata) {
+                        MetadataArtists.Add(artistsMetadata);
+                        MetadataTags.Add(tagsMetadata);
+                    }
+
+                    string fileNamePage = string.Empty;
+                    if (currentPage < 1000) {
+                        fileNamePage += "0";
+                        if (currentPage < 100) {
+                            fileNamePage += "0";
+                            if (currentPage < 10)
+                                fileNamePage += "0";
+                        }
+                    }
+                    fileNamePage += (currentPage);
+
+                  // File name artist for the schema
+                    string fileNameArtist = "(none)";
+                    bool useHardcodedFilter = false;
+                    if (string.IsNullOrEmpty(Settings.Default.undesiredTags))
+                        useHardcodedFilter = true;
+
+                    if (xmlArtist.Count > 0) {
+                        if (!string.IsNullOrEmpty(xmlArtist[0].InnerText)) {
+                            for (int j = 0; j < xmlArtist.Count; j++) {
+                                if (useHardcodedFilter) {
+                                    if (!UndesiredTags.isUndesiredHardcoded(xmlArtist[j].InnerText)) {
+                                        fileNameArtist = xmlArtist[j].InnerText;
+                                        break;
+                                    }
+                                }
+                                else {
+                                    if (!UndesiredTags.isUndesired(xmlArtist[j].InnerText)) {
+                                        fileNameArtist = xmlArtist[j].InnerText;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    string fileName = fileNameSchema.Replace("%poolname%", poolName)
+                                                    .Replace("%poolid%", poolID)
+                                                    .Replace("%page%", fileNamePage)
+                                                    .Replace("%md5%", xmlMD5[i].InnerText)
+                                                    .Replace("%id%", xmlID[i].InnerText)
+                                                    .Replace("%rating%", rating.ToLower())
+                                                    .Replace("%rating2%", xmlRating[i].InnerText)
+                                                    .Replace("%artist%", fileNameArtist)
+                                                    .Replace("%ext%", xmlExt[i].InnerText)
+                                                    .Replace("%fav_count%", xmlFavCount[i].InnerText)
+                                                    .Replace("%score%", xmlScore[i].InnerText)
+                                                    .Replace("%author%", xmlAuthor[i].InnerText) + "." + xmlExt[i].InnerText;
+
 
                     for (int j = 0; j < foundTags.Count; j++) {
                         if (GraylistedTags.Count > 0) {
@@ -222,6 +329,7 @@ namespace aphrodite {
 
 
                     URLs.Add(xmlUrl[i].InnerText);
+                    FileNames.Add(fileName);
                     if (isBlacklisted) {
                         urlBlacklisted.Add(true);
                         blacklistedPageCount++;
@@ -235,15 +343,41 @@ namespace aphrodite {
 
                     if (isBlacklisted && saveBlacklisted) {
                         if (!mergeBlacklisted) {
-                            blacklistInfo += "    BLACKLISTED PAGE " + (currentPage) + ":\n        MD5: " + xmlMD5[i].InnerText + "\n        URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\n        ARTIST(S): " + artists + "\n        TAGS: " + xmlTags[i].InnerText + "\n        SCORE: " + xmlScore[i].InnerText + "\n        RATING: " + rating + "\n        DESCRIPITON:\n\"" + xmlDescription[i].InnerText + "\"\n        OFFENDING TAGS: " + foundBlacklistedTags + "\n\n";
+                            blacklistInfo += "    BLACKLISTED PAGE " + (currentPage) + ":\n" +
+                                             "        MD5: " + xmlMD5[i].InnerText + "\n" +
+                                             "        URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\n" +
+                                             "        ARTIST(S): " + artists + "\n" +
+                                             "        TAGS: " + xmlTags[i].InnerText + "\n" +
+                                             "        SCORE: " + xmlScore[i].InnerText + "\n" +
+                                             "        RATING: " + rating + "\n" +
+                                             "        DESCRIPITON:\n        \"" + xmlDescription[i].InnerText + "\"\n" +
+                                             "        OFFENDING TAGS: " + foundBlacklistedTags +
+                                             "\n\n";
                         }
                         else {
-                            poolInfo += "    BLACKLISTED PAGE: " + (currentPage) + "\n        MD5: " + xmlMD5[i].InnerText + "\n        URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\n        ARTIST(S): " + artists + "\n        TAGS: " + xmlTags[i].InnerText + "\n        SCORE: " + xmlScore[i].InnerText + "\n        RATING: " + rating + "\n        DESCRIPITON:\n\"" + xmlDescription[i].InnerText + "\"\n        OFFENDING TAGS: " + foundBlacklistedTags + "\n\n";
+                            poolInfo += "    BLACKLISTED PAGE: " + (currentPage) + "\n" +
+                                        "        MD5: " + xmlMD5[i].InnerText + "\n" +
+                                        "        URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\n" +
+                                        "        ARTIST(S): " + artists + "\n" +
+                                        "        TAGS: " + xmlTags[i].InnerText + "\n" +
+                                        "        SCORE: " + xmlScore[i].InnerText + "\n" +
+                                        "        RATING: " + rating + "\n" +
+                                        "        DESCRIPITON:\n        \"" + xmlDescription[i].InnerText + "\"\n" +
+                                        "        OFFENDING TAGS: " + foundBlacklistedTags +
+                                        "\n\n";
                         }
 
                     }
                     else {
-                        poolInfo += "    PAGE: " + (currentPage) + "\n        MD5: " + xmlMD5[i].InnerText + "\n        URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\n        ARTIST(S): " + artists + "\n        TAGS: " + xmlTags[i].InnerText + "\n        SCORE: " + xmlScore[i].InnerText + "\n        RATING: " + rating + "\n        DESCRIPITON:\n\"" + xmlDescription[i].InnerText + "\"\n\n";
+                        poolInfo += "    PAGE: " + (currentPage) + "\n" +
+                                    "        MD5: " + xmlMD5[i].InnerText + "\n" +
+                                    "        URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\n" +
+                                    "        ARTIST(S): " + artists + "\n" +
+                                    "        TAGS: " + xmlTags[i].InnerText + "\n" +
+                                    "        SCORE: " + xmlScore[i].InnerText + "\n" +
+                                    "        RATING: " + rating + "\n" +
+                                    "        DESCRIPITON:\n        \"" + xmlDescription[i].InnerText +
+                                    "\"\n\n";
                     }
                 }
 
@@ -251,6 +385,7 @@ namespace aphrodite {
                 if (pages > 1) {
                     for (int i = 2; i < pages + 1; i++) {
                         writeToConsole("Starting JSON download for page " + i + "...", true);
+                        this.Invoke((MethodInvoker)(() => status.Text = "Getting pool information for page " + i));
                         url = poolJson + poolID;
                         postXML = apiTools.getJSON(poolJson + poolID + poolPageJson + i, header);
                         writeToConsole("JSON Downloaded.", true);
@@ -270,13 +405,18 @@ namespace aphrodite {
                         xmlArtist = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/artist");
                         xmlScore = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/score");
                         xmlRating = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/rating");
+                        xmlExt = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/file_ext");
+                        xmlFavCount = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/fav_count");
+                        xmlAuthor = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/author");
                         xmlDescription = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/description");
                         for (int j = 0; j < xmlID.Count; j++) {
                             string artists = string.Empty;
+                            string artistsMetadata = string.Empty;
                             bool isBlacklisted = false;
                             string foundBlacklistedTags = string.Empty;
                             string rating;
                             List<string> foundTags = xmlTags[j].InnerText.Split(' ').ToList();
+                            string tagsMetadata = xmlTags[j].InnerText;
                             currentPage++;
 
                             switch (xmlRating[j].InnerText) {
@@ -294,11 +434,62 @@ namespace aphrodite {
                                     break;
                             }
 
-                            for (int k = 0; k < xmlArtist[j].ChildNodes.Count; k++) {
-                                artists += xmlArtist[j].ChildNodes[k].InnerText + "\n                   ";
+                            if (xmlArtist[i].ChildNodes.Count > 0) {
+                                for (int k = 0; k < xmlArtist[i].ChildNodes.Count; k++) {
+                                    artists += xmlArtist[i].ChildNodes[k].InnerText + "\n                   ";
+                                    artistsMetadata += xmlArtist[i].ChildNodes[j].InnerText + " ";
+                                }
+                                artists = artists.TrimEnd(' ');
+                                artists = artists.TrimEnd('\n');
+                                artistsMetadata = artistsMetadata.TrimEnd(' ');
                             }
-                            artists = artists.TrimEnd(' ');
-                            artists = artists.TrimEnd('\n');
+                            else {
+                                artists = "(none)";
+                                artistsMetadata = "(no artist)";
+                            }
+
+                            if (saveMetadata) {
+                                MetadataArtists.Add(artistsMetadata);
+                                MetadataTags.Add(tagsMetadata);
+                            }
+
+                            string fileNamePage = string.Empty;
+                            if (currentPage < 1000) {
+                                fileNamePage += "0";
+                                if (currentPage < 100)
+                                    fileNamePage += "0";
+                            }
+                            fileNamePage += (currentPage);
+
+                            string fileNameArtist;
+                            if (xmlArtist[i].ChildNodes.Count > 0) {
+                                if (string.IsNullOrEmpty(xmlArtist[i].ChildNodes[0].InnerText)) {
+                                    fileNameArtist = "(none)";
+                                }
+                                else {
+                                    if (xmlArtist[i].ChildNodes[0].InnerText != "conditional_dnp") {
+                                        fileNameArtist = xmlArtist[i].ChildNodes[0].InnerText;
+                                    }
+                                    else {
+                                        fileNameArtist = xmlArtist[i].ChildNodes[1].InnerText;
+                                    }
+                                }
+                            }
+                            else {
+                                fileNameArtist = "unknown_artist";
+                            }
+                            string fileName = fileNameSchema.Replace("%poolname%", poolName)
+                                                            .Replace("%poolid%", poolID)
+                                                            .Replace("%page%", fileNamePage)
+                                                            .Replace("%md5%", xmlMD5[i].InnerText)
+                                                            .Replace("%id%", xmlID[i].InnerText)
+                                                            .Replace("%rating%", rating.ToLower())
+                                                            .Replace("%rating2%", xmlRating[i].InnerText)
+                                                            .Replace("%artist%", fileNameArtist)
+                                                            .Replace("%ext%", xmlExt[i].InnerText)
+                                                            .Replace("%fav_count%", xmlFavCount[i].InnerText)
+                                                            .Replace("%score%", xmlScore[i].InnerText)
+                                                            .Replace("%author%", xmlAuthor[i].InnerText) + "." + xmlExt[i].InnerText;
 
                             for (int k = 0; k < foundTags.Count; k++) {
                                 if (GraylistedTags.Count > 0) {
@@ -324,6 +515,7 @@ namespace aphrodite {
 
 
                             URLs.Add(xmlUrl[j].InnerText);
+                            FileNames.Add(fileName);
                             if (isBlacklisted) {
                                 urlBlacklisted.Add(true);
                                 blacklistedPageCount++;
@@ -337,15 +529,41 @@ namespace aphrodite {
 
                             if (isBlacklisted && saveBlacklisted) {
                                 if (!mergeBlacklisted) {
-                                    blacklistInfo += "    BLACKLISTED PAGE " + (currentPage) + ":\n        MD5: " + xmlMD5[j].InnerText + "\n        URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n        ARTIST(S): " + artists + "\n        TAGS: " + xmlTags[j].InnerText + "\n        SCORE: " + xmlScore[j].InnerText + "\n        RATING: " + rating + "\n        DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n        OFFENDING TAGS: " + foundBlacklistedTags + "\n\n";
+                                    blacklistInfo += "    BLACKLISTED PAGE " + (currentPage) + ":\n" +
+                                                     "        MD5: " + xmlMD5[j].InnerText + "\n" +
+                                                     "        URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n" +
+                                                     "        ARTIST(S): " + artists + "\n" +
+                                                     "        TAGS: " + xmlTags[j].InnerText + "\n" +
+                                                     "        SCORE: " + xmlScore[j].InnerText + "\n" +
+                                                     "        RATING: " + rating + "\n" +
+                                                     "        DESCRIPITON:\n        \"" + xmlDescription[j].InnerText + "\"\n" +
+                                                     "        OFFENDING TAGS: " + foundBlacklistedTags +
+                                                     "\n\n";
                                 }
                                 else {
-                                    poolInfo += "    BLACKLIST PAGE: " + (currentPage) + "\n        MD5: " + xmlMD5[j].InnerText + "\n        URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n        ARTIST(S): " + artists + "\n        TAGS: " + xmlTags[j].InnerText + "\n        SCORE: " + xmlScore[j].InnerText + "\n        RATING: " + rating + "\n        DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n        OFFENDING TAGS: " + foundBlacklistedTags + "\n\n";
+                                    poolInfo += "    BLACKLIST PAGE: " + (currentPage) + "\n" +
+                                                "        MD5: " + xmlMD5[j].InnerText + "\n" +
+                                                "        URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n" +
+                                                "        ARTIST(S): " + artists + "\n" +
+                                                "        TAGS: " + xmlTags[j].InnerText + "\n" +
+                                                "        SCORE: " + xmlScore[j].InnerText + "\n" +
+                                                "        RATING: " + rating + "\n" +
+                                                "        DESCRIPITON:\n        \"" + xmlDescription[j].InnerText + "\"\n" +
+                                                "        OFFENDING TAGS: " + foundBlacklistedTags +
+                                                "\n\n";
                                 }
 
                             }
                             else {
-                                poolInfo += "    PAGE: " + (currentPage) + "\n        MD5: " + xmlMD5[j].InnerText + "\n        URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n        ARTIST(S): " + artists + "\n        TAGS: " + xmlTags[j].InnerText + "\n        SCORE: " + xmlScore[j].InnerText + "\n        RATING: " + rating + "\n        DESCRIPITON:\n\"" + xmlDescription[j].InnerText + "\"\n\n";
+                                poolInfo += "    PAGE: " + (currentPage) + "\n" +
+                                            "        MD5: " + xmlMD5[j].InnerText + "\n" +
+                                            "        URL: https://e621.net/post/show/" + xmlID[j].InnerText + "\n" +
+                                            "        ARTIST(S): " + artists + "\n" +
+                                            "        TAGS: " + xmlTags[j].InnerText + "\n" +
+                                            "        SCORE: " + xmlScore[j].InnerText + "\n" +
+                                            "        RATING: " + rating + "\n" +
+                                            "        DESCRIPITON:\n        \"" + xmlDescription[j].InnerText + "\"" +
+                                            "\n\n";
                             }
                         }
                     }
@@ -354,6 +572,7 @@ namespace aphrodite {
             // Check for files.
                 if (URLs.Count <= 0) {
                     writeToConsole("No files were found while downloading. Press any key to continue...", true);
+                    this.Invoke((MethodInvoker)(() => status.Text = "URL count is empty. Empty pool?"));
                     MessageBox.Show("No files are to be downloaded.");
                     return false;
                 }
@@ -380,10 +599,25 @@ namespace aphrodite {
 
                 this.BeginInvoke(new MethodInvoker(() => {
                     pbDownloadStatus.Style = ProgressBarStyle.Blocks;
-                    if (saveBlacklisted)
-                        pbTotalStatus.Maximum = pageCount + blacklistedPageCount;
-                    else
-                        pbTotalStatus.Maximum = pageCount;
+                    int total;
+
+                    if (saveBlacklisted) {
+                        total = pageCount + blacklistedPageCount;
+
+                        if (File.Exists(saveTo + "\\pool.nfo"))
+                            total -= apiTools.countFiles(saveTo) - 1;
+                        if (File.Exists(saveTo + "\\blacklisted\\pool.blacklisted.nfo"))
+                            total -= apiTools.countFiles(saveTo + "\\blacklisted") - 1;
+
+                        pbTotalStatus.Maximum = total;
+                    }
+                    else {
+                        total = pageCount;
+                        total -= apiTools.countFiles(saveTo) - 1;
+
+                        pbTotalStatus.Maximum = total;
+                        //pbTotalStatus.Maximum = pageCount - apiTools.countFiles(saveTo);
+                    }
                 }));
 
                 int currentDownloadFile = 1;
@@ -406,7 +640,11 @@ namespace aphrodite {
                             this.BeginInvoke(new MethodInvoker(() => {
                                 pbDownloadStatus.Value = 0;
                                 lbPercentage.Text = "0%";
-                                pbTotalStatus.Value++;
+
+                                if (pbTotalStatus.Value != pbTotalStatus.Maximum)
+                                    pbTotalStatus.Value++;
+                                else
+                                    lbRemoved.Visible = true;
                             }));
                             currentDownloadFile++;
                             Monitor.Pulse(e.UserState);
@@ -423,15 +661,9 @@ namespace aphrodite {
                         if (urlBlacklisted[y] && !saveBlacklisted)
                             continue;
 
-                        string fileName = "\\";
+                        string fileName = "\\" + FileNames[y];
 
-                        if (usePoolName)
-                            fileName += poolName + "_";
-
-                        if (y >= 9)
-                            fileName += (currentPage) + "." + url.Split('.')[3];
-                        else
-                            fileName += "0" + (currentPage) + "." + url.Split('.')[3];
+                        this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
 
                         if (urlBlacklisted[y] && !mergeBlacklisted) {
                             if (File.Exists(saveTo + "\\blacklisted" + fileName))
@@ -454,6 +686,11 @@ namespace aphrodite {
                             }
                         }
 
+                    // Save metadata to file, and update it if one exists
+                        if (saveMetadata) { 
+                            if (fileName.EndsWith(".jpg") || fileName.EndsWith(".jpeg"))
+                                writeMetadata.setMetadata(saveTo + "\\blacklisted" + fileName, MetadataArtists[y], MetadataTags[y]);
+                        }
                     }
                 }
 
@@ -505,9 +742,12 @@ namespace aphrodite {
                 throw ex;
             }
         }
+
         public void updateTotals() {
             this.BeginInvoke(new MethodInvoker(()=> {
-                lbTotal.Text = (pageCount) + " clean pages\n" + (blacklistedPageCount) + " blacklisted pages\n" + (pageCount + blacklistedPageCount) + " total pages";
+                lbTotal.Text = (pageCount) + " clean pages\n" +
+                               (blacklistedPageCount) + " blacklisted pages\n" +
+                               (pageCount + blacklistedPageCount) + " total pages";
                 if (saveBlacklisted)
                     lbFile.Text = "File 1 of " + (pageCount + blacklistedPageCount);
                 else
