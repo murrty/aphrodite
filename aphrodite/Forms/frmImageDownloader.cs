@@ -34,10 +34,17 @@ namespace aphrodite {
         public bool saveInfo;                   // Global setting for saving images.nfo file.
         public bool ignoreFinish;               // Global setting for exiting after finishing.
 
-        public bool separateArtists = false;    // Setting to separate files by artist.
-        public int fileNameCode;                // How the file names will be named.
-                                                // 0 = MD5
-                                                // 1 = artist_MD5
+        public bool separateArtists;            // Setting to separate files by artist.
+        public string fileNameSchema;           // The schema used for the file name.
+                                                    // %md5%        = the md5 of the file
+                                                    // %id%         = the id of the page
+                                                    // %rating%     = the rating of the image (eg: safe)
+                                                    // %rating2%    = the lettered rating of the image (eg: s)
+                                                    // %artist%     = the first artist in the artists array
+                                                    // %ext%        = the extension
+                                                    // %fav_count%  = the amount of favorites the post has
+                                                    // %score%      = the score of the post
+                                                    // %author%     = the user who submitted the post to e621
 
         public static readonly string postJsonBase = "https://e621.net/post/show.json?id=";    // Json base url.
 
@@ -92,8 +99,10 @@ namespace aphrodite {
                 if (!url.StartsWith("https://"))
                     url = "https://" + url;
 
-            // Get postID from the split.
-                postID = url.Split('/')[5];
+            // Get postID from the split (if exists).
+                if (string.IsNullOrEmpty(postID))
+                    postID = url.Split('/')[5];
+
                 this.BeginInvoke(new MethodInvoker(() => {
                     lbInfo.Text = "Downloading image id " + postID;
                     status.Text = "Waiting for JSON parse...";
@@ -120,20 +129,16 @@ namespace aphrodite {
                 xmlDoc.LoadXml(postXML);
                 Debug.Print("Gathering post information from XML");
                 XmlNodeList xmlMD5 = xmlDoc.DocumentElement.SelectNodes("/root/md5");
+                XmlNodeList xmlID = xmlDoc.DocumentElement.SelectNodes("/root/id");
                 XmlNodeList xmlURL = xmlDoc.DocumentElement.SelectNodes("/root/file_url");
                 XmlNodeList xmlTags = xmlDoc.DocumentElement.SelectNodes("/root/tags");
                 XmlNodeList xmlArtist = xmlDoc.DocumentElement.SelectNodes("/root/artist/item");
                 XmlNodeList xmlScore = xmlDoc.DocumentElement.SelectNodes("/root/score");
                 XmlNodeList xmlRating = xmlDoc.DocumentElement.SelectNodes("/root/rating");
+                XmlNodeList xmlFavCount = xmlDoc.DocumentElement.SelectNodes("/root/fav_count");
+                XmlNodeList xmlAuthor = xmlDoc.DocumentElement.SelectNodes("/root/author");
                 XmlNodeList xmlDescription = xmlDoc.DocumentElement.SelectNodes("/root/description");
                 XmlNodeList xmlExt = xmlDoc.DocumentElement.SelectNodes("/root/file_ext");
-
-            // Get the artists.
-                string foundArtists = string.Empty;
-                for (int i = 0; i < xmlArtist.Count; i++) {
-                    foundArtists += xmlArtist[i].InnerText + "\n";
-                }
-                foundArtists.TrimEnd('\n');
 
             // Get the rating.
                 string rating = xmlRating[0].InnerText;
@@ -149,8 +154,22 @@ namespace aphrodite {
                         break;
                 }
 
+            // Get the artists.
+                string foundArtists = string.Empty;
+                if (xmlArtist.Count > 0) {
+                    for (int i = 0; i < xmlArtist.Count; i++) {
+                        foundArtists += xmlArtist[i].InnerText + "\n               ";
+                    }
+                    foundArtists = foundArtists.TrimEnd(' ');
+                    foundArtists = foundArtists.TrimEnd('\n');
+                }
+                else {
+                    foundArtists = "(none)";
+                }
+
             // Read blacklists if it's blacklisted.
                 List<string> foundTags = xmlTags[0].InnerText.Split(' ').ToList();
+                bool isGraylisted = false;
                 bool isBlacklisted = false;
                 string offendingTags = string.Empty;
                 for (int i = 0; i < foundTags.Count; i++) {
@@ -158,7 +177,7 @@ namespace aphrodite {
                         for (int j = 0; j < GraylistedTags.Count; j++) {
                             if (foundTags[i] == GraylistedTags[j]) {
                                 offendingTags += foundTags[i];
-                                isBlacklisted = true;
+                                isGraylisted = true;
                             }
                         }
                     }
@@ -169,6 +188,7 @@ namespace aphrodite {
                         for (int j = 0; j < BlacklistedTags.Count; j++) {
                             if (foundTags[i] == BlacklistedTags[j]) {
                                 offendingTags += foundTags[i];
+                                isGraylisted = true;
                                 isBlacklisted = true;
                             }
                         }
@@ -176,21 +196,81 @@ namespace aphrodite {
                 }
 
             // set the .nfo buffer.
-                if (isBlacklisted) {
+                if (isGraylisted || isBlacklisted) {
                     if (separateBlacklisted) {
-                        blacklistInfo += "BLACKLISTED POST " + postID + ":\n    MD5: " + xmlMD5[0].InnerText + "\n    URL: https://e621.net/post/show/" + postID + "\n    ARTIST(S): " + foundArtists + "\n    TAGS: " + xmlTags[0].InnerText + "\n    SCORE: " + xmlScore[0].InnerText + "\n    RATING: " + rating + "\n    OFFENDING TAGS: " + offendingTags + "\n    DESCRIPITON:\n\"    " + xmlDescription[0].InnerText + "\"\n\n";
+                        blacklistInfo += "BLACKLISTED POST " + postID + ":\n" +
+                                         "    MD5: " + xmlMD5[0].InnerText + "\n" +
+                                         "    URL: https://e621.net/post/show/" + postID + "\n" +
+                                         "    ARTIST(S): " + foundArtists + "\n" +
+                                         "    TAGS: " + xmlTags[0].InnerText + "\n" +
+                                         "    SCORE: " + xmlScore[0].InnerText + "\n" +
+                                         "    RATING: " + rating + "\n" +
+                                         "    OFFENDING TAGS: " + offendingTags + "\n" +
+                                         "    DESCRIPITON:\n\"    " + xmlDescription[0].InnerText + "\"" +
+                                         "\n\n";
                     }
                     else {
-                        imageInfo += "POST " + postID + ":\n    MD5: " + xmlMD5[0].InnerText + "\n    URL: https://e621.net/post/show/" + postID + "\n    ARTIST(S): " + foundArtists + "\n    TAGS: " + xmlTags[0].InnerText + "\n    SCORE: " + xmlScore[0].InnerText + "\n    RATING: " + rating + "\n    DESCRIPITON:\n\"    " + xmlDescription[0].InnerText + "\"\n\n";
+                        imageInfo += "BLACKLISTED POST " + postID + ":\n" +
+                                     "    MD5: " + xmlMD5[0].InnerText + "\n" +
+                                     "    URL: https://e621.net/post/show/" + postID + "\n" +
+                                     "    ARTIST(S): " + foundArtists + "\n" +
+                                     "    TAGS: " + xmlTags[0].InnerText + "\n" +
+                                     "    SCORE: " + xmlScore[0].InnerText + "\n" +
+                                     "    RATING: " + rating + "\n" +
+                                     "    DESCRIPITON:\n\"    " + xmlDescription[0].InnerText + "\"" +
+                                     "\n\n";
                     }
                 }
                 else {
-                    imageInfo += "POST " + postID + ":\n    MD5: " + xmlMD5[0].InnerText + "\n    URL: https://e621.net/post/show/" + postID + "\n    ARTIST(S): " + foundArtists + "\n    TAGS: " + xmlTags[0].InnerText + "\n    SCORE: " + xmlScore[0].InnerText + "\n    RATING: " + rating + "\n    DESCRIPITON:\n\"    " + xmlDescription[0].InnerText + "\"\n\n";
+                    imageInfo += "POST " + postID + ":\n" +
+                                 "    MD5: " + xmlMD5[0].InnerText + "\n" +
+                                 "    URL: https://e621.net/post/show/" + postID + "\n" +
+                                 "    ARTIST(S): " + foundArtists + "\n" +
+                                 "    TAGS: " + xmlTags[0].InnerText + "\n" +
+                                 "    SCORE: " + xmlScore[0].InnerText + "\n" +
+                                 "    RATING: " + rating + "\n" +
+                                 "    DESCRIPITON:\n    \"" + xmlDescription[0].InnerText + "\"" +
+                                 "\n\n";
                 }
 
             // Trim the excess in the buffer.
                 imageInfo = imageInfo.TrimEnd('\n');
                 blacklistInfo = blacklistInfo.TrimEnd('\n');
+
+            // Work on the filename
+                string fileNameArtist = "(none)";
+                bool useHardcodedFilter = false;
+                if (string.IsNullOrEmpty(Settings.Default.undesiredTags))
+                    useHardcodedFilter = true;
+
+                if (xmlArtist.Count > 0) {
+                    if (!string.IsNullOrEmpty(xmlArtist[0].InnerText)) {
+                        for (int i = 0; i < xmlArtist.Count; i++) {
+                            if (useHardcodedFilter) {
+                                if (!UndesiredTags.isUndesiredHardcoded(xmlArtist[i].InnerText)) {
+                                    fileNameArtist = xmlArtist[i].InnerText;
+                                    break;
+                                }
+                            }
+                            else {
+                                if (!UndesiredTags.isUndesired(xmlArtist[i].InnerText)) {
+                                    fileNameArtist = xmlArtist[i].InnerText;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                string fileName = fileNameSchema.Replace("%md5%", xmlMD5[0].InnerText)
+                                                .Replace("%id%", xmlID[0].InnerText)
+                                                .Replace("%rating%", rating.ToLower())
+                                                .Replace("%rating2%", xmlRating[0].InnerText)
+                                                .Replace("%artist%", fileNameArtist)
+                                                .Replace("%ext%", xmlExt[0].InnerText)
+                                                .Replace("%fav_count%", xmlFavCount[0].InnerText)
+                                                .Replace("%score%", xmlScore[0].InnerText)
+                                                .Replace("%author%", xmlAuthor[0].InnerText) + "." + xmlExt[0].InnerText;
 
             // Start working on the saveTo string.
                 if (separateRatings) {
@@ -207,26 +287,15 @@ namespace aphrodite {
                     }
                 }
 
-                if (isBlacklisted && separateBlacklisted)
+                if (isGraylisted || isBlacklisted && separateBlacklisted)
                     saveTo += "\\blacklisted";
-                if (separateArtists)
-                    saveTo += "\\" + xmlArtist[0].InnerText;
+                if (separateArtists) {
+                    saveTo += "\\" + fileNameArtist;
+                }
 
-                // Create output directory.
-                if (!Directory.Exists(saveTo)) {
+            // Create output directory.
+                if (!Directory.Exists(saveTo))
                     Directory.CreateDirectory(saveTo);
-                }
-
-            // Work on the filename
-                string fileName = string.Empty;
-                switch (fileNameCode) {
-                    case 0:
-                        fileName = xmlMD5[0].InnerText + "." + xmlExt[0].InnerText;
-                        break;
-                    case 1:
-                        fileName = xmlArtist[0].InnerText + "_" + xmlMD5[0].InnerText + "." + xmlExt[0].InnerText;
-                        break;
-                }
 
             // Check file before continuing.
                 if (File.Exists(saveTo + "\\" + fileName))
