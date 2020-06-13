@@ -17,6 +17,7 @@ namespace aphrodite {
 
         public frmBlacklist() {
             InitializeComponent();
+            this.Icon = Properties.Resources.Brad;
         }
 
         private void frmBlacklist_Load(object sender, EventArgs e) {

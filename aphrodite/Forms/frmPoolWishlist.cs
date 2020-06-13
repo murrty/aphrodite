@@ -32,6 +32,7 @@ namespace aphrodite {
 
         public frmPoolWishlist() {
             InitializeComponent();
+            this.Icon = Properties.Resources.Brad;
             SetTextBoxHint(txtName.Handle, "Pool name...");
             SetTextBoxHint(txtURL.Handle, "Pool url...");
         }

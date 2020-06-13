@@ -101,6 +101,7 @@ namespace aphrodite {
     #region Form
         public frmTagDownloader() {
             InitializeComponent();
+            this.Icon = Properties.Resources.Brad;
         }
         private void frmDownload_Load(object sender, EventArgs e) {
             if (fromURL)
@@ -658,11 +659,16 @@ namespace aphrodite {
                             GraylistedFileExists.Add(alreadyExists);
                         }
 
+                        string CombinedTags = string.Empty;
+                        for (int j = 0; j > foundTags.Count; j++) {
+                            CombinedTags += foundTags[j] + "\n";
+                        }
+
                         blacklistInfo += "POST " + xmlID[i].InnerText + ":\n" +
                                          "    MD5: " + xmlMD5[i].InnerText + "\n" +
                                          "    URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\n" +
                                          "    ARTIST(S): " + artists + "\n" +
-                                         "    TAGS: " + string.Concat(foundTags.ToArray()) + "\n" +
+                                         "    TAGS: " + CombinedTags + //string.Concat(foundTags.ToArray()) + "\n" +
                                          "    SCORE: Up " + xmlScoreUp[i].InnerText + ", Down " + xmlScoreDown[i].InnerText + ", Total " + xmlScore[i].InnerText + "\n" +
                                          "    RATING: " + rating + "\n" +
                                          "    DESCRIPITON:\n    \"" + xmlDescription[i].InnerText + "\"\n" +
@@ -697,11 +703,16 @@ namespace aphrodite {
                             FileExists.Add(alreadyExists);
                         }
 
+                        string CombinedTags = string.Empty;
+                        for (int j = 0; j > foundTags.Count; j++) {
+                            CombinedTags += foundTags[j] + "\n";
+                        }
+
                         tagInfo += "POST " + xmlID[i].InnerText + ":\n" +
                                    "    MD5: " + xmlMD5[i].InnerText + "\n" +
                                    "    URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\n" +
                                    "    ARTIST(S): " + artists + "\n" +
-                                   "    TAGS: " + string.Concat(foundTags.ToArray()) + "\n" +
+                                   "    TAGS: " + CombinedTags + //string.Concat(foundTags.ToArray()) + "\n" +
                                    "    SCORE: Up " + xmlScoreUp[i].InnerText + ", Down " + xmlScoreDown[i].InnerText + ", Total " + xmlScore[i].InnerText + "\n" +
                                    "    RATING: " + rating + "\n" +
                                    "    DESCRIPITON:\n    \"" + xmlDescription[i].InnerText + "\"" +
@@ -1094,11 +1105,16 @@ namespace aphrodite {
                                     GraylistedFileExists.Add(alreadyExists);
                                 }
 
+                                string CombinedTags = string.Empty;
+                                for (int j = 0; j > foundTags.Count; j++) {
+                                    CombinedTags += foundTags[j] + "\n";
+                                }
+
                                 blacklistInfo += "POST " + xmlID[i].InnerText + ":\n" +
                                                  "    MD5: " + xmlMD5[i].InnerText + "\n" +
                                                  "    URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\n" +
                                                  "    ARTIST(S): " + artists + "\n" +
-                                                 "    TAGS: " + string.Concat(foundTags.ToArray()) + "\n" +
+                                                 "    TAGS: " + CombinedTags + //string.Concat(foundTags.ToArray()) + "\n" +
                                                  "    SCORE: Up " + xmlScoreUp[i].InnerText + ", Down " + xmlScoreDown[i].InnerText + ", Total " + xmlScore[i].InnerText + "\n" +
                                                  "    RATING: " + rating + "\n" +
                                                  "    DESCRIPITON:\n    \"" + xmlDescription[i].InnerText + "\"\n" +
@@ -1133,11 +1149,16 @@ namespace aphrodite {
                                     FileExists.Add(alreadyExists);
                                 }
 
+                                string CombinedTags = string.Empty;
+                                for (int j = 0; j > foundTags.Count; j++) {
+                                    CombinedTags += foundTags[j] + "\n";
+                                }
+
                                 tagInfo += "POST " + xmlID[i].InnerText + ":\n" +
                                            "    MD5: " + xmlMD5[i].InnerText + "\n" +
                                            "    URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\n" +
                                            "    ARTIST(S): " + artists + "\n" +
-                                           "    TAGS: " + string.Concat(foundTags.ToArray()) + "\n" +
+                                           "    TAGS: " + CombinedTags + //string.Concat(foundTags.ToArray()) + "\n" +
                                            "    SCORE: Up " + xmlScoreUp[i].InnerText + ", Down " + xmlScoreDown[i].InnerText + ", Total " + xmlScore[i].InnerText + "\n" +
                                            "    RATING: " + rating + "\n" +
                                            "    DESCRIPITON:\n    \"" + xmlDescription[i].InnerText + "\"" +

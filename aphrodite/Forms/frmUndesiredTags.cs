@@ -12,6 +12,7 @@ namespace aphrodite {
     public partial class frmUndesiredTags : Form {
         public frmUndesiredTags() {
             InitializeComponent();
+            this.Icon = Properties.Resources.Brad;
         }
 
         private void frmUndesiredTags_Load(object sender, EventArgs e) {

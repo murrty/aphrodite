@@ -54,6 +54,7 @@ namespace aphrodite {
     #region Form
         public frmImageDownloader() {
             InitializeComponent();
+            this.Icon = Properties.Resources.Brad;
         }
         private void frmImageDownloader_Load(object sender, EventArgs e) {
             startDownload();

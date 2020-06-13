@@ -34,6 +34,7 @@ namespace aphrodite {
 
         public frmIndexer() {
             InitializeComponent();
+            this.Icon = Properties.Resources.Brad;
         }
 
         private string getJSON(string url) {

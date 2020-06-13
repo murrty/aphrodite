@@ -62,6 +62,7 @@ namespace aphrodite {
     #region Form
         public frmMain() {
             InitializeComponent();
+            this.Icon = Properties.Resources.Brad;
 
             if (Properties.Settings.Default.showDebugDates)
                 this.Text += " (debug " + Properties.Settings.Default.debugDate + ")";

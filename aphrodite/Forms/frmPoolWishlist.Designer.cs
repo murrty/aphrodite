@@ -23,7 +23,6 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmPoolWishlist));
             this.lbWish = new System.Windows.Forms.ListBox();
             this.txtURL = new System.Windows.Forms.TextBox();
             this.btnAdd = new System.Windows.Forms.Button();
@@ -92,7 +91,7 @@
             this.chkUpdate.AutoSize = true;
             this.chkUpdate.Location = new System.Drawing.Point(12, 264);
             this.chkUpdate.Name = "chkUpdate";
-            this.chkUpdate.Size = new System.Drawing.Size(89, 17);
+            this.chkUpdate.Size = new System.Drawing.Size(90, 17);
             this.chkUpdate.TabIndex = 6;
             this.chkUpdate.Text = "Update mode";
             this.chkUpdate.UseVisualStyleBackColor = true;
@@ -126,7 +125,6 @@
             this.Controls.Add(this.btnAdd);
             this.Controls.Add(this.txtURL);
             this.Controls.Add(this.lbWish);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimumSize = new System.Drawing.Size(318, 280);
             this.Name = "frmPoolWishlist";

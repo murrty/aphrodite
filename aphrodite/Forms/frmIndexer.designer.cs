@@ -63,7 +63,7 @@
             this.rbImage.Checked = true;
             this.rbImage.Location = new System.Drawing.Point(12, 12);
             this.rbImage.Name = "rbImage";
-            this.rbImage.Size = new System.Drawing.Size(52, 17);
+            this.rbImage.Size = new System.Drawing.Size(53, 17);
             this.rbImage.TabIndex = 0;
             this.rbImage.TabStop = true;
             this.rbImage.Text = "image";
@@ -74,7 +74,7 @@
             this.rbPool.AutoSize = true;
             this.rbPool.Location = new System.Drawing.Point(71, 12);
             this.rbPool.Name = "rbPool";
-            this.rbPool.Size = new System.Drawing.Size(44, 17);
+            this.rbPool.Size = new System.Drawing.Size(45, 17);
             this.rbPool.TabIndex = 1;
             this.rbPool.TabStop = true;
             this.rbPool.Text = "pool";
@@ -85,7 +85,7 @@
             this.rbTag.AutoSize = true;
             this.rbTag.Location = new System.Drawing.Point(122, 12);
             this.rbTag.Name = "rbTag";
-            this.rbTag.Size = new System.Drawing.Size(118, 17);
+            this.rbTag.Size = new System.Drawing.Size(119, 17);
             this.rbTag.TabIndex = 2;
             this.rbTag.TabStop = true;
             this.rbTag.Text = "tag(s), 120 hard limit";
@@ -323,7 +323,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(458, 458);
+            this.ClientSize = new System.Drawing.Size(450, 449);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.lbPoss);
             this.Controls.Add(this.pbHint);
@@ -334,7 +334,6 @@
             this.Controls.Add(this.rbTag);
             this.Controls.Add(this.rbPool);
             this.Controls.Add(this.rbImage);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(466, 488);
             this.MinimumSize = new System.Drawing.Size(466, 488);

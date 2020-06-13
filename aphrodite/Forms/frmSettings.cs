@@ -42,6 +42,7 @@ namespace aphrodite {
 
         public frmSettings() {
             InitializeComponent();
+            this.Icon = Properties.Resources.Brad;
 
             Settings.Default.Reload();
             Tags.Default.Reload();

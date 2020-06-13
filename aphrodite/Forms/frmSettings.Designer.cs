@@ -145,7 +145,7 @@
             this.tbMain.Location = new System.Drawing.Point(0, 0);
             this.tbMain.Name = "tbMain";
             this.tbMain.SelectedIndex = 0;
-            this.tbMain.Size = new System.Drawing.Size(418, 223);
+            this.tbMain.Size = new System.Drawing.Size(410, 223);
             this.tbMain.TabIndex = 10;
             // 
             // tbGeneral
@@ -160,7 +160,7 @@
             this.tbGeneral.Location = new System.Drawing.Point(4, 22);
             this.tbGeneral.Name = "tbGeneral";
             this.tbGeneral.Padding = new System.Windows.Forms.Padding(3);
-            this.tbGeneral.Size = new System.Drawing.Size(410, 197);
+            this.tbGeneral.Size = new System.Drawing.Size(402, 197);
             this.tbGeneral.TabIndex = 0;
             this.tbGeneral.Text = "General";
             this.tbGeneral.UseVisualStyleBackColor = true;
@@ -184,7 +184,7 @@
             this.chkSaveTagMetadata.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkSaveTagMetadata.Location = new System.Drawing.Point(8, 65);
             this.chkSaveTagMetadata.Name = "chkSaveTagMetadata";
-            this.chkSaveTagMetadata.Size = new System.Drawing.Size(132, 17);
+            this.chkSaveTagMetadata.Size = new System.Drawing.Size(133, 17);
             this.chkSaveTagMetadata.TabIndex = 8;
             this.chkSaveTagMetadata.Text = "Save tags to metadata";
             this.JustTheTips.SetToolTip(this.chkSaveTagMetadata, "When enabled, the tags of the image will be saved to the file (if it supports met" +
@@ -198,7 +198,7 @@
             this.chkSaveArtistMetadata.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkSaveArtistMetadata.Location = new System.Drawing.Point(8, 42);
             this.chkSaveArtistMetadata.Name = "chkSaveArtistMetadata";
-            this.chkSaveArtistMetadata.Size = new System.Drawing.Size(145, 17);
+            this.chkSaveArtistMetadata.Size = new System.Drawing.Size(146, 17);
             this.chkSaveArtistMetadata.TabIndex = 7;
             this.chkSaveArtistMetadata.Text = "Save artist(s) to metadata";
             this.JustTheTips.SetToolTip(this.chkSaveArtistMetadata, "When enabled, the artist(s) of the image will be saved to the file (if it support" +
@@ -212,7 +212,7 @@
             this.chkSaveMetadata.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkSaveMetadata.Location = new System.Drawing.Point(8, 19);
             this.chkSaveMetadata.Name = "chkSaveMetadata";
-            this.chkSaveMetadata.Size = new System.Drawing.Size(155, 17);
+            this.chkSaveMetadata.Size = new System.Drawing.Size(156, 17);
             this.chkSaveMetadata.TabIndex = 6;
             this.chkSaveMetadata.Text = "Save metadata with images";
             this.JustTheTips.SetToolTip(this.chkSaveMetadata, "Save metadata to the image file when downloading");
@@ -223,7 +223,7 @@
             this.chkIgnoreFinish.AutoSize = true;
             this.chkIgnoreFinish.Location = new System.Drawing.Point(23, 145);
             this.chkIgnoreFinish.Name = "chkIgnoreFinish";
-            this.chkIgnoreFinish.Size = new System.Drawing.Size(171, 17);
+            this.chkIgnoreFinish.Size = new System.Drawing.Size(172, 17);
             this.chkIgnoreFinish.TabIndex = 4;
             this.chkIgnoreFinish.Text = "Don\'t notify finished downloads";
             this.JustTheTips.SetToolTip(this.chkIgnoreFinish, "Doesn\'t notify you when downloads are completed\r\nPlugin downloads quit when finis" +
@@ -237,7 +237,7 @@
             this.chkSaveBlacklisted.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkSaveBlacklisted.Location = new System.Drawing.Point(24, 122);
             this.chkSaveBlacklisted.Name = "chkSaveBlacklisted";
-            this.chkSaveBlacklisted.Size = new System.Drawing.Size(139, 17);
+            this.chkSaveBlacklisted.Size = new System.Drawing.Size(140, 17);
             this.chkSaveBlacklisted.TabIndex = 3;
             this.chkSaveBlacklisted.Text = "Save blacklisted images";
             this.JustTheTips.SetToolTip(this.chkSaveBlacklisted, "Saves blacklisted images into a separate folder.\r\nImages downloaded with the \'ima" +
@@ -251,7 +251,7 @@
             this.chkSaveInfo.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkSaveInfo.Location = new System.Drawing.Point(23, 99);
             this.chkSaveInfo.Name = "chkSaveInfo";
-            this.chkSaveInfo.Size = new System.Drawing.Size(122, 17);
+            this.chkSaveInfo.Size = new System.Drawing.Size(123, 17);
             this.chkSaveInfo.TabIndex = 2;
             this.chkSaveInfo.Text = "Save image info files";
             this.JustTheTips.SetToolTip(this.chkSaveInfo, resources.GetString("chkSaveInfo.ToolTip"));
@@ -305,7 +305,7 @@
             this.chkSkipExistingFiles.AutoSize = true;
             this.chkSkipExistingFiles.Location = new System.Drawing.Point(74, 156);
             this.chkSkipExistingFiles.Name = "chkSkipExistingFiles";
-            this.chkSkipExistingFiles.Size = new System.Drawing.Size(105, 17);
+            this.chkSkipExistingFiles.Size = new System.Drawing.Size(106, 17);
             this.chkSkipExistingFiles.TabIndex = 5;
             this.chkSkipExistingFiles.Text = "Skip existing files";
             this.JustTheTips.SetToolTip(this.chkSkipExistingFiles, "Enable this option to skip adding existing files to the internal download list.");
@@ -356,7 +356,7 @@
             this.chkExplicit.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkExplicit.Location = new System.Drawing.Point(17, 19);
             this.chkExplicit.Name = "chkExplicit";
-            this.chkExplicit.Size = new System.Drawing.Size(32, 17);
+            this.chkExplicit.Size = new System.Drawing.Size(33, 17);
             this.chkExplicit.TabIndex = 1;
             this.chkExplicit.Text = "E";
             this.JustTheTips.SetToolTip(this.chkExplicit, "Download images rated Explicit");
@@ -369,7 +369,7 @@
             this.chkSeparate.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkSeparate.Location = new System.Drawing.Point(20, 42);
             this.chkSeparate.Name = "chkSeparate";
-            this.chkSeparate.Size = new System.Drawing.Size(102, 17);
+            this.chkSeparate.Size = new System.Drawing.Size(103, 17);
             this.chkSeparate.TabIndex = 4;
             this.chkSeparate.Text = "Separate ratings";
             this.JustTheTips.SetToolTip(this.chkSeparate, "Separates ratings into different folders");
@@ -382,7 +382,7 @@
             this.chkQuestionable.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkQuestionable.Location = new System.Drawing.Point(55, 18);
             this.chkQuestionable.Name = "chkQuestionable";
-            this.chkQuestionable.Size = new System.Drawing.Size(33, 17);
+            this.chkQuestionable.Size = new System.Drawing.Size(34, 17);
             this.chkQuestionable.TabIndex = 2;
             this.chkQuestionable.Text = "Q";
             this.JustTheTips.SetToolTip(this.chkQuestionable, "Download images rated Questionable");
@@ -395,7 +395,7 @@
             this.chkSafe.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkSafe.Location = new System.Drawing.Point(94, 18);
             this.chkSafe.Name = "chkSafe";
-            this.chkSafe.Size = new System.Drawing.Size(32, 17);
+            this.chkSafe.Size = new System.Drawing.Size(33, 17);
             this.chkSafe.TabIndex = 3;
             this.chkSafe.Text = "S";
             this.JustTheTips.SetToolTip(this.chkSafe, "Download images rated Safe");
@@ -419,7 +419,7 @@
             this.chkScoreAsTag.Enabled = false;
             this.chkScoreAsTag.Location = new System.Drawing.Point(19, 60);
             this.chkScoreAsTag.Name = "chkScoreAsTag";
-            this.chkScoreAsTag.Size = new System.Drawing.Size(105, 17);
+            this.chkScoreAsTag.Size = new System.Drawing.Size(106, 17);
             this.chkScoreAsTag.TabIndex = 3;
             this.chkScoreAsTag.Text = "Include with tags";
             this.JustTheTips.SetToolTip(this.chkScoreAsTag, "If checked, uses the score minimum as a tag (ex: \"gay score:>25\").\r\nThis widly in" +
@@ -452,7 +452,7 @@
             this.chkMinimumScore.AutoSize = true;
             this.chkMinimumScore.Location = new System.Drawing.Point(18, 43);
             this.chkMinimumScore.Name = "chkMinimumScore";
-            this.chkMinimumScore.Size = new System.Drawing.Size(107, 17);
+            this.chkMinimumScore.Size = new System.Drawing.Size(108, 17);
             this.chkMinimumScore.TabIndex = 2;
             this.chkMinimumScore.Text = "Enable score limit";
             this.JustTheTips.SetToolTip(this.chkMinimumScore, "Only downloads images with a score equal to or greater than provided");
@@ -502,7 +502,7 @@
             this.chkAddWishlistSilent.AutoSize = true;
             this.chkAddWishlistSilent.Location = new System.Drawing.Point(67, 118);
             this.chkAddWishlistSilent.Name = "chkAddWishlistSilent";
-            this.chkAddWishlistSilent.Size = new System.Drawing.Size(154, 17);
+            this.chkAddWishlistSilent.Size = new System.Drawing.Size(155, 17);
             this.chkAddWishlistSilent.TabIndex = 4;
             this.chkAddWishlistSilent.Text = "Add pools to wishlist silently";
             this.JustTheTips.SetToolTip(this.chkAddWishlistSilent, "Add the pool to your wishlist without showing the application.");
@@ -513,7 +513,7 @@
             this.chkOpen.AutoSize = true;
             this.chkOpen.Location = new System.Drawing.Point(67, 84);
             this.chkOpen.Name = "chkOpen";
-            this.chkOpen.Size = new System.Drawing.Size(138, 17);
+            this.chkOpen.Size = new System.Drawing.Size(139, 17);
             this.chkOpen.TabIndex = 3;
             this.chkOpen.Text = "Open after downloading";
             this.JustTheTips.SetToolTip(this.chkOpen, "Opens the pool folder after downloading");
@@ -526,7 +526,7 @@
             this.chkMerge.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkMerge.Location = new System.Drawing.Point(67, 61);
             this.chkMerge.Name = "chkMerge";
-            this.chkMerge.Size = new System.Drawing.Size(276, 17);
+            this.chkMerge.Size = new System.Drawing.Size(277, 17);
             this.chkMerge.TabIndex = 2;
             this.chkMerge.Text = "Merge blacklisted images with non blacklisted images";
             this.JustTheTips.SetToolTip(this.chkMerge, "Merge blacklisted images with the rest of the pool\r\npool.blacklisted.nfo is not s" +
@@ -540,7 +540,7 @@
             this.chkPoolName.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkPoolName.Location = new System.Drawing.Point(67, 41);
             this.chkPoolName.Name = "chkPoolName";
-            this.chkPoolName.Size = new System.Drawing.Size(178, 17);
+            this.chkPoolName.Size = new System.Drawing.Size(179, 17);
             this.chkPoolName.TabIndex = 1;
             this.chkPoolName.Text = "Save files as \"poolname_####\"";
             this.JustTheTips.SetToolTip(this.chkPoolName, "Save pool files as the pool name + page number.\r\nEx: The_Internship_05.jpg");
@@ -570,7 +570,7 @@
             this.chkUseForm.AutoSize = true;
             this.chkUseForm.Location = new System.Drawing.Point(94, 111);
             this.chkUseForm.Name = "chkUseForm";
-            this.chkUseForm.Size = new System.Drawing.Size(223, 17);
+            this.chkUseForm.Size = new System.Drawing.Size(224, 17);
             this.chkUseForm.TabIndex = 4;
             this.chkUseForm.Text = "Use download form for download progress";
             this.JustTheTips.SetToolTip(this.chkUseForm, "Shows a form when downloading images that will report progress");
@@ -581,7 +581,7 @@
             this.chkSepArtists.AutoSize = true;
             this.chkSepArtists.Location = new System.Drawing.Point(156, 89);
             this.chkSepArtists.Name = "chkSepArtists";
-            this.chkSepArtists.Size = new System.Drawing.Size(98, 17);
+            this.chkSepArtists.Size = new System.Drawing.Size(99, 17);
             this.chkSepArtists.TabIndex = 3;
             this.chkSepArtists.Text = "Separate artists";
             this.chkSepArtists.UseVisualStyleBackColor = true;
@@ -593,7 +593,7 @@
             this.chkSeparateBlacklisted.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkSeparateBlacklisted.Location = new System.Drawing.Point(186, 69);
             this.chkSeparateBlacklisted.Name = "chkSeparateBlacklisted";
-            this.chkSeparateBlacklisted.Size = new System.Drawing.Size(157, 17);
+            this.chkSeparateBlacklisted.Size = new System.Drawing.Size(158, 17);
             this.chkSeparateBlacklisted.TabIndex = 2;
             this.chkSeparateBlacklisted.Text = "Separate blacklisted images";
             this.JustTheTips.SetToolTip(this.chkSeparateBlacklisted, "Separates blacklisted images into separate folder.");
@@ -606,7 +606,7 @@
             this.chkSeparateImages.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkSeparateImages.Location = new System.Drawing.Point(67, 69);
             this.chkSeparateImages.Name = "chkSeparateImages";
-            this.chkSeparateImages.Size = new System.Drawing.Size(102, 17);
+            this.chkSeparateImages.Size = new System.Drawing.Size(103, 17);
             this.chkSeparateImages.TabIndex = 1;
             this.chkSeparateImages.Text = "Separate ratings";
             this.JustTheTips.SetToolTip(this.chkSeparateImages, "Separate ratings into separate folders for images");
@@ -617,7 +617,7 @@
             this.rbMD5.AutoSize = true;
             this.rbMD5.Location = new System.Drawing.Point(222, 174);
             this.rbMD5.Name = "rbMD5";
-            this.rbMD5.Size = new System.Drawing.Size(126, 17);
+            this.rbMD5.Size = new System.Drawing.Size(127, 17);
             this.rbMD5.TabIndex = 8;
             this.rbMD5.Text = "Save images as \'md5\'";
             this.JustTheTips.SetToolTip(this.rbMD5, "Saves files as the MD5 hash of the image\r\nex: 7ec39fcc0afe7b237d61b1afdfb9b927.jp" +
@@ -649,7 +649,7 @@
             this.rbArtist.Checked = true;
             this.rbArtist.Location = new System.Drawing.Point(62, 174);
             this.rbArtist.Name = "rbArtist";
-            this.rbArtist.Size = new System.Drawing.Size(154, 17);
+            this.rbArtist.Size = new System.Drawing.Size(155, 17);
             this.rbArtist.TabIndex = 0;
             this.rbArtist.TabStop = true;
             this.rbArtist.Text = "Save images as \'artist_md5\'";
@@ -926,12 +926,11 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.AutoValidate = System.Windows.Forms.AutoValidate.EnablePreventFocusChange;
-            this.ClientSize = new System.Drawing.Size(418, 260);
+            this.ClientSize = new System.Drawing.Size(410, 251);
             this.Controls.Add(this.btnBlacklist);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.tbMain);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(426, 290);
             this.MinimumSize = new System.Drawing.Size(426, 290);

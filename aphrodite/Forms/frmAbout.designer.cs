@@ -95,13 +95,12 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(272, 150);
+            this.ClientSize = new System.Drawing.Size(264, 141);
             this.Controls.Add(this.lbVersion);
             this.Controls.Add(this.pbIcon);
             this.Controls.Add(this.lbBody);
             this.Controls.Add(this.lbHeader);
             this.Controls.Add(this.llbCheckForUpdates);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(280, 180);
             this.MinimumSize = new System.Drawing.Size(280, 180);

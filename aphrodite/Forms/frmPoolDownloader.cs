@@ -18,7 +18,7 @@ using System.Xml.Linq;
 namespace aphrodite {
     public partial class frmPoolDownloader : Form {
 
-    #region Variables
+        #region Variables
         public string poolID;                   // String for the pool id.
         public string header;                   // String for the header.
         public string saveTo;                   // String for the save directory.
@@ -38,34 +38,36 @@ namespace aphrodite {
         public bool mergeBlacklisted;           // Setting for merging blacklisted pages with regular pages.
         public bool openAfter;                  // Setting for opening the folder after download.
         public string fileNameSchema;           // The name of the files to be created
-                                                    // %poolname%   = the name of the pool
-                                                    // %poolid%     = the id of the pool
-                                                    // %page%       = the page number of the page
-                                                    // %md5%        = the md5 of the file
-                                                    // %id%         = the id of the page
-                                                    // %rating%     = the rating of the page (eg: safe)
-                                                    // %rating2%    = the lettered rating of the page (eg: s)
-                                                    // %artist%     = the first artist in the artists array
-                                                    // %ext%        = the extension
-                                                    // %fav_count%  = the amount of favorites the post has
-                                                    // %score%      = the score of the post
-                                                    // %author%     = the user who submitted the post to e621
+        // %poolname%   = the name of the pool
+        // %poolid%     = the id of the pool
+        // %page%       = the page number of the page
+        // %md5%        = the md5 of the file
+        // %id%         = the id of the page
+        // %rating%     = the rating of the page (eg: safe)
+        // %rating2%    = the lettered rating of the page (eg: s)
+        // %artist%     = the first artist in the artists array
+        // %ext%        = the extension
+        // %fav_count%  = the amount of favorites the post has
+        // %score%      = the score of the post
+        // %author%     = the user who submitted the post to e621
 
         public int pageCount = 0;               // Will update the page count before download.
         public int blacklistedPageCount = 0;    // Will count the blacklisted pages before download.
 
         //public static readonly string poolJson = "https://e621.net/pool/show.json?id=";
-        public static readonly string poolJson = "https://e621.net/posts?tags=pool:";
+        public static readonly string poolJson = "https://e621.net/pools/{0}.json";
+        public static readonly string poolJsonSearch = "https://e621.net/posts?tags=pool:";
         public static readonly string poolPageJson = "&page=";
 
         Metadata writeMetadata = new Metadata();
 
         Thread poolDownloader;
-    #endregion
+        #endregion
 
-    #region Form
+        #region Form
         public frmPoolDownloader() {
             InitializeComponent();
+            this.Icon = Properties.Resources.Brad;
         }
 
         private void frmDownload_Load(object sender, EventArgs e) {
@@ -87,9 +89,9 @@ namespace aphrodite {
                 this.Text += ".";
             }
         }
-    #endregion
+        #endregion
 
-    #region Downloader
+        #region Downloader
         private void startDownload() {
             MessageBox.Show("Pool downloading is wip");
             return;
@@ -111,14 +113,14 @@ namespace aphrodite {
 
         private bool downloadPool() {
             try {
-            // Set the saveTo to \\Pools.
+                // Set the saveTo to \\Pools.
                 if (!saveTo.EndsWith("\\Pools"))
                     saveTo += "\\Pools";
 
                 staticSaveTo = saveTo;
                 writeToConsole("Set output to " + saveTo);
 
-            // New variables for the API parse
+                // New variables for the API parse
                 List<string> URLs = new List<string>();
                 List<string> FileNames = new List<string>();
                 List<string> MetadataArtists = new List<string>();
@@ -133,14 +135,14 @@ namespace aphrodite {
                 XmlDocument xmlDoc = new XmlDocument();
                 writeToConsole("Configured variables");
 
-            // Begin the XML download
+                // Begin the XML download
                 this.Invoke((MethodInvoker)(() => status.Text = "Getting pool information for page 1"));
                 writeToConsole("Starting JSON download for page 1...", true);
                 url = poolJson + poolID;
                 string postXML = apiTools.getJSON(poolJson + poolID, header);
                 writeToConsole("JSON Downloaded.", true);
 
-            // Check the XML.
+                // Check the XML.
                 writeToConsole("Checking XML...");
                 if (postXML == apiTools.emptyXML || string.IsNullOrWhiteSpace(postXML)) {
                     this.BeginInvoke(new MethodInvoker(() => {
@@ -155,7 +157,7 @@ namespace aphrodite {
                 writeToConsole("XML is valid.");
                 xmlDoc.LoadXml(postXML);
 
-            // XmlNodeLists for pool information.
+                // XmlNodeLists for pool information.
                 XmlNodeList xmlName = xmlDoc.DocumentElement.SelectNodes("/root/name");
                 XmlNodeList xmlDescription = xmlDoc.DocumentElement.SelectNodes("/root/description");
                 XmlNodeList xmlCount = xmlDoc.DocumentElement.SelectNodes("/root/post_count");
@@ -179,7 +181,7 @@ namespace aphrodite {
 
                 this.Invoke((MethodInvoker)(() => lbName.Text = xmlName[0].InnerText));
 
-            // Count the image count and do math for pages.
+                // Count the image count and do math for pages.
                 int pages = 1;
                 int imageCount = 0;
                 Int32.TryParse(xmlCount[0].InnerText, out imageCount);
@@ -192,12 +194,12 @@ namespace aphrodite {
                     writeToConsole("Counted 1 page with " + imageCount + " files in total.", true);
                 }
 
-            // Set the output folder name.
+                // Set the output folder name.
                 poolName = apiTools.replaceIllegalCharacters(xmlName[0].InnerText);
                 saveTo += "\\" + poolName;
                 writeToConsole("Updated saveTo to \\Pools\\" + poolName);
 
-            // Begin ripping the rest of the pool Json.
+                // Begin ripping the rest of the pool Json.
                 XmlNodeList xmlID = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/id");
                 XmlNodeList xmlMD5 = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/md5");
                 XmlNodeList xmlUrl = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/file_url");
@@ -249,7 +251,7 @@ namespace aphrodite {
                         artistsMetadata = "(no artist)";
                     }
 
-                // Add to the metadata list
+                    // Add to the metadata list
                     if (saveMetadata) {
                         MetadataArtists.Add(artistsMetadata);
                         MetadataTags.Add(tagsMetadata);
@@ -266,7 +268,7 @@ namespace aphrodite {
                     }
                     fileNamePage += (currentPage);
 
-                  // File name artist for the schema
+                    // File name artist for the schema
                     string fileNameArtist = "(none)";
                     bool useHardcodedFilter = false;
                     if (string.IsNullOrEmpty(Settings.Default.undesiredTags))
@@ -381,7 +383,7 @@ namespace aphrodite {
                     }
                 }
 
-            // Redo above but for other pages.
+                // Redo above but for other pages.
                 if (pages > 1) {
                     for (int i = 2; i < pages + 1; i++) {
                         writeToConsole("Starting JSON download for page " + i + "...", true);
@@ -569,7 +571,7 @@ namespace aphrodite {
                     }
                 }
 
-            // Check for files.
+                // Check for files.
                 if (URLs.Count <= 0) {
                     writeToConsole("No files were found while downloading. Press any key to continue...", true);
                     this.Invoke((MethodInvoker)(() => status.Text = "URL count is empty. Empty pool?"));
@@ -579,13 +581,13 @@ namespace aphrodite {
 
                 writeToConsole("There are " + URLs.Count + " files in total.", true);
 
-            // Create directories.
+                // Create directories.
                 if (!Directory.Exists(saveTo))
                     Directory.CreateDirectory(saveTo);
                 if (hasBlacklistedFiles && saveBlacklisted && !mergeBlacklisted && !Directory.Exists(saveTo + "\\blacklisted"))
                     Directory.CreateDirectory(saveTo + "\\blacklisted");
 
-            // Save .nfo files.
+                // Save .nfo files.
                 if (saveInfo) {
                     poolInfo = poolInfo.TrimEnd('\n');
                     blacklistInfo = blacklistInfo.TrimEnd('\n');
@@ -621,7 +623,7 @@ namespace aphrodite {
                 }));
 
                 int currentDownloadFile = 1;
-            // Download pool.
+                // Download pool.
                 writeToConsole("Starting pool download...", true);
                 string outputBar = string.Empty;
                 currentPage = 0;
@@ -686,15 +688,15 @@ namespace aphrodite {
                             }
                         }
 
-                    // Save metadata to file, and update it if one exists
-                        if (saveMetadata) { 
+                        // Save metadata to file, and update it if one exists
+                        if (saveMetadata) {
                             if (fileName.EndsWith(".jpg") || fileName.EndsWith(".jpeg"))
                                 writeMetadata.setMetadata(saveTo + "\\blacklisted" + fileName, MetadataArtists[y], MetadataTags[y]);
                         }
                     }
                 }
 
-            // Finish the job.
+                // Finish the job.
                 this.BeginInvoke(new MethodInvoker(() => {
                     pbDownloadStatus.Value = 100;
                     lbPercentage.Text = "100%";
@@ -744,7 +746,7 @@ namespace aphrodite {
         }
 
         public void updateTotals() {
-            this.BeginInvoke(new MethodInvoker(()=> {
+            this.BeginInvoke(new MethodInvoker(() => {
                 lbTotal.Text = (pageCount) + " clean pages\n" +
                                (blacklistedPageCount) + " blacklisted pages\n" +
                                (pageCount + blacklistedPageCount) + " total pages";
@@ -757,7 +759,7 @@ namespace aphrodite {
         public void writeToConsole(string message, bool important = false) {
             Debug.Print(message);
         }
-    #endregion
+        #endregion
 
     }
 }

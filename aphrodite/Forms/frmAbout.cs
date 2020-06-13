@@ -17,7 +17,7 @@ namespace aphrodite {
     public partial class frmAbout : Form {
         List<Thread> thr = new List<Thread>();
 
-        public frmAbout() { InitializeComponent(); }
+        public frmAbout() { InitializeComponent(); this.Icon = Properties.Resources.Brad; }
 
         private void About_Shown(object sender, EventArgs e) {
             lbVersion.Text = "v" + Properties.Settings.Default.currentVersion.ToString();

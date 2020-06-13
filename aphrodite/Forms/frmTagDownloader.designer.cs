@@ -24,7 +24,6 @@
         /// </summary>
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmTagDownloader));
             this.lbID = new System.Windows.Forms.Label();
             this.lbFile = new System.Windows.Forms.Label();
             this.lbPercentage = new System.Windows.Forms.Label();
@@ -171,7 +170,6 @@
             this.Controls.Add(this.lbBlacklist);
             this.Controls.Add(this.lbLimits);
             this.Controls.Add(this.pbDownloadStatus);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(300, 184);

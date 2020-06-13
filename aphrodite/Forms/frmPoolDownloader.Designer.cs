@@ -24,7 +24,6 @@
         /// </summary>
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmPoolDownloader));
             this.lbID = new System.Windows.Forms.Label();
             this.lbName = new System.Windows.Forms.Label();
             this.lbFile = new System.Windows.Forms.Label();
@@ -76,9 +75,9 @@
             // 
             // status
             // 
-            this.status.Location = new System.Drawing.Point(0, 154);
+            this.status.Location = new System.Drawing.Point(0, 145);
             this.status.Name = "status";
-            this.status.Size = new System.Drawing.Size(268, 22);
+            this.status.Size = new System.Drawing.Size(260, 22);
             this.status.SizingGrip = false;
             this.status.TabIndex = 5;
             this.status.Text = "Waiting for initial start";
@@ -136,7 +135,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(268, 176);
+            this.ClientSize = new System.Drawing.Size(260, 167);
             this.Controls.Add(this.lbRemoved);
             this.Controls.Add(this.pbTotalStatus);
             this.Controls.Add(this.status);
@@ -146,7 +145,6 @@
             this.Controls.Add(this.lbID);
             this.Controls.Add(this.lbTotal);
             this.Controls.Add(this.pbDownloadStatus);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(276, 206);
             this.MinimizeBox = false;

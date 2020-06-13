@@ -23,7 +23,6 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmRedownloader));
             this.tcMain = new System.Windows.Forms.TabControl();
             this.tbTags = new System.Windows.Forms.TabPage();
             this.lbTags = new System.Windows.Forms.ListBox();
@@ -45,7 +44,7 @@
             this.tcMain.Location = new System.Drawing.Point(0, 0);
             this.tcMain.Name = "tcMain";
             this.tcMain.SelectedIndex = 0;
-            this.tcMain.Size = new System.Drawing.Size(292, 210);
+            this.tcMain.Size = new System.Drawing.Size(284, 210);
             this.tcMain.TabIndex = 0;
             // 
             // tbTags
@@ -54,7 +53,7 @@
             this.tbTags.Location = new System.Drawing.Point(4, 22);
             this.tbTags.Name = "tbTags";
             this.tbTags.Padding = new System.Windows.Forms.Padding(3);
-            this.tbTags.Size = new System.Drawing.Size(284, 184);
+            this.tbTags.Size = new System.Drawing.Size(276, 184);
             this.tbTags.TabIndex = 0;
             this.tbTags.Text = "Tags";
             this.tbTags.UseVisualStyleBackColor = true;
@@ -126,12 +125,11 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(292, 270);
+            this.ClientSize = new System.Drawing.Size(284, 261);
             this.Controls.Add(this.lbDownloadedOn);
             this.Controls.Add(this.btnRenumerate);
             this.Controls.Add(this.btnRedownload);
             this.Controls.Add(this.tcMain);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(300, 300);
             this.MinimumSize = new System.Drawing.Size(300, 300);

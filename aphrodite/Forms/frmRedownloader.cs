@@ -180,6 +180,7 @@ namespace aphrodite {
     #region Form
         public frmRedownloader() {
             InitializeComponent();
+            this.Icon = Properties.Resources.Brad;
         }
 
         private void frmTagRedownloader_Load(object sender, EventArgs e) {
