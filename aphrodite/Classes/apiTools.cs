@@ -24,13 +24,16 @@ namespace aphrodite {
             }
 
             try {
-                Debug.Print("Starting tag json download");
+                Debug.Print("Downloading JSON at " + url);
                 using (ExWebClient wc = new ExWebClient()) {
-                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                     wc.Proxy = WebRequest.GetSystemWebProxy();
                     wc.Headers.Add(header);
                     wc.Method = "GET";
                     string json = wc.DownloadString(url);
+                    if (json == "{\"posts\":[]}") {
+                        return null;
+                    }
+                    url = string.Empty;
                     byte[] bytes = Encoding.ASCII.GetBytes(json);
                     using (var stream = new MemoryStream(bytes)) {
                         var quotas = new XmlDictionaryReaderQuotas();
@@ -131,7 +134,28 @@ namespace aphrodite {
             return input;
         }
 
-    #region Validation checks
+        public static int countFiles(string dir, SearchOption option = SearchOption.TopDirectoryOnly) {
+            if (!Directory.Exists(dir))
+                return 0;
+
+            string[] files = Directory.EnumerateFiles(dir, "*", option).ToArray();
+            return files.Length;
+        }
+
+        public static string getIdFromURL(string url) {
+            url = setUrlString(url);
+
+            if (!isValidE621Link(url))
+                return null;
+
+            return url.Split('/')[5];
+        }
+
+        public static string getBlacklistedImageUrl(string md5, string ext) {
+            return "https://static1.e621.net/data/" + md5.Substring(0, 2) + "/" + md5.Substring(2, 2) + "." + ext;
+        }
+
+    #region Validation checks for e621
         public static bool isValidE621Link(string url) {
             url = setUrlString(url);
 
@@ -179,7 +203,7 @@ namespace aphrodite {
                 input = input.Replace("http://", "https://");
             if (!input.StartsWith("https://"))
                 input = "https://" + input;
-            return input.Replace("www.", "");
+            return input.Replace("https://www.", "https://");
         }
     #endregion
     }
