@@ -1,19 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
-using System.Xml.Linq;
 
 namespace aphrodite {
     public partial class frmPoolDownloader : Form {
@@ -53,11 +47,6 @@ namespace aphrodite {
 
         public int pageCount = 0;               // Will update the page count before download.
         public int blacklistedPageCount = 0;    // Will count the blacklisted pages before download.
-
-        //public static readonly string poolJson = "https://e621.net/pool/show.json?id=";
-        public static readonly string poolJson = "https://e621.net/pools/{0}.json";
-        public static readonly string poolJsonSearch = "https://e621.net/posts?tags=pool:";
-        public static readonly string poolPageJson = "&page=";
 
         Metadata writeMetadata = new Metadata();
 
@@ -120,7 +109,11 @@ namespace aphrodite {
                 staticSaveTo = saveTo;
                 writeToConsole("Set output to " + saveTo);
 
+                #region define new variables
                 // New variables for the API parse
+                string poolJson = string.Format("https://e621.net/pools/{0}.json", poolID);
+                string poolJsonPage = string.Format("https://e621.net/posts.json?tags=pool:{0}&limit=320", poolID);
+
                 List<string> URLs = new List<string>();
                 List<string> FileNames = new List<string>();
                 List<string> MetadataArtists = new List<string>();
@@ -132,14 +125,17 @@ namespace aphrodite {
                 string poolInfo = string.Empty;
                 string blacklistInfo = string.Empty;
                 bool hasBlacklistedFiles = false;
+
                 XmlDocument xmlDoc = new XmlDocument();
                 writeToConsole("Configured variables");
+                #endregion
 
+                #region initial xml download
                 // Begin the XML download
                 this.Invoke((MethodInvoker)(() => status.Text = "Getting pool information for page 1"));
                 writeToConsole("Starting JSON download for page 1...", true);
-                url = poolJson + poolID;
-                string postXML = apiTools.getJSON(poolJson + poolID, header);
+                url = poolJson;
+                string postXML = apiTools.getJSON(poolJson, header);
                 writeToConsole("JSON Downloaded.", true);
 
                 // Check the XML.
@@ -156,18 +152,30 @@ namespace aphrodite {
                 }
                 writeToConsole("XML is valid.");
                 xmlDoc.LoadXml(postXML);
+                #endregion
 
+                #region initial api parse for main data
                 // XmlNodeLists for pool information.
                 XmlNodeList xmlName = xmlDoc.DocumentElement.SelectNodes("/root/name");
                 XmlNodeList xmlDescription = xmlDoc.DocumentElement.SelectNodes("/root/description");
                 XmlNodeList xmlCount = xmlDoc.DocumentElement.SelectNodes("/root/post_count");
+                XmlNodeList xmlPoolDeleted = xmlDoc.DocumentElement.SelectNodes("/root/is_deleted");
+
+                if (xmlPoolDeleted[0].InnerText.ToLower() == "true") {
+                    // idk how to handle it because I haven't found a deleted pool yet
+                }
+
+                string poolDescription = "No description";
+                if (xmlDescription[0].InnerText != "") {
+                    poolDescription = "\"" + xmlDescription[0].InnerText + "\"";
+                }
 
                 poolInfo += "POOL: " + poolID + "\n" +
                             "DOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\n" +
                             "    NAME: " + xmlName[0].InnerText + "\n" +
                             "    PAGES: " + xmlCount[0].InnerText + "\n" +
                             "    URL: https://e621.net/pool/show/" + poolID + "\n" +
-                            "    DESCRIPTION:\n    \"" + xmlDescription[0].InnerText + "\"" +
+                            "    DESCRIPTION:\n    " + poolDescription +
                             "\n\n";
 
                 blacklistInfo += "POOL: " + poolID + "\n" +
@@ -175,31 +183,28 @@ namespace aphrodite {
                                  "    NAME: " + xmlName[0].InnerText + "\n" +
                                  "    PAGES: " + xmlCount[0].InnerText + "\n" +
                                  "    URL: https://e621.net/pool/show/" + poolID + "\n" +
-                                 "    DESCRIPTION:\n    \"" + xmlDescription[0].InnerText + "\"\n" +
+                                 "    DESCRIPTION:\n    " + poolDescription +
                                  "    BLACKLISTED TAGS: " + graylist +
                                  "\n\n";
 
                 this.Invoke((MethodInvoker)(() => lbName.Text = xmlName[0].InnerText));
 
                 // Count the image count and do math for pages.
-                int pages = 1;
-                int imageCount = 0;
-                Int32.TryParse(xmlCount[0].InnerText, out imageCount);
-                if (imageCount > 24) {
-                    decimal pageGuess = decimal.Divide(imageCount, 24);
-                    pages = Convert.ToInt32(Math.Ceiling(pageGuess));
-                    writeToConsole("Counted " + pages + " pages with " + imageCount + " files in total.", true);
-                }
-                else {
-                    writeToConsole("Counted 1 page with " + imageCount + " files in total.", true);
-                }
+                int pages = apiTools.CountPoolPages(Convert.ToDecimal(xmlCount[0].InnerText));
 
                 // Set the output folder name.
                 poolName = apiTools.replaceIllegalCharacters(xmlName[0].InnerText);
                 saveTo += "\\" + poolName;
                 writeToConsole("Updated saveTo to \\Pools\\" + poolName);
+                #endregion
 
+                #region First page rip
                 // Begin ripping the rest of the pool Json.
+                xmlDoc = new XmlDocument();
+                url = poolJsonPage;
+                postXML = apiTools.getJSON(poolJsonPage + "&page=1", header);
+                xmlDoc.LoadXml(postXML);
+
                 XmlNodeList xmlID = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/id");
                 XmlNodeList xmlMD5 = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/md5");
                 XmlNodeList xmlUrl = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/file_url");
@@ -235,6 +240,11 @@ namespace aphrodite {
                         default:
                             rating = "Unknown";
                             break;
+                    }
+
+                    poolDescription = "No description";
+                    if (xmlDescription[0].InnerText != "") {
+                        poolDescription = "\"" + xmlDescription[0].InnerText + "\"";
                     }
 
                     if (xmlArtist[i].ChildNodes.Count > 0) {
@@ -382,14 +392,18 @@ namespace aphrodite {
                                     "\"\n\n";
                     }
                 }
+                #endregion
 
+                #region consecutive pages
                 // Redo above but for other pages.
                 if (pages > 1) {
                     for (int i = 2; i < pages + 1; i++) {
                         writeToConsole("Starting JSON download for page " + i + "...", true);
                         this.Invoke((MethodInvoker)(() => status.Text = "Getting pool information for page " + i));
+                        xmlDoc = new XmlDocument();
+
                         url = poolJson + poolID;
-                        postXML = apiTools.getJSON(poolJson + poolID + poolPageJson + i, header);
+                        postXML = apiTools.getJSON(poolJson + poolID + "&page=" + i, header);
                         writeToConsole("JSON Downloaded.", true);
 
                         writeToConsole("Checking XML...");
@@ -570,7 +584,9 @@ namespace aphrodite {
                         }
                     }
                 }
+                #endregion
 
+                #region pre-download checks
                 // Check for files.
                 if (URLs.Count <= 0) {
                     writeToConsole("No files were found while downloading. Press any key to continue...", true);
@@ -586,7 +602,9 @@ namespace aphrodite {
                     Directory.CreateDirectory(saveTo);
                 if (hasBlacklistedFiles && saveBlacklisted && !mergeBlacklisted && !Directory.Exists(saveTo + "\\blacklisted"))
                     Directory.CreateDirectory(saveTo + "\\blacklisted");
+                #endregion
 
+                #region Downloading
                 // Save .nfo files.
                 if (saveInfo) {
                     poolInfo = poolInfo.TrimEnd('\n');
@@ -695,6 +713,7 @@ namespace aphrodite {
                         }
                     }
                 }
+                #endregion
 
                 // Finish the job.
                 this.BeginInvoke(new MethodInvoker(() => {
@@ -708,40 +727,35 @@ namespace aphrodite {
                 }
                 return true;
             }
-            catch (ThreadAbortException thrEx) {
-                Debug.Print("Thread was requested to be, and has been, aborted.");
-                Debug.Print("==========BEGIN THREADABORTEXCEPTION==========");
-                Debug.Print(thrEx.ToString());
-                Debug.Print("==========END THREADABORTEXCEPTION==========");
+            catch (ThreadAbortException) {
+                Debug.Print("Thread was requested to be, and has been, aborted. (frmPoolDownloader.cs)");
                 return false;
-                throw thrEx;
+            }
+            catch (ObjectDisposedException) {
+                Debug.Print("Seems like the object got disposed. (frmPoolDownloader.cs)");
+                return false;
             }
             catch (WebException WebE) {
-                Debug.Print("A WebException has occured.");
-                Debug.Print("==========BEGIN WEBEXCEPTION==========");
-                Debug.Print(WebE.ToString());
-                Debug.Print("==========END WEBEXCEPTION==========");
+                Debug.Print("A WebException has occured. (frmPoolDownloader.cs)");
                 this.BeginInvoke(new MethodInvoker(() => {
                     status.Text = "A WebException has occured";
                     pbDownloadStatus.State = ProgressBarState.Error;
                     pbTotalStatus.State = ProgressBarState.Error;
                 }));
-                apiTools.webError(WebE, url);
+
+                ErrorLog.ReportWebException(WebE, "frmPoolDownloader.cs", url);
+
                 return false;
-                throw WebE;
             }
             catch (Exception ex) {
-                Debug.Print("A gneral exception has occured.");
-                Debug.Print("==========BEGIN EXCEPTION==========");
-                Debug.Print(ex.ToString());
-                Debug.Print("==========END EXCEPTION==========");
+                Debug.Print("An exception has occured. (frmPoolDownloader.cs)");
                 this.BeginInvoke(new MethodInvoker(() => {
                     status.Text = "A Exception has occured";
                     pbDownloadStatus.State = ProgressBarState.Error;
                     pbTotalStatus.State = ProgressBarState.Error;
                 }));
+                ErrorLog.ReportException(ex, "frmPoolDownloader.cs", false);
                 return false;
-                throw ex;
             }
         }
 

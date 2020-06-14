@@ -70,11 +70,7 @@
             this.mRedownloader = new System.Windows.Forms.MenuItem();
             this.mReverseSearch = new System.Windows.Forms.MenuItem();
             this.mSep = new System.Windows.Forms.MenuItem();
-            this.mIndexer = new System.Windows.Forms.MenuItem();
             this.mParser = new System.Windows.Forms.MenuItem();
-            this.mSep2 = new System.Windows.Forms.MenuItem();
-            this.mInkBunnyDownloader = new System.Windows.Forms.MenuItem();
-            this.mImgurDownloader = new System.Windows.Forms.MenuItem();
             this.mAbout = new System.Windows.Forms.MenuItem();
             this.mProtocol = new System.Windows.Forms.MenuItem();
             this.TouchingTips = new System.Windows.Forms.ToolTip(this.components);
@@ -350,7 +346,7 @@
             this.tbPools.Location = new System.Drawing.Point(4, 22);
             this.tbPools.Name = "tbPools";
             this.tbPools.Padding = new System.Windows.Forms.Padding(3);
-            this.tbPools.Size = new System.Drawing.Size(274, 177);
+            this.tbPools.Size = new System.Drawing.Size(266, 168);
             this.tbPools.TabIndex = 1;
             this.tbPools.Text = "Pool";
             this.tbPools.UseVisualStyleBackColor = true;
@@ -426,7 +422,7 @@
             this.tbImages.Location = new System.Drawing.Point(4, 22);
             this.tbImages.Name = "tbImages";
             this.tbImages.Padding = new System.Windows.Forms.Padding(3);
-            this.tbImages.Size = new System.Drawing.Size(274, 177);
+            this.tbImages.Size = new System.Drawing.Size(266, 168);
             this.tbImages.TabIndex = 3;
             this.tbImages.Text = "Image";
             this.tbImages.UseVisualStyleBackColor = true;
@@ -533,7 +529,7 @@
             this.tbIni.Location = new System.Drawing.Point(4, 22);
             this.tbIni.Name = "tbIni";
             this.tbIni.Padding = new System.Windows.Forms.Padding(3);
-            this.tbIni.Size = new System.Drawing.Size(274, 177);
+            this.tbIni.Size = new System.Drawing.Size(266, 168);
             this.tbIni.TabIndex = 2;
             this.tbIni.Text = "// Portable Mode \\\\";
             this.tbIni.UseVisualStyleBackColor = true;
@@ -579,11 +575,7 @@
             this.mRedownloader,
             this.mReverseSearch,
             this.mSep,
-            this.mIndexer,
-            this.mParser,
-            this.mSep2,
-            this.mInkBunnyDownloader,
-            this.mImgurDownloader});
+            this.mParser});
             this.mTools.Text = "tools";
             // 
             // mWishlist
@@ -609,36 +601,11 @@
             this.mSep.Index = 3;
             this.mSep.Text = "-";
             // 
-            // mIndexer
-            // 
-            this.mIndexer.Index = 4;
-            this.mIndexer.Text = "indexer";
-            this.mIndexer.Click += new System.EventHandler(this.mIndexer_Click);
-            // 
             // mParser
             // 
-            this.mParser.Index = 5;
+            this.mParser.Index = 4;
             this.mParser.Text = "nfo parser";
             this.mParser.Click += new System.EventHandler(this.mParser_Click);
-            // 
-            // mSep2
-            // 
-            this.mSep2.Index = 6;
-            this.mSep2.Text = "-";
-            this.mSep2.Visible = false;
-            // 
-            // mInkBunnyDownloader
-            // 
-            this.mInkBunnyDownloader.Index = 7;
-            this.mInkBunnyDownloader.Text = "inkbunny downloader";
-            this.mInkBunnyDownloader.Visible = false;
-            this.mInkBunnyDownloader.Click += new System.EventHandler(this.mInkBunnyDownloader_Click);
-            // 
-            // mImgurDownloader
-            // 
-            this.mImgurDownloader.Index = 8;
-            this.mImgurDownloader.Text = "imgur downloader";
-            this.mImgurDownloader.Visible = false;
             // 
             // mAbout
             // 
@@ -721,7 +688,6 @@
         private System.Windows.Forms.MenuItem mTools;
         private System.Windows.Forms.MenuItem mWishlist;
         private System.Windows.Forms.MenuItem mRedownloader;
-        private System.Windows.Forms.MenuItem mIndexer;
         private System.Windows.Forms.MenuItem mReverseSearch;
         private System.Windows.Forms.MenuItem mSep;
         private System.Windows.Forms.GroupBox gbtScore;
@@ -747,9 +713,6 @@
         private System.Windows.Forms.CheckBox chkImageSeparateBlacklisted;
         private System.Windows.Forms.CheckBox chkImageSeparateRatings;
         private System.Windows.Forms.MenuItem mParser;
-        private System.Windows.Forms.MenuItem mSep2;
-        private System.Windows.Forms.MenuItem mInkBunnyDownloader;
-        private System.Windows.Forms.MenuItem mImgurDownloader;
     }
 }
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -7,7 +6,6 @@ using System.Net;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
@@ -15,7 +13,8 @@ using System.Xml.Linq;
 namespace aphrodite {
     class apiTools {
         public static readonly string emptyXML = "<root type=\"array\"></root>";
-
+        public static readonly string[] badChars = { "\\", "/", ":", "*", "?", "\"", "<", ">", "|" };
+        public static readonly string[] replacementChars = new string[] { "%5C", "%2F", "%3A", "%2A", "%3F", "%22", "%3C", "%3E", "%7C" };
         public static string getJSON(string url, string header) {
             Debug.Print("getJson starting");
 
@@ -52,37 +51,23 @@ namespace aphrodite {
                     }
                 }
             }
-            catch (ThreadAbortException thrEx) {
-                Debug.Print("Thread was requested to be aborted.");
-                Debug.Print("========== BEGIN THREADABORTEXCEPTION ==========");
-                Debug.Print(thrEx.ToString());
-                Debug.Print("========== END THREADABORTEXCEPTION ==========");
+            catch (ThreadAbortException) {
+                Debug.Print("Thread was requested to be aborted. (apiTools.cs)");
                 return null;
-                throw thrEx;
             }
-            catch (ObjectDisposedException disEx) {
-                Debug.Print("Seems like the object got disposed.");
-                Debug.Print("========== BEGIN OBJDISPOSEDEXCEPTION ==========");
-                Debug.Print(disEx.ToString());
-                Debug.Print("========== END OBJDISPOSEDEXCEPTION ==========");
+            catch (ObjectDisposedException) {
+                Debug.Print("Seems like the object got disposed. (apiTools.cs)");
                 return null;
             }
             catch (WebException WebE) {
-                Debug.Print("A WebException has occured.");
-                Debug.Print("========== BEGIN WEBEXCEPTION ==========");
-                Debug.Print(WebE.ToString());
-                Debug.Print("========== END WEBEXCEPTION ==========");
-                webError(WebE, url);
+                Debug.Print("A WebException has occured. (apiTools.cs)");
+                ErrorLog.ReportException(WebE, "apiTools.cs");
                 return null;
-                throw WebE;
             }
             catch (Exception ex) {
-                Debug.Print("A Exception has occured.");
-                Debug.Print("========== BEGIN EXCEPTION ==========");
-                Debug.Print(ex.ToString());
-                Debug.Print("========== END EXCEPTION ==========");
+                Debug.Print("A Exception has occured. (apiTools.cs)");
+                ErrorLog.ReportException(ex, "apiTools.cs");
                 return null;
-                throw ex;
             }
         }
         public static bool isXmlDead(string xml) {
@@ -92,44 +77,18 @@ namespace aphrodite {
                 return false;
         }
 
-        public static void webError(WebException WebE, string url = "Not defined.") {
-            var resp = WebE.Response as HttpWebResponse;
-            int respID = (int)resp.StatusCode;
-            if (resp != null) {
-                if (respID == 404) {
-                    MessageBox.Show("404 at " + url + "\nThe item was not found.");
-                }
-                else if (respID == 403) {
-                    MessageBox.Show("403 at " + url + "\nYou do not have access to this.");
-                }
-                else if (respID == 421) {
-                    MessageBox.Show("421 at " + url + "\nYou are throttled. Try again later.");
-                }
-                else if (respID == 500) {
-                    MessageBox.Show("500 at " + url + "\nAn error occured on the server. Try again later.");
-                }
-                else if (respID == 502) {
-                    MessageBox.Show("502 at " + url + "\ne621 sent an invalid response. Try again later.");
-                }
-                else if (respID == 503) {
-                    MessageBox.Show("503 at " + url + "\ne621 cannot handle your request or you have exceeded the request limit.\nTry again later, or decrease your downloads");
-                }
-                else {
-                    MessageBox.Show(respID + " at " + url + "\nThe error is not documented in the source. It's either unrelated or not relevant.\nTry again, either now or later.");
-                }
-            }
-
-            Debug.Print(url);
-        }
-
         public static void debugMessage(string message) {
             Debug.Print(message);
         }
 
-        public static string replaceIllegalCharacters(string input) {
-            string[] badChars = { "\\", "/", ":", "*", "?", "\"", "<", ">", "|" };
+        public static string replaceIllegalCharacters(string input, bool WithCodes = true) {
             for (int i = 0; i < badChars.Length; i++) {
-                input = input.Replace(badChars[i], "_");
+                if (WithCodes) {
+                    input = input.Replace(badChars[i], replacementChars[i]);
+                }
+                else {
+                    input = input.Replace(badChars[i], "_");
+                }
             }
             return input;
         }
@@ -153,6 +112,10 @@ namespace aphrodite {
 
         public static string getBlacklistedImageUrl(string md5, string ext) {
             return "https://static1.e621.net/data/" + md5.Substring(0, 2) + "/" + md5.Substring(2, 2) + "." + ext;
+        }
+
+        public static int CountPoolPages(decimal PageCount) {
+            return (int)Math.Ceiling(PageCount / 320);
         }
 
     #region Validation checks for e621

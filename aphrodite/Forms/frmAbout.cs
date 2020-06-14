@@ -1,15 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -21,7 +12,7 @@ namespace aphrodite {
 
         private void About_Shown(object sender, EventArgs e) {
             lbVersion.Text = "v" + Properties.Settings.Default.currentVersion.ToString();
-            if (Properties.Settings.Default.showDebugDates) {
+            if (Program.IsDebug) {
                 lbVersion.Text += " (" + Properties.Settings.Default.debugDate + ")";
                 this.Text = "About aphrodite (debug)";
             }

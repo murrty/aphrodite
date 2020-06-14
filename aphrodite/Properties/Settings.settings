@@ -3,7 +3,10 @@
   <Profiles />
   <Settings>
     <Setting Name="currentVersion" Type="System.Decimal" Scope="Application">
-      <Value Profile="(Default)">1.8</Value>
+      <Value Profile="(Default)">2.0</Value>
+    </Setting>
+    <Setting Name="debugDate" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">2020-05-14</Value>
     </Setting>
   </Settings>
 </SettingsFile>

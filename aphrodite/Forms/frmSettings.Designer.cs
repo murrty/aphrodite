@@ -295,7 +295,7 @@
             this.tbTags.Location = new System.Drawing.Point(4, 22);
             this.tbTags.Name = "tbTags";
             this.tbTags.Padding = new System.Windows.Forms.Padding(3);
-            this.tbTags.Size = new System.Drawing.Size(410, 197);
+            this.tbTags.Size = new System.Drawing.Size(402, 197);
             this.tbTags.TabIndex = 1;
             this.tbTags.Text = "Tags";
             this.tbTags.UseVisualStyleBackColor = true;
@@ -492,7 +492,7 @@
             this.tbPools.Location = new System.Drawing.Point(4, 22);
             this.tbPools.Name = "tbPools";
             this.tbPools.Padding = new System.Windows.Forms.Padding(3);
-            this.tbPools.Size = new System.Drawing.Size(410, 197);
+            this.tbPools.Size = new System.Drawing.Size(402, 197);
             this.tbPools.TabIndex = 2;
             this.tbPools.Text = "Pools";
             this.tbPools.UseVisualStyleBackColor = true;
@@ -560,7 +560,7 @@
             this.tbImages.Location = new System.Drawing.Point(4, 22);
             this.tbImages.Name = "tbImages";
             this.tbImages.Padding = new System.Windows.Forms.Padding(3);
-            this.tbImages.Size = new System.Drawing.Size(410, 197);
+            this.tbImages.Size = new System.Drawing.Size(402, 197);
             this.tbImages.TabIndex = 4;
             this.tbImages.Text = "Images";
             this.tbImages.UseVisualStyleBackColor = true;
@@ -670,7 +670,7 @@
             this.tbProtocol.Location = new System.Drawing.Point(4, 22);
             this.tbProtocol.Name = "tbProtocol";
             this.tbProtocol.Padding = new System.Windows.Forms.Padding(3);
-            this.tbProtocol.Size = new System.Drawing.Size(410, 197);
+            this.tbProtocol.Size = new System.Drawing.Size(402, 197);
             this.tbProtocol.TabIndex = 3;
             this.tbProtocol.Text = "Protocols";
             this.tbProtocol.UseVisualStyleBackColor = true;
@@ -751,7 +751,7 @@
             this.tbPortable.Location = new System.Drawing.Point(4, 22);
             this.tbPortable.Name = "tbPortable";
             this.tbPortable.Padding = new System.Windows.Forms.Padding(3);
-            this.tbPortable.Size = new System.Drawing.Size(410, 197);
+            this.tbPortable.Size = new System.Drawing.Size(402, 197);
             this.tbPortable.TabIndex = 5;
             this.tbPortable.Text = "Portable";
             this.tbPortable.UseVisualStyleBackColor = true;
@@ -792,7 +792,7 @@
             this.tbSchemas.Location = new System.Drawing.Point(4, 22);
             this.tbSchemas.Name = "tbSchemas";
             this.tbSchemas.Padding = new System.Windows.Forms.Padding(3);
-            this.tbSchemas.Size = new System.Drawing.Size(410, 197);
+            this.tbSchemas.Size = new System.Drawing.Size(402, 197);
             this.tbSchemas.TabIndex = 6;
             this.tbSchemas.Text = "Schemas";
             this.tbSchemas.UseVisualStyleBackColor = true;

@@ -8,36 +8,42 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace aphrodite.Properties {
+namespace aphrodite {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "12.0.0.0")]
-    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
+    internal sealed partial class FormSettings : global::System.Configuration.ApplicationSettingsBase {
         
-        private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
+        private static FormSettings defaultInstance = ((FormSettings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new FormSettings())));
         
-        public static Settings Default {
+        public static FormSettings Default {
             get {
                 return defaultInstance;
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2.0")]
-        public decimal currentVersion {
+        [global::System.Configuration.DefaultSettingValueAttribute("-999999")]
+        public int frmMainX {
             get {
-                return ((decimal)(this["currentVersion"]));
+                return ((int)(this["frmMainX"]));
+            }
+            set {
+                this["frmMainX"] = value;
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2020-05-14")]
-        public string debugDate {
+        [global::System.Configuration.DefaultSettingValueAttribute("-999999")]
+        public int frmMainY {
             get {
-                return ((string)(this["debugDate"]));
+                return ((int)(this["frmMainY"]));
+            }
+            set {
+                this["frmMainY"] = value;
             }
         }
     }

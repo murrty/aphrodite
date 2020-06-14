@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
-using System.Xml.Linq;
 
 namespace aphrodite {
     public partial class frmTagDownloader : Form {
@@ -42,24 +37,21 @@ namespace aphrodite {
         public bool separateRatings = true;         // Setting for separating the ratings.
         public bool skipExistingFile = false;       // Skip files if they exist
         public string fileNameSchema = "%md5%";     // The schema used for the file name.
-                                                        // %md5%        = the md5 of the file
-                                                        // %id%         = the id of the page
-                                                        // %rating%     = the rating of the image (eg: safe)
-                                                        // %rating2%    = the lettered rating of the image (eg: s)
-                                                        // %artist%     = the first artist in the artists array
-                                                        // %ext%        = the extension
-                                                        // %fav_count%  = the amount of favorites the post has
-                                                        // %score%      = the score of the post
-                                                        // %author%     = the user who submitted the post to e621
+                                                    // %md5%        = the md5 of the file
+                                                    // %id%         = the id of the page
+                                                    // %rating%     = the rating of the image (eg: safe)
+                                                    // %rating2%    = the lettered rating of the image (eg: s)
+                                                    // %artist%     = the first artist in the artists array
+                                                    // %ext%        = the extension
+                                                    // %fav_count%  = the amount of favorites the post has
+                                                    // %score%      = the score of the post
+                                                    // %author%     = the user who submitted the post to e621
 
         //public static readonly string tagJson = "https://e621.net/post/index.json?tags="; // Old API url.
         public static readonly string tagJson = "https://e621.net/posts.json?tags=";        // Updated API url.
         public static readonly string limitJson = "&limit=320";                             // Maximum limit suffix
         public static readonly string pageJson = "&page=";                                  // Page suffix.
         public static readonly string imgUrl = "https://static1.e621.net/data/";
-
-        string[] badFolderChars = new string[] { "\\", "/", ":", "*", "?", "\"", "<", ">", "|" };                           // The characters forbidden in folder names.
-        string[] replacementFolderChars = new string[] { "%5C", "%2F", "%3A", "%2A", "%3F", "%22", "%3C", "%3E", "%7C" };   // Replacement for the forbidden names.
 
         //       \ = %5C
         //       / = %2F
@@ -261,9 +253,7 @@ namespace aphrodite {
 #region initialization
                 //Properties.Settings.Default.Log += "Tag downloader starting for tags " + tags + "\n";
             // Set the saveTo.
-                string newTagName = tags;
-                for (int i = 0; i < badFolderChars.Length; i++)                                        // Replace bad characters (if present).
-                    newTagName = newTagName.Replace(badFolderChars[i], replacementFolderChars[i]);
+                string newTagName = apiTools.replaceIllegalCharacters(tags);
                 if (useMinimumScore)                                                                    // Add minimum score to folder name.
                     newTagName += " (scores " + (minimumScore) + "+)";
                 if (!this.saveTo.EndsWith("\\Tags\\" + newTagName))                                     // Set the output folder.
@@ -340,6 +330,7 @@ namespace aphrodite {
                 XmlNodeList xmlTagsInvalid = doc.DocumentElement.SelectNodes("/root/posts/item/tags/invalid");
                 XmlNodeList xmlTagsLore = doc.DocumentElement.SelectNodes("/root/posts/item/tags/lore");
                 XmlNodeList xmlTagsMeta = doc.DocumentElement.SelectNodes("/root/posts/item/tags/meta");
+                XmlNodeList xmlTagsLocked = doc.DocumentElement.SelectNodes("/root/posts/item/locked_tags");
                 XmlNodeList xmlScore = doc.DocumentElement.SelectNodes("/root/posts/item/score/total");
                 XmlNodeList xmlScoreUp = doc.DocumentElement.SelectNodes("/root/posts/item/score/up");
                 XmlNodeList xmlScoreDown = doc.DocumentElement.SelectNodes("/root/posts/item/score/down");
@@ -368,6 +359,7 @@ namespace aphrodite {
                     bool alreadyExists = false;                                             // Will determine if the file exists.
                     List<string> foundTags = new List<string>();                            // Get the entire tag list of the file.
                     string foundGraylistedTags = string.Empty;                              // The buffer for the tags that are graylisted.
+                    string ReadTags = string.Empty;
 
                 // Check the image limit & break if reached.
                     if (imageLimit > 0 && imageLimit == totalCount) {
@@ -376,30 +368,61 @@ namespace aphrodite {
                     }
 
                 // Create new tag list to merge all the tag groups into one.
+                    ReadTags += "          General: [";
                     for (int x = 0; x < xmlTagsGeneral[i].ChildNodes.Count; x++) {
                         foundTags.Add(xmlTagsGeneral[i].ChildNodes[x].InnerText);
+                        ReadTags += xmlTagsGeneral[i].ChildNodes[x].InnerText + ", ";
                     }
+                    ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                    ReadTags += "]\n          Species: [";
                     for (int x = 0; x < xmlTagsSpecies[i].ChildNodes.Count; x++) {
                         foundTags.Add(xmlTagsSpecies[i].ChildNodes[x].InnerText);
+                        ReadTags += xmlTagsSpecies[i].ChildNodes[x].InnerText + ", ";
                     }
+                    ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                    ReadTags += "]\n          Character: [";
                     for (int x = 0; x < xmlTagsCharacter[i].ChildNodes.Count; x++) {
                         foundTags.Add(xmlTagsCharacter[i].ChildNodes[x].InnerText);
+                        ReadTags += xmlTagsCharacter[i].ChildNodes[x].InnerText + ", ";
                     }
+                    ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                    ReadTags += "]\n          Copyright: [";
                     for (int x = 0; x < xmlTagsCopyright[i].ChildNodes.Count; x++) {
                         foundTags.Add(xmlTagsCopyright[i].ChildNodes[x].InnerText);
+                        ReadTags += xmlTagsCopyright[i].ChildNodes[x].InnerText + ", ";
                     }
+                    ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                    ReadTags += "]\n          Artist: [";
                     for (int x = 0; x < xmlTagsArtist[i].ChildNodes.Count; x++) {
                         foundTags.Add(xmlTagsArtist[i].ChildNodes[x].InnerText);
+                        ReadTags += xmlTagsArtist[i].ChildNodes[x].InnerText + ", ";
                     }
+                    ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                    ReadTags += "]\n          Invalid: [";
                     for (int x = 0; x < xmlTagsInvalid[i].ChildNodes.Count; x++) {
                         foundTags.Add(xmlTagsInvalid[i].ChildNodes[x].InnerText);
+                        ReadTags += xmlTagsInvalid[i].ChildNodes[x].InnerText + ", ";
                     }
+                    ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                    ReadTags += "]\n          Lore: [";
                     for (int x = 0; x < xmlTagsLore[i].ChildNodes.Count; x++) {
                         foundTags.Add(xmlTagsLore[i].ChildNodes[x].InnerText);
+                        ReadTags += xmlTagsLore[i].ChildNodes[x].InnerText + ", ";
                     }
+                    ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                    ReadTags += "]\n          Meta: [";
                     for (int x = 0; x < xmlTagsMeta[i].ChildNodes.Count; x++) {
                         foundTags.Add(xmlTagsMeta[i].ChildNodes[x].InnerText);
+                        ReadTags += xmlTagsMeta[i].ChildNodes[x].InnerText + ", ";
                     }
+                    ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                    ReadTags += "]\n          Locked tags: [";
+                    for (int x = 0; x < xmlTagsLocked[i].ChildNodes.Count; x++) {
+                        foundTags.Add(xmlTagsLocked[i].ChildNodes[x].InnerText);
+                        ReadTags += xmlTagsLocked[i].ChildNodes[x].InnerText + ", ";
+                    }
+                    ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                    ReadTags += "]\n";
 
                 // Set the rating for the .nfo file.
                     if (rating == "e")
@@ -712,7 +735,7 @@ namespace aphrodite {
                                    "    MD5: " + xmlMD5[i].InnerText + "\n" +
                                    "    URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\n" +
                                    "    ARTIST(S): " + artists + "\n" +
-                                   "    TAGS: " + CombinedTags + //string.Concat(foundTags.ToArray()) + "\n" +
+                                   "    TAGS:\n" + CombinedTags + //string.Concat(foundTags.ToArray()) + "\n" +
                                    "    SCORE: Up " + xmlScoreUp[i].InnerText + ", Down " + xmlScoreDown[i].InnerText + ", Total " + xmlScore[i].InnerText + "\n" +
                                    "    RATING: " + rating + "\n" +
                                    "    DESCRIPITON:\n    \"" + xmlDescription[i].InnerText + "\"" +
@@ -780,7 +803,7 @@ namespace aphrodite {
                     bool deadPage = false;
                     while (!deadPage) {
                         changeTask("Downloading tag information for page " + (pageCount) + "...");
-                        url = tagJson + tags + pageJson + pageCount + limitJson;
+                        url = tagJson + tags + limitJson + pageJson + pageCount;
                         xml = apiTools.getJSON(url, webHeader);
 
                         if (pageLimit > 0 && pageCount > pageLimit)
@@ -804,6 +827,7 @@ namespace aphrodite {
                         xmlTagsInvalid = doc.DocumentElement.SelectNodes("/root/posts/item/tags/invalid");
                         xmlTagsLore = doc.DocumentElement.SelectNodes("/root/posts/item/tags/lore");
                         xmlTagsMeta = doc.DocumentElement.SelectNodes("/root/posts/item/tags/meta");
+                        xmlTagsLocked = doc.DocumentElement.SelectNodes("/root/posts/item/locked_tags");
                         xmlScore = doc.DocumentElement.SelectNodes("/root/posts/item/score/total");
                         xmlScoreUp = doc.DocumentElement.SelectNodes("/root/posts/item/score/up");
                         xmlScoreDown = doc.DocumentElement.SelectNodes("/root/posts/item/score/down");
@@ -825,36 +849,68 @@ namespace aphrodite {
                             bool alreadyExists = false;
                             List<string> foundTags = new List<string>();
                             string foundGraylistedTags = string.Empty;
+                            string ReadTags = string.Empty;
 
                             if (imageLimit > 0 && imageLimit == totalCount) {
                                 morePages = false;
                                 break;
                             }
 
+                            ReadTags += "          General: [";
                             for (int x = 0; x < xmlTagsGeneral[i].ChildNodes.Count; x++) {
                                 foundTags.Add(xmlTagsGeneral[i].ChildNodes[x].InnerText);
+                                ReadTags += xmlTagsGeneral[i].ChildNodes[x].InnerText + ", ";
                             }
+                            ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                            ReadTags += "]\n          Species: [";
                             for (int x = 0; x < xmlTagsSpecies[i].ChildNodes.Count; x++) {
                                 foundTags.Add(xmlTagsSpecies[i].ChildNodes[x].InnerText);
+                                ReadTags += xmlTagsSpecies[i].ChildNodes[x].InnerText + ", ";
                             }
+                            ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                            ReadTags += "]\n          Character: [";
                             for (int x = 0; x < xmlTagsCharacter[i].ChildNodes.Count; x++) {
                                 foundTags.Add(xmlTagsCharacter[i].ChildNodes[x].InnerText);
+                                ReadTags += xmlTagsCharacter[i].ChildNodes[x].InnerText + ", ";
                             }
+                            ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                            ReadTags += "]\n          Copyright: [";
                             for (int x = 0; x < xmlTagsCopyright[i].ChildNodes.Count; x++) {
                                 foundTags.Add(xmlTagsCopyright[i].ChildNodes[x].InnerText);
+                                ReadTags += xmlTagsCopyright[i].ChildNodes[x].InnerText + ", ";
                             }
+                            ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                            ReadTags += "]\n          Artist: [";
                             for (int x = 0; x < xmlTagsArtist[i].ChildNodes.Count; x++) {
                                 foundTags.Add(xmlTagsArtist[i].ChildNodes[x].InnerText);
+                                ReadTags += xmlTagsArtist[i].ChildNodes[x].InnerText + ", ";
                             }
+                            ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                            ReadTags += "]\n          Invalid: [";
                             for (int x = 0; x < xmlTagsInvalid[i].ChildNodes.Count; x++) {
                                 foundTags.Add(xmlTagsInvalid[i].ChildNodes[x].InnerText);
+                                ReadTags += xmlTagsInvalid[i].ChildNodes[x].InnerText + ", ";
                             }
+                            ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                            ReadTags += "]\n          Lore: [";
                             for (int x = 0; x < xmlTagsLore[i].ChildNodes.Count; x++) {
                                 foundTags.Add(xmlTagsLore[i].ChildNodes[x].InnerText);
+                                ReadTags += xmlTagsLore[i].ChildNodes[x].InnerText + ", ";
                             }
+                            ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                            ReadTags += "]\n          Meta: [";
                             for (int x = 0; x < xmlTagsMeta[i].ChildNodes.Count; x++) {
                                 foundTags.Add(xmlTagsMeta[i].ChildNodes[x].InnerText);
+                                ReadTags += xmlTagsMeta[i].ChildNodes[x].InnerText + ", ";
                             }
+                            ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                            ReadTags += "]\n          Locked tags: [";
+                            for (int x = 0; x < xmlTagsLocked[i].ChildNodes.Count; x++) {
+                                foundTags.Add(xmlTagsLocked[i].ChildNodes[x].InnerText);
+                                ReadTags += xmlTagsLocked[i].ChildNodes[x].InnerText + ", ";
+                            }
+                            ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                            ReadTags += "]\n";
 
                             if (rating == "e")
                                 rating = "Explicit";
@@ -1114,7 +1170,7 @@ namespace aphrodite {
                                                  "    MD5: " + xmlMD5[i].InnerText + "\n" +
                                                  "    URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\n" +
                                                  "    ARTIST(S): " + artists + "\n" +
-                                                 "    TAGS: " + CombinedTags + //string.Concat(foundTags.ToArray()) + "\n" +
+                                                 "    TAGS:\n" + CombinedTags + //string.Concat(foundTags.ToArray()) + "\n" +
                                                  "    SCORE: Up " + xmlScoreUp[i].InnerText + ", Down " + xmlScoreDown[i].InnerText + ", Total " + xmlScore[i].InnerText + "\n" +
                                                  "    RATING: " + rating + "\n" +
                                                  "    DESCRIPITON:\n    \"" + xmlDescription[i].InnerText + "\"\n" +
@@ -1587,48 +1643,33 @@ namespace aphrodite {
                 return true;
 #endregion
             }
-            catch (ThreadAbortException thrEx) {
-                Debug.Print("Thread was requested to be, and has been, aborted.");
-                Debug.Print("========== BEGIN THREADABORTEXCEPTION ==========");
-                Debug.Print(thrEx.ToString());
-                Debug.Print("========== END THREADABORTEXCEPTION ==========");
-                //Properties.Settings.Default.Log += "Thread aborted for tag downloader\n";
+            catch (ThreadAbortException) {
+                Debug.Print("Thread was requested to be, and has been, aborted. (frmTagDownloader.cs)");
                 return false;
-                throw thrEx;
+            }
+            catch (ObjectDisposedException) {
+                Debug.Print("Seems like the object got disposed. (frmTagDownloader.cs)");
+                return false;
             }
             catch (WebException WebE) {
-                Debug.Print("A WebException has occured.");
-                Debug.Print("========== BEGIN WEBEXCEPTION ==========");
-                Debug.Print(WebE.ToString());
-                Debug.Print("========== END WEBEXCEPTION ==========");
-                //Properties.Settings.Default.Log += "WebException for tag downloader\n";
-                //Properties.Settings.Default.Log += WebE.ToString() + "\n";
+                Debug.Print("A WebException has occured. (frmTagDownloader.cs)");
                 this.BeginInvoke(new MethodInvoker(() => {
                     status.Text = "A WebException has occured";
                     pbDownloadStatus.State = ProgressBarState.Error;
                     pbTotalStatus.State = ProgressBarState.Error;
                 }));
-                apiTools.webError(WebE, url);
+                ErrorLog.ReportWebException(WebE,url, "frmTagDownloader.cs");
                 return false;
-                throw WebE;
             }
             catch (Exception ex) {
-                Debug.Print("A gneral exception has occured.");
-                Debug.Print("========== BEGIN EXCEPTION ==========");
-                Debug.Print(ex.ToString());
-                Debug.Print("========== END EXCEPTION ==========");
-                //Properties.Settings.Default.Log += "General exception for tag downloader\nMessage: ";
-                //Properties.Settings.Default.Log += ex.Message.ToString() + "\nSource: ";
-                //Properties.Settings.Default.Log += ex.Source.ToString() + "\nStackTrace: ";
-                //Properties.Settings.Default.Log += ex.StackTrace.ToString() + "\nTarget: ";
-                //Properties.Settings.Default.Log += ex.TargetSite.ToString() +'\n';
+                Debug.Print("A gneral exception has occured. (frmTagDownloader.cs)");
                 this.BeginInvoke(new MethodInvoker(() => {
                     status.Text = "A Exception has occured";
                     pbDownloadStatus.State = ProgressBarState.Error;
                     pbTotalStatus.State = ProgressBarState.Error;
                 }));
+                ErrorLog.ReportException(ex, "frmTagDownloader.cs");
                 return false;
-                throw ex;
             }
         }
         private bool downloadPage(string pageURL) {
@@ -1660,9 +1701,7 @@ namespace aphrodite {
 
             try {
             // Set the saveTo.
-                string newTagName = tags;
-                for (int i = 0; i < badFolderChars.Length; i++)                                             // Replace bad characters (if present).
-                    newTagName = newTagName.Replace(badFolderChars[i], replacementFolderChars[i]);
+                string newTagName = apiTools.replaceIllegalCharacters(tags);
                 if (useMinimumScore)                                                                        // Add minimum score to folder name.
                     newTagName += " (scores " + (minimumScore) + "+)";
                 if (!this.saveTo.EndsWith("\\Pages\\" + newTagName + " (page " + pageNumber + ")"))   // Set the output folder.
@@ -2227,30 +2266,23 @@ namespace aphrodite {
                 }));
                 return true;
             }
-            catch (ThreadAbortException thrEx) {
-                Debug.Print("Thread was requested to be, and has been, aborted.");
-                Debug.Print("========== BEGIN THREADABORTEXCEPTION ==========");
-                Debug.Print(thrEx.ToString());
-                Debug.Print("========== END THREADABORTEXCEPTION ==========");
+            catch (ThreadAbortException) {
+                Debug.Print("Thread was requested to be, and has been, aborted. (frmTagDownloader.cs)");
                 return false;
-                throw thrEx;
+            }
+            catch (ObjectDisposedException) {
+                Debug.Print("An ObjectDisposedException occured. (frmTagDownloader.cs)");
+                return false;
             }
             catch (WebException WebE) {
-                Debug.Print("A WebException has occured.");
-                Debug.Print("========== BEGIN WEBEXCEPTION ==========");
-                Debug.Print(WebE.ToString());
-                Debug.Print("========== END WEBEXCEPTION ==========");
-                apiTools.webError(WebE, url);
+                Debug.Print("A WebException has occured. (frmTagDownloader.cs)");
+                ErrorLog.ReportWebException(WebE, url, "frmTagDownloader.cs");
                 return false;
-                throw WebE;
             }
             catch (Exception ex) {
-                Debug.Print("A gneral exception has occured.");
-                Debug.Print("========== BEGIN EXCEPTION ==========");
-                Debug.Print(ex.ToString());
-                Debug.Print("========== END EXCEPTION ==========");
+                Debug.Print("A gneral exception has occured. (frmTagDowloader.cs)");
+                ErrorLog.ReportException(ex, "frmTagDownloader.cs");
                 return false;
-                throw ex;
             }
         }
 

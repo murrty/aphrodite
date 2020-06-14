@@ -1,17 +1,13 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Shell;
 
@@ -19,17 +15,8 @@ namespace aphrodite {
     public partial class frmMain : Form {
 
     #region Variables
-        bool isAdmin = false;           // Determines if the application is running as admin.
         bool useIni = false;            // Determinse if the ini file will be used, enabling portable mode.
         IniFile ini = new IniFile();    // The ini file variable, doesn't create anything, or enable portable mode, on it's own.
-
-        JumpList jList = new JumpList();
-        JumpTask jStt = new JumpTask() { Title = "Change settings", Description = "Change aphrodite's settings", Arguments = "configuresettings", IconResourcePath = Environment.CurrentDirectory + "\\" + AppDomain.CurrentDomain.FriendlyName };
-        JumpTask jRdl = new JumpTask() { Title = "Redownloader", Description = "Redownload tags or pools", Arguments = "jRedownloader", IconResourcePath = Environment.CurrentDirectory + "\\" + AppDomain.CurrentDomain.FriendlyName };
-        JumpTask jPwl = new JumpTask() { Title = "Pool Wishlist", Description = "Show pool wishlist", Arguments = "jWishlist", IconResourcePath = Environment.CurrentDirectory + "\\" + AppDomain.CurrentDomain.FriendlyName };
-        JumpTask jBl = new JumpTask() { Title = "Modify blacklists", Description = "Add, Remove, or Edit the blacklists", Arguments = "jBlacklist", IconResourcePath = Environment.CurrentDirectory + "\\" + AppDomain.CurrentDomain.FriendlyName };
-        //JumpTask jPool = new JumpTask() { Title = "Download a pool", Description = "Download pool", Arguments = "jPool", IconResourcePath = Environment.CurrentDirectory + "\\" + AppDomain.CurrentDomain.FriendlyName };
-        //JumpTask jTag = new JumpTask() { Title = "Download tag(s)", Description = "Download tag(s)", Arguments = "jTags", IconResourcePath = Environment.CurrentDirectory + "\\" + AppDomain.CurrentDomain.FriendlyName };
 
         // Valid protocols:
         //                  'pools:'
@@ -64,24 +51,9 @@ namespace aphrodite {
             InitializeComponent();
             this.Icon = Properties.Resources.Brad;
 
-            if (Properties.Settings.Default.showDebugDates)
+            if (Program.IsDebug) {
                 this.Text += " (debug " + Properties.Settings.Default.debugDate + ")";
-
-            List<JumpTask>taskList = new List<JumpTask>();
-            taskList.Add(jStt);
-            taskList.Add(jRdl);
-            taskList.Add(jPwl);
-            taskList.Add(jBl);
-            //taskList.Add(jPool);
-            //taskList.Add(jTag);
-
-            jList.JumpItems.AddRange(taskList);
-            jList.Apply();
-
-            if (!(new WindowsPrincipal(WindowsIdentity.GetCurrent())).IsInRole(WindowsBuiltInRole.Administrator))
-                isAdmin = false;
-            else
-                isAdmin = true;
+            }
 
             if (File.Exists(Environment.CurrentDirectory + "\\aphrodite.ini"))
                 if (ini.KeyExists("useIni"))
@@ -106,7 +78,7 @@ namespace aphrodite {
                 string arg = Environment.GetCommandLineArgs()[i]; // buffer for the arg
                 if (arg.StartsWith("installProtocol")) { // if the argument is installProtocol
                     frmSettings settings = new frmSettings(); // start the protocol section of the settings.
-                    settings.isAdmin = isAdmin;
+                    settings.isAdmin = Program.IsAdmin;
                     settings.protocol = true;
                     settings.useIni = useIni;
                     settings.ShowDialog();
@@ -114,7 +86,7 @@ namespace aphrodite {
                 if (arg.StartsWith("-settings") || arg.StartsWith("tags:configuresettings") || arg.StartsWith("pools:configuresettings") || arg.StartsWith("images:configuresettings") || arg.StartsWith("-protocol") || arg.StartsWith("-portable") || arg.StartsWith("-schema") || arg.StartsWith("configuresettings")) { // check for configure settings argument
                     frmSettings settings = new frmSettings(); // configure settings argument was passed
                     settings.pluginChange = true; // boolean to switch to the tab on load
-                    settings.isAdmin = isAdmin; // sets isAdmin for the protocol.
+                    settings.isAdmin = Program.IsAdmin; // sets isAdmin for the protocol.
 
                     switch (arg.ToLower()) {
                         case "-settings":
@@ -349,7 +321,7 @@ namespace aphrodite {
 
         private void mSettings_Click(object sender, EventArgs e) {
             frmSettings settings = new frmSettings();
-            settings.isAdmin = isAdmin;
+            settings.isAdmin = Program.IsAdmin;
             settings.useIni = useIni;
             settings.ShowDialog();
 
@@ -390,7 +362,7 @@ namespace aphrodite {
             blackList.ShowDialog();
         }
         private void mReverseSearch_Click(object sender, EventArgs e) {
-            Process.Start("https://iqdb.harry.lu/");
+            Process.Start("https://saucenao.com/index.php");
         }
         private void mWishlist_Click(object sender, EventArgs e) {
             if (useIni)
@@ -406,10 +378,6 @@ namespace aphrodite {
             rd.useIni = useIni;
             rd.Show();
         }
-        private void mIndexer_Click(object sender, EventArgs e) {
-            frmIndexer idx = new frmIndexer();
-            idx.Show();
-        }
         private void mParser_Click(object sender, EventArgs e) {
             frmParser psr = new frmParser();
             psr.ShowDialog();
@@ -421,7 +389,7 @@ namespace aphrodite {
         }
         private void mProtocol_Click(object sender, EventArgs e) {
             frmSettings settings = new frmSettings();
-            settings.isAdmin = isAdmin;
+            settings.isAdmin = Program.IsAdmin;
             settings.protocol = true;
             settings.ShowDialog();
         }
@@ -1012,12 +980,5 @@ namespace aphrodite {
         }
         // ARGUMENT DOWNLOADS ONLY // Downloads image from URL.
     #endregion
-
-    #region Future work here, maybe
-        private void mInkBunnyDownloader_Click(object sender, EventArgs e) {
-            //frmInkMain ibDownloader = new frmInkMain();
-            //ibDownloader.Show();
-        }
-     #endregion
     }
 }

@@ -1,15 +1,8 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace aphrodite {
@@ -159,8 +152,8 @@ namespace aphrodite {
             }
             else {
               // General
-                if (txtSaveTo.Text != Environment.CurrentDirectory)
-                    Settings.Default.saveLocation = txtSaveTo.Text;
+                //if (txtSaveTo.Text != Environment.CurrentDirectory)
+                Settings.Default.saveLocation = txtSaveTo.Text;
                 Settings.Default.saveInfo = chkSaveInfo.Checked;
                 Settings.Default.saveBlacklisted = chkSaveBlacklisted.Checked;
                 Settings.Default.ignoreFinish = chkIgnoreFinish.Checked;

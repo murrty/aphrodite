@@ -71,6 +71,7 @@
   <ItemGroup>
     <Compile Include="Classes\apiTools.cs" />
     <Compile Include="Classes\Downloader.cs" />
+    <Compile Include="Classes\ErrorLog.cs" />
     <Compile Include="Classes\ExProgressBar.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -81,6 +82,18 @@
     <Compile Include="Classes\Metadata.cs" />
     <Compile Include="Classes\UndesiredTags.cs" />
     <Compile Include="Classes\Updater.cs" />
+    <Compile Include="Forms\frmException.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmException.Designer.cs">
+      <DependentUpon>frmException.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmUpdateAvailable.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmUpdateAvailable.Designer.cs">
+      <DependentUpon>frmUpdateAvailable.cs</DependentUpon>
+    </Compile>
     <Compile Include="Settings\FormSettings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -147,12 +160,6 @@
     <Compile Include="Forms\frmRedownloader.Designer.cs">
       <DependentUpon>frmRedownloader.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\frmIndexer.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\frmIndexer.designer.cs">
-      <DependentUpon>frmIndexer.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\frmUndesiredTags.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -187,6 +194,9 @@
     <EmbeddedResource Include="Forms\frmBlacklist.resx">
       <DependentUpon>frmBlacklist.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmException.resx">
+      <DependentUpon>frmException.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmImageDownloader.resx">
       <DependentUpon>frmImageDownloader.cs</DependentUpon>
     </EmbeddedResource>
@@ -211,11 +221,11 @@
     <EmbeddedResource Include="Forms\frmRedownloader.resx">
       <DependentUpon>frmRedownloader.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\frmIndexer.resx">
-      <DependentUpon>frmIndexer.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmUndesiredTags.resx">
       <DependentUpon>frmUndesiredTags.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmUpdateAvailable.resx">
+      <DependentUpon>frmUpdateAvailable.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
