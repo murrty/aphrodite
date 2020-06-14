@@ -36,6 +36,10 @@ namespace aphrodite {
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 
+                if (IsDebug) {
+                    //ErrorLog.ReportCustomException("Test", "Program.cs");
+                }
+
                 if (Settings.Default.firstTime) {
                     MessageBox.Show(
                         "This is your first time running aphrodite, so read this before continuing:\n\n" +

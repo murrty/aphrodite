@@ -20,7 +20,7 @@ namespace aphrodite {
 
         public static decimal getCloudVersion() {
             try {
-                string xml = apiTools.getJSON(githubJSON, Program.UserAgent);
+                string xml = apiTools.GetJSON(githubJSON, Program.UserAgent);
                 XmlDocument doc = new XmlDocument();
                 doc.LoadXml(xml);
                 XmlNodeList xmlTag = doc.DocumentElement.SelectNodes("/root/tag_name");
@@ -28,7 +28,7 @@ namespace aphrodite {
                 return decimal.Parse(xmlTag[0].InnerText.Replace(".", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), NumberStyles.Any, CultureInfo.InvariantCulture);
             }
             catch (Exception ex) {
-                Debug.Print(ex.ToString());
+                apiTools.SendDebugMessage(ex.ToString());
                 return -1;
             }
         }
@@ -45,7 +45,7 @@ namespace aphrodite {
                     return false;
             }
             catch (Exception ex) {
-                Debug.Print(ex.ToString());
+                apiTools.SendDebugMessage(ex.ToString());
                 return false;
             }
         }

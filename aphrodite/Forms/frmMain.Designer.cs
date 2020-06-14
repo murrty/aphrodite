@@ -44,19 +44,15 @@
             this.numScore = new System.Windows.Forms.NumericUpDown();
             this.label2 = new System.Windows.Forms.Label();
             this.tbPools = new System.Windows.Forms.TabPage();
-            this.chkPoolName = new System.Windows.Forms.CheckBox();
             this.chkMerge = new System.Windows.Forms.CheckBox();
             this.chkOpen = new System.Windows.Forms.CheckBox();
             this.btnDownloadPool = new System.Windows.Forms.Button();
             this.txtID = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.tbImages = new System.Windows.Forms.TabPage();
-            this.chkUseForm = new System.Windows.Forms.CheckBox();
+            this.chkImageUseForm = new System.Windows.Forms.CheckBox();
             this.chkImageSeparateBlacklisted = new System.Windows.Forms.CheckBox();
             this.chkImageSeparateRatings = new System.Windows.Forms.CheckBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.rbImageArtistMD5 = new System.Windows.Forms.RadioButton();
-            this.rbImageMD5 = new System.Windows.Forms.RadioButton();
             this.btnDownloadImage = new System.Windows.Forms.Button();
             this.txtImageUrl = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -74,6 +70,7 @@
             this.mAbout = new System.Windows.Forms.MenuItem();
             this.mProtocol = new System.Windows.Forms.MenuItem();
             this.TouchingTips = new System.Windows.Forms.ToolTip(this.components);
+            this.chkImageSeparateArtists = new System.Windows.Forms.CheckBox();
             this.tbMain.SuspendLayout();
             this.tbTags.SuspendLayout();
             this.gbtPageLimit.SuspendLayout();
@@ -85,7 +82,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.numScore)).BeginInit();
             this.tbPools.SuspendLayout();
             this.tbImages.SuspendLayout();
-            this.groupBox1.SuspendLayout();
             this.tbIni.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -337,7 +333,6 @@
             // 
             // tbPools
             // 
-            this.tbPools.Controls.Add(this.chkPoolName);
             this.tbPools.Controls.Add(this.chkMerge);
             this.tbPools.Controls.Add(this.chkOpen);
             this.tbPools.Controls.Add(this.btnDownloadPool);
@@ -351,20 +346,10 @@
             this.tbPools.Text = "Pool";
             this.tbPools.UseVisualStyleBackColor = true;
             // 
-            // chkPoolName
-            // 
-            this.chkPoolName.AutoSize = true;
-            this.chkPoolName.Location = new System.Drawing.Point(53, 69);
-            this.chkPoolName.Name = "chkPoolName";
-            this.chkPoolName.Size = new System.Drawing.Size(189, 17);
-            this.chkPoolName.TabIndex = 2;
-            this.chkPoolName.Text = "Use pool name for files (pool_###)";
-            this.chkPoolName.UseVisualStyleBackColor = true;
-            // 
             // chkMerge
             // 
             this.chkMerge.AutoSize = true;
-            this.chkMerge.Location = new System.Drawing.Point(53, 114);
+            this.chkMerge.Location = new System.Drawing.Point(53, 107);
             this.chkMerge.Name = "chkMerge";
             this.chkMerge.Size = new System.Drawing.Size(169, 17);
             this.chkMerge.TabIndex = 4;
@@ -374,7 +359,7 @@
             // chkOpen
             // 
             this.chkOpen.AutoSize = true;
-            this.chkOpen.Location = new System.Drawing.Point(53, 91);
+            this.chkOpen.Location = new System.Drawing.Point(53, 84);
             this.chkOpen.Name = "chkOpen";
             this.chkOpen.Size = new System.Drawing.Size(139, 17);
             this.chkOpen.TabIndex = 3;
@@ -412,10 +397,10 @@
             // 
             // tbImages
             // 
-            this.tbImages.Controls.Add(this.chkUseForm);
+            this.tbImages.Controls.Add(this.chkImageSeparateArtists);
+            this.tbImages.Controls.Add(this.chkImageUseForm);
             this.tbImages.Controls.Add(this.chkImageSeparateBlacklisted);
             this.tbImages.Controls.Add(this.chkImageSeparateRatings);
-            this.tbImages.Controls.Add(this.groupBox1);
             this.tbImages.Controls.Add(this.btnDownloadImage);
             this.tbImages.Controls.Add(this.txtImageUrl);
             this.tbImages.Controls.Add(this.label4);
@@ -427,22 +412,22 @@
             this.tbImages.Text = "Image";
             this.tbImages.UseVisualStyleBackColor = true;
             // 
-            // chkUseForm
+            // chkImageUseForm
             // 
-            this.chkUseForm.AutoSize = true;
-            this.chkUseForm.Location = new System.Drawing.Point(62, 148);
-            this.chkUseForm.Name = "chkUseForm";
-            this.chkUseForm.Size = new System.Drawing.Size(151, 17);
-            this.chkUseForm.TabIndex = 5;
-            this.chkUseForm.Text = "Use form to show progress";
-            this.chkUseForm.UseVisualStyleBackColor = true;
+            this.chkImageUseForm.AutoSize = true;
+            this.chkImageUseForm.Location = new System.Drawing.Point(61, 137);
+            this.chkImageUseForm.Name = "chkImageUseForm";
+            this.chkImageUseForm.Size = new System.Drawing.Size(151, 17);
+            this.chkImageUseForm.TabIndex = 5;
+            this.chkImageUseForm.Text = "Use form to show progress";
+            this.chkImageUseForm.UseVisualStyleBackColor = true;
             // 
             // chkImageSeparateBlacklisted
             // 
             this.chkImageSeparateBlacklisted.AutoSize = true;
             this.chkImageSeparateBlacklisted.Checked = true;
             this.chkImageSeparateBlacklisted.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkImageSeparateBlacklisted.Location = new System.Drawing.Point(77, 125);
+            this.chkImageSeparateBlacklisted.Location = new System.Drawing.Point(77, 91);
             this.chkImageSeparateBlacklisted.Name = "chkImageSeparateBlacklisted";
             this.chkImageSeparateBlacklisted.Size = new System.Drawing.Size(122, 17);
             this.chkImageSeparateBlacklisted.TabIndex = 4;
@@ -454,46 +439,12 @@
             this.chkImageSeparateRatings.AutoSize = true;
             this.chkImageSeparateRatings.Checked = true;
             this.chkImageSeparateRatings.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkImageSeparateRatings.Location = new System.Drawing.Point(86, 102);
+            this.chkImageSeparateRatings.Location = new System.Drawing.Point(86, 68);
             this.chkImageSeparateRatings.Name = "chkImageSeparateRatings";
             this.chkImageSeparateRatings.Size = new System.Drawing.Size(103, 17);
             this.chkImageSeparateRatings.TabIndex = 3;
             this.chkImageSeparateRatings.Text = "Separate ratings";
             this.chkImageSeparateRatings.UseVisualStyleBackColor = true;
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.rbImageArtistMD5);
-            this.groupBox1.Controls.Add(this.rbImageMD5);
-            this.groupBox1.Location = new System.Drawing.Point(61, 49);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(152, 49);
-            this.groupBox1.TabIndex = 2;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Save file as...";
-            this.groupBox1.Visible = false;
-            // 
-            // rbImageArtistMD5
-            // 
-            this.rbImageArtistMD5.AutoSize = true;
-            this.rbImageArtistMD5.Checked = true;
-            this.rbImageArtistMD5.Location = new System.Drawing.Point(6, 19);
-            this.rbImageArtistMD5.Name = "rbImageArtistMD5";
-            this.rbImageArtistMD5.Size = new System.Drawing.Size(73, 17);
-            this.rbImageArtistMD5.TabIndex = 1;
-            this.rbImageArtistMD5.TabStop = true;
-            this.rbImageArtistMD5.Text = "artist_md5";
-            this.rbImageArtistMD5.UseVisualStyleBackColor = true;
-            // 
-            // rbImageMD5
-            // 
-            this.rbImageMD5.AutoSize = true;
-            this.rbImageMD5.Location = new System.Drawing.Point(95, 19);
-            this.rbImageMD5.Name = "rbImageMD5";
-            this.rbImageMD5.Size = new System.Drawing.Size(45, 17);
-            this.rbImageMD5.TabIndex = 2;
-            this.rbImageMD5.Text = "md5";
-            this.rbImageMD5.UseVisualStyleBackColor = true;
             // 
             // btnDownloadImage
             // 
@@ -621,6 +572,16 @@
             this.mProtocol.Visible = false;
             this.mProtocol.Click += new System.EventHandler(this.mProtocol_Click);
             // 
+            // chkImageSeparateArtists
+            // 
+            this.chkImageSeparateArtists.AutoSize = true;
+            this.chkImageSeparateArtists.Location = new System.Drawing.Point(84, 114);
+            this.chkImageSeparateArtists.Name = "chkImageSeparateArtists";
+            this.chkImageSeparateArtists.Size = new System.Drawing.Size(99, 17);
+            this.chkImageSeparateArtists.TabIndex = 16;
+            this.chkImageSeparateArtists.Text = "Separate artists";
+            this.chkImageSeparateArtists.UseVisualStyleBackColor = true;
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -653,8 +614,6 @@
             this.tbPools.PerformLayout();
             this.tbImages.ResumeLayout(false);
             this.tbImages.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
             this.tbIni.ResumeLayout(false);
             this.tbIni.PerformLayout();
             this.ResumeLayout(false);
@@ -699,20 +658,17 @@
         private System.Windows.Forms.CheckBox chkScoreAsTag;
         private System.Windows.Forms.ToolTip TouchingTips;
         private System.Windows.Forms.CheckBox chkSeparateRatings;
-        private System.Windows.Forms.CheckBox chkPoolName;
         private System.Windows.Forms.TabPage tbIni;
         private System.Windows.Forms.Label lbIni;
         private System.Windows.Forms.TabPage tbImages;
         private System.Windows.Forms.TextBox txtImageUrl;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button btnDownloadImage;
-        private System.Windows.Forms.RadioButton rbImageArtistMD5;
-        private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.RadioButton rbImageMD5;
-        private System.Windows.Forms.CheckBox chkUseForm;
+        private System.Windows.Forms.CheckBox chkImageUseForm;
         private System.Windows.Forms.CheckBox chkImageSeparateBlacklisted;
         private System.Windows.Forms.CheckBox chkImageSeparateRatings;
         private System.Windows.Forms.MenuItem mParser;
+        private System.Windows.Forms.CheckBox chkImageSeparateArtists;
     }
 }
 

@@ -455,6 +455,18 @@ namespace aphrodite {
             //}
         }
 
+        /// <summary>
+        /// Reports a custom-styled exception that is designed in the method that calls it.
+        /// </summary>
+        /// <param name="Exception">The (stylized) exception</param>
+        /// <param name="ErrorClass">The class that it originated from</param>
+        public static void ReportCustomException(string Exception, string ErrorClass) {
+            frmException fException = new frmException();
+            fException.SetCustomDescription = true;
+            fException.CustomDescription = Exception + "\n\nThis exception occured at: " + ErrorClass;
+            fException.ShowDialog();
+        }
+
         public static void WriteToFile(string Buffer) {
             try {
                 string FileName = string.Format("\\error_{0}.log", DateTime.Now);

@@ -113,41 +113,50 @@ namespace aphrodite {
 
             // Begin to get the XML
                 url = postJson;
-                string postXML = apiTools.getJSON(postJson, header);
+                string postXML = apiTools.GetJSON(postJson, header);
 
             // Check the XML.
-                if (postXML == apiTools.emptyXML || string.IsNullOrWhiteSpace(postXML)) {
-                    Debug.Print("Xml is empty, aborting.");
+                if (postXML == apiTools.EmptyXML || string.IsNullOrWhiteSpace(postXML)) {
+                    apiTools.SendDebugMessage("Xml is empty, aborting.");
                     return false;
                 }
 
             // Begin parsing XML.
                 xmlDoc.LoadXml(postXML);
-                Debug.Print("Gathering post information from XML");
-                XmlNodeList xmlID = xmlDoc.DocumentElement.SelectNodes("/root/id");
-                XmlNodeList xmlMD5 = xmlDoc.DocumentElement.SelectNodes("/root/file/md5");
-                XmlNodeList xmlExt = xmlDoc.DocumentElement.SelectNodes("/root/file/ext");
-                XmlNodeList xmlURL = xmlDoc.DocumentElement.SelectNodes("/root/file/url");
-                XmlNodeList xmlTagsGeneral = xmlDoc.DocumentElement.SelectNodes("/root/tags/general");
-                XmlNodeList xmlTagsSpecies = xmlDoc.DocumentElement.SelectNodes("/root/tags/species");
-                XmlNodeList xmlTagsCharacter = xmlDoc.DocumentElement.SelectNodes("/root/tags/character");
-                XmlNodeList xmlTagsCopyright = xmlDoc.DocumentElement.SelectNodes("/root/tags/copyright");
-                XmlNodeList xmlTagsArtist = xmlDoc.DocumentElement.SelectNodes("/root/tags/artist");
-                XmlNodeList xmlTagsInvalid = xmlDoc.DocumentElement.SelectNodes("/root/tags/invalid");
-                XmlNodeList xmlTagsLore = xmlDoc.DocumentElement.SelectNodes("/root/tags/lore");
-                XmlNodeList xmlTagsMeta = xmlDoc.DocumentElement.SelectNodes("/root/tags/meta");
-                XmlNodeList xmlTagsLocked = xmlDoc.DocumentElement.SelectNodes("/root/locked_tags");
-                XmlNodeList xmlScoreUp = xmlDoc.DocumentElement.SelectNodes("/root/score/up");
-                XmlNodeList xmlScoreDown = xmlDoc.DocumentElement.SelectNodes("/root/score/down");
-                XmlNodeList xmlScoreTotal = xmlDoc.DocumentElement.SelectNodes("/root/score/total");
-                XmlNodeList xmlRating = xmlDoc.DocumentElement.SelectNodes("/root/rating");
-                XmlNodeList xmlFavCount = xmlDoc.DocumentElement.SelectNodes("/root/fav_count");
-                XmlNodeList xmlAuthor = xmlDoc.DocumentElement.SelectNodes("/root/author");
-                XmlNodeList xmlDescription = xmlDoc.DocumentElement.SelectNodes("/root/description");
-                XmlNodeList xmlDeleted = xmlDoc.DocumentElement.SelectNodes("/root/flags/deleted");
+                apiTools.SendDebugMessage("Gathering post information from XML");
+                XmlNodeList xmlID = xmlDoc.DocumentElement.SelectNodes("/root/post/id");
+                XmlNodeList xmlMD5 = xmlDoc.DocumentElement.SelectNodes("/root/post/file/md5");
+                XmlNodeList xmlExt = xmlDoc.DocumentElement.SelectNodes("/root/post/file/ext");
+                XmlNodeList xmlURL = xmlDoc.DocumentElement.SelectNodes("/root/post/file/url");
+                XmlNodeList xmlTagsGeneral = xmlDoc.DocumentElement.SelectNodes("/root/post/tags/general");
+                XmlNodeList xmlTagsSpecies = xmlDoc.DocumentElement.SelectNodes("/root/post/tags/species");
+                XmlNodeList xmlTagsCharacter = xmlDoc.DocumentElement.SelectNodes("/root/post/tags/character");
+                XmlNodeList xmlTagsCopyright = xmlDoc.DocumentElement.SelectNodes("/root/post/tags/copyright");
+                XmlNodeList xmlTagsArtist = xmlDoc.DocumentElement.SelectNodes("/root/post/tags/artist");
+                XmlNodeList xmlTagsInvalid = xmlDoc.DocumentElement.SelectNodes("/root/post/tags/invalid");
+                XmlNodeList xmlTagsLore = xmlDoc.DocumentElement.SelectNodes("/root/post/tags/lore");
+                XmlNodeList xmlTagsMeta = xmlDoc.DocumentElement.SelectNodes("/root/post/tags/meta");
+                XmlNodeList xmlTagsLocked = xmlDoc.DocumentElement.SelectNodes("/root/post/locked_tags");
+                XmlNodeList xmlScoreUp = xmlDoc.DocumentElement.SelectNodes("/root/post/score/up");
+                XmlNodeList xmlScoreDown = xmlDoc.DocumentElement.SelectNodes("/root/post/score/down");
+                XmlNodeList xmlScoreTotal = xmlDoc.DocumentElement.SelectNodes("/root/post/score/total");
+                XmlNodeList xmlRating = xmlDoc.DocumentElement.SelectNodes("/root/post/rating");
+                XmlNodeList xmlFavCount = xmlDoc.DocumentElement.SelectNodes("/root/post/fav_count");
+                XmlNodeList xmlAuthor = xmlDoc.DocumentElement.SelectNodes("/root/post/uploader_id");
+                XmlNodeList xmlDescription = xmlDoc.DocumentElement.SelectNodes("/root/post/description");
+                XmlNodeList xmlDeleted = xmlDoc.DocumentElement.SelectNodes("/root/post/flags/deleted");
 
                 if (xmlDeleted[0].InnerText.ToLower() == "true") {
                     //return false;
+                }
+
+                string DownloadUrl = xmlURL[0].InnerText;
+                if (DownloadUrl == null) {
+                    DownloadUrl = apiTools.GetBlacklistedImageUrl(xmlMD5[0].InnerText, xmlExt[0].InnerText);
+                    if (DownloadUrl == null) {
+                        ErrorLog.ReportCustomException("DownloadUrl was still null after attempting to bypass blacklist with MD5", "ImageDownloader.cs");
+                        return false;
+                    }
                 }
 
                 List<string> foundTags = new List<string>();
@@ -224,7 +233,7 @@ namespace aphrodite {
                 }
 
             // Set the description
-                string imageDescription = "No description";
+                string imageDescription = " No description";
                 if (xmlDescription[0].InnerText != "") {
                     imageDescription = "\n                \"" + xmlDescription[0].InnerText + "\"";
                 }
@@ -413,7 +422,7 @@ namespace aphrodite {
                 }));
 
             // Download file.
-                url = xmlURL[0].InnerText;
+                url = DownloadUrl;
                 using (ExWebClient wc = new ExWebClient()) {
                     wc.DownloadProgressChanged += (s, e) => {
                         this.BeginInvoke(new MethodInvoker(() => {
@@ -436,24 +445,24 @@ namespace aphrodite {
                     wc.Proxy = WebRequest.GetSystemWebProxy();
                     wc.Headers.Add(header);
                     wc.Method = "GET";
-                    Debug.Print("Beginning download of file " + xmlURL[0].InnerText);
+                    apiTools.SendDebugMessage("Beginning download of file " + DownloadUrl);
 
-                    wc.DownloadFile(xmlURL[0].InnerText, saveTo + "\\" + fileName);
+                    wc.DownloadFile(DownloadUrl, saveTo + "\\" + fileName);
                 }
 
 
                 return true;
             }
             catch (ThreadAbortException) {
-                Debug.Print("Thread was requested to be, and has been, aborted. (frmImageDownloader.cs)");
+                apiTools.SendDebugMessage("Thread was requested to be, and has been, aborted. (frmImageDownloader.cs)");
                 return false;
             }
             catch (ObjectDisposedException) {
-                Debug.Print("An ObjectDisposedException occured. (frmImageDownloader.cs)");
+                apiTools.SendDebugMessage("An ObjectDisposedException occured. (frmImageDownloader.cs)");
                 return false;
             }
             catch (WebException WebE) {
-                Debug.Print("A WebException has occured. (frmImageDownloader.cs)");
+                apiTools.SendDebugMessage("A WebException has occured. (frmImageDownloader.cs)");
                 this.BeginInvoke(new MethodInvoker(() => {
                     status.Text = "A WebException has occured";
                     pbDownloadStatus.State = ProgressBarState.Error;
@@ -462,7 +471,7 @@ namespace aphrodite {
                 return false;
             }
             catch (Exception ex) {
-                Debug.Print("A gneral exception has occured. (frmImageDownloader.cs)");
+                apiTools.SendDebugMessage("A gneral exception has occured. (frmImageDownloader.cs)");
                 this.BeginInvoke(new MethodInvoker(() => {
                     status.Text = "A Exception has occured";
                     pbDownloadStatus.State = ProgressBarState.Error;

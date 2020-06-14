@@ -172,7 +172,7 @@ namespace aphrodite {
                     }
                     Environment.Exit(0);
                 }
-                if (arg.StartsWith("pools:") && apiTools.isValidPoolLink(arg.Replace("pools:", ""))) {
+                if (arg.StartsWith("pools:") && apiTools.IsValidPoolLink(arg.Replace("pools:", ""))) {
                     string poolID = arg.Replace("pools:", "").Replace("http://","https://").Replace("www.","");
                     if (!poolID.StartsWith("https://"))
                         poolID = "https://" + poolID;
@@ -184,7 +184,7 @@ namespace aphrodite {
                     Environment.Exit(0);
                 }
                 else if (arg.StartsWith("tags:")) {
-                    if (apiTools.isValidPageLink(arg.Replace("tags:", ""))) {
+                    if (apiTools.IsValidPageLink(arg.Replace("tags:", ""))) {
                         downloadPageOfTags(arg.Replace("tags:", ""));
                         Environment.Exit(0);
                     }
@@ -192,7 +192,7 @@ namespace aphrodite {
                         txtTags.Text = getTags(Environment.GetCommandLineArgs()).Replace("%20", " ");
                     }
                 }
-                else if (arg.StartsWith("images:") && apiTools.isValidImageLink(arg.Replace("images:", ""))) {
+                else if (arg.StartsWith("images:") && apiTools.IsValidImageLink(arg.Replace("images:", ""))) {
                     downloadImage(arg.Replace("images:", ""));
                     Environment.Exit(0);
                 }
@@ -243,24 +243,12 @@ namespace aphrodite {
                 numLimit.Value = Convert.ToDecimal(ini.ReadInt("imageLimit", "Tags"));
                 numPageLimit.Value = Convert.ToDecimal(ini.ReadInt("pageLimit", "Tags"));
 
-                chkPoolName.Checked = ini.ReadBool("usePoolName", "Pools");
                 chkMerge.Checked = ini.ReadBool("mergeBlacklisted", "Pools");
                 chkOpen.Checked = ini.ReadBool("openAfter", "Pools");
 
-                switch (ini.ReadInt("fileNameCode", "Images")) {
-                    case 0:
-                        rbImageMD5.Checked = true;
-                        break;
-                    case 1:
-                        rbImageArtistMD5.Checked = true;
-                        break;
-                    default:
-                        rbImageArtistMD5.Checked = true;
-                        break;
-                }
                 chkImageSeparateRatings.Checked = ini.ReadBool("separateRatings", "Images");
                 chkImageSeparateBlacklisted.Checked = ini.ReadBool("separateBlacklisted", "Images");
-                chkUseForm.Checked = ini.ReadBool("useForm", "Images");
+                chkImageUseForm.Checked = ini.ReadBool("useForm", "Images");
 
             }
             else {
@@ -279,7 +267,7 @@ namespace aphrodite {
 
                 chkImageSeparateRatings.Checked = Images.Default.separateRatings;
                 chkImageSeparateBlacklisted.Checked = Images.Default.separateBlacklisted;
-                chkUseForm.Checked = Images.Default.useForm;
+                chkImageUseForm.Checked = Images.Default.useForm;
 
                 tbMain.TabPages.Remove(tbIni);
 
@@ -336,7 +324,6 @@ namespace aphrodite {
                 numLimit.Value = Convert.ToDecimal(ini.ReadInt("imageLimit", "Tags"));
                 numPageLimit.Value = Convert.ToDecimal(ini.ReadInt("pageLimit", "Tags"));
 
-                chkPoolName.Checked = ini.ReadBool("usePoolName", "Pools");
                 chkOpen.Checked = ini.ReadBool("openAfter", "Pools");
                 chkMerge.Checked = ini.ReadBool("mergeBlacklisted", "Pools");
             }
@@ -656,24 +643,9 @@ namespace aphrodite {
     #endregion
 
     #region Pools
-        private void txtID_TextChanged(object sender, EventArgs e) {
-            var txtSender = (TextBox)sender;
-            var curPos = txtSender.SelectionStart;
-            txtSender.Text = Regex.Replace(txtSender.Text, "[^0-9]", "");
-            txtSender.SelectionStart = curPos;
-        }
-        private void txtID_KeyDown(object sender, KeyEventArgs e) {
-            if (e.KeyCode == Keys.Enter)
-                btnDownloadPool_Click(this, new EventArgs());
-        }
-
         private void btnDownloadPool_Click(object sender, EventArgs e) {
             if (string.IsNullOrWhiteSpace(txtID.Text)) {
                 MessageBox.Show("Please specify pool ID to download.");
-                return;
-            }
-            if (string.IsNullOrWhiteSpace(Settings.Default.saveLocation)) {
-                MessageBox.Show("Please configure a save location to download images to.");
                 return;
             }
 
@@ -722,263 +694,31 @@ namespace aphrodite {
         }
 
         private void downloadPool(string poolID) {
-            // USED FOR THE ARGUMENT DOWNLOADS
-            frmPoolDownloader poolDL = new frmPoolDownloader();
-            poolDL.poolID = poolID;
-
-            poolDL.header = Program.UserAgent;
-
-            if (useIni) {
-                poolDL.saveTo = Environment.CurrentDirectory;
-
-                if (File.Exists(File.ReadAllText(Environment.CurrentDirectory + "\\graylist.cfg")))
-                    poolDL.graylist = File.ReadAllText(Environment.CurrentDirectory + "\\graylist.cfg");
-                else
-                    poolDL.graylist = string.Empty;
-
-                if (File.Exists(Environment.CurrentDirectory + "\\blacklist.cfg"))
-                    poolDL.blacklist = File.ReadAllText(Environment.CurrentDirectory + "\\blacklist.cfg");
-                else
-                    poolDL.blacklist = string.Empty;
-
-
-
-                if (ini.KeyExists("saveInfo", "Global"))
-                    poolDL.saveInfo = ini.ReadBool("saveInfo", "Global");
-                else
-                    poolDL.saveInfo = true;
-
-                if (ini.KeyExists("openAfter", "Global"))
-                    poolDL.openAfter = false; //ini.ReadBool("openAfter", "Global");
-                else
-                    poolDL.openAfter = false;
-
-                if (ini.KeyExists("saveBlacklisted", "Global"))
-                    poolDL.saveBlacklisted = ini.ReadBool("saveBlacklisted", "Global");
-                else
-                    poolDL.saveBlacklisted = true;
-
-                if (ini.KeyExists("ignoreFinish", "Global"))
-                    poolDL.ignoreFinish = ini.ReadBool("ignoreFinish", "Global");
-                else
-                    poolDL.ignoreFinish = false;
-
-
-
-                //if (ini.KeyExists("usePoolName", "Pools"))
-                //    poolDL.usePoolName = ini.ReadBool("usePoolName", "Pools");
-                //else
-                //    poolDL.usePoolName = true;
-
-                if (ini.KeyExists("fileNameSchema", "Pools"))
-                    poolDL.fileNameSchema = ini.ReadString("fileNameSchema", "Pools").ToLower();
-                else
-                    poolDL.fileNameSchema = "%poolname%_%page%";
-
-                if (ini.KeyExists("mergeBlacklisted", "Pools"))
-                    poolDL.mergeBlacklisted = ini.ReadBool("mergeBlacklisted", "Pools");
-                else
-                    poolDL.mergeBlacklisted = true;
-
-                if (ini.KeyExists("openAfter", "Pools"))
-                    poolDL.openAfter = ini.ReadBool("openAfter", "Pools");
-                else
-                    poolDL.openAfter = false;
-            }
-            else {
-                Settings.Default.Reload();
-                Pools.Default.Reload();
-                poolDL.saveTo = Settings.Default.saveLocation;
-                poolDL.graylist = Settings.Default.blacklist;
-                poolDL.blacklist = Settings.Default.zeroToleranceBlacklist;
-
-                poolDL.saveInfo = Settings.Default.saveInfo;
-                poolDL.ignoreFinish = Settings.Default.ignoreFinish;
-                poolDL.saveBlacklisted = Settings.Default.saveBlacklisted;
-
-                //poolDL.usePoolName = Pools.Default.usePoolName;
-                poolDL.fileNameSchema = Pools.Default.fileNameSchema.ToLower();
-                poolDL.mergeBlacklisted = Pools.Default.mergeBlacklisted;
-                poolDL.openAfter = Pools.Default.openAfter;
-            }
-
-            poolDL.ShowDialog();
-        } // ARGUMENT DOWNLOADS ONLY // Downloads a pool from a URL.
+            Downloader.Arguments.downloadPool(poolID);
+        }
+    
+        private void txtID_TextChanged(object sender, EventArgs e) {
+            var txtSender = (TextBox)sender;
+            var curPos = txtSender.SelectionStart;
+            txtSender.Text = Regex.Replace(txtSender.Text, "[^0-9]", "");
+            txtSender.SelectionStart = curPos;
+        }
+        private void txtID_KeyDown(object sender, KeyEventArgs e) {
+            if (e.KeyCode == Keys.Enter)
+                btnDownloadPool_Click(this, new EventArgs());
+        }
     #endregion
 
     #region Images
-        private void downloadImage(string url, bool useForm = false) {
-            // USED FOR THE ARGUMENT DOWNLOADS
-            if (useIni)
-                if (ini.KeyExists("useForm", "Images"))
-                    if (ini.ReadBool("useForm", "Images"))
-                        useForm = true;
-            else
-                useForm = Images.Default.useForm;
-
-            if (useForm) {
-                frmImageDownloader imageDL = new frmImageDownloader();
-                imageDL.url = url;
-                imageDL.header = Program.UserAgent;
-                if (useIni) {
-                    imageDL.saveTo = Environment.CurrentDirectory;
-
-                    if (File.Exists(File.ReadAllText(Environment.CurrentDirectory + "\\graylist.cfg")))
-                        imageDL.graylist = File.ReadAllText(Environment.CurrentDirectory + "\\graylist.cfg");
-                    else
-                        imageDL.graylist = string.Empty;
-
-                    if (File.Exists(Environment.CurrentDirectory + "\\blacklist.cfg"))
-                        imageDL.blacklist = File.ReadAllText(Environment.CurrentDirectory + "\\blacklist.cfg");
-                    else
-                        imageDL.blacklist = string.Empty;
-
-
-
-                    if (ini.KeyExists("saveInfo", "Global"))
-                        imageDL.saveInfo = ini.ReadBool("saveInfo", "Global");
-                    else
-                        imageDL.saveInfo = true;
-
-                    if (ini.KeyExists("ignoreFinish", "Global"))
-                        imageDL.ignoreFinish = ini.ReadBool("ignoreFinish", "Global");
-                    else
-                        imageDL.ignoreFinish = false;
-
-
-
-                    //if (ini.KeyExists("fileNameCode", "Images"))
-                    //    imageDL.fileNameCode = ini.ReadInt("fileNameCode", "Images");
-                    //else
-                    //    imageDL.fileNameCode = 1;
-                    if (ini.KeyExists("fileNameSchema", "Images"))
-                        imageDL.fileNameSchema = ini.ReadString("fileNameSchema", "Images").ToLower();
-                    else
-                        imageDL.fileNameSchema = "%artist%_%md5%";
-
-                    if (ini.KeyExists("separateRatings", "Images"))
-                        imageDL.separateRatings = ini.ReadBool("separateRatings", "Images");
-                    else
-                        imageDL.separateRatings = true;
-
-                    if (ini.KeyExists("separateBlacklisted", "Images"))
-                        imageDL.separateBlacklisted = ini.ReadBool("separateBlacklisted", "Images");
-                    else
-                        imageDL.separateBlacklisted = true;
-
-                    if (ini.KeyExists("separateArtists", "Images")) {
-                        imageDL.separateArtists = ini.ReadBool("separateArtists", "Images");
-                    }
-                    else {
-                        imageDL.separateArtists = false;
-                    }
-                }
-                else {
-                    Settings.Default.Reload();
-                    Images.Default.Reload();
-
-                    imageDL.saveTo = Settings.Default.saveLocation;
-                    imageDL.graylist = Settings.Default.blacklist;
-                    imageDL.blacklist = Settings.Default.zeroToleranceBlacklist;
-                    imageDL.separateRatings = Images.Default.separateRatings;
-                    imageDL.separateBlacklisted = Images.Default.separateBlacklisted;
-                    imageDL.saveInfo = Settings.Default.saveInfo;
-                    imageDL.ignoreFinish = Settings.Default.ignoreFinish;
-                    imageDL.fileNameSchema = Images.Default.fileNameSchema.ToLower();
-                    imageDL.separateArtists = Images.Default.separateArtists;
-                }
-
-                imageDL.ShowDialog();
-
-            }
-            else {
-                ImageDownloader imageDL = new ImageDownloader();
-                imageDL.url = url;
-                imageDL.header = Program.UserAgent;
-
-                if (useIni) {
-                    imageDL.saveTo = Environment.CurrentDirectory;
-
-                    if (ini.KeyExists("graylist"))
-                        imageDL.graylist = ini.ReadString("graylist");
-                    else
-                        imageDL.graylist = string.Empty;
-
-                    if (ini.KeyExists("blacklist"))
-                        imageDL.blacklist = ini.ReadString("blacklist");
-                    else
-                        imageDL.blacklist = string.Empty;
-
-
-
-                    if (ini.KeyExists("saveInfo", "Global"))
-                        imageDL.saveInfo = ini.ReadBool("saveInfo", "Global");
-                    else
-                        imageDL.saveInfo = true;
-
-                    if (ini.KeyExists("ignoreFinish", "Global"))
-                        imageDL.ignoreFinish = ini.ReadBool("ignoreFinish", "Global");
-                    else
-                        imageDL.ignoreFinish = false;
-
-
-                    if (ini.KeyExists("fileNameSchema", "Images")) {
-                        imageDL.fileNameSchema = ini.ReadString("fileNameSchema", "Images").ToLower();
-                    }
-                    else {
-                        imageDL.fileNameSchema = "%artist%_%md5%";
-                    }
-
-                    if (ini.KeyExists("separateRatings", "Images"))
-                        imageDL.separateRatings = ini.ReadBool("separateRatings", "Images");
-                    else
-                        imageDL.separateRatings = true;
-
-                    if (ini.KeyExists("separateBlacklisted", "Images"))
-                        imageDL.separateBlacklisted = ini.ReadBool("separateBlacklisted", "Images");
-                    else
-                        imageDL.separateBlacklisted = true;
-
-                    if (ini.KeyExists("separateArtists", "Images")) {
-                        imageDL.separateArtists = ini.ReadBool("separateArtists", "Images");
-                    }
-                    else {
-                        imageDL.separateArtists = false;
-                    }
-                }
-                else {
-                    Settings.Default.Reload();
-                    Images.Default.Reload();
-
-                    imageDL.saveTo = Settings.Default.saveLocation;
-                    imageDL.graylist = Settings.Default.blacklist;
-                    imageDL.blacklist = Settings.Default.zeroToleranceBlacklist;
-                    imageDL.separateRatings = Images.Default.separateRatings;
-                    imageDL.separateBlacklisted = Images.Default.separateBlacklisted;
-                    imageDL.saveInfo = Settings.Default.saveInfo;
-                    imageDL.ignoreFinish = Settings.Default.ignoreFinish;
-                    imageDL.fileNameSchema = Images.Default.fileNameSchema;
-                    imageDL.separateArtists = Images.Default.separateArtists;
-                }
-
-                imageDL.downloadImage();
-            }
-        }
-
         private void btnDownloadImage_Click(object sender, EventArgs e) {
             if (string.IsNullOrEmpty(txtImageUrl.Text))
                 return;
 
-            string imageUrl = txtImageUrl.Text.Replace("http://", "https://").Replace("https://www.", "https://");
-
-            if (!imageUrl.StartsWith("https://e621.net/post/show/")) {
-                imageUrl = "https://e621.net/post/show/" + imageUrl;
-            }
-
-            if (apiTools.isValidImageLink(imageUrl))
-                downloadImage(imageUrl, true);
+            Downloader.MainForm.downloadImage(txtImageUrl.Text, chkImageSeparateRatings.Checked, chkImageSeparateBlacklisted.Checked, chkImageSeparateArtists.Checked, chkImageUseForm.Checked);
         }
-        // ARGUMENT DOWNLOADS ONLY // Downloads image from URL.
+        private void downloadImage(string url) {
+            Downloader.Arguments.downloadImage(url);
+        }
     #endregion
     }
 }

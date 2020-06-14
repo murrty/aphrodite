@@ -37,7 +37,7 @@
             this.btnExceptionGithub.Name = "btnExceptionGithub";
             this.btnExceptionGithub.Size = new System.Drawing.Size(85, 24);
             this.btnExceptionGithub.TabIndex = 10;
-            this.btnExceptionGithub.Text = "btnExceptionGithub";
+            this.btnExceptionGithub.Text = "Open Github";
             this.btnExceptionGithub.UseVisualStyleBackColor = true;
             this.btnExceptionGithub.Click += new System.EventHandler(this.btnExceptionGithub_Click);
             // 
@@ -56,7 +56,7 @@
             this.btnExceptionOk.Name = "btnExceptionOk";
             this.btnExceptionOk.Size = new System.Drawing.Size(75, 24);
             this.btnExceptionOk.TabIndex = 11;
-            this.btnExceptionOk.Text = "btnExceptionOk";
+            this.btnExceptionOk.Text = "OK";
             this.btnExceptionOk.UseVisualStyleBackColor = true;
             this.btnExceptionOk.Click += new System.EventHandler(this.btnExceptionOk_Click);
             // 
@@ -75,9 +75,9 @@
             this.lbExceptionDescription.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbExceptionDescription.Location = new System.Drawing.Point(13, 34);
             this.lbExceptionDescription.Name = "lbExceptionDescription";
-            this.lbExceptionDescription.Size = new System.Drawing.Size(141, 17);
+            this.lbExceptionDescription.Size = new System.Drawing.Size(432, 17);
             this.lbExceptionDescription.TabIndex = 7;
-            this.lbExceptionDescription.Text = "lbExceptionDescription";
+            this.lbExceptionDescription.Text = "While rummaging through degeneracy, something wrong has happened.";
             // 
             // lbExceptionHeader
             // 
@@ -85,9 +85,9 @@
             this.lbExceptionHeader.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbExceptionHeader.Location = new System.Drawing.Point(12, 3);
             this.lbExceptionHeader.Name = "lbExceptionHeader";
-            this.lbExceptionHeader.Size = new System.Drawing.Size(171, 25);
+            this.lbExceptionHeader.Size = new System.Drawing.Size(199, 25);
             this.lbExceptionHeader.TabIndex = 6;
-            this.lbExceptionHeader.Text = "lbExceptionHeader";
+            this.lbExceptionHeader.Text = "An exception occured.";
             // 
             // frmException
             // 
@@ -106,7 +106,7 @@
             this.Name = "frmException";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "frmException";
+            this.Text = "An exception has occured";
             this.Load += new System.EventHandler(this.frmException_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

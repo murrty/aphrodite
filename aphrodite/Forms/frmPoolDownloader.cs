@@ -135,12 +135,12 @@ namespace aphrodite {
                 this.Invoke((MethodInvoker)(() => status.Text = "Getting pool information for page 1"));
                 writeToConsole("Starting JSON download for page 1...", true);
                 url = poolJson;
-                string postXML = apiTools.getJSON(poolJson, header);
+                string postXML = apiTools.GetJSON(poolJson, header);
                 writeToConsole("JSON Downloaded.", true);
 
                 // Check the XML.
                 writeToConsole("Checking XML...");
-                if (postXML == apiTools.emptyXML || string.IsNullOrWhiteSpace(postXML)) {
+                if (postXML == apiTools.EmptyXML || string.IsNullOrWhiteSpace(postXML)) {
                     this.BeginInvoke(new MethodInvoker(() => {
                         status.Text = "Pool failed to download.";
                         tmrTitle.Stop();
@@ -193,7 +193,7 @@ namespace aphrodite {
                 int pages = apiTools.CountPoolPages(Convert.ToDecimal(xmlCount[0].InnerText));
 
                 // Set the output folder name.
-                poolName = apiTools.replaceIllegalCharacters(xmlName[0].InnerText);
+                poolName = apiTools.ReplaceIllegalCharacters(xmlName[0].InnerText);
                 saveTo += "\\" + poolName;
                 writeToConsole("Updated saveTo to \\Pools\\" + poolName);
                 #endregion
@@ -202,7 +202,7 @@ namespace aphrodite {
                 // Begin ripping the rest of the pool Json.
                 xmlDoc = new XmlDocument();
                 url = poolJsonPage;
-                postXML = apiTools.getJSON(poolJsonPage + "&page=1", header);
+                postXML = apiTools.GetJSON(poolJsonPage + "&page=1", header);
                 xmlDoc.LoadXml(postXML);
 
                 XmlNodeList xmlID = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/id");
@@ -242,7 +242,7 @@ namespace aphrodite {
                             break;
                     }
 
-                    poolDescription = "No description";
+                    poolDescription = " No description";
                     if (xmlDescription[0].InnerText != "") {
                         poolDescription = "\"" + xmlDescription[0].InnerText + "\"";
                     }
@@ -403,11 +403,11 @@ namespace aphrodite {
                         xmlDoc = new XmlDocument();
 
                         url = poolJson + poolID;
-                        postXML = apiTools.getJSON(poolJson + poolID + "&page=" + i, header);
+                        postXML = apiTools.GetJSON(poolJson + poolID + "&page=" + i, header);
                         writeToConsole("JSON Downloaded.", true);
 
                         writeToConsole("Checking XML...");
-                        if (postXML == apiTools.emptyXML || string.IsNullOrWhiteSpace(postXML)) {
+                        if (postXML == apiTools.EmptyXML || string.IsNullOrWhiteSpace(postXML)) {
                             writeToConsole("XML is empty, assuming dead page.");
                             break;
                         }
@@ -625,15 +625,15 @@ namespace aphrodite {
                         total = pageCount + blacklistedPageCount;
 
                         if (File.Exists(saveTo + "\\pool.nfo"))
-                            total -= apiTools.countFiles(saveTo) - 1;
+                            total -= apiTools.CountFiles(saveTo) - 1;
                         if (File.Exists(saveTo + "\\blacklisted\\pool.blacklisted.nfo"))
-                            total -= apiTools.countFiles(saveTo + "\\blacklisted") - 1;
+                            total -= apiTools.CountFiles(saveTo + "\\blacklisted") - 1;
 
                         pbTotalStatus.Maximum = total;
                     }
                     else {
                         total = pageCount;
-                        total -= apiTools.countFiles(saveTo) - 1;
+                        total -= apiTools.CountFiles(saveTo) - 1;
 
                         pbTotalStatus.Maximum = total;
                         //pbTotalStatus.Maximum = pageCount - apiTools.countFiles(saveTo);
@@ -728,15 +728,15 @@ namespace aphrodite {
                 return true;
             }
             catch (ThreadAbortException) {
-                Debug.Print("Thread was requested to be, and has been, aborted. (frmPoolDownloader.cs)");
+                apiTools.SendDebugMessage("Thread was requested to be, and has been, aborted. (frmPoolDownloader.cs)");
                 return false;
             }
             catch (ObjectDisposedException) {
-                Debug.Print("Seems like the object got disposed. (frmPoolDownloader.cs)");
+                apiTools.SendDebugMessage("Seems like the object got disposed. (frmPoolDownloader.cs)");
                 return false;
             }
             catch (WebException WebE) {
-                Debug.Print("A WebException has occured. (frmPoolDownloader.cs)");
+                apiTools.SendDebugMessage("A WebException has occured. (frmPoolDownloader.cs)");
                 this.BeginInvoke(new MethodInvoker(() => {
                     status.Text = "A WebException has occured";
                     pbDownloadStatus.State = ProgressBarState.Error;
@@ -748,7 +748,7 @@ namespace aphrodite {
                 return false;
             }
             catch (Exception ex) {
-                Debug.Print("An exception has occured. (frmPoolDownloader.cs)");
+                apiTools.SendDebugMessage("An exception has occured. (frmPoolDownloader.cs)");
                 this.BeginInvoke(new MethodInvoker(() => {
                     status.Text = "A Exception has occured";
                     pbDownloadStatus.State = ProgressBarState.Error;
@@ -771,7 +771,7 @@ namespace aphrodite {
             }));
         }
         public void writeToConsole(string message, bool important = false) {
-            Debug.Print(message);
+            apiTools.SendDebugMessage(message);
         }
         #endregion
 

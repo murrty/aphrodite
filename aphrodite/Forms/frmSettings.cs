@@ -6,6 +6,9 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace aphrodite {
+    // theory: read the registry key for the protocol to determine location of aphridite.exe,
+    // if aphrodite.exe is this one, disable the button, otherwise enable it to move it to the
+    // currently running version's directory.
     public partial class frmSettings : Form {
         #region Variables
         public bool pluginChange = false;   // is the form being changed from the userscript?
@@ -21,6 +24,8 @@ namespace aphrodite {
         public bool noprotocols = true;     // Are there no protocols installed?
 
         public bool useIni = false;         // Determine if the ini file will be used.
+
+        private bool changedSaveTo = false; // Determines if the txtSaveTo was changed.
 
         IniFile ini = new IniFile();
         #endregion
@@ -114,8 +119,9 @@ namespace aphrodite {
                 FileInfo fI = new FileInfo(Environment.CurrentDirectory + "\\aphrodite.ini");
                 fI.IsReadOnly = false;
 
-                if (ini.ReadInt("iniVersion") != Settings.Default.iniVersion)
+                if (ini.ReadInt("iniVersion") != Settings.Default.iniVersion) {
                     ini.WriteInt("iniVersion", Settings.Default.iniVersion);
+                }
 
               // General
                 ini.WriteBool("saveInfo", chkSaveInfo.Checked, "Global");
@@ -126,7 +132,7 @@ namespace aphrodite {
                 ini.WriteBool("saveTagMetadata", chkSaveTagMetadata.Checked, "Global");
 
               // Tags
-                ini.WriteString("fileNameSchema", apiTools.replaceIllegalCharacters(txtTagSchema.Text.ToLower()), "Tags");
+                ini.WriteString("fileNameSchema", apiTools.ReplaceIllegalCharacters(txtTagSchema.Text.ToLower()), "Tags");
                 ini.WriteBool("Explicit", chkExplicit.Checked, "Tags");
                 ini.WriteBool("Questionable", chkQuestionable.Checked, "Tags");
                 ini.WriteBool("Safe", chkSafe.Checked, "Tags");
@@ -139,12 +145,12 @@ namespace aphrodite {
                 ini.WriteBool("skipExistingFiles", chkSkipExistingFiles.Checked, "Tags");
 
               // Pools
-                ini.WriteString("fileNameSchema", apiTools.replaceIllegalCharacters(txtPoolSchema.Text.ToLower()), "Pools");
+                ini.WriteString("fileNameSchema", apiTools.ReplaceIllegalCharacters(txtPoolSchema.Text.ToLower()), "Pools");
                 ini.WriteBool("mergeBlacklisted", chkMerge.Checked, "Pools");
                 ini.WriteBool("openAfter", chkOpen.Checked, "Pools");
 
               // Images
-                ini.WriteString("fileNameSchema", apiTools.replaceIllegalCharacters(txtImageSchema.Text.ToLower()), "Images");
+                ini.WriteString("fileNameSchema", apiTools.ReplaceIllegalCharacters(txtImageSchema.Text.ToLower()), "Images");
                 ini.WriteBool("separateRatings", chkSeparateImages.Checked, "Images");
                 ini.WriteBool("separateBlacklisted", chkSeparateBlacklisted.Checked, "Images");
                 ini.WriteBool("separateArtists", chkSepArtists.Checked, "Images");
@@ -152,8 +158,9 @@ namespace aphrodite {
             }
             else {
               // General
-                //if (txtSaveTo.Text != Environment.CurrentDirectory)
-                Settings.Default.saveLocation = txtSaveTo.Text;
+                if (changedSaveTo) {
+                    Settings.Default.saveLocation = txtSaveTo.Text;
+                }
                 Settings.Default.saveInfo = chkSaveInfo.Checked;
                 Settings.Default.saveBlacklisted = chkSaveBlacklisted.Checked;
                 Settings.Default.ignoreFinish = chkIgnoreFinish.Checked;
@@ -162,7 +169,7 @@ namespace aphrodite {
                 Settings.Default.saveTagMetadata = chkSaveTagMetadata.Checked;
 
               // Tags
-                Tags.Default.fileNameSchema = apiTools.replaceIllegalCharacters(txtTagSchema.Text.ToLower());
+                Tags.Default.fileNameSchema = apiTools.ReplaceIllegalCharacters(txtTagSchema.Text.ToLower());
                 Tags.Default.Explicit = chkExplicit.Checked;
                 Tags.Default.Questionable = chkQuestionable.Checked;
                 Tags.Default.Safe = chkSafe.Checked;
@@ -175,13 +182,13 @@ namespace aphrodite {
                 Tags.Default.skipExistingFiles = chkSkipExistingFiles.Checked;
 
               // Pools
-                Pools.Default.fileNameSchema = apiTools.replaceIllegalCharacters(txtPoolSchema.Text.ToLower());
+                Pools.Default.fileNameSchema = apiTools.ReplaceIllegalCharacters(txtPoolSchema.Text.ToLower());
                 Pools.Default.mergeBlacklisted = chkMerge.Checked;
                 Pools.Default.openAfter = chkOpen.Checked;
                 Pools.Default.addWishlistSilent = chkAddWishlistSilent.Checked;
 
               // Images
-                Images.Default.fileNameSchema = apiTools.replaceIllegalCharacters(txtImageSchema.Text.ToLower());
+                Images.Default.fileNameSchema = apiTools.ReplaceIllegalCharacters(txtImageSchema.Text.ToLower());
                 Images.Default.separateRatings = chkSeparateImages.Checked;
                 Images.Default.separateBlacklisted = chkSeparateBlacklisted.Checked;
                 Images.Default.separateArtists = chkSepArtists.Checked;
@@ -208,7 +215,7 @@ namespace aphrodite {
                 chkSaveTagMetadata.Checked = ini.ReadBool("saveTagMetadata", "Global");
 
               // Tags
-                txtTagSchema.Text = apiTools.replaceIllegalCharacters(ini.ReadString("fileNameSchema", "Tags").ToLower());
+                txtTagSchema.Text = apiTools.ReplaceIllegalCharacters(ini.ReadString("fileNameSchema", "Tags").ToLower());
                 chkExplicit.Checked = ini.ReadBool("Explicit", "Tags");
                 chkQuestionable.Checked = ini.ReadBool("Questionable", "Tags");
                 chkSafe.Checked = ini.ReadBool("Safe", "Tags");
@@ -221,14 +228,14 @@ namespace aphrodite {
                 chkSkipExistingFiles.Checked = ini.ReadBool("skipExistingFiles", "Tags");
 
               // Pools
-                txtPoolSchema.Text = apiTools.replaceIllegalCharacters(ini.ReadString("fileNameSchema", "Pools").ToLower());
+                txtPoolSchema.Text = apiTools.ReplaceIllegalCharacters(ini.ReadString("fileNameSchema", "Pools").ToLower());
                 chkMerge.Checked = ini.ReadBool("mergeBlacklisted", "Pools");
                 chkOpen.Checked = ini.ReadBool("openAfter", "Pools");
                 chkAddWishlistSilent.Checked = false;
                 chkAddWishlistSilent.Enabled = false;
 
               // Images
-                txtImageSchema.Text = apiTools.replaceIllegalCharacters(ini.ReadString("fileNameSchema", "Images").ToLower());
+                txtImageSchema.Text = apiTools.ReplaceIllegalCharacters(ini.ReadString("fileNameSchema", "Images").ToLower());
                 chkSeparateImages.Checked = ini.ReadBool("separateRatings", "Images");
                 chkSeparateBlacklisted.Checked = ini.ReadBool("separateBlacklisted", "Images");
                 chkSepArtists.Checked = ini.ReadBool("separateArtists", "Images");
@@ -236,7 +243,12 @@ namespace aphrodite {
             }
             else {
               // General
-                txtSaveTo.Text = Settings.Default.saveLocation;
+                if (string.IsNullOrEmpty(Settings.Default.saveLocation)) {
+                    txtSaveTo.Text = Environment.CurrentDirectory;
+                }
+                else {
+                    txtSaveTo.Text = Settings.Default.saveLocation;
+                }
                 chkSaveInfo.Checked = Settings.Default.saveInfo;
                 chkSaveBlacklisted.Checked = Settings.Default.saveBlacklisted;
                 chkIgnoreFinish.Checked = Settings.Default.ignoreFinish;
@@ -245,7 +257,7 @@ namespace aphrodite {
                 chkSaveTagMetadata.Checked = Settings.Default.saveTagMetadata;
 
               // Tags
-                txtTagSchema.Text = apiTools.replaceIllegalCharacters(Tags.Default.fileNameSchema.ToLower());
+                txtTagSchema.Text = apiTools.ReplaceIllegalCharacters(Tags.Default.fileNameSchema.ToLower());
                 chkExplicit.Checked = Tags.Default.Explicit;
                 chkQuestionable.Checked = Tags.Default.Questionable;
                 chkSafe.Checked = Tags.Default.Safe;
@@ -258,13 +270,13 @@ namespace aphrodite {
                 chkSkipExistingFiles.Checked = Tags.Default.skipExistingFiles;
 
               // Pools
-                txtPoolSchema.Text = apiTools.replaceIllegalCharacters(Pools.Default.fileNameSchema.ToLower());
+                txtPoolSchema.Text = apiTools.ReplaceIllegalCharacters(Pools.Default.fileNameSchema.ToLower());
                 chkMerge.Checked = Pools.Default.mergeBlacklisted;
                 chkOpen.Checked = Pools.Default.openAfter;
                 chkAddWishlistSilent.Checked = Pools.Default.addWishlistSilent;
 
               // Images
-                txtImageSchema.Text = apiTools.replaceIllegalCharacters(Images.Default.fileNameSchema.ToLower());
+                txtImageSchema.Text = apiTools.ReplaceIllegalCharacters(Images.Default.fileNameSchema.ToLower());
                 chkSeparateImages.Checked = Images.Default.separateRatings;
                 chkSeparateBlacklisted.Checked = Images.Default.separateBlacklisted;
                 chkSepArtists.Checked = Images.Default.separateArtists;
@@ -360,11 +372,14 @@ namespace aphrodite {
                 return;
 
             FolderBrowserDialog fbd = new FolderBrowserDialog() { Description = "Select a folder to store downloads" };
-            if (!string.IsNullOrEmpty(txtSaveTo.Text))
+            if (!string.IsNullOrEmpty(txtSaveTo.Text)) {
                 fbd.SelectedPath = txtSaveTo.Text;
+            }
 
-            if (fbd.ShowDialog() == DialogResult.OK)
+            if (fbd.ShowDialog() == DialogResult.OK) {
                 txtSaveTo.Text = fbd.SelectedPath;
+                changedSaveTo = true;
+            }
         }
         private void btnSave_Click(object sender, EventArgs e) {
             saveSettings();
@@ -560,14 +575,6 @@ namespace aphrodite {
         private void btnImagesUserscript_Click(object sender, EventArgs e) {
             Process.Start("https://github.com/murrty/aphrodite/raw/master/Resources/aphrodite.images.user.js");
         }
-
-        private void btnSchemaUndesiredTags_Click(object sender, EventArgs e) {
-            frmUndesiredTags undesiredTags = new frmUndesiredTags();
-            undesiredTags.ShowDialog();
-
-            undesiredTags.Dispose();
-        }
-
         private void btnExportIni_Click(object sender, EventArgs e) {
             MessageBox.Show("You can use the system-based settings for aphrodite by changing \"useIni\" to \"False\".\nAlso, graylist & blacklist have spaces between tags and are separate files, so... keep that in mind.");
             string bufferINI = "[aphrodite]\nuseIni=True";
@@ -583,7 +590,7 @@ namespace aphrodite {
             bufferINI += "\nsaveTagMetadata=" + Settings.Default.saveTagMetadata;
 
             bufferINI += "\n\n[Tags]";
-            bufferINI += "\nfileNameSchema=" + apiTools.replaceIllegalCharacters(Tags.Default.fileNameSchema);
+            bufferINI += "\nfileNameSchema=" + apiTools.ReplaceIllegalCharacters(Tags.Default.fileNameSchema);
             bufferINI += "\nuseMinimumScore=" + Tags.Default.enableScoreMin;
             bufferINI += "\nscoreAsTag=" + Tags.Default.scoreAsTag;
             bufferINI += "\nscoreMin=" + Tags.Default.scoreMin;
@@ -595,12 +602,12 @@ namespace aphrodite {
             bufferINI += "\nSafe=" + Tags.Default.Safe;
 
             bufferINI += "\n\n[Pools]";
-            bufferINI += "\nfileNameSchema=" + apiTools.replaceIllegalCharacters(Pools.Default.fileNameSchema);
+            bufferINI += "\nfileNameSchema=" + apiTools.ReplaceIllegalCharacters(Pools.Default.fileNameSchema);
             bufferINI += "\nmergeBlacklisted=" + Pools.Default.mergeBlacklisted;
             bufferINI += "\nopenAfter=" + Pools.Default.openAfter;
 
             bufferINI += "\n\n[Images]";
-            bufferINI += "\nfileNameSchema=" + apiTools.replaceIllegalCharacters(Images.Default.fileNameSchema);
+            bufferINI += "\nfileNameSchema=" + apiTools.ReplaceIllegalCharacters(Images.Default.fileNameSchema);
             bufferINI += "\nseparateRatings=" + Images.Default.separateRatings;
             bufferINI += "\nseparateBlacklisted=" + Images.Default.separateBlacklisted;
             bufferINI += "\nuseForm=" + Images.Default.useForm;
@@ -613,6 +620,59 @@ namespace aphrodite {
 
             //FileInfo fI = new FileInfo(Environment.CurrentDirectory + "\\aphrodite.ini");
             //fI.IsReadOnly = true;
+        }
+
+        private void btnSchemaUndesiredTags_Click(object sender, EventArgs e) {
+            frmUndesiredTags undesiredTags = new frmUndesiredTags();
+            undesiredTags.ShowDialog();
+
+            undesiredTags.Dispose();
+        }
+
+        private void txtTagSchema_KeyPress(object sender, KeyPressEventArgs e) {
+            switch (e.KeyChar) {
+                case (char)92:  // \
+                case (char)47:  // /
+                case (char)58:  // :
+                case (char)42:  // *
+                case (char)63:  // ?
+                case (char)34:  // "
+                case (char)60:  // <
+                case (char)62:  // >
+                case (char)124: // |
+                    e.Handled = true;
+                    break;
+            }
+        }
+        private void txtPoolSchema_KeyPress(object sender, KeyPressEventArgs e) {
+            switch (e.KeyChar) {
+                case (char)92:  // \
+                case (char)47:  // /
+                case (char)58:  // :
+                case (char)42:  // *
+                case (char)63:  // ?
+                case (char)34:  // "
+                case (char)60:  // <
+                case (char)62:  // >
+                case (char)124: // |
+                    e.Handled = true;
+                    break;
+            }
+        }
+        private void txtImageSchema_KeyPress(object sender, KeyPressEventArgs e) {
+            switch (e.KeyChar) {
+                case (char)92:  // \
+                case (char)47:  // /
+                case (char)58:  // :
+                case (char)42:  // *
+                case (char)63:  // ?
+                case (char)34:  // "
+                case (char)60:  // <
+                case (char)62:  // >
+                case (char)124: // |
+                    e.Handled = true;
+                    break;
+            }
         }
     }
 }

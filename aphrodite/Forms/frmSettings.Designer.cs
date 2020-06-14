@@ -799,14 +799,12 @@
             // 
             // btnSchemaUndesiredTags
             // 
-            this.btnSchemaUndesiredTags.Enabled = false;
             this.btnSchemaUndesiredTags.Location = new System.Drawing.Point(272, 84);
             this.btnSchemaUndesiredTags.Name = "btnSchemaUndesiredTags";
             this.btnSchemaUndesiredTags.Size = new System.Drawing.Size(98, 23);
             this.btnSchemaUndesiredTags.TabIndex = 4;
             this.btnSchemaUndesiredTags.Text = "undesired tags...";
             this.btnSchemaUndesiredTags.UseVisualStyleBackColor = true;
-            this.btnSchemaUndesiredTags.Visible = false;
             this.btnSchemaUndesiredTags.Click += new System.EventHandler(this.btnSchemaUndesiredTags_Click);
             // 
             // lbImageExt
@@ -881,6 +879,7 @@
             this.txtImageSchema.TabIndex = 3;
             this.txtImageSchema.Text = "%artist%_%md5%";
             this.JustTheTips.SetToolTip(this.txtImageSchema, resources.GetString("txtImageSchema.ToolTip"));
+            this.txtImageSchema.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtImageSchema_KeyPress);
             // 
             // txtTagSchema
             // 
@@ -890,6 +889,7 @@
             this.txtTagSchema.TabIndex = 1;
             this.txtTagSchema.Text = "%md5%";
             this.JustTheTips.SetToolTip(this.txtTagSchema, resources.GetString("txtTagSchema.ToolTip"));
+            this.txtTagSchema.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtTagSchema_KeyPress);
             // 
             // lbImageSchema
             // 
@@ -908,6 +908,7 @@
             this.txtPoolSchema.TabIndex = 2;
             this.txtPoolSchema.Text = "%poolname%_%page%";
             this.JustTheTips.SetToolTip(this.txtPoolSchema, resources.GetString("txtPoolSchema.ToolTip"));
+            this.txtPoolSchema.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtPoolSchema_KeyPress);
             // 
             // btnBlacklist
             // 

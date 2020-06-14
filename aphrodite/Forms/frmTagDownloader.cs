@@ -253,7 +253,7 @@ namespace aphrodite {
 #region initialization
                 //Properties.Settings.Default.Log += "Tag downloader starting for tags " + tags + "\n";
             // Set the saveTo.
-                string newTagName = apiTools.replaceIllegalCharacters(tags);
+                string newTagName = apiTools.ReplaceIllegalCharacters(tags);
                 if (useMinimumScore)                                                                    // Add minimum score to folder name.
                     newTagName += " (scores " + (minimumScore) + "+)";
                 if (!this.saveTo.EndsWith("\\Tags\\" + newTagName))                                     // Set the output folder.
@@ -304,8 +304,8 @@ namespace aphrodite {
             // Get XML of page.
                 changeTask("Downloading tag information for page 1...");
                 url = tagJson + tags + limitJson;
-                xml = apiTools.getJSON(url, webHeader);
-                if (apiTools.isXmlDead(xml)) {
+                xml = apiTools.GetJSON(url, webHeader);
+                if (apiTools.IsXmlDead(xml)) {
                     this.BeginInvoke(new MethodInvoker(() => {
                         pbDownloadStatus.Value = 0;
                         lbPercentage.Text = "0%";
@@ -434,6 +434,12 @@ namespace aphrodite {
                     else
                         rating = "Unknown";
 
+                // Set the description
+                    string imageDescription = " No description";
+                    if (xmlDescription[i].InnerText != "") {
+                        imageDescription = "\n                \"" + xmlDescription[0].InnerText + "\"";
+                    }
+
                 // Gets the artists of the file and then trims the end of garbage.
                     for (int j = 0; j < xmlTagsArtist[i].ChildNodes.Count; j++)
                         artists += xmlTagsArtist[i].ChildNodes[j].InnerText + "\n               ";
@@ -466,7 +472,7 @@ namespace aphrodite {
                     if (fileUrl == null) {
                         if (xmlDeleted[i].InnerText.ToLower() == "false") {
                             //fileUrl = imgUrl + xmlMD5[i].InnerText.Substring(0, 2) + "/" + xmlMD5[i].InnerText.Substring(2, 2) + "." + xmlExt[i].InnerText;
-                            fileUrl = apiTools.getBlacklistedImageUrl(xmlMD5[i].InnerText, xmlExt[i].InnerText);
+                            fileUrl = apiTools.GetBlacklistedImageUrl(xmlMD5[i].InnerText, xmlExt[i].InnerText);
                         }
                     }
                     
@@ -692,10 +698,10 @@ namespace aphrodite {
                                          "    URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\n" +
                                          "    ARTIST(S): " + artists + "\n" +
                                          "    TAGS: " + CombinedTags + //string.Concat(foundTags.ToArray()) + "\n" +
+                                         "    OFFENDING TAGS: " + foundGraylistedTags +
                                          "    SCORE: Up " + xmlScoreUp[i].InnerText + ", Down " + xmlScoreDown[i].InnerText + ", Total " + xmlScore[i].InnerText + "\n" +
                                          "    RATING: " + rating + "\n" +
-                                         "    DESCRIPITON:\n    \"" + xmlDescription[i].InnerText + "\"\n" +
-                                         "    OFFENDING TAGS: " + foundGraylistedTags +
+                                         "    DESCRIPITON:" + imageDescription +
                                          "\n\n";
                     }
                     else {
@@ -738,7 +744,7 @@ namespace aphrodite {
                                    "    TAGS:\n" + CombinedTags + //string.Concat(foundTags.ToArray()) + "\n" +
                                    "    SCORE: Up " + xmlScoreUp[i].InnerText + ", Down " + xmlScoreDown[i].InnerText + ", Total " + xmlScore[i].InnerText + "\n" +
                                    "    RATING: " + rating + "\n" +
-                                   "    DESCRIPITON:\n    \"" + xmlDescription[i].InnerText + "\"" +
+                                   "    DESCRIPITON:" + imageDescription +
                                    "\n\n";
                     }
                 }
@@ -804,12 +810,12 @@ namespace aphrodite {
                     while (!deadPage) {
                         changeTask("Downloading tag information for page " + (pageCount) + "...");
                         url = tagJson + tags + limitJson + pageJson + pageCount;
-                        xml = apiTools.getJSON(url, webHeader);
+                        xml = apiTools.GetJSON(url, webHeader);
 
                         if (pageLimit > 0 && pageCount > pageLimit)
                             break;
 
-                        if (apiTools.isXmlDead(xml)) {
+                        if (apiTools.IsXmlDead(xml)) {
                             deadPage = true;
                             break;
                         }
@@ -920,6 +926,11 @@ namespace aphrodite {
                                 rating = "Safe";
                             else
                                 rating = "Unknown";
+                            
+                            string imageDescription = " No description";
+                            if (xmlDescription[0].InnerText != "") {
+                                imageDescription = "\n                \"" + xmlDescription[i].InnerText + "\"";
+                            }
 
                             for (int j = 0; j < xmlTagsArtist[i].ChildNodes.Count; j++)
                                 artists += xmlTagsArtist[i].ChildNodes[j].InnerText + "\n               ";
@@ -950,7 +961,7 @@ namespace aphrodite {
                             if (fileUrl == null) {
                                 if (xmlDeleted[i].InnerText.ToLower() == "false") {
                                     //fileUrl = imgUrl + xmlMD5[i].InnerText.Substring(0, 2) + "/" + xmlMD5[i].InnerText.Substring(2, 2) + "." + xmlExt[i].InnerText;
-                                    fileUrl = apiTools.getBlacklistedImageUrl(xmlMD5[i].InnerText, xmlExt[i].InnerText);
+                                    fileUrl = apiTools.GetBlacklistedImageUrl(xmlMD5[i].InnerText, xmlExt[i].InnerText);
                                 }
                             }
 
@@ -1170,11 +1181,11 @@ namespace aphrodite {
                                                  "    MD5: " + xmlMD5[i].InnerText + "\n" +
                                                  "    URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\n" +
                                                  "    ARTIST(S): " + artists + "\n" +
-                                                 "    TAGS:\n" + CombinedTags + //string.Concat(foundTags.ToArray()) + "\n" +
+                                                 "    TAGS: " + CombinedTags + //string.Concat(foundTags.ToArray()) + "\n" +
+                                                 "    OFFENDING TAGS: " + foundGraylistedTags +
                                                  "    SCORE: Up " + xmlScoreUp[i].InnerText + ", Down " + xmlScoreDown[i].InnerText + ", Total " + xmlScore[i].InnerText + "\n" +
                                                  "    RATING: " + rating + "\n" +
-                                                 "    DESCRIPITON:\n    \"" + xmlDescription[i].InnerText + "\"\n" +
-                                                 "    OFFENDING TAGS: " + foundGraylistedTags +
+                                                 "    DESCRIPITON:" + imageDescription +
                                                  "\n\n";
                             }
                             else {
@@ -1214,10 +1225,10 @@ namespace aphrodite {
                                            "    MD5: " + xmlMD5[i].InnerText + "\n" +
                                            "    URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\n" +
                                            "    ARTIST(S): " + artists + "\n" +
-                                           "    TAGS: " + CombinedTags + //string.Concat(foundTags.ToArray()) + "\n" +
+                                           "    TAGS:\n" + CombinedTags + //string.Concat(foundTags.ToArray()) + "\n" +
                                            "    SCORE: Up " + xmlScoreUp[i].InnerText + ", Down " + xmlScoreDown[i].InnerText + ", Total " + xmlScore[i].InnerText + "\n" +
                                            "    RATING: " + rating + "\n" +
-                                           "    DESCRIPITON:\n    \"" + xmlDescription[i].InnerText + "\"" +
+                                           "    DESCRIPITON:" + imageDescription +
                                            "\n\n";
                             }
                         }
@@ -1411,7 +1422,7 @@ namespace aphrodite {
                             //    if (!lbFile.Text.Contains(("(" + e.TotalBytesToReceive / 1024) + "kb)"))
                             //        this.Invoke((MethodInvoker)(() => lbFile.Text += " (" + (e.TotalBytesToReceive / 1024) + "kb)"));
                             //    sizeRecieved = true;
-                            //    Debug.Print((e.TotalBytesToReceive / 1024).ToString());
+                            //    apiTools.SendDebugMessage((e.TotalBytesToReceive / 1024).ToString());
                             //}
                             this.BeginInvoke(new MethodInvoker(() => {
                                 pbDownloadStatus.Value = e.ProgressPercentage;
@@ -1644,15 +1655,15 @@ namespace aphrodite {
 #endregion
             }
             catch (ThreadAbortException) {
-                Debug.Print("Thread was requested to be, and has been, aborted. (frmTagDownloader.cs)");
+                apiTools.SendDebugMessage("Thread was requested to be, and has been, aborted. (frmTagDownloader.cs)");
                 return false;
             }
             catch (ObjectDisposedException) {
-                Debug.Print("Seems like the object got disposed. (frmTagDownloader.cs)");
+                apiTools.SendDebugMessage("Seems like the object got disposed. (frmTagDownloader.cs)");
                 return false;
             }
             catch (WebException WebE) {
-                Debug.Print("A WebException has occured. (frmTagDownloader.cs)");
+                apiTools.SendDebugMessage("A WebException has occured. (frmTagDownloader.cs)");
                 this.BeginInvoke(new MethodInvoker(() => {
                     status.Text = "A WebException has occured";
                     pbDownloadStatus.State = ProgressBarState.Error;
@@ -1662,7 +1673,7 @@ namespace aphrodite {
                 return false;
             }
             catch (Exception ex) {
-                Debug.Print("A gneral exception has occured. (frmTagDownloader.cs)");
+                apiTools.SendDebugMessage("A gneral exception has occured. (frmTagDownloader.cs)");
                 this.BeginInvoke(new MethodInvoker(() => {
                     status.Text = "A Exception has occured";
                     pbDownloadStatus.State = ProgressBarState.Error;
@@ -1701,7 +1712,7 @@ namespace aphrodite {
 
             try {
             // Set the saveTo.
-                string newTagName = apiTools.replaceIllegalCharacters(tags);
+                string newTagName = apiTools.ReplaceIllegalCharacters(tags);
                 if (useMinimumScore)                                                                        // Add minimum score to folder name.
                     newTagName += " (scores " + (minimumScore) + "+)";
                 if (!this.saveTo.EndsWith("\\Pages\\" + newTagName + " (page " + pageNumber + ")"))   // Set the output folder.
@@ -1750,7 +1761,7 @@ namespace aphrodite {
             // Get XML of page.
                 changeTask("Downloading page information...");
                 url = tagJson + tags + pageJson + pageNumber;
-                xml = apiTools.getJSON(url, webHeader);
+                xml = apiTools.GetJSON(url, webHeader);
                 if (xml == null)
                     return false;
 
@@ -1956,19 +1967,19 @@ namespace aphrodite {
                         if (!Directory.Exists(saveTo + "\\explicit"))
                             Directory.CreateDirectory(saveTo + "\\explicit");
                         else
-                            cleanExplicitCount -= apiTools.countFiles(saveTo + "\\explicit");
+                            cleanExplicitCount -= apiTools.CountFiles(saveTo + "\\explicit");
                     }
                     if (QuestionableURLs.Count > 0) {
                         if (!Directory.Exists(saveTo + "\\questionable"))
                             Directory.CreateDirectory(saveTo + "\\questionable");
                         else
-                            cleanQuestionableCount -= apiTools.countFiles(saveTo + "\\questionable");
+                            cleanQuestionableCount -= apiTools.CountFiles(saveTo + "\\questionable");
                     }
                     if (SafeURLs.Count > 0) {
                         if (!Directory.Exists(saveTo + "\\safe"))
                             Directory.CreateDirectory(saveTo + "\\safe");
                         else
-                            cleanSafeCount -= apiTools.countFiles(saveTo + "\\safe");
+                            cleanSafeCount -= apiTools.CountFiles(saveTo + "\\safe");
                     }
 
                     if (saveBlacklistedFiles) {
@@ -1976,19 +1987,19 @@ namespace aphrodite {
                             if (!Directory.Exists(saveTo + "\\explicit\\blacklisted"))
                                 Directory.CreateDirectory(saveTo + "\\explicit\\blacklisted");
                             else
-                                graylistExplicitCount -= apiTools.countFiles(saveTo + "\\explicit\\blacklisted");
+                                graylistExplicitCount -= apiTools.CountFiles(saveTo + "\\explicit\\blacklisted");
                         }
                         if (GraylistedQuestionableURLs.Count > 0) {
                             if (!Directory.Exists(saveTo + "\\questionable\\blacklisted"))
                                 Directory.CreateDirectory(saveTo + "\\questionable\\blacklisted");
                             else
-                                graylistQuestionableCount -= apiTools.countFiles(saveTo + "\\questionable\\blacklisted");
+                                graylistQuestionableCount -= apiTools.CountFiles(saveTo + "\\questionable\\blacklisted");
                         }
                         if (GraylistedSafeURLs.Count > 0) {
                             if (!Directory.Exists(saveTo + "\\safe\\blacklisted"))
                                 Directory.CreateDirectory(saveTo + "\\safe\\blacklisted");
                             else
-                                graylistSafeCount -= apiTools.countFiles(saveTo + "\\safe\\blacklisted");
+                                graylistSafeCount -= apiTools.CountFiles(saveTo + "\\safe\\blacklisted");
                         }
                     }
                 }
@@ -1996,13 +2007,13 @@ namespace aphrodite {
                     if (!Directory.Exists(saveTo))
                         Directory.CreateDirectory(saveTo);
                     else
-                        cleanTotalCount -= apiTools.countFiles(saveTo);
+                        cleanTotalCount -= apiTools.CountFiles(saveTo);
 
                     if (saveBlacklistedFiles && GraylistedURLs.Count > 0) {
                         if (!Directory.Exists(saveTo + "\\blacklisted"))
                             Directory.CreateDirectory(saveTo + "\\blacklisted");
                         else
-                            graylistTotalCount -= apiTools.countFiles(saveTo + "\\blacklisted");
+                            graylistTotalCount -= apiTools.CountFiles(saveTo + "\\blacklisted");
                     }
                 }
 
@@ -2267,20 +2278,20 @@ namespace aphrodite {
                 return true;
             }
             catch (ThreadAbortException) {
-                Debug.Print("Thread was requested to be, and has been, aborted. (frmTagDownloader.cs)");
+                apiTools.SendDebugMessage("Thread was requested to be, and has been, aborted. (frmTagDownloader.cs)");
                 return false;
             }
             catch (ObjectDisposedException) {
-                Debug.Print("An ObjectDisposedException occured. (frmTagDownloader.cs)");
+                apiTools.SendDebugMessage("An ObjectDisposedException occured. (frmTagDownloader.cs)");
                 return false;
             }
             catch (WebException WebE) {
-                Debug.Print("A WebException has occured. (frmTagDownloader.cs)");
+                apiTools.SendDebugMessage("A WebException has occured. (frmTagDownloader.cs)");
                 ErrorLog.ReportWebException(WebE, url, "frmTagDownloader.cs");
                 return false;
             }
             catch (Exception ex) {
-                Debug.Print("A gneral exception has occured. (frmTagDowloader.cs)");
+                apiTools.SendDebugMessage("A gneral exception has occured. (frmTagDowloader.cs)");
                 ErrorLog.ReportException(ex, "frmTagDownloader.cs");
                 return false;
             }

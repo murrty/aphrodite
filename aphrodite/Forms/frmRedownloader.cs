@@ -293,7 +293,7 @@ namespace aphrodite {
                             tagDL.ratings = ratings.Split(' ');
 
                         if (ini.KeyExists("fileNameSchema", "Tags"))
-                            tagDL.fileNameSchema = apiTools.replaceIllegalCharacters(ini.ReadString("fileNameSchema", "Tags").ToLower());
+                            tagDL.fileNameSchema = apiTools.ReplaceIllegalCharacters(ini.ReadString("fileNameSchema", "Tags").ToLower());
                         else
                             tagDL.fileNameSchema = "%md5%";
                     }
@@ -333,7 +333,7 @@ namespace aphrodite {
                         ratings = ratings.TrimEnd(' ');
                         tagDL.ratings = ratings.Split(' ');
 
-                        tagDL.fileNameSchema = apiTools.replaceIllegalCharacters(Tags.Default.fileNameSchema.ToLower());
+                        tagDL.fileNameSchema = apiTools.ReplaceIllegalCharacters(Tags.Default.fileNameSchema.ToLower());
                     }
 
                     tagDL.ShowDialog();
@@ -350,7 +350,7 @@ namespace aphrodite {
                     return;
                 }
 
-                Downloader.downloadPool(poolid.ToString(), useIni);
+                Downloader.Arguments.downloadPool(poolid.ToString(), useIni);
             }
         }
         private void lbTags_MouseDoubleClick(object sender, MouseEventArgs e) {
@@ -465,7 +465,7 @@ namespace aphrodite {
                             tagDL.ratings = ratings.Split(' ');
 
                         if (ini.KeyExists("fileNameSchema", "Tags"))
-                            tagDL.fileNameSchema = apiTools.replaceIllegalCharacters(ini.ReadString("fileNameSchema", "Tags").ToLower());
+                            tagDL.fileNameSchema = apiTools.ReplaceIllegalCharacters(ini.ReadString("fileNameSchema", "Tags").ToLower());
                         else
                             tagDL.fileNameSchema = "%md5%";
                     }
@@ -505,7 +505,7 @@ namespace aphrodite {
                         ratings = ratings.TrimEnd(' ');
                         tagDL.ratings = ratings.Split(' ');
 
-                        tagDL.fileNameSchema = apiTools.replaceIllegalCharacters(Tags.Default.fileNameSchema.ToLower());
+                        tagDL.fileNameSchema = apiTools.ReplaceIllegalCharacters(Tags.Default.fileNameSchema.ToLower());
                     }
 
                     tagDL.ShowDialog();
@@ -529,7 +529,7 @@ namespace aphrodite {
                     return;
                 }
 
-                Downloader.downloadPool(poolid.ToString(), useIni);
+                Downloader.Arguments.downloadPool(poolid.ToString(), useIni);
             }
         }
         private void lbPools_SelectedIndexChanged(object sender, EventArgs e) {

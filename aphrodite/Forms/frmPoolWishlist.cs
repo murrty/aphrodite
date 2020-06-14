@@ -100,8 +100,8 @@ namespace aphrodite {
             if (poolID.Contains("?"))
                 poolID = poolID.Split('?')[0];
             poolID = poolID.Split('/')[5];
-
-            Downloader.downloadPool(poolID, useIni);
+            
+            Downloader.Arguments.downloadPool(poolID, useIni);
         }
 
         private void lbWish_SelectedIndexChanged(object sender, EventArgs e) {
