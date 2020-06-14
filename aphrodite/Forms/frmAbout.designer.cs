@@ -32,6 +32,7 @@
             this.lbBody = new System.Windows.Forms.Label();
             this.pbIcon = new System.Windows.Forms.PictureBox();
             this.tipWoof = new System.Windows.Forms.ToolTip(this.components);
+            this.lnkLicense = new System.Windows.Forms.LinkLabel();
             ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).BeginInit();
             this.SuspendLayout();
             // 
@@ -90,12 +91,24 @@
             this.tipWoof.SetToolTip(this.pbIcon, "bark bark (rough translation: click me)");
             this.pbIcon.Click += new System.EventHandler(this.pbIcon_Click);
             // 
+            // lnkLicense
+            // 
+            this.lnkLicense.AutoSize = true;
+            this.lnkLicense.Location = new System.Drawing.Point(12, 120);
+            this.lnkLicense.Name = "lnkLicense";
+            this.lnkLicense.Size = new System.Drawing.Size(45, 13);
+            this.lnkLicense.TabIndex = 5;
+            this.lnkLicense.TabStop = true;
+            this.lnkLicense.Text = "licenses";
+            this.lnkLicense.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkLicense_LinkClicked);
+            // 
             // frmAbout
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(264, 141);
+            this.Controls.Add(this.lnkLicense);
             this.Controls.Add(this.lbVersion);
             this.Controls.Add(this.pbIcon);
             this.Controls.Add(this.lbBody);
@@ -125,5 +138,6 @@
         private System.Windows.Forms.Label lbBody;
         private System.Windows.Forms.PictureBox pbIcon;
         private System.Windows.Forms.ToolTip tipWoof;
+        private System.Windows.Forms.LinkLabel lnkLicense;
     }
 }

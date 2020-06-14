@@ -340,9 +340,11 @@ namespace aphrodite {
 
                     string fileNamePage = string.Empty;
                     fileNamePage = (PostIDs.IndexOf(xmlID[i].InnerText) + 1).ToString();
-                    do {
-                        fileNamePage = "0" + fileNamePage;
-                    } while (fileNamePage.Length < 4);
+                    if (fileNamePage.Length < 4) {
+                        do {
+                            fileNamePage = "0" + fileNamePage;
+                        } while (fileNamePage.Length < 4);
+                    }
                     //    fileNamePage += "0";
                     //    if (currentPage < 100) {
                     //        fileNamePage += "0";
@@ -610,9 +612,11 @@ namespace aphrodite {
 
                             string fileNamePage = string.Empty;
                             fileNamePage = (PostIDs.IndexOf(xmlID[j].InnerText) + 1).ToString();
-                            do {
-                                fileNamePage = "0" + fileNamePage;
-                            } while (fileNamePage.Length < 4);
+                            if (fileNamePage.Length < 4) {
+                                do {
+                                    fileNamePage = "0" + fileNamePage;
+                                } while (fileNamePage.Length < 4);
+                            }
                             //string fileNamePage = string.Empty;
                             //if (currentPage < 1000) {
                             //    fileNamePage += "0";

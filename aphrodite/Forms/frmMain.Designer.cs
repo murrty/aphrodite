@@ -50,6 +50,7 @@
             this.txtID = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.tbImages = new System.Windows.Forms.TabPage();
+            this.chkImageSeparateArtists = new System.Windows.Forms.CheckBox();
             this.chkImageUseForm = new System.Windows.Forms.CheckBox();
             this.chkImageSeparateBlacklisted = new System.Windows.Forms.CheckBox();
             this.chkImageSeparateRatings = new System.Windows.Forms.CheckBox();
@@ -70,7 +71,6 @@
             this.mAbout = new System.Windows.Forms.MenuItem();
             this.mProtocol = new System.Windows.Forms.MenuItem();
             this.TouchingTips = new System.Windows.Forms.ToolTip(this.components);
-            this.chkImageSeparateArtists = new System.Windows.Forms.CheckBox();
             this.tbMain.SuspendLayout();
             this.tbTags.SuspendLayout();
             this.gbtPageLimit.SuspendLayout();
@@ -412,6 +412,16 @@
             this.tbImages.Text = "Image";
             this.tbImages.UseVisualStyleBackColor = true;
             // 
+            // chkImageSeparateArtists
+            // 
+            this.chkImageSeparateArtists.AutoSize = true;
+            this.chkImageSeparateArtists.Location = new System.Drawing.Point(84, 114);
+            this.chkImageSeparateArtists.Name = "chkImageSeparateArtists";
+            this.chkImageSeparateArtists.Size = new System.Drawing.Size(99, 17);
+            this.chkImageSeparateArtists.TabIndex = 16;
+            this.chkImageSeparateArtists.Text = "Separate artists";
+            this.chkImageSeparateArtists.UseVisualStyleBackColor = true;
+            // 
             // chkImageUseForm
             // 
             this.chkImageUseForm.AutoSize = true;
@@ -571,16 +581,6 @@
             this.mProtocol.Text = "protocol";
             this.mProtocol.Visible = false;
             this.mProtocol.Click += new System.EventHandler(this.mProtocol_Click);
-            // 
-            // chkImageSeparateArtists
-            // 
-            this.chkImageSeparateArtists.AutoSize = true;
-            this.chkImageSeparateArtists.Location = new System.Drawing.Point(84, 114);
-            this.chkImageSeparateArtists.Name = "chkImageSeparateArtists";
-            this.chkImageSeparateArtists.Size = new System.Drawing.Size(99, 17);
-            this.chkImageSeparateArtists.TabIndex = 16;
-            this.chkImageSeparateArtists.Text = "Separate artists";
-            this.chkImageSeparateArtists.UseVisualStyleBackColor = true;
             // 
             // frmMain
             // 

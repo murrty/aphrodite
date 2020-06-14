@@ -371,7 +371,8 @@ namespace aphrodite {
             if (useIni)
                 return;
 
-            FolderBrowserDialog fbd = new FolderBrowserDialog() { Description = "Select a folder to store downloads" };
+            Ookii.Dialogs.WinForms.VistaFolderBrowserDialog fbd = new Ookii.Dialogs.WinForms.VistaFolderBrowserDialog();
+            //FolderBrowserDialog fbd = new FolderBrowserDialog() { Description = "Select a folder to store downloads" };
             if (!string.IsNullOrEmpty(txtSaveTo.Text)) {
                 fbd.SelectedPath = txtSaveTo.Text;
             }

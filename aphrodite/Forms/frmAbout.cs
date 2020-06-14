@@ -45,5 +45,10 @@ namespace aphrodite {
             this.Dispose();
         }
 
+        private void lnkLicense_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
+            frmLicensing license = new frmLicensing();
+            license.ShowDialog();
+        }
+
     }
 }

@@ -413,11 +413,6 @@ namespace aphrodite {
                 MessageBox.Show("Please specify tags to download.");
                 return;
             }
-            if (string.IsNullOrWhiteSpace(Settings.Default.saveLocation)) {
-                MessageBox.Show("Please configure a save location to download images to.");
-                return;
-            }
-
             if (numLimit.Value == 0) {
                 if (MessageBox.Show("Downloading won't be limited. This may take a long while or even blacklist you. Continue anyway?", "aphrodite", MessageBoxButtons.YesNo) == DialogResult.No) {
                     return;
@@ -430,7 +425,6 @@ namespace aphrodite {
             if (txtTags.Text.EndsWith(" ")) {
                 txtTags.Text = txtTags.Text.TrimEnd(' ');
             }
-
             if (txtTags.Text.Contains("/")) {
                 txtTags.Text = txtTags.Text.Replace("/", "%25-2F");
             }
@@ -458,63 +452,25 @@ namespace aphrodite {
             if (ratings.EndsWith(" "))
                 ratings = ratings.TrimEnd(' ');
 
-            frmTagDownloader tagDL = new frmTagDownloader();
-        // Global settings first
-            tagDL.webHeader = Program.UserAgent;
-            tagDL.openAfter = false;
-            if (useIni) {
-                tagDL.saveTo = Environment.CurrentDirectory;
-                tagDL.graylist = File.ReadAllText(Environment.CurrentDirectory + "\\graylist.cfg");
-                tagDL.blacklist = File.ReadAllText(Environment.CurrentDirectory + "\\blacklist.cfg");
-                tagDL.saveInfo = ini.ReadBool("saveInfo", "Global");
-                tagDL.saveBlacklistedFiles = ini.ReadBool("saveBlacklisted", "Global");
-                tagDL.ignoreFinish = ini.ReadBool("ignoreFinish", "Global");
-                tagDL.fileNameSchema = ini.ReadString("fileNameSchema", "Tags");
-            }
-            else {
-                Settings.Default.Reload();
-                tagDL.saveTo = Settings.Default.saveLocation;
-                tagDL.graylist = Settings.Default.blacklist;
-                tagDL.blacklist = Settings.Default.zeroToleranceBlacklist;
-                tagDL.saveInfo = Settings.Default.saveInfo;
-                tagDL.saveBlacklistedFiles = Settings.Default.saveBlacklisted;
-                tagDL.ignoreFinish = Settings.Default.ignoreFinish;
-                tagDL.fileNameSchema = Tags.Default.fileNameSchema;
+            string rates = string.Empty;
+            if (chkSeparateRatings.Checked) {
+                if (chkExplicit.Checked) {
+                    rates += "e ";
+                }
+                if (chkQuestionable.Checked) {
+                    rates += "q ";
+                }
+                if (chkSafe.Checked) {
+                    rates += "s ";
+                }
+                rates = rates.TrimEnd(' ');
             }
 
-        // Form settings next
-            tagDL.tags = txtTags.Text;
-            tagDL.useMinimumScore = chkMinimumScore.Checked;
-            if (tagDL.useMinimumScore) {
-                tagDL.scoreAsTag = chkScoreAsTag.Checked;
-                tagDL.minimumScore = Convert.ToInt32(numScore.Value);
-            }
-            if (numLimit.Value > 0) {
-                tagDL.imageLimit = Convert.ToInt32(numLimit.Value);
-            }
-            if (Convert.ToInt32(numPageLimit.Value) > 0)
-                tagDL.pageLimit = Convert.ToInt32(numPageLimit.Value);
-            tagDL.separateRatings = chkSeparateRatings.Checked;
-            if (tagDL.separateRatings) {
-                string rates = string.Empty;
-                if (chkExplicit.Checked)
-                    rates += "e ";
-                if (chkQuestionable.Checked)
-                    rates += "q ";
-                if (chkSafe.Checked)
-                    rates += "s ";
-                rates = rates.TrimEnd(' ');
-                tagDL.ratings = rates.Split(' ');
-            }
-            tagDL.Show();
-            txtTags.Clear();
+            Downloader.MainForm.downloadTags(txtTags.Text, (int)numPageLimit.Value, chkMinimumScore.Checked, chkScoreAsTag.Checked, (int)numScore.Value, (int)numLimit.Value, rates.Split(' '), chkSeparateRatings.Checked, useIni);
         }
 
         private void chkMinimumScore_CheckedChanged(object sender, EventArgs e) {
             numScore.Enabled = chkMinimumScore.Checked;
-        }
-        private void chkPageLimit_CheckedChanged(object sender, EventArgs e) {
-            //numPageLimit.Enabled = chkPageLimit.Checked;
         }
 
         private void downloadPageOfTags(string tags) {
@@ -649,48 +605,7 @@ namespace aphrodite {
                 return;
             }
 
-            frmPoolDownloader poolDL = new frmPoolDownloader();
-            poolDL.poolID = txtID.Text;
-            poolDL.header = Program.UserAgent;
-
-            if (useIni) {
-                poolDL.saveTo = Environment.CurrentDirectory;
-                poolDL.graylist = File.ReadAllText(Environment.CurrentDirectory + "\\graylist.cfg");
-                poolDL.blacklist = File.ReadAllText(Environment.CurrentDirectory + "\\blacklist.cfg");
-
-                poolDL.saveInfo = ini.ReadBool("saveInfo", "Global");
-                poolDL.saveBlacklisted = ini.ReadBool("saveBlacklisted", "Global");
-                poolDL.ignoreFinish = ini.ReadBool("ignoreFinish", "Global");
-
-                poolDL.saveInfo = ini.ReadBool("saveMetadata", "Global");
-                poolDL.saveBlacklisted = ini.ReadBool("saveArtistMetadata", "Global");
-                poolDL.ignoreFinish = ini.ReadBool("saveTagMetadata", "Global");
-
-                poolDL.fileNameSchema = ini.ReadString("fileNameSchema", "Pools");
-            }
-            else {
-                Settings.Default.Reload();
-                poolDL.saveTo = Settings.Default.saveLocation;
-                poolDL.graylist = Settings.Default.blacklist;
-                poolDL.blacklist = Settings.Default.zeroToleranceBlacklist;
-
-                poolDL.saveInfo = Settings.Default.saveInfo;
-                poolDL.saveBlacklisted = Settings.Default.saveBlacklisted;
-                poolDL.ignoreFinish = Settings.Default.ignoreFinish;
-
-                poolDL.saveMetadata = Settings.Default.saveMetadata;
-                poolDL.saveArtistMetadata = Settings.Default.saveArtistMetadata;
-                poolDL.saveTagMetadata = Settings.Default.saveTagMetadata;
-
-                poolDL.fileNameSchema = Pools.Default.fileNameSchema;
-            }
-
-            poolDL.mergeBlacklisted = chkMerge.Checked;
-            poolDL.openAfter = chkOpen.Checked;
-
-            poolDL.ShowDialog();
-
-            txtID.Clear();
+            Downloader.MainForm.downloadPool(txtID.Text, chkOpen.Checked, chkMerge.Checked, useIni);
         }
 
         private void downloadPool(string poolID) {
