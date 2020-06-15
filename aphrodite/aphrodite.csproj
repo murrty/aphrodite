@@ -88,12 +88,28 @@
     <Compile Include="Forms\frmException.Designer.cs">
       <DependentUpon>frmException.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\frmLicensing.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmLicensing.Designer.cs">
+      <DependentUpon>frmLicensing.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\frmUpdateAvailable.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\frmUpdateAvailable.Designer.cs">
       <DependentUpon>frmUpdateAvailable.cs</DependentUpon>
     </Compile>
+    <Compile Include="Ookii\Interop\ComDlgResources.cs" />
+    <Compile Include="Ookii\Interop\COMGuids.cs" />
+    <Compile Include="Ookii\Interop\ErrorHelper.cs" />
+    <Compile Include="Ookii\Interop\IProgressDialog.cs" />
+    <Compile Include="Ookii\Interop\ShellComInterfaces.cs" />
+    <Compile Include="Ookii\Interop\ShellWrapperDefinitions.cs" />
+    <Compile Include="Ookii\Interop\Win32Resources.cs" />
+    <Compile Include="Ookii\Interop\WindowHandleWrapper.cs" />
+    <Compile Include="Ookii\NativeMethods.cs" />
+    <Compile Include="Ookii\SafeHandle.cs" />
     <Compile Include="Settings\FormSettings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -188,6 +204,9 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Tags.settings</DependentUpon>
     </Compile>
+    <Compile Include="Ookii\VistaFolderBrowserDialog.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <EmbeddedResource Include="Forms\frmAbout.resx">
       <DependentUpon>frmAbout.cs</DependentUpon>
     </EmbeddedResource>
@@ -199,6 +218,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmImageDownloader.resx">
       <DependentUpon>frmImageDownloader.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmLicensing.resx">
+      <DependentUpon>frmLicensing.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmParser.resx">
       <DependentUpon>frmParser.cs</DependentUpon>
