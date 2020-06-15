@@ -29,7 +29,10 @@ namespace aphrodite {
                 }
                 else {
                     Settings.Default.Reload();
-                    tagDL.saveTo = Settings.Default.saveLocation;
+                    if (Settings.Default.saveLocation != string.Empty)
+                        tagDL.saveTo = Settings.Default.saveLocation;
+                    else
+                        tagDL.saveTo = Environment.CurrentDirectory;
                     tagDL.graylist = Settings.Default.blacklist;
                     tagDL.blacklist = Settings.Default.zeroToleranceBlacklist;
                     tagDL.saveInfo = Settings.Default.saveInfo;
@@ -73,7 +76,10 @@ namespace aphrodite {
                 }
                 else {
                     Settings.Default.Reload();
-                    PoolDl.saveTo = Settings.Default.saveLocation;
+                    if (Settings.Default.saveLocation != string.Empty)
+                        PoolDl.saveTo = Settings.Default.saveLocation;
+                    else
+                        PoolDl.saveTo = Environment.CurrentDirectory;
                     PoolDl.graylist = Settings.Default.blacklist;
                     PoolDl.blacklist = Settings.Default.zeroToleranceBlacklist;
 
@@ -142,7 +148,10 @@ namespace aphrodite {
 
                     }
                     else {
-                        imgDl.saveTo = Settings.Default.saveLocation;
+                        if (Settings.Default.saveLocation != string.Empty)
+                            imgDl.saveTo = Settings.Default.saveLocation;
+                        else
+                            imgDl.saveTo = Environment.CurrentDirectory;
                         imgDl.staticSaveTo = Settings.Default.saveLocation;
                         imgDl.graylist = Settings.Default.blacklist;
                         imgDl.blacklist = Settings.Default.zeroToleranceBlacklist;
@@ -223,6 +232,7 @@ namespace aphrodite {
                 try {
                     frmPoolDownloader poolDL = new frmPoolDownloader();
                     poolDL.header = Program.UserAgent;
+                    poolDL.poolID = ID;
 
                     if (useIni) {
                         poolDL.saveTo = Environment.CurrentDirectory;

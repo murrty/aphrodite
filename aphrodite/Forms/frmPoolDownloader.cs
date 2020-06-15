@@ -436,7 +436,7 @@ namespace aphrodite {
                     updateTotals();
 
                     if (isBlacklisted && saveBlacklisted && !mergeBlacklisted) {
-                        blacklistInfo += "    BLACKLISTED PAGE " + (currentPage) + ":\n" +
+                        blacklistInfo += "    BLACKLISTED PAGE " + fileNamePage + ":\n" +
                                          "        MD5: " + xmlMD5[i].InnerText + "\n" +
                                          "        URL: https://e621.net/posts/" + xmlID[i].InnerText + "\n" +
                                          "        ARTIST(S): " + artists + "\n" +
@@ -449,7 +449,7 @@ namespace aphrodite {
 
                     }
                     else {
-                        poolInfo += "    PAGE: " + (currentPage) + "\n" +
+                        poolInfo += "    PAGE: " + fileNamePage + "\n" +
                                     "        MD5: " + xmlMD5[i].InnerText + "\n" +
                                     "        URL: https://e621.net/posts/" + xmlID[i].InnerText + "\n" +
                                     "        ARTIST(S): " + artists + "\n" +
@@ -713,7 +713,7 @@ namespace aphrodite {
                             updateTotals();
 
                             if (isBlacklisted && saveBlacklisted && !mergeBlacklisted) {
-                                blacklistInfo += "    BLACKLISTED PAGE " + (currentPage) + ":\n" +
+                                blacklistInfo += "    BLACKLISTED PAGE " + fileNamePage + ":\n" +
                                                  "        MD5: " + xmlMD5[j].InnerText + "\n" +
                                                  "        URL: https://e621.net/posts/" + xmlID[j].InnerText + "\n" +
                                                  "        ARTIST(S): " + artists + "\n" +
@@ -726,7 +726,7 @@ namespace aphrodite {
 
                             }
                             else {
-                                poolInfo += "    PAGE: " + (currentPage) + "\n" +
+                                poolInfo += "    PAGE: " + fileNamePage + "\n" +
                                             "        MD5: " + xmlMD5[j].InnerText + "\n" +
                                             "        URL: https://e621.net/posts/" + xmlID[j].InnerText + "\n" +
                                             "        ARTIST(S): " + artists + "\n" +
