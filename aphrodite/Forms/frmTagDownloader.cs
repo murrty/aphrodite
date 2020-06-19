@@ -12,7 +12,7 @@ using System.Xml;
 namespace aphrodite {
     public partial class frmTagDownloader : Form {
 
-    #region Variables
+    #region Public Variables
         public string tags = string.Empty;          // The tags that will be downloaded.
         public string downloadUrl = string.Empty;   // The URL that will be downloaded.
         public string webHeader = string.Empty;     // The WebClient header.
@@ -88,6 +88,12 @@ namespace aphrodite {
 
         int blacklistCount = 0;                 // Will be the count of how many blacklisted files that will be skipped.
         int totalCount = 0;                     // Will be the count of how many files that were parsed.
+    #endregion
+
+    #region Private Variables
+        private bool DownloadHasFinished = false;
+        private bool DownloadHasErrored = false;
+        private bool DownloadHasAborted = false;
     #endregion
 
     #region Form
@@ -197,9 +203,35 @@ namespace aphrodite {
             }
         }
 
-        private bool downloadTags() {
+        private void AfterDownload(int PresentFiles, int TotalFiles) {
+            if (DownloadHasFinished) {
+                lbFile.Text = "All " + (PresentFiles) + " file(s) downloaded. (" + (TotalFiles) + " total files downloaded)";
+                pbDownloadStatus.Value = pbDownloadStatus.Maximum;
+                lbPercentage.Text = "Done";
+                tmrTitle.Stop();
+                status.Text = "Finished downloading tags";
+                this.Text = "Finished downloading tags " + tags;
+            }
+            else if (DownloadHasErrored) {
+
+            }
+            else if (DownloadHasAborted) {
+
+            }
+            else {
+                // assume it completed
+                lbFile.Text = "Download assumed to be completed...";
+                pbDownloadStatus.Value = pbDownloadStatus.Maximum;
+                lbPercentage.Text = "Done?";
+                tmrTitle.Stop();
+                status.Text = "DownloadHasFinished is not set to true, assuming the download completed.";
+                this.Text = "Tags download completed";
+            }
+        }
+
+        private void downloadTags() {
             changeTask("Awaiting API call");
-#region new defines
+            #region Download variables
             string url = string.Empty;                                          // The URL being accessed, changes per API call/File download.
 
             string tagInfo = string.Empty;                                      // The buffer for the 'tag.nfo' file that will be created.
@@ -246,12 +278,17 @@ namespace aphrodite {
             int tagLength = 0;                                                  // Will be the count of tags being downloaded (1-6).
             int pageCount = 1;                                                  // Will be the count of the pages parsed.
 
-            bool morePages = false;                                             // Will determine if there are more than 1 page.
-#endregion
+            int count = -1;
+            int presentCount = -1;
 
+            bool morePages = false;                                             // Will determine if there are more than 1 page.
+
+            #endregion
+
+            #region Downloader try-statement
             try {
-#region initialization
-                //Properties.Settings.Default.Log += "Tag downloader starting for tags " + tags + "\n";
+            #region initialization
+            //Properties.Settings.Default.Log += "Tag downloader starting for tags " + tags + "\n";
             // Set the saveTo.
                 string newTagName = apiTools.ReplaceIllegalCharacters(tags);
                 if (useMinimumScore)                                                                    // Add minimum score to folder name.
@@ -298,9 +335,9 @@ namespace aphrodite {
                     GraylistedTags = graylist.Split(' ').ToList();
                 if (!string.IsNullOrWhiteSpace(blacklist))
                     BlacklistedTags = blacklist.Split(' ').ToList();
-#endregion
+            #endregion
 
-#region first page of the tag
+            #region first page of the tag
             // Get XML of page.
                 changeTask("Downloading tag information for page 1...");
                 url = tagJson + tags + limitJson;
@@ -313,9 +350,9 @@ namespace aphrodite {
                     }));
                     return false;
                 }
-#endregion
+            #endregion
 
-#region first page parsing
+            #region first page parsing
             // Parse the XML file.
                 XmlDocument doc = new XmlDocument();
                 doc.LoadXml(xml);
@@ -810,9 +847,9 @@ namespace aphrodite {
                     }
                     lbBlacklist.Text = labelBuffer;
                 }));
-#endregion
+            #endregion
 
-#region parse extra pages past the initial 320 images (copy + paste of the first block)
+            #region parse extra pages past the initial 320 images (copy + paste of the first block)
             // Check for extra pages and then parse them as well.
                 if (morePages) {
                     //Properties.Settings.Default.Log += "More pages detected\n";
@@ -1301,9 +1338,9 @@ namespace aphrodite {
                         pageCount++;
                     }
                 }
-#endregion
+            #endregion
 
-#region output logic
+            #region output logic
             // Create output folders
                 if (separateRatings) {
                     if (ExplicitURLs.Count > 0) {
@@ -1343,9 +1380,9 @@ namespace aphrodite {
                             Directory.CreateDirectory(saveTo + "\\blacklisted");
                     }
                 }
-#endregion
+            #endregion
 
-#region pre-download logic
+            #region pre-download logic
             // Update totals
                 if (separateRatings) {
                     cleanTotalCount = cleanExplicitCount + cleanQuestionableCount + cleanSafeCount;
@@ -1424,9 +1461,9 @@ namespace aphrodite {
 
                     pbDownloadStatus.Style = ProgressBarStyle.Blocks;
                 }));
-#endregion
+            #endregion
 
-#region download
+            #region download
             // Start the download
                 using (ExWebClient wc = new ExWebClient()) {
                     wc.DownloadProgressChanged += (s, e) => {
@@ -1635,11 +1672,11 @@ namespace aphrodite {
                         }
                     }
                 }
-#endregion
+            #endregion
 
-#region post download
-                int count = 0;
-                int presentCount = 0;
+            #region post download
+                count = 0;
+                presentCount = 0;
                 if (separateRatings) {
                     count += (ExplicitURLs.Count + QuestionableURLs.Count + SafeURLs.Count);
                     presentCount += cleanTotalCount;
@@ -1657,24 +1694,19 @@ namespace aphrodite {
                     }
                 }
 
-                this.BeginInvoke(new MethodInvoker(() => {
-                    lbFile.Text = "All " + (presentCount) + " file(s) downloaded. (" + (count) + " total files downloaded)";
-                    pbDownloadStatus.Value = pbDownloadStatus.Maximum;
-                    lbPercentage.Text = "Done";
-                    tmrTitle.Stop();
-                    status.Text = "Finished downloading tags";
-                    this.Text = "Tags download completed";
-                }));
-                return true;
-#endregion
+                DownloadHasFinished = true;
+            #endregion
             }
+            #endregion
+
+            #region Downloader catch-statements
             catch (ThreadAbortException) {
                 apiTools.SendDebugMessage("Thread was requested to be, and has been, aborted. (frmTagDownloader.cs)");
-                return false;
+                DownloadHasAborted = true;
             }
             catch (ObjectDisposedException) {
                 apiTools.SendDebugMessage("Seems like the object got disposed. (frmTagDownloader.cs)");
-                return false;
+                DownloadHasErrored = true;
             }
             catch (WebException WebE) {
                 apiTools.SendDebugMessage("A WebException has occured. (frmTagDownloader.cs)");
@@ -1683,8 +1715,8 @@ namespace aphrodite {
                     pbDownloadStatus.State = ProgressBarState.Error;
                     pbTotalStatus.State = ProgressBarState.Error;
                 }));
+                DownloadHasErrored = true;
                 ErrorLog.ReportWebException(WebE,url, "frmTagDownloader.cs");
-                return false;
             }
             catch (Exception ex) {
                 apiTools.SendDebugMessage("A gneral exception has occured. (frmTagDownloader.cs)");
@@ -1693,9 +1725,16 @@ namespace aphrodite {
                     pbDownloadStatus.State = ProgressBarState.Error;
                     pbTotalStatus.State = ProgressBarState.Error;
                 }));
+                DownloadHasErrored = true;
                 ErrorLog.ReportException(ex, "frmTagDownloader.cs");
-                return false;
             }
+            #endregion
+
+            #region After download
+            this.BeginInvoke(new MethodInvoker(() => {
+                AfterDownload(presentCount, count);
+            }));
+            #endregion
         }
         private bool downloadPage(string pageURL) {
             string pageNumber = pageURL.Split('/')[5];
