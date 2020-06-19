@@ -158,8 +158,18 @@ namespace aphrodite {
             this.CenterToScreen();
         }
         private void frmDownload_FormClosing(object sender, FormClosingEventArgs e) {
-            tagDownload.Abort();
-            this.Dispose();
+            if (!DownloadHasFinished && !DownloadHasErrored && !DownloadHasAborted) {
+                DownloadHasAborted = true;
+
+                if (tagDownload.IsAlive) {
+                    tagDownload.Abort();
+                }
+                
+                e.Cancel = true;
+            }
+            else {
+                this.Dispose();
+            }
         }
 
         private void tmrTitle_Tick(object sender, EventArgs e) {
@@ -185,12 +195,7 @@ namespace aphrodite {
                             this.DialogResult = DialogResult.Abort;
                     }
                     else {
-                        if (downloadTags()) {
-                            if (ignoreFinish)
-                                this.DialogResult = DialogResult.OK;
-                        }
-                        else
-                            this.DialogResult = DialogResult.Abort;
+                        downloadTags();
                     }
                 });
 
@@ -204,19 +209,37 @@ namespace aphrodite {
         }
 
         private void AfterDownload(int PresentFiles, int TotalFiles) {
+            if (ignoreFinish) {
+                if (DownloadHasFinished) {
+                    this.DialogResult = DialogResult.OK;
+                }
+                else {
+                    this.DialogResult = DialogResult.Abort;
+                }
+            }
             if (DownloadHasFinished) {
                 lbFile.Text = "All " + (PresentFiles) + " file(s) downloaded. (" + (TotalFiles) + " total files downloaded)";
                 pbDownloadStatus.Value = pbDownloadStatus.Maximum;
                 lbPercentage.Text = "Done";
                 tmrTitle.Stop();
-                status.Text = "Finished downloading tags";
                 this.Text = "Finished downloading tags " + tags;
+                status.Text = "Finished downloading tags";
             }
             else if (DownloadHasErrored) {
-
+                lbFile.Text = "Downloading has encountered an error";
+                pbDownloadStatus.State = ProgressBarState.Error;
+                lbPercentage.Text = "Error";
+                tmrTitle.Stop();
+                this.Text = "Download error";
+                status.Text = "Downloading has resulted in an error";
             }
             else if (DownloadHasAborted) {
-
+                lbFile.Text = "Download canceled";
+                pbDownloadStatus.State = ProgressBarState.Error;
+                lbPercentage.Text = "Canceled";
+                tmrTitle.Stop();
+                this.Text = "Download canceled";
+                status.Text = "Download has canceled";
             }
             else {
                 // assume it completed
@@ -224,8 +247,8 @@ namespace aphrodite {
                 pbDownloadStatus.Value = pbDownloadStatus.Maximum;
                 lbPercentage.Text = "Done?";
                 tmrTitle.Stop();
-                status.Text = "DownloadHasFinished is not set to true, assuming the download completed.";
                 this.Text = "Tags download completed";
+                status.Text = "DownloadHasFinished is not set to true, assuming the download completed";
             }
         }
 
@@ -343,12 +366,14 @@ namespace aphrodite {
                 url = tagJson + tags + limitJson;
                 xml = apiTools.GetJSON(url, webHeader);
                 if (apiTools.IsXmlDead(xml)) {
+                    DownloadHasErrored = true;
                     this.BeginInvoke(new MethodInvoker(() => {
                         pbDownloadStatus.Value = 0;
-                        lbPercentage.Text = "0%";
+                        pbDownloadStatus.Style = ProgressBarStyle.Blocks;
+                        lbPercentage.Text = "API error";
                         status.Text = "API returned null.";
                     }));
-                    return false;
+                    return;
                 }
             #endregion
 
