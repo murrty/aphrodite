@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Aphrodite
 // @namespace   https://github.com/murrty/aphrodite
-// @version     1.5
+// @version     1.6
 // @description e621 general downloader (pools & images based on tags)
 // @run-at      document-end
 // @include     http*://e621.net/pools/*
@@ -38,25 +38,27 @@ if (document.URL.indexOf("e621.net/posts/") > -1 || document.URL.indexOf("e621.n
 
     poolDiv.id = "paginator";
 
-    if (document.URL.indexOf("e621.net/pools/") > -1) {
-        poolDiv.appendChild(poolSpacer);
-    }
 
     poolLink.id = "download-pool";
     poolLink.title = "Download this pool using aphrodite";
     poolLink.appendChild(document.createTextNode('download pool'));
     poolDiv.appendChild(poolLink);
-
-    poolWish.id = "pool-add-to-wishlist";
-    poolWish.title = "Add pool to aphrodite's wishlist";
-    poolWish.appendChild(document.createTextNode('add to wishlist'));
+    poolLink.style = "position: relative;left: 5px";
 
     poolSettings.id = "pool-settings";
     poolSettings.href = "pools:configuresettings";
     poolSettings.title = "Change aphrodite's pool downloading settings";
-    poolSettings.appendChild(document.createTextNode('settings'));
+    poolSettings.appendChild(document.createTextNode('pool settings'));
+    poolSettings.style = "position: relative;left: 25px";
     poolDiv.appendChild(poolSettings);
+  
+    poolWish.id = "pool-add-to-wishlist";
+    poolWish.title = "Add pool to aphrodite's wishlist";
+    poolWish.style = "position: relative;left: 45px";
+    poolWish.appendChild(document.createTextNode('add to wishlist'));
 
+
+  
     //if (document.URL.indexOf("e621.net/posts/") > -1) {
     //    poolDiv.style = "display: normal; text-align: left; padding: 1em 23px 1em;"
     //    poolDiv.className = "status-notice";
@@ -72,6 +74,7 @@ if (document.URL.indexOf("e621.net/posts/") > -1 || document.URL.indexOf("e621.n
         poolWish.href = "poolwl:" + document.URL + "$" + document.title.substring(6, document.title.length - 7);
         poolDiv.appendChild(poolWish);
         fPoolElement.parentNode.insertBefore(poolDiv, fPoolElement);
+        fPoolElement.parentNode.insertBefore(poolSpacer, fPoolElement);
     }
 }
 // Tag
@@ -110,4 +113,3 @@ else if (document.URL.indexOf("e621.net/posts") > -1 || document.URL.indexOf("e6
     tagDiv.appendChild(tagSettings);
     tagElement.parentNode.insertBefore(tagDiv, tagElement);
 }
-
