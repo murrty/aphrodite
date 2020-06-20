@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        aphrodite images
 // @namespace   https://github.com/murrty/aphrodite
-// @version     1.3
+// @version     1.4
 // @description e621 image downloader
 // @run-at      document-end
 // @include     http*://e621.net/posts/*
@@ -33,8 +33,9 @@ imageSettings.href = "images:configuresettings";
 imageSettings.title = "Change the Image Downloader settings";
 imageSettings.appendChild(document.createTextNode('image settings'));
 imageDiv.appendChild(imageSettings);
-imageDiv.appendChild(imageSpacerTwo);
+//imageDiv.appendChild(imageSpacerTwo);
 
 //imageDiv.style = "display: normal; text-align: left; padding: 1em 18px 1em;";
 imageDiv.className = "status-notice";
 fImagesSidebar.parentNode.insertBefore(imageDiv, fImagesSidebar);
+fImagesSidebar.parentNode.insertBefore(imageSpacerTwo, fImagesSidebar);
