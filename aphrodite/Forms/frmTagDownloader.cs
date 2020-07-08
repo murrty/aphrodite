@@ -63,34 +63,37 @@ namespace aphrodite {
         //       > = %3E
         //       | = %7C
         // (space) = %20
-        
-        Thread tagDownload;                     // New thread for the downloader.
-
-        int cleanTotalCount = 0;                // Will be the count of how many files that are set for download.
-        int cleanExplicitCount = 0;             // Will be the count of how many explicit files that are set for download.
-        int cleanQuestionableCount = 0;         // Will be the count of how many questionable files that are set for download.
-        int cleanSafeCount = 0;                 // Will be the count of how many safe files that are set for download.
-
-        int cleanTotalExistCount = 0;           // Will be the count of how many files already exist in total.
-        int cleanExplicitExistCount = 0;        // Will be the count of how many explicit files already exist.
-        int cleanQuestionableExistCount = 0;    // Will be the count of how many questionable files already exist.
-        int cleanSafeExistCount = 0;            // Will be the count of how many safe files already exist.
-
-        int graylistTotalCount = 0;             // Will be the count of how many graylisted files that are set for download.
-        int graylistExplicitCount = 0;          // Will be the count of how many explicit graylisted files that are set for download.
-        int graylistQuestionableCount = 0;      // Will be the count of how many questionable graylisted files that are set for download.
-        int graylistSafeCount = 0;              // Will be the count of how many safe graylisted files that are set for download.
-
-        int graylistTotalExistCount = 0;        // Will be the count of how many gralisted files already exist in total.
-        int graylistExplicitExistCount = 0;     // Will be the count of how many explicit graylisted files already exist.
-        int graylistQuestionableExistCount = 0; // Will be the count of how many questionable graylisted files already exist.
-        int graylistSafeExistCount = 0;         // Will be the count of how many safe graylisted files already exist.
-
-        int blacklistCount = 0;                 // Will be the count of how many blacklisted files that will be skipped.
-        int totalCount = 0;                     // Will be the count of how many files that were parsed.
     #endregion
 
     #region Private Variables
+        private Thread tagDownload;                     // New thread for the downloader.
+
+        private int cleanTotalCount = 0;                // Will be the count of how many files that are set for download.
+        private int cleanExplicitCount = 0;             // Will be the count of how many explicit files that are set for download.
+        private int cleanQuestionableCount = 0;         // Will be the count of how many questionable files that are set for download.
+        private int cleanSafeCount = 0;                 // Will be the count of how many safe files that are set for download.
+
+        private int cleanTotalExistCount = 0;           // Will be the count of how many files already exist in total.
+        private int cleanExplicitExistCount = 0;        // Will be the count of how many explicit files already exist.
+        private int cleanQuestionableExistCount = 0;    // Will be the count of how many questionable files already exist.
+        private int cleanSafeExistCount = 0;            // Will be the count of how many safe files already exist.
+
+        private int graylistTotalCount = 0;             // Will be the count of how many graylisted files that are set for download.
+        private int graylistExplicitCount = 0;          // Will be the count of how many explicit graylisted files that are set for download.
+        private int graylistQuestionableCount = 0;      // Will be the count of how many questionable graylisted files that are set for download.
+        private int graylistSafeCount = 0;              // Will be the count of how many safe graylisted files that are set for download.
+
+        private int graylistTotalExistCount = 0;        // Will be the count of how many gralisted files already exist in total.
+        private int graylistExplicitExistCount = 0;     // Will be the count of how many explicit graylisted files already exist.
+        private int graylistQuestionableExistCount = 0; // Will be the count of how many questionable graylisted files already exist.
+        private int graylistSafeExistCount = 0;         // Will be the count of how many safe graylisted files already exist.
+
+        private int blacklistCount = 0;                 // Will be the count of how many blacklisted files that will be skipped.
+        private int totalCount = 0;                     // Will be the count of how many files that were parsed.
+
+        private int PresentFiles = 0;
+        private int TotalFiles = 0;
+
         private bool DownloadHasFinished = false;
         private bool DownloadHasErrored = false;
         private bool DownloadHasAborted = false;
@@ -159,13 +162,24 @@ namespace aphrodite {
         }
         private void frmDownload_FormClosing(object sender, FormClosingEventArgs e) {
             if (!DownloadHasFinished && !DownloadHasErrored && !DownloadHasAborted) {
+                tmrTitle.Stop();
                 DownloadHasAborted = true;
 
                 if (tagDownload.IsAlive) {
                     tagDownload.Abort();
                 }
-                
-                e.Cancel = true;
+
+                if (!ignoreFinish) {
+                    e.Cancel = true;
+                }
+                else {
+                    lbFile.Text = "Download canceled";
+                    pbDownloadStatus.State = ProgressBarState.Error;
+                    lbPercentage.Text = "Canceled";
+                    tmrTitle.Stop();
+                    this.Text = "Download canceled";
+                    status.Text = "Download has canceled";
+                }
             }
             else {
                 this.Dispose();
@@ -208,13 +222,19 @@ namespace aphrodite {
             }
         }
 
-        private void AfterDownload(int PresentFiles, int TotalFiles) {
+        private void AfterDownload(int ErrorType = 0) {
             if (ignoreFinish) {
                 if (DownloadHasFinished) {
-                    this.DialogResult = DialogResult.OK;
+                    this.DialogResult = DialogResult.Yes;
+                }
+                else if (DownloadHasErrored) {
+                    this.DialogResult = DialogResult.No;
+                }
+                else if (DownloadHasAborted) {
+                    this.DialogResult = DialogResult.Abort;
                 }
                 else {
-                    this.DialogResult = DialogResult.Abort;
+                    this.DialogResult = DialogResult.Ignore;
                 }
             }
             if (DownloadHasFinished) {
@@ -226,12 +246,22 @@ namespace aphrodite {
                 status.Text = "Finished downloading tags";
             }
             else if (DownloadHasErrored) {
-                lbFile.Text = "Downloading has encountered an error";
-                pbDownloadStatus.State = ProgressBarState.Error;
-                lbPercentage.Text = "Error";
-                tmrTitle.Stop();
-                this.Text = "Download error";
-                status.Text = "Downloading has resulted in an error";
+                if (ErrorType == 0) {
+                    lbFile.Text = "Downloading has encountered an error";
+                    pbDownloadStatus.State = ProgressBarState.Error;
+                    lbPercentage.Text = "Error";
+                    tmrTitle.Stop();
+                    this.Text = "Download error";
+                    status.Text = "Downloading has resulted in an error";
+                }
+                else if (ErrorType == 1) {
+                    lbFile.Text = "API parsing has resulted in an error";
+                    pbDownloadStatus.State = ProgressBarState.Error;
+                    lbPercentage.Text = "Error";
+                    tmrTitle.Stop();
+                    this.Text = "API parsing error";
+                    status.Text = "API parsing has resulted in an error";
+                }
             }
             else if (DownloadHasAborted) {
                 lbFile.Text = "Download canceled";
@@ -248,7 +278,7 @@ namespace aphrodite {
                 lbPercentage.Text = "Done?";
                 tmrTitle.Stop();
                 this.Text = "Tags download completed";
-                status.Text = "DownloadHasFinished is not set to true, assuming the download completed";
+                status.Text = "Download status booleans not set, assuming the download completed";
             }
         }
 
@@ -366,14 +396,7 @@ namespace aphrodite {
                 url = tagJson + tags + limitJson;
                 xml = apiTools.GetJSON(url, webHeader);
                 if (apiTools.IsXmlDead(xml)) {
-                    DownloadHasErrored = true;
-                    this.BeginInvoke(new MethodInvoker(() => {
-                        pbDownloadStatus.Value = 0;
-                        pbDownloadStatus.Style = ProgressBarStyle.Blocks;
-                        lbPercentage.Text = "API error";
-                        status.Text = "API returned null.";
-                    }));
-                    return;
+                    throw new ApiReturnedNullOrEmptyException(ApiReturnedNullOrEmptyException.ReportedEmpty);
                 }
             #endregion
 
@@ -511,7 +534,7 @@ namespace aphrodite {
                 // File name artist for the schema
                     string fileNameArtist = "(none)";
                     bool useHardcodedFilter = false;
-                    if (string.IsNullOrEmpty(Settings.Default.undesiredTags))
+                    if (string.IsNullOrEmpty(General.Default.undesiredTags))
                         useHardcodedFilter = true;
 
                     if (xmlTagsArtist[i].ChildNodes.Count > 0) {
@@ -551,7 +574,7 @@ namespace aphrodite {
 
                 // Check for null file url + fix for files that are auto blacklisted :)
                     string fileUrl = xmlURL[i].InnerText;
-                    if (fileUrl == null) {
+                    if (string.IsNullOrEmpty(fileUrl)) {
                         if (xmlDeleted[i].InnerText.ToLower() == "false") {
                             //fileUrl = imgUrl + xmlMD5[i].InnerText.Substring(0, 2) + "/" + xmlMD5[i].InnerText.Substring(2, 2) + "." + xmlExt[i].InnerText;
                             fileUrl = apiTools.GetBlacklistedImageUrl(xmlMD5[i].InnerText, xmlExt[i].InnerText);
@@ -1011,7 +1034,7 @@ namespace aphrodite {
 
                             string fileNameArtist = "(none)";
                             bool useHardcodedFilter = false;
-                            if (string.IsNullOrEmpty(Settings.Default.undesiredTags))
+                            if (string.IsNullOrEmpty(General.Default.undesiredTags))
                                 useHardcodedFilter = true;
 
                             if (xmlTagsArtist[i].ChildNodes.Count > 0) {
@@ -1044,9 +1067,8 @@ namespace aphrodite {
                                                             .Replace("%author%", xmlAuthor[i].InnerText) + "." + xmlExt[i].InnerText;
 
                             string fileUrl = xmlURL[i].InnerText;
-                            if (fileUrl == null) {
+                            if (string.IsNullOrEmpty(fileUrl)) {
                                 if (xmlDeleted[i].InnerText.ToLower() == "false") {
-                                    //fileUrl = imgUrl + xmlMD5[i].InnerText.Substring(0, 2) + "/" + xmlMD5[i].InnerText.Substring(2, 2) + "." + xmlExt[i].InnerText;
                                     fileUrl = apiTools.GetBlacklistedImageUrl(xmlMD5[i].InnerText, xmlExt[i].InnerText);
                                 }
                             }
@@ -1505,6 +1527,8 @@ namespace aphrodite {
                                 pbDownloadStatus.Value++;
                                 pbDownloadStatus.Value--;
                                 lbPercentage.Text = e.ProgressPercentage.ToString() + "%";
+
+                                lbBytes.Text = (e.BytesReceived / 1024) + " kb / " + (e.TotalBytesToReceive / 1024) + " kb";
                             }));
                         }
                     };
@@ -1700,22 +1724,20 @@ namespace aphrodite {
             #endregion
 
             #region post download
-                count = 0;
-                presentCount = 0;
                 if (separateRatings) {
-                    count += (ExplicitURLs.Count + QuestionableURLs.Count + SafeURLs.Count);
-                    presentCount += cleanTotalCount;
+                    TotalFiles += (ExplicitURLs.Count + QuestionableURLs.Count + SafeURLs.Count);
+                    PresentFiles += cleanTotalCount;
                     if (saveBlacklistedFiles) {
-                        count += (GraylistedExplicitURLs.Count + GraylistedQuestionableURLs.Count + GraylistedSafeURLs.Count);
-                        presentCount += graylistTotalCount;
+                        TotalFiles += (GraylistedExplicitURLs.Count + GraylistedQuestionableURLs.Count + GraylistedSafeURLs.Count);
+                        PresentFiles += graylistTotalCount;
                     }
                 }
                 else {
-                    count += URLs.Count;
-                    presentCount += cleanTotalCount;
+                    TotalFiles += URLs.Count;
+                    PresentFiles += cleanTotalCount;
                     if (saveBlacklistedFiles) {
-                        count += GraylistedURLs.Count;
-                        presentCount += graylistTotalCount;
+                        TotalFiles += GraylistedURLs.Count;
+                        PresentFiles += graylistTotalCount;
                     }
                 }
 
@@ -1731,6 +1753,10 @@ namespace aphrodite {
             }
             catch (ObjectDisposedException) {
                 apiTools.SendDebugMessage("Seems like the object got disposed. (frmTagDownloader.cs)");
+                DownloadHasErrored = true;
+            }
+            catch (ApiReturnedNullOrEmptyException) {
+                apiTools.SendDebugMessage("Api returned null or empty. (frmTagDownloader.cs)");
                 DownloadHasErrored = true;
             }
             catch (WebException WebE) {
@@ -1755,10 +1781,12 @@ namespace aphrodite {
             }
             #endregion
 
-            #region After download
-            this.BeginInvoke(new MethodInvoker(() => {
-                AfterDownload(presentCount, count);
-            }));
+            #region After download finally statement
+            finally {
+                this.BeginInvoke(new MethodInvoker(() => {
+                    AfterDownload();
+                }));
+            }
             #endregion
         }
         private bool downloadPage(string pageURL) {

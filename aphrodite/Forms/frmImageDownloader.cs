@@ -12,7 +12,7 @@ using System.Xml;
 namespace aphrodite {
     public partial class frmImageDownloader : Form {
 
-    #region Variables
+    #region Public Variables
         public string url;                      // The URL of the file to be downloaded.
         public string postID;                   // The ID of the post.
 
@@ -40,9 +40,15 @@ namespace aphrodite {
                                                     // %score%      = the score of the post
                                                     // %author%     = the user who submitted the post to e621
 
-        Thread imageDownload;                   // The thread for the downloader.
-
         public static readonly string postJsonBase = "https://e621.net/posts/{0}.json";
+    #endregion
+
+    #region PrivateVariables
+        private Thread imageDownload;                   // The thread for the downloader.
+
+        private bool DownloadHasFinished = false;
+        private bool DownloadHasErrored = false;
+        private bool DownloadHasAborted = false;
     #endregion
 
     #region Form
@@ -68,18 +74,61 @@ namespace aphrodite {
         private void startDownload() {
             imageDownload = new Thread(() => {
                 Thread.CurrentThread.IsBackground = true;
-                if (downloadImage()) {
-                    if (!ignoreFinish)
-                        MessageBox.Show("The post " + postID +" has beem downloaded.");
-
-                    this.DialogResult = DialogResult.OK;
-                }
+                downloadImage();
             });
             tmrTitle.Start();
             imageDownload.Start();
         }
-
-        public bool downloadImage() {
+        private void AfterDownload() {
+            if (ignoreFinish) {
+                if (DownloadHasFinished) {
+                    this.DialogResult = DialogResult.Yes;
+                }
+                else if (DownloadHasErrored) {
+                    this.DialogResult = DialogResult.No;
+                }
+                else if (DownloadHasAborted) {
+                    this.DialogResult = DialogResult.Abort;
+                }
+                else {
+                    this.DialogResult = DialogResult.Ignore;
+                }
+            }
+            if (DownloadHasFinished) {
+                lbInfo.Text = "The image has been downloaded";
+                pbDownloadStatus.Value = pbDownloadStatus.Maximum;
+                lbPercentage.Text = "Done";
+                tmrTitle.Stop();
+                this.Text = "Image " +  postID + " finished downloading";
+                status.Text = "Finished downloading pool";
+            }
+            else if (DownloadHasErrored) {
+                lbInfo.Text = "Downloading has encountered an error";
+                pbDownloadStatus.State = ProgressBarState.Error;
+                lbPercentage.Text = "Error";
+                tmrTitle.Stop();
+                this.Text = "Download error";
+                status.Text = "Downloading has resulted in an error";
+            }
+            else if (DownloadHasAborted) {
+                lbInfo.Text = "Download canceled";
+                pbDownloadStatus.State = ProgressBarState.Error;
+                lbPercentage.Text = "Canceled";
+                tmrTitle.Stop();
+                this.Text = "Download canceled";
+                status.Text = "Download has canceled";
+            }
+            else {
+                // assume it completed
+                lbInfo.Text = "Download assumed to be completed...";
+                pbDownloadStatus.Value = pbDownloadStatus.Maximum;
+                lbPercentage.Text = "Done?";
+                tmrTitle.Stop();
+                this.Text = "Image " + postID + " finished downloading";
+                status.Text = "Download status booleans not set, assuming the download completed";
+            }
+        }
+        public void downloadImage() {
             try {
             // Set the saveto to \\Images.
                 if (!saveTo.EndsWith("\\Images"))
@@ -118,7 +167,7 @@ namespace aphrodite {
             // Check the XML.
                 if (postXML == apiTools.EmptyXML || string.IsNullOrWhiteSpace(postXML)) {
                     apiTools.SendDebugMessage("Xml is empty, aborting.");
-                    return false;
+                    throw new Exception("XML is reported as empty, cannot parse an empty xml.");
                 }
 
             // Begin parsing XML.
@@ -147,7 +196,8 @@ namespace aphrodite {
                 XmlNodeList xmlDeleted = xmlDoc.DocumentElement.SelectNodes("/root/post/flags/deleted");
 
                 if (xmlDeleted[0].InnerText.ToLower() == "true") {
-                    //return false;
+                    DownloadHasErrored = true;
+                    goto Finished;
                 }
 
                 string DownloadUrl = xmlURL[0].InnerText;
@@ -155,7 +205,8 @@ namespace aphrodite {
                     DownloadUrl = apiTools.GetBlacklistedImageUrl(xmlMD5[0].InnerText, xmlExt[0].InnerText);
                     if (DownloadUrl == null) {
                         ErrorLog.ReportCustomException("DownloadUrl was still null after attempting to bypass blacklist with MD5", "ImageDownloader.cs");
-                        return false;
+                        DownloadHasErrored = true;
+                        return;
                     }
                 }
 
@@ -323,7 +374,7 @@ namespace aphrodite {
             // Work on the filename
                 string fileNameArtist = "(none)";
                 bool useHardcodedFilter = false;
-                if (string.IsNullOrEmpty(Settings.Default.undesiredTags))
+                if (string.IsNullOrEmpty(General.Default.undesiredTags))
                     useHardcodedFilter = true;
 
                 if (xmlTagsArtist.Count > 0) {
@@ -383,8 +434,10 @@ namespace aphrodite {
                     Directory.CreateDirectory(saveTo);
 
             // Check file before continuing.
-                if (File.Exists(saveTo + "\\" + fileName))
-                    return true;
+                if (File.Exists(saveTo + "\\" + fileName)) {
+                    DownloadHasFinished = true;
+                    goto Finished;
+                }
 
             // Save image.nfo.
                 if (saveInfo) {
@@ -450,16 +503,16 @@ namespace aphrodite {
                     wc.DownloadFile(DownloadUrl, saveTo + "\\" + fileName);
                 }
 
-
-                return true;
+                DownloadHasFinished = true;
+Finished:
+                Debug.Print("Finished");
             }
             catch (ThreadAbortException) {
                 apiTools.SendDebugMessage("Thread was requested to be, and has been, aborted. (frmImageDownloader.cs)");
-                return false;
+                DownloadHasAborted = true;
             }
             catch (ObjectDisposedException) {
                 apiTools.SendDebugMessage("An ObjectDisposedException occured. (frmImageDownloader.cs)");
-                return false;
             }
             catch (WebException WebE) {
                 apiTools.SendDebugMessage("A WebException has occured. (frmImageDownloader.cs)");
@@ -468,7 +521,7 @@ namespace aphrodite {
                     pbDownloadStatus.State = ProgressBarState.Error;
                 }));
                 ErrorLog.ReportWebException(WebE, url, "frmImageDownloader.cs");
-                return false;
+                DownloadHasErrored = true;
             }
             catch (Exception ex) {
                 apiTools.SendDebugMessage("A gneral exception has occured. (frmImageDownloader.cs)");
@@ -477,10 +530,16 @@ namespace aphrodite {
                     pbDownloadStatus.State = ProgressBarState.Error;
                 }));
                 ErrorLog.ReportException(ex, "frmImageDownloader.cs");
-                return false;
+                DownloadHasErrored = true;
+            }
+            finally {
+                this.BeginInvoke(new MethodInvoker(() => {
+                    AfterDownload();
+                }));
             }
         }
     #endregion
+
 
     }
 }
