@@ -6,7 +6,6 @@ using System.Net;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading;
-using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -72,7 +71,7 @@ namespace aphrodite {
             }
         }
         public static bool IsXmlDead(string xml) {
-            if (xml == null || xml == EmptyXML)
+            if (string.IsNullOrEmpty(xml) || xml == EmptyXML)
                 return true;
             else
                 return false;
@@ -105,7 +104,7 @@ namespace aphrodite {
         }
 
         public static string GetBlacklistedImageUrl(string md5, string ext) {
-            return "https://static1.e621.net/data/" + md5.Substring(0, 2) + "/" + md5.Substring(2, 2) + "." + ext;
+            return "https://static1.e621.net/data/" + md5.Substring(0, 2) + "/" + md5.Substring(2, 2) + "/" + md5 + "." + ext;
         }
 
         public static string GetTagsFromUrl(string url) {
@@ -216,5 +215,25 @@ namespace aphrodite {
             return input.Replace("https://www.", "https://");
         }
     #endregion
+
     }
+
+    [Serializable]
+    public class ApiReturnedNullOrEmptyException : Exception {
+        public static string ReportedEmpty = "API was reported as empty.";
+        public static string ReportedDead = "API was reported as dead.";
+        public ApiReturnedNullOrEmptyException () { }
+
+        public ApiReturnedNullOrEmptyException (string message) : base(message) { }
+
+        public ApiReturnedNullOrEmptyException(string message, Exception inner) : base (message, inner) { }
+    }
+    [Serializable]
+    public class ApiReturnedNullException : Exception {
+        public ApiReturnedNullException () { }
+        public ApiReturnedNullException(string message) : base(message) { }
+        public ApiReturnedNullException(string message, Exception inner) : base(message, inner) { }
+    }
+
+
 }
