@@ -28,16 +28,16 @@ namespace aphrodite {
                     tagDL.fileNameSchema = ini.ReadString("fileNameSchema", "Tags");
                 }
                 else {
-                    Settings.Default.Reload();
-                    if (Settings.Default.saveLocation != string.Empty)
-                        tagDL.saveTo = Settings.Default.saveLocation;
+                    General.Default.Reload();
+                    if (General.Default.saveLocation != string.Empty)
+                        tagDL.saveTo = General.Default.saveLocation;
                     else
                         tagDL.saveTo = Environment.CurrentDirectory;
-                    tagDL.graylist = Settings.Default.blacklist;
-                    tagDL.blacklist = Settings.Default.zeroToleranceBlacklist;
-                    tagDL.saveInfo = Settings.Default.saveInfo;
-                    tagDL.saveBlacklistedFiles = Settings.Default.saveBlacklisted;
-                    tagDL.ignoreFinish = Settings.Default.ignoreFinish;
+                    tagDL.graylist = General.Default.blacklist;
+                    tagDL.blacklist = General.Default.zeroToleranceBlacklist;
+                    tagDL.saveInfo = General.Default.saveInfo;
+                    tagDL.saveBlacklistedFiles = General.Default.saveBlacklisted;
+                    tagDL.ignoreFinish = General.Default.ignoreFinish;
                     tagDL.fileNameSchema = Tags.Default.fileNameSchema;
                 }
 
@@ -75,21 +75,21 @@ namespace aphrodite {
                     PoolDl.fileNameSchema = ini.ReadString("fileNameSchema", "Pools");
                 }
                 else {
-                    Settings.Default.Reload();
-                    if (Settings.Default.saveLocation != string.Empty)
-                        PoolDl.saveTo = Settings.Default.saveLocation;
+                    General.Default.Reload();
+                    if (General.Default.saveLocation != string.Empty)
+                        PoolDl.saveTo = General.Default.saveLocation;
                     else
                         PoolDl.saveTo = Environment.CurrentDirectory;
-                    PoolDl.graylist = Settings.Default.blacklist;
-                    PoolDl.blacklist = Settings.Default.zeroToleranceBlacklist;
+                    PoolDl.graylist = General.Default.blacklist;
+                    PoolDl.blacklist = General.Default.zeroToleranceBlacklist;
 
-                    PoolDl.saveInfo = Settings.Default.saveInfo;
-                    PoolDl.saveBlacklisted = Settings.Default.saveBlacklisted;
-                    PoolDl.ignoreFinish = Settings.Default.ignoreFinish;
+                    PoolDl.saveInfo = General.Default.saveInfo;
+                    PoolDl.saveBlacklisted = General.Default.saveBlacklisted;
+                    PoolDl.ignoreFinish = General.Default.ignoreFinish;
 
-                    PoolDl.saveMetadata = Settings.Default.saveMetadata;
-                    PoolDl.saveArtistMetadata = Settings.Default.saveArtistMetadata;
-                    PoolDl.saveTagMetadata = Settings.Default.saveTagMetadata;
+                    PoolDl.saveMetadata = General.Default.saveMetadata;
+                    PoolDl.saveArtistMetadata = General.Default.saveArtistMetadata;
+                    PoolDl.saveTagMetadata = General.Default.saveTagMetadata;
 
                     PoolDl.fileNameSchema = Pools.Default.fileNameSchema;
                 }
@@ -148,15 +148,15 @@ namespace aphrodite {
 
                     }
                     else {
-                        if (Settings.Default.saveLocation != string.Empty)
-                            imgDl.saveTo = Settings.Default.saveLocation;
+                        if (General.Default.saveLocation != string.Empty)
+                            imgDl.saveTo = General.Default.saveLocation;
                         else
                             imgDl.saveTo = Environment.CurrentDirectory;
-                        imgDl.staticSaveTo = Settings.Default.saveLocation;
-                        imgDl.graylist = Settings.Default.blacklist;
-                        imgDl.blacklist = Settings.Default.zeroToleranceBlacklist;
-                        imgDl.saveInfo = Settings.Default.saveInfo;
-                        imgDl.ignoreFinish = Settings.Default.ignoreFinish;
+                        imgDl.staticSaveTo = General.Default.saveLocation;
+                        imgDl.graylist = General.Default.blacklist;
+                        imgDl.blacklist = General.Default.zeroToleranceBlacklist;
+                        imgDl.saveInfo = General.Default.saveInfo;
+                        imgDl.ignoreFinish = General.Default.ignoreFinish;
                         imgDl.fileNameSchema = Images.Default.fileNameSchema;
                     }
 
@@ -210,12 +210,12 @@ namespace aphrodite {
 
                     }
                     else {
-                        imgDl.saveTo = Settings.Default.saveLocation;
-                        imgDl.staticSaveTo = Settings.Default.saveLocation;
-                        imgDl.graylist = Settings.Default.blacklist;
-                        imgDl.blacklist = Settings.Default.zeroToleranceBlacklist;
-                        imgDl.saveInfo = Settings.Default.saveInfo;
-                        imgDl.ignoreFinish = Settings.Default.ignoreFinish;
+                        imgDl.saveTo = General.Default.saveLocation;
+                        imgDl.staticSaveTo = General.Default.saveLocation;
+                        imgDl.graylist = General.Default.blacklist;
+                        imgDl.blacklist = General.Default.zeroToleranceBlacklist;
+                        imgDl.saveInfo = General.Default.saveInfo;
+                        imgDl.ignoreFinish = General.Default.ignoreFinish;
                         imgDl.fileNameSchema = Images.Default.fileNameSchema;
                     }
 
@@ -301,22 +301,22 @@ namespace aphrodite {
                             poolDL.openAfter = false;
                     }
                     else {
-                        Settings.Default.Reload();
+                        General.Default.Reload();
                         Pools.Default.Reload();
 
-                        if (Settings.Default.saveLocation != string.Empty)
-                            poolDL.saveTo = Settings.Default.saveLocation;
+                        if (General.Default.saveLocation != string.Empty)
+                            poolDL.saveTo = General.Default.saveLocation;
                         else
                             poolDL.saveTo = Environment.CurrentDirectory;
-                        poolDL.graylist = Settings.Default.blacklist;
-                        poolDL.blacklist = Settings.Default.zeroToleranceBlacklist;
+                        poolDL.graylist = General.Default.blacklist;
+                        poolDL.blacklist = General.Default.zeroToleranceBlacklist;
                         //poolDL.saveMetadata = Settings.Default.saveMetadata;
                         //poolDL.saveArtistMetadata = Settings.Default.saveArtistMetadata;
                         //poolDL.saveTagMetadata = Settings.Default.saveTagMetadata;
 
-                        poolDL.saveInfo = Settings.Default.saveInfo;
-                        poolDL.ignoreFinish = Settings.Default.ignoreFinish;
-                        poolDL.saveBlacklisted = Settings.Default.saveBlacklisted;
+                        poolDL.saveInfo = General.Default.saveInfo;
+                        poolDL.ignoreFinish = General.Default.ignoreFinish;
+                        poolDL.saveBlacklisted = General.Default.saveBlacklisted;
 
                         poolDL.fileNameSchema = apiTools.ReplaceIllegalCharacters(Pools.Default.fileNameSchema);
                         poolDL.mergeBlacklisted = Pools.Default.mergeBlacklisted;
@@ -418,20 +418,20 @@ namespace aphrodite {
                             tagDL.fileNameSchema = "%md5%";
                     }
                     else {
-                        Settings.Default.Reload();
+                        General.Default.Reload();
                         Tags.Default.Reload();
 
-                        if (Settings.Default.saveLocation != string.Empty)
-                            tagDL.saveTo = Settings.Default.saveLocation;
+                        if (General.Default.saveLocation != string.Empty)
+                            tagDL.saveTo = General.Default.saveLocation;
                         else
                             tagDL.saveTo = Environment.CurrentDirectory;
-                        tagDL.graylist = Settings.Default.blacklist;
-                        tagDL.blacklist = Settings.Default.zeroToleranceBlacklist;
+                        tagDL.graylist = General.Default.blacklist;
+                        tagDL.blacklist = General.Default.zeroToleranceBlacklist;
 
-                        tagDL.saveInfo = Settings.Default.saveInfo;
+                        tagDL.saveInfo = General.Default.saveInfo;
                         tagDL.openAfter = false;
-                        tagDL.saveBlacklistedFiles = Settings.Default.saveBlacklisted;
-                        tagDL.ignoreFinish = Settings.Default.ignoreFinish;
+                        tagDL.saveBlacklistedFiles = General.Default.saveBlacklisted;
+                        tagDL.ignoreFinish = General.Default.ignoreFinish;
 
                         tagDL.useMinimumScore = Tags.Default.enableScoreMin;
                         if (tagDL.useMinimumScore) {
@@ -554,19 +554,19 @@ namespace aphrodite {
                             tagDL.fileNameSchema = "%md5%";
                     }
                     else {
-                        Settings.Default.Reload();
+                        General.Default.Reload();
                         Tags.Default.Reload();
-                        if (Settings.Default.saveLocation != string.Empty)
-                            tagDL.saveTo = Settings.Default.saveLocation;
+                        if (General.Default.saveLocation != string.Empty)
+                            tagDL.saveTo = General.Default.saveLocation;
                         else
                             tagDL.saveTo = Environment.CurrentDirectory;
-                        tagDL.graylist = Settings.Default.blacklist;
-                        tagDL.blacklist = Settings.Default.zeroToleranceBlacklist;
+                        tagDL.graylist = General.Default.blacklist;
+                        tagDL.blacklist = General.Default.zeroToleranceBlacklist;
 
-                        tagDL.saveInfo = Settings.Default.saveInfo;
+                        tagDL.saveInfo = General.Default.saveInfo;
                         tagDL.openAfter = false;
-                        tagDL.saveBlacklistedFiles = Settings.Default.saveBlacklisted;
-                        tagDL.ignoreFinish = Settings.Default.ignoreFinish;
+                        tagDL.saveBlacklistedFiles = General.Default.saveBlacklisted;
+                        tagDL.ignoreFinish = General.Default.ignoreFinish;
 
                         tagDL.useMinimumScore = Tags.Default.enableScoreMin;
                         if (tagDL.useMinimumScore) {
@@ -668,12 +668,12 @@ namespace aphrodite {
                             imageDL.separateArtists = false;
                     }
                     else {
-                        imageDL.saveTo = Settings.Default.saveLocation;
-                        imageDL.graylist = Settings.Default.blacklist;
-                        imageDL.blacklist = Settings.Default.zeroToleranceBlacklist;
+                        imageDL.saveTo = General.Default.saveLocation;
+                        imageDL.graylist = General.Default.blacklist;
+                        imageDL.blacklist = General.Default.zeroToleranceBlacklist;
 
-                        imageDL.saveInfo = Settings.Default.saveInfo;
-                        imageDL.ignoreFinish = Settings.Default.ignoreFinish;
+                        imageDL.saveInfo = General.Default.saveInfo;
+                        imageDL.ignoreFinish = General.Default.ignoreFinish;
 
                         imageDL.fileNameSchema = apiTools.ReplaceIllegalCharacters(Images.Default.fileNameSchema);
                         imageDL.separateRatings = Images.Default.separateRatings;
@@ -733,15 +733,15 @@ namespace aphrodite {
                             imageDL.separateArtists = false;
                     }
                     else {
-                        if (Settings.Default.saveLocation != string.Empty)
-                            imageDL.saveTo = Settings.Default.saveLocation;
+                        if (General.Default.saveLocation != string.Empty)
+                            imageDL.saveTo = General.Default.saveLocation;
                         else
                             imageDL.saveTo = Environment.CurrentDirectory;
-                        imageDL.graylist = Settings.Default.blacklist;
-                        imageDL.blacklist = Settings.Default.zeroToleranceBlacklist;
+                        imageDL.graylist = General.Default.blacklist;
+                        imageDL.blacklist = General.Default.zeroToleranceBlacklist;
 
-                        imageDL.saveInfo = Settings.Default.saveInfo;
-                        imageDL.ignoreFinish = Settings.Default.ignoreFinish;
+                        imageDL.saveInfo = General.Default.saveInfo;
+                        imageDL.ignoreFinish = General.Default.ignoreFinish;
 
                         imageDL.fileNameSchema = apiTools.ReplaceIllegalCharacters(Images.Default.fileNameSchema);
                         imageDL.separateRatings = Images.Default.separateRatings;

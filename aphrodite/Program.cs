@@ -40,15 +40,15 @@ namespace aphrodite {
                     //ErrorLog.ReportCustomException("Test", "Program.cs");
                 }
 
-                if (Settings.Default.firstTime) {
+                if (General.Default.firstTime) {
                     MessageBox.Show(
                         "This is your first time running aphrodite, so read this before continuing:\n\n" +
                         "This program is \"advertised\" as a porn downloader. You don't have to download any 18+ material using it, but it's emphasised on porn.\n" +
                         "As soon as you get access into the program, change the settings and set your prefered file name schema. I don't want to be responsible for any excess files being downloaded.\n\n" +
                         "Just so you know."
                     );
-                    Settings.Default.firstTime = false;
-                    Settings.Default.Save();
+                    General.Default.firstTime = false;
+                    General.Default.Save();
                 }
 
                 Application.Run(new frmMain());

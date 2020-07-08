@@ -55,14 +55,11 @@ namespace aphrodite {
                 this.Text += " (debug " + Properties.Settings.Default.debugDate + ")";
             }
 
-            if (File.Exists(Environment.CurrentDirectory + "\\aphrodite.ini"))
-                if (ini.KeyExists("useIni"))
-                    if (ini.ReadBool("useIni"))
+            if (File.Exists(Environment.CurrentDirectory + "\\aphrodite.ini")) {
+                if (ini.KeyExists("useIni")) {
+                    if (ini.ReadBool("useIni")) {
                         useIni = true;
-
-            if (useIni) {
-                if (ini.ReadInt("iniVersion") < Settings.Default.iniVersion) {
-                    MessageBox.Show("A new setting has been added to the program and your ini file is out of date.\nOpen the Settings form and save it to set it as the default, or change it if the new settings is not what you want to have enabled.");
+                    }
                 }
             }
 
@@ -70,8 +67,8 @@ namespace aphrodite {
             SetTextBoxHint(txtID.Handle, "Pool ID...");
         }
         private void frmMain_Load(object sender, EventArgs e) {
-            if (string.IsNullOrWhiteSpace(Settings.Default.saveLocation) || string.IsNullOrEmpty(Settings.Default.saveLocation)) {
-                Settings.Default.saveLocation = Environment.CurrentDirectory;
+            if (string.IsNullOrWhiteSpace(General.Default.saveLocation) || string.IsNullOrEmpty(General.Default.saveLocation)) {
+                General.Default.saveLocation = Environment.CurrentDirectory;
             }
 
             for (int i = 1; i < Environment.GetCommandLineArgs().Length; i++) { // count each runtime argument, int 0 = boot directory.
@@ -562,15 +559,15 @@ namespace aphrodite {
                     tagDL.fileNameSchema = "%md5%";
             }
             else {
-                Settings.Default.Reload();
+                General.Default.Reload();
                 Tags.Default.Reload();
-                tagDL.graylist = Settings.Default.blacklist;
-                tagDL.blacklist = Settings.Default.zeroToleranceBlacklist;
-                tagDL.saveTo = Settings.Default.saveLocation;
-                tagDL.saveInfo = Settings.Default.saveInfo;
+                tagDL.graylist = General.Default.blacklist;
+                tagDL.blacklist = General.Default.zeroToleranceBlacklist;
+                tagDL.saveTo = General.Default.saveLocation;
+                tagDL.saveInfo = General.Default.saveInfo;
                 tagDL.openAfter = false;
-                tagDL.saveBlacklistedFiles = Settings.Default.saveBlacklisted;
-                tagDL.ignoreFinish = Settings.Default.ignoreFinish;
+                tagDL.saveBlacklistedFiles = General.Default.saveBlacklisted;
+                tagDL.ignoreFinish = General.Default.ignoreFinish;
                 tagDL.useMinimumScore = Tags.Default.enableScoreMin;
                 if (tagDL.useMinimumScore) {
                     tagDL.scoreAsTag = Tags.Default.scoreAsTag;
@@ -626,13 +623,20 @@ namespace aphrodite {
 
     #region Images
         private void btnDownloadImage_Click(object sender, EventArgs e) {
-            if (string.IsNullOrEmpty(txtImageUrl.Text))
+            if (string.IsNullOrEmpty(txtImageUrl.Text)) {
+                MessageBox.Show("Please enter a valid image url or id");
                 return;
+            }
 
             Downloader.MainForm.downloadImage(txtImageUrl.Text, chkImageSeparateRatings.Checked, chkImageSeparateBlacklisted.Checked, chkImageSeparateArtists.Checked, chkImageUseForm.Checked);
         }
         private void downloadImage(string url) {
             Downloader.Arguments.downloadImage(url);
+        }
+        private void txtImageUrl_KeyPress(object sender, KeyPressEventArgs e) {
+            if (e.KeyChar == (char)Keys.Enter) {
+                btnDownloadImage_Click(this, new EventArgs());
+            }
         }
     #endregion
     }

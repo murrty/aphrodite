@@ -80,6 +80,7 @@
     </Compile>
     <Compile Include="Classes\IniFile.cs" />
     <Compile Include="Classes\Metadata.cs" />
+    <Compile Include="Classes\Settings.cs" />
     <Compile Include="Classes\UndesiredTags.cs" />
     <Compile Include="Classes\Updater.cs" />
     <Compile Include="Forms\frmException.cs">
@@ -194,10 +195,10 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Settings\Settings.Designer.cs">
+    <Compile Include="Settings\General.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
+      <DependentUpon>General.settings</DependentUpon>
     </Compile>
     <Compile Include="Settings\Tags.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -280,9 +281,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="Settings\Settings.settings">
+    <None Include="Settings\General.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+      <LastGenOutput>General.Designer.cs</LastGenOutput>
     </None>
     <None Include="Settings\Tags.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

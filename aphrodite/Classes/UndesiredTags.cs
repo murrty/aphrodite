@@ -24,7 +24,7 @@ namespace aphrodite {
 
         public static bool isUndesired(string tag) {
             List<string> undesiredTags = new List<string>();
-            undesiredTags.AddRange(Settings.Default.undesiredTags.Split(' '));
+            undesiredTags.AddRange(General.Default.undesiredTags.Split(' '));
 
             for (int i = 0; i < undesiredTags.Count; i++) {
                 if (tag == undesiredTags[i])

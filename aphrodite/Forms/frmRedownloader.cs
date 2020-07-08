@@ -32,21 +32,21 @@ namespace aphrodite {
                 string[] Tags = new string[0];
                 string[] Pools = new string[0];
 
-                if (Directory.Exists(Settings.Default.saveLocation + "\\Tags")) {
-                    Tags = Directory.GetDirectories(Settings.Default.saveLocation + "\\Tags");
+                if (Directory.Exists(General.Default.saveLocation + "\\Tags")) {
+                    Tags = Directory.GetDirectories(General.Default.saveLocation + "\\Tags");
                 }
-                if (Directory.Exists(Settings.Default.saveLocation + "\\Pools")) {
-                    Pools = Directory.GetDirectories(Settings.Default.saveLocation + "\\Pools");
+                if (Directory.Exists(General.Default.saveLocation + "\\Pools")) {
+                    Pools = Directory.GetDirectories(General.Default.saveLocation + "\\Pools");
                 }
 
                 if (Tags.Length > 0) {
                     for (int i = 0; i < Tags.Length; i++) {
-                        lbTags.Items.Add(Tags[i].Replace(Settings.Default.saveLocation + "\\Tags\\", string.Empty));
+                        lbTags.Items.Add(Tags[i].Replace(General.Default.saveLocation + "\\Tags\\", string.Empty));
                     }
                 }
                 if (Pools.Length > 0) {
                     for (int i = 0; i < Pools.Length; i++) {
-                        lbPools.Items.Add(Pools[i].Replace(Settings.Default.saveLocation + "\\Pools\\", string.Empty));
+                        lbPools.Items.Add(Pools[i].Replace(General.Default.saveLocation + "\\Pools\\", string.Empty));
                     }
                 }
             }
@@ -179,7 +179,7 @@ namespace aphrodite {
         private void frmTagRedownloader_Load(object sender, EventArgs e) {
             loadDownloads();
             if (!useIni)
-                saveLocation = Settings.Default.saveLocation;
+                saveLocation = General.Default.saveLocation;
         }
 
         private void btnRedownload_Click(object sender, EventArgs e) {
@@ -298,17 +298,17 @@ namespace aphrodite {
                             tagDL.fileNameSchema = "%md5%";
                     }
                     else {
-                        Settings.Default.Reload();
+                        General.Default.Reload();
                         Tags.Default.Reload();
 
-                        tagDL.saveTo = Settings.Default.saveLocation;
-                        tagDL.graylist = Settings.Default.blacklist;
-                        tagDL.blacklist = Settings.Default.zeroToleranceBlacklist;
+                        tagDL.saveTo = General.Default.saveLocation;
+                        tagDL.graylist = General.Default.blacklist;
+                        tagDL.blacklist = General.Default.zeroToleranceBlacklist;
 
-                        tagDL.saveInfo = Settings.Default.saveInfo;
+                        tagDL.saveInfo = General.Default.saveInfo;
                         tagDL.openAfter = false;
-                        tagDL.saveBlacklistedFiles = Settings.Default.saveBlacklisted;
-                        tagDL.ignoreFinish = Settings.Default.ignoreFinish;
+                        tagDL.saveBlacklistedFiles = General.Default.saveBlacklisted;
+                        tagDL.ignoreFinish = General.Default.ignoreFinish;
 
                         tagDL.useMinimumScore = minimumScore;
                         if (minimumScore) {
@@ -470,17 +470,17 @@ namespace aphrodite {
                             tagDL.fileNameSchema = "%md5%";
                     }
                     else {
-                        Settings.Default.Reload();
+                        General.Default.Reload();
                         Tags.Default.Reload();
 
-                        tagDL.saveTo = Settings.Default.saveLocation;
-                        tagDL.graylist = Settings.Default.blacklist;
-                        tagDL.blacklist = Settings.Default.zeroToleranceBlacklist;
+                        tagDL.saveTo = General.Default.saveLocation;
+                        tagDL.graylist = General.Default.blacklist;
+                        tagDL.blacklist = General.Default.zeroToleranceBlacklist;
 
-                        tagDL.saveInfo = Settings.Default.saveInfo;
+                        tagDL.saveInfo = General.Default.saveInfo;
                         tagDL.openAfter = false;
-                        tagDL.saveBlacklistedFiles = Settings.Default.saveBlacklisted;
-                        tagDL.ignoreFinish = Settings.Default.ignoreFinish;
+                        tagDL.saveBlacklistedFiles = General.Default.saveBlacklisted;
+                        tagDL.ignoreFinish = General.Default.ignoreFinish;
 
                         tagDL.useMinimumScore = minimumScore;
                         if (minimumScore) {

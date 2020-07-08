@@ -115,7 +115,7 @@ namespace aphrodite {
                 }
 
                 string DownloadUrl = xmlURL[0].InnerText;
-                if (DownloadUrl == null) {
+                if (string.IsNullOrEmpty(DownloadUrl)) {
                     DownloadUrl = apiTools.GetBlacklistedImageUrl(xmlMD5[0].InnerText, xmlExt[0].InnerText);
                     if (DownloadUrl == null) {
                         ErrorLog.ReportCustomException("DownloadUrl was still null after attempting to bypass blacklist with MD5", "ImageDownloader.cs");
@@ -287,7 +287,7 @@ namespace aphrodite {
             // Work on the filename
                 string fileNameArtist = "unknown";
                 bool useHardcodedFilter = false;
-                if (string.IsNullOrEmpty(Settings.Default.undesiredTags))
+                if (string.IsNullOrEmpty(General.Default.undesiredTags))
                     useHardcodedFilter = true;
 
                 if (xmlTagsArtist.Count > 0) {

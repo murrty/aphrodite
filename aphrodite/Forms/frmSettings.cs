@@ -42,7 +42,7 @@ namespace aphrodite {
             InitializeComponent();
             this.Icon = Properties.Resources.Brad;
 
-            Settings.Default.Reload();
+            General.Default.Reload();
             Tags.Default.Reload();
             Pools.Default.Reload();
             Images.Default.Reload();
@@ -119,10 +119,6 @@ namespace aphrodite {
                 FileInfo fI = new FileInfo(Environment.CurrentDirectory + "\\aphrodite.ini");
                 fI.IsReadOnly = false;
 
-                if (ini.ReadInt("iniVersion") != Settings.Default.iniVersion) {
-                    ini.WriteInt("iniVersion", Settings.Default.iniVersion);
-                }
-
               // General
                 ini.WriteBool("saveInfo", chkSaveInfo.Checked, "Global");
                 ini.WriteBool("saveBlacklisted", chkSaveBlacklisted.Checked, "Global");
@@ -159,14 +155,14 @@ namespace aphrodite {
             else {
               // General
                 if (changedSaveTo) {
-                    Settings.Default.saveLocation = txtSaveTo.Text;
+                    General.Default.saveLocation = txtSaveTo.Text;
                 }
-                Settings.Default.saveInfo = chkSaveInfo.Checked;
-                Settings.Default.saveBlacklisted = chkSaveBlacklisted.Checked;
-                Settings.Default.ignoreFinish = chkIgnoreFinish.Checked;
-                Settings.Default.saveMetadata = chkSaveMetadata.Checked;
-                Settings.Default.saveArtistMetadata = chkSaveArtistMetadata.Checked;
-                Settings.Default.saveTagMetadata = chkSaveTagMetadata.Checked;
+                General.Default.saveInfo = chkSaveInfo.Checked;
+                General.Default.saveBlacklisted = chkSaveBlacklisted.Checked;
+                General.Default.ignoreFinish = chkIgnoreFinish.Checked;
+                General.Default.saveMetadata = chkSaveMetadata.Checked;
+                General.Default.saveArtistMetadata = chkSaveArtistMetadata.Checked;
+                General.Default.saveTagMetadata = chkSaveTagMetadata.Checked;
 
               // Tags
                 Tags.Default.fileNameSchema = apiTools.ReplaceIllegalCharacters(txtTagSchema.Text.ToLower());
@@ -195,7 +191,7 @@ namespace aphrodite {
                 Images.Default.useForm = chkUseForm.Checked;
 
               // Save all 4
-                Settings.Default.Save();
+                General.Default.Save();
                 Tags.Default.Save();
                 Pools.Default.Save();
                 Images.Default.Save();
@@ -243,18 +239,18 @@ namespace aphrodite {
             }
             else {
               // General
-                if (string.IsNullOrEmpty(Settings.Default.saveLocation)) {
+                if (string.IsNullOrEmpty(General.Default.saveLocation)) {
                     txtSaveTo.Text = Environment.CurrentDirectory;
                 }
                 else {
-                    txtSaveTo.Text = Settings.Default.saveLocation;
+                    txtSaveTo.Text = General.Default.saveLocation;
                 }
-                chkSaveInfo.Checked = Settings.Default.saveInfo;
-                chkSaveBlacklisted.Checked = Settings.Default.saveBlacklisted;
-                chkIgnoreFinish.Checked = Settings.Default.ignoreFinish;
-                chkSaveMetadata.Checked = Settings.Default.saveMetadata;
-                chkSaveArtistMetadata.Checked = Settings.Default.saveArtistMetadata;
-                chkSaveTagMetadata.Checked = Settings.Default.saveTagMetadata;
+                chkSaveInfo.Checked = General.Default.saveInfo;
+                chkSaveBlacklisted.Checked = General.Default.saveBlacklisted;
+                chkIgnoreFinish.Checked = General.Default.ignoreFinish;
+                chkSaveMetadata.Checked = General.Default.saveMetadata;
+                chkSaveArtistMetadata.Checked = General.Default.saveArtistMetadata;
+                chkSaveTagMetadata.Checked = General.Default.saveTagMetadata;
 
               // Tags
                 txtTagSchema.Text = apiTools.ReplaceIllegalCharacters(Tags.Default.fileNameSchema.ToLower());
@@ -327,8 +323,8 @@ namespace aphrodite {
                 noprotocols = false;
         }
         private string createProtocolDir() {
-            if (!string.IsNullOrWhiteSpace(Settings.Default.saveLocation)) {
-                return Settings.Default.saveLocation;
+            if (!string.IsNullOrWhiteSpace(General.Default.saveLocation)) {
+                return General.Default.saveLocation;
             }
 
             string directory = Environment.CurrentDirectory;
@@ -403,7 +399,7 @@ namespace aphrodite {
             frmBlacklist blackList = new frmBlacklist();
             blackList.useIni = useIni;
             if (blackList.ShowDialog() == DialogResult.OK) {
-                Settings.Default.Save();
+                General.Default.Save();
             }
         }
 
@@ -579,16 +575,16 @@ namespace aphrodite {
         private void btnExportIni_Click(object sender, EventArgs e) {
             MessageBox.Show("You can use the system-based settings for aphrodite by changing \"useIni\" to \"False\".\nAlso, graylist & blacklist have spaces between tags and are separate files, so... keep that in mind.");
             string bufferINI = "[aphrodite]\nuseIni=True";
-            File.WriteAllText(Environment.CurrentDirectory + "\\graylist.cfg", Settings.Default.blacklist);
-            File.WriteAllText(Environment.CurrentDirectory + "\\blacklist.cfg", Settings.Default.zeroToleranceBlacklist);
+            File.WriteAllText(Environment.CurrentDirectory + "\\graylist.cfg", General.Default.blacklist);
+            File.WriteAllText(Environment.CurrentDirectory + "\\blacklist.cfg", General.Default.zeroToleranceBlacklist);
 
             bufferINI += "\n\n[Global]";
-            bufferINI += "\nsaveInfo=" + Settings.Default.saveInfo;
-            bufferINI += "\nsaveBlacklisted=" + Settings.Default.saveBlacklisted;
-            bufferINI += "\nignoreFinish=" + Settings.Default.ignoreFinish;
-            bufferINI += "\nsaveMetadata=" + Settings.Default.saveMetadata;
-            bufferINI += "\nsaveArtistMetadata=" + Settings.Default.saveArtistMetadata;
-            bufferINI += "\nsaveTagMetadata=" + Settings.Default.saveTagMetadata;
+            bufferINI += "\nsaveInfo=" + General.Default.saveInfo;
+            bufferINI += "\nsaveBlacklisted=" + General.Default.saveBlacklisted;
+            bufferINI += "\nignoreFinish=" + General.Default.ignoreFinish;
+            bufferINI += "\nsaveMetadata=" + General.Default.saveMetadata;
+            bufferINI += "\nsaveArtistMetadata=" + General.Default.saveArtistMetadata;
+            bufferINI += "\nsaveTagMetadata=" + General.Default.saveTagMetadata;
 
             bufferINI += "\n\n[Tags]";
             bufferINI += "\nfileNameSchema=" + apiTools.ReplaceIllegalCharacters(Tags.Default.fileNameSchema);

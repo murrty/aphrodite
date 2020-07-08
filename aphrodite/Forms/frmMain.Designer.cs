@@ -249,7 +249,7 @@
             // 
             this.txtTags.Location = new System.Drawing.Point(38, 24);
             this.txtTags.Name = "txtTags";
-            this.txtTags.Size = new System.Drawing.Size(223, 20);
+            this.txtTags.Size = new System.Drawing.Size(190, 20);
             this.txtTags.TabIndex = 1;
             this.txtTags.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.TouchingTips.SetToolTip(this.txtTags, "The tags that will be downloaded");
@@ -470,10 +470,11 @@
             // 
             this.txtImageUrl.Location = new System.Drawing.Point(38, 24);
             this.txtImageUrl.Name = "txtImageUrl";
-            this.txtImageUrl.Size = new System.Drawing.Size(223, 20);
+            this.txtImageUrl.Size = new System.Drawing.Size(190, 20);
             this.txtImageUrl.TabIndex = 1;
             this.txtImageUrl.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.TouchingTips.SetToolTip(this.txtImageUrl, "The image that will be downloaded");
+            this.txtImageUrl.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtImageUrl_KeyPress);
             // 
             // label4
             // 

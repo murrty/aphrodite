@@ -9,7 +9,7 @@ namespace aphrodite {
         }
 
         private void frmUndesiredTags_Load(object sender, EventArgs e) {
-            if (string.IsNullOrEmpty(Settings.Default.undesiredTags)) {
+            if (string.IsNullOrEmpty(General.Default.undesiredTags)) {
                 listTags.Items.AddRange(UndesiredTags.HardcodedUndesiredTags);
             }
         }
@@ -20,7 +20,7 @@ namespace aphrodite {
                 undesiredBuffer += listTags.GetItemText(listTags.Items[i]) + " ";
             }
 
-            Settings.Default.undesiredTags = undesiredBuffer.TrimEnd(' ');
+            General.Default.undesiredTags = undesiredBuffer.TrimEnd(' ');
             this.Dispose();
         }
 
@@ -37,7 +37,7 @@ namespace aphrodite {
         }
 
         private void btnReset_Click(object sender, EventArgs e) {
-            if (string.IsNullOrEmpty(Settings.Default.undesiredTags)) {
+            if (string.IsNullOrEmpty(General.Default.undesiredTags)) {
                 listTags.Items.AddRange(UndesiredTags.HardcodedUndesiredTags);
             }
         }

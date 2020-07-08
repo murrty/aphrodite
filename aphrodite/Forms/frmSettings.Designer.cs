@@ -226,8 +226,8 @@
             this.chkIgnoreFinish.Size = new System.Drawing.Size(172, 17);
             this.chkIgnoreFinish.TabIndex = 4;
             this.chkIgnoreFinish.Text = "Don\'t notify finished downloads";
-            this.JustTheTips.SetToolTip(this.chkIgnoreFinish, "Doesn\'t notify you when downloads are completed\r\nPlugin downloads quit when finis" +
-        "hed");
+            this.JustTheTips.SetToolTip(this.chkIgnoreFinish, "Doesn\'t notify you when downloads are completed, and aborted downloads close when" +
+        " requested\r\nPlugin downloads quit when finished");
             this.chkIgnoreFinish.UseVisualStyleBackColor = true;
             // 
             // chkSaveBlacklisted

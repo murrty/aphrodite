@@ -26,9 +26,9 @@ namespace aphrodite {
                 lbIni.Visible = true;
             }
             else {
-                Settings.Default.Reload();
-                rtbBlacklist.Text = Settings.Default.blacklist.Replace(' ', '\n');
-                rtbZTB.Text = Settings.Default.zeroToleranceBlacklist.Replace(' ', '\n');
+                General.Default.Reload();
+                rtbBlacklist.Text = General.Default.blacklist.Replace(' ', '\n');
+                rtbZTB.Text = General.Default.zeroToleranceBlacklist.Replace(' ', '\n');
             }
         }
 
@@ -89,9 +89,9 @@ namespace aphrodite {
                     File.Delete(Environment.CurrentDirectory + "\\blacklist.cfg");
             }
             else {
-                Settings.Default.blacklist = rtbBlacklist.Text.Replace('\n', ' ');
-                Settings.Default.zeroToleranceBlacklist = rtbZTB.Text.Replace('\n', ' ');
-                Settings.Default.Save();
+                General.Default.blacklist = rtbBlacklist.Text.Replace('\n', ' ');
+                General.Default.zeroToleranceBlacklist = rtbZTB.Text.Replace('\n', ' ');
+                General.Default.Save();
             }
             this.DialogResult = DialogResult.OK;
         }
