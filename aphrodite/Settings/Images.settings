@@ -1,5 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="aphrodite" GeneratedClassName="Images">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="aphrodite.Settings" GeneratedClassName="Images">
   <Profiles />
   <Settings>
     <Setting Name="separateRatings" Type="System.Boolean" Scope="User">
@@ -16,6 +16,9 @@
     </Setting>
     <Setting Name="fileNameSchema" Type="System.String" Scope="User">
       <Value Profile="(Default)">%artist%_%md5%</Value>
+    </Setting>
+    <Setting Name="separateNonImages" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>

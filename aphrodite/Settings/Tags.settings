@@ -32,8 +32,8 @@
     <Setting Name="fileNameSchema" Type="System.String" Scope="User">
       <Value Profile="(Default)">%md5%</Value>
     </Setting>
-    <Setting Name="skipExistingFiles" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+    <Setting Name="separateNonImages" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>

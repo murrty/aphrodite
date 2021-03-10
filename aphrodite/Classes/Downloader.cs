@@ -25,6 +25,7 @@ namespace aphrodite {
                     tagDL.saveInfo = ini.ReadBool("saveInfo", "Global");
                     tagDL.saveBlacklistedFiles = ini.ReadBool("saveBlacklisted", "Global");
                     tagDL.ignoreFinish = ini.ReadBool("ignoreFinish", "Global");
+                    tagDL.separateNonImages = ini.ReadBool("separateNonImages", "Tags");
                     tagDL.fileNameSchema = ini.ReadString("fileNameSchema", "Tags");
                 }
                 else {
@@ -38,6 +39,7 @@ namespace aphrodite {
                     tagDL.saveInfo = General.Default.saveInfo;
                     tagDL.saveBlacklistedFiles = General.Default.saveBlacklisted;
                     tagDL.ignoreFinish = General.Default.ignoreFinish;
+                    tagDL.separateNonImages = Tags.Default.separateNonImages;
                     tagDL.fileNameSchema = Tags.Default.fileNameSchema;
                 }
 
@@ -140,6 +142,10 @@ namespace aphrodite {
                         else
                             imgDl.ignoreFinish = false;
 
+                        if (ini.KeyExists("separateNonImages", "Images"))
+                            imgDl.fileNameSchema = apiTools.ReplaceIllegalCharacters(ini.ReadString("separateNonImages", "Images").ToLower());
+                        else
+                            imgDl.separateNonImages = true;
 
                         if (ini.KeyExists("fileNameSchema", "Images"))
                             imgDl.fileNameSchema = apiTools.ReplaceIllegalCharacters(ini.ReadString("fileNameSchema", "Images").ToLower());
@@ -152,11 +158,13 @@ namespace aphrodite {
                             imgDl.saveTo = General.Default.saveLocation;
                         else
                             imgDl.saveTo = Environment.CurrentDirectory;
+
                         imgDl.staticSaveTo = General.Default.saveLocation;
                         imgDl.graylist = General.Default.blacklist;
                         imgDl.blacklist = General.Default.zeroToleranceBlacklist;
                         imgDl.saveInfo = General.Default.saveInfo;
                         imgDl.ignoreFinish = General.Default.ignoreFinish;
+                        imgDl.separateNonImages = Images.Default.separateNonImages;
                         imgDl.fileNameSchema = Images.Default.fileNameSchema;
                     }
 
@@ -323,7 +331,7 @@ namespace aphrodite {
                         poolDL.openAfter = Pools.Default.openAfter;
                     }
 
-                    poolDL.Show();
+                    poolDL.ShowDialog();
 
                     return true;
                 }
@@ -398,6 +406,11 @@ namespace aphrodite {
                         else
                             tagDL.separateRatings = true;
 
+                        if (ini.KeyExists("separateNonImages", "Tags"))
+                            tagDL.separateNonImages = ini.ReadBool("separateNonImages", "Tags");
+                        else
+                            tagDL.separateNonImages = true;
+
                         if (ini.KeyExists("Explicit", "Tags"))
                             if (ini.ReadBool("Explicit", "Tags"))
                                 ratings += "e ";
@@ -446,6 +459,7 @@ namespace aphrodite {
                             tagDL.pageLimit = Tags.Default.pageLimit;
 
                         tagDL.separateRatings = Tags.Default.separateRatings;
+                        tagDL.separateNonImages = Tags.Default.separateNonImages;
 
                         if (Tags.Default.Explicit)
                             ratings += "e ";
@@ -459,7 +473,7 @@ namespace aphrodite {
                         tagDL.fileNameSchema = apiTools.ReplaceIllegalCharacters(Tags.Default.fileNameSchema.ToLower());
                     }
 
-                    tagDL.Show();
+                    tagDL.ShowDialog();
 
                     return true;
                 }
@@ -534,6 +548,11 @@ namespace aphrodite {
                         else
                             tagDL.separateRatings = true;
 
+                        if (ini.KeyExists("separateNonImages", "Tags"))
+                            tagDL.separateNonImages = ini.ReadBool("separateNonImages", "Tags");
+                        else
+                            tagDL.separateNonImages = true;
+
                         if (ini.KeyExists("Explicit", "Tags"))
                             if (ini.ReadBool("Explicit", "Tags"))
                                 ratings += "e ";
@@ -581,6 +600,7 @@ namespace aphrodite {
                             tagDL.pageLimit = Tags.Default.pageLimit;
 
                         tagDL.separateRatings = Tags.Default.separateRatings;
+                        tagDL.separateNonImages = Tags.Default.separateNonImages;
 
                         if (Tags.Default.Explicit)
                             ratings += "e ";
@@ -594,7 +614,7 @@ namespace aphrodite {
                         tagDL.fileNameSchema = apiTools.ReplaceIllegalCharacters(Tags.Default.fileNameSchema.ToLower());
                     }
 
-                    tagDL.Show();
+                    tagDL.ShowDialog();
 
                     return true;
                 }
@@ -662,6 +682,11 @@ namespace aphrodite {
                         else
                             imageDL.separateBlacklisted = true;
 
+                        if (ini.KeyExists("separateNonImages", "Images"))
+                            imageDL.separateNonImages = ini.ReadBool("separateNonImages", "Images");
+                        else
+                            imageDL.separateNonImages = false;
+
                         if (ini.KeyExists("separateArtists", "Images"))
                             imageDL.separateArtists = ini.ReadBool("separateArtists", "Images");
                         else
@@ -678,10 +703,11 @@ namespace aphrodite {
                         imageDL.fileNameSchema = apiTools.ReplaceIllegalCharacters(Images.Default.fileNameSchema);
                         imageDL.separateRatings = Images.Default.separateRatings;
                         imageDL.separateBlacklisted = Images.Default.separateBlacklisted;
+                        imageDL.separateNonImages = Images.Default.separateNonImages;
                         imageDL.separateArtists = Images.Default.separateArtists;
                     }
 
-                    imageDL.Show();
+                    imageDL.ShowDialog();
                 }
                 else {
                     ImageDownloader imageDL = new ImageDownloader();
@@ -727,6 +753,11 @@ namespace aphrodite {
                         else
                             imageDL.separateBlacklisted = true;
 
+                        if (ini.KeyExists("separateNonImages", "Images"))
+                            imageDL.separateNonImages = ini.ReadBool("separateNonImages", "Images");
+                        else
+                            imageDL.separateNonImages = false;
+
                         if (ini.KeyExists("separateArtists", "Images"))
                             imageDL.separateArtists = ini.ReadBool("separateArtists", "Images");
                         else
@@ -746,6 +777,7 @@ namespace aphrodite {
                         imageDL.fileNameSchema = apiTools.ReplaceIllegalCharacters(Images.Default.fileNameSchema);
                         imageDL.separateRatings = Images.Default.separateRatings;
                         imageDL.separateBlacklisted = Images.Default.separateBlacklisted;
+                        imageDL.separateNonImages = Images.Default.separateNonImages;
                         imageDL.separateArtists = Images.Default.separateArtists;
                     }
 

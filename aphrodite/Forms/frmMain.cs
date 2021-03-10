@@ -175,9 +175,9 @@ namespace aphrodite {
                         poolID = "https://" + poolID;
                     if (poolID.Contains("?"))
                         poolID = poolID.Split('?')[0];
-                    poolID = poolID.Split('/')[5];
+                    poolID = poolID.Split('/')[4];
 
-                    downloadPool(poolID);
+                    Downloader.Arguments.downloadPool(poolID);
                     Environment.Exit(0);
                 }
                 else if (arg.StartsWith("tags:")) {
@@ -605,9 +605,6 @@ namespace aphrodite {
             Downloader.MainForm.downloadPool(txtID.Text, chkOpen.Checked, chkMerge.Checked, useIni);
         }
 
-        private void downloadPool(string poolID) {
-            Downloader.Arguments.downloadPool(poolID);
-        }
     
         private void txtID_TextChanged(object sender, EventArgs e) {
             var txtSender = (TextBox)sender;

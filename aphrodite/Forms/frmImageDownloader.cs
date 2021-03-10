@@ -24,6 +24,7 @@ namespace aphrodite {
 
         public bool separateRatings;            // Setting for separating ratings.
         public bool separateBlacklisted;        // Setting for separating blacklisted files.
+        public bool separateNonImages;          // Setting for separating non images (gif, apng, webm, swf)
 
         public bool saveInfo;                   // Global setting for saving images.nfo file.
         public bool ignoreFinish;               // Global setting for exiting after finishing.
@@ -427,6 +428,23 @@ namespace aphrodite {
                     saveTo += "\\blacklisted";
                 if (separateArtists) {
                     saveTo += "\\" + fileNameArtist;
+                }
+
+                switch (separateNonImages) {
+                    case true:
+                        if (fileName.EndsWith("gif")) {
+                            saveTo += "\\gif";
+                        }
+                        else if (fileName.EndsWith("apng")) {
+                            saveTo += "\\apng";
+                        }
+                        else if (fileName.EndsWith("webm")) {
+                            saveTo += "\\webm";
+                        }
+                        else if (fileName.EndsWith("swf")) {
+                            saveTo += "\\swf";
+                        }
+                        break;
                 }
 
             // Create output directory.

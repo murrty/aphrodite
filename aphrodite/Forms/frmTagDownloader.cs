@@ -35,6 +35,7 @@ namespace aphrodite {
         public bool saveInfo = false;               // Setting for saving the info.
         public string[] ratings = null;             // Setting for the ratings.
         public bool separateRatings = true;         // Setting for separating the ratings.
+        public bool separateNonImages = true;      // Setting for separating non images (gif, apng, webm, swf)
         public bool skipExistingFile = false;       // Skip files if they exist
         public string fileNameSchema = "%md5%";     // The schema used for the file name.
                                                     // %md5%        = the md5 of the file
@@ -607,34 +608,48 @@ namespace aphrodite {
                     }
 
                 // Add to the counts (and break for blacklisted)
+                    string outputDir = saveTo;
                     if (isBlacklisted) {
                         blacklistCount++;
                         totalCount++;
                     }
                     else if (isGraylisted) {
                         if (separateRatings) {
-                            switch (rating.ToLower()) {
-                                case "explicit":
-                                    if (File.Exists(saveTo + "\\explicit\\blacklisted\\" + fileName)) {
-                                        alreadyExists = true;
-                                    }
-                                    break;
-                                case "questionable":
-                                    if (File.Exists(saveTo + "\\questionable\\blacklisted\\" + fileName)) {
-                                        alreadyExists = true;
-                                    }
-                                    break;
-                                case "safe":
-                                    if (File.Exists(saveTo + "\\safe\\blacklisted\\" + fileName)) {
-                                        alreadyExists = true;
-                                    }
-                                    break;
+                            outputDir += "\\" + rating.ToLower() + "\\blacklisted\\";
+                            if (separateNonImages) {
+                                if (fileName.EndsWith("gif")) {
+                                    outputDir += "gif\\";
+                                }
+                                else if (fileName.EndsWith("apng")) {
+                                    outputDir += "apng\\";
+                                }
+                                else if (fileName.EndsWith("webm")) {
+                                    outputDir += "webm\\";
+                                }
+                                else if (fileName.EndsWith("swf")) {
+                                    outputDir += "swf\\";
+                                }
                             }
+                            outputDir += fileName;
+                            alreadyExists = File.Exists(outputDir);
                         }
                         else {
-                            if (File.Exists(saveTo + "\\blacklisted\\" + fileName)) {
-                                alreadyExists = true;
+                            outputDir += "\\blacklisted\\";
+                            if (separateNonImages) {
+                                if (fileName.EndsWith("gif")) {
+                                    outputDir += "gif\\";
+                                }
+                                else if (fileName.EndsWith("apng")) {
+                                    outputDir += "apng\\";
+                                }
+                                else if (fileName.EndsWith("webm")) {
+                                    outputDir += "webm\\";
+                                }
+                                else if (fileName.EndsWith("swf")) {
+                                    outputDir += "swf\\";
+                                }
                             }
+                            alreadyExists = File.Exists(outputDir);
                         }
                         
 
@@ -678,29 +693,43 @@ namespace aphrodite {
                     }
                     else {
                         if (separateRatings) {
-                            switch (rating.ToLower()) {
-                                case "explicit":
-                                    if (File.Exists(saveTo + "\\explicit\\" + fileName)) {
-                                        alreadyExists = true;
-                                    }
-                                    break;
-                                case "questionable":
-                                    if (File.Exists(saveTo + "\\questionable\\" + fileName)) {
-                                        alreadyExists = true;
-                                    }
-                                    break;
-                                case "safe":
-                                    if (File.Exists(saveTo + "\\safe\\" + fileName)) {
-                                        alreadyExists = true;
-                                    }
-                                    break;
+                            outputDir += "\\" + rating.ToLower() + "\\";
+                            if (separateNonImages) {
+                                if (fileName.EndsWith("gif")) {
+                                    outputDir += "gif\\";
+                                }
+                                else if (fileName.EndsWith("apng")) {
+                                    outputDir += "apng\\";
+                                }
+                                else if (fileName.EndsWith("webm")) {
+                                    outputDir += "webm\\";
+                                }
+                                else if (fileName.EndsWith("swf")) {
+                                    outputDir += "swf\\";
+                                }
                             }
+                            outputDir += fileName;
+                            alreadyExists = File.Exists(outputDir);
                         }
                         else {
-                            if (File.Exists(saveTo + "\\" + fileName)) {
-                                alreadyExists = true;
+                            outputDir += "\\";
+                            if (separateNonImages) {
+                                if (fileName.EndsWith("gif")) {
+                                    outputDir += "gif\\";
+                                }
+                                else if (fileName.EndsWith("apng")) {
+                                    outputDir += "apng\\";
+                                }
+                                else if (fileName.EndsWith("webm")) {
+                                    outputDir += "webm\\";
+                                }
+                                else if (fileName.EndsWith("swf")) {
+                                    outputDir += "swf\\";
+                                }
                             }
+                            alreadyExists = File.Exists(outputDir);
                         }
+
                         switch (xmlRating[i].InnerText.ToLower()) {
                             case "e":
                                 if (alreadyExists) {
@@ -1096,34 +1125,48 @@ namespace aphrodite {
                                 }
                             }
 
+                            string outputDir = saveTo;
                             if (isBlacklisted) {
                                 blacklistCount++;
                                 totalCount++;
                             }
                             else if (isGraylisted) {
                                 if (separateRatings) {
-                                    switch (rating.ToLower()) {
-                                        case "explicit":
-                                            if (File.Exists(saveTo + "\\explicit\\blacklisted\\" + fileName)) {
-                                                alreadyExists = true;
-                                            }
-                                            break;
-                                        case "questionable":
-                                            if (File.Exists(saveTo + "\\questionable\\blacklisted\\" + fileName)) {
-                                                alreadyExists = true;
-                                            }
-                                            break;
-                                        case "safe":
-                                            if (File.Exists(saveTo + "\\safe\\blacklisted\\" + fileName)) {
-                                                alreadyExists = true;
-                                            }
-                                            break;
+                                    outputDir += "\\" + rating.ToLower() + "\\blacklisted\\";
+                                    if (separateNonImages) {
+                                        if (fileName.EndsWith("gif")) {
+                                            outputDir += "gif\\";
+                                        }
+                                        else if (fileName.EndsWith("apng")) {
+                                            outputDir += "apng\\";
+                                        }
+                                        else if (fileName.EndsWith("webm")) {
+                                            outputDir += "webm\\";
+                                        }
+                                        else if (fileName.EndsWith("swf")) {
+                                            outputDir += "swf\\";
+                                        }
                                     }
+                                    outputDir += fileName;
+                                    alreadyExists = File.Exists(outputDir);
                                 }
                                 else {
-                                    if (File.Exists(saveTo + "\\blacklisted\\" + fileName)) {
-                                        alreadyExists = true;
+                                    outputDir += "\\blacklisted\\";
+                                    if (separateNonImages) {
+                                        if (fileName.EndsWith("gif")) {
+                                            outputDir += "gif\\";
+                                        }
+                                        else if (fileName.EndsWith("apng")) {
+                                            outputDir += "apng\\";
+                                        }
+                                        else if (fileName.EndsWith("webm")) {
+                                            outputDir += "webm\\";
+                                        }
+                                        else if (fileName.EndsWith("swf")) {
+                                            outputDir += "swf\\";
+                                        }
                                     }
+                                    alreadyExists = File.Exists(outputDir);
                                 }
 
 
@@ -1167,29 +1210,43 @@ namespace aphrodite {
                             }
                             else {
                                 if (separateRatings) {
-                                    switch (rating.ToLower()) {
-                                        case "explicit":
-                                            if (File.Exists(saveTo + "\\explicit\\" + fileName)) {
-                                                alreadyExists = true;
-                                            }
-                                            break;
-                                        case "questionable":
-                                            if (File.Exists(saveTo + "\\questionable\\" + fileName)) {
-                                                alreadyExists = true;
-                                            }
-                                            break;
-                                        case "safe":
-                                            if (File.Exists(saveTo + "\\safe\\" + fileName)) {
-                                                alreadyExists = true;
-                                            }
-                                            break;
+                                    outputDir += "\\" + rating.ToLower() + "\\";
+                                    if (separateNonImages) {
+                                        if (fileName.EndsWith("gif")) {
+                                            outputDir += "gif\\";
+                                        }
+                                        else if (fileName.EndsWith("apng")) {
+                                            outputDir += "apng\\";
+                                        }
+                                        else if (fileName.EndsWith("webm")) {
+                                            outputDir += "webm\\";
+                                        }
+                                        else if (fileName.EndsWith("swf")) {
+                                            outputDir += "swf\\";
+                                        }
                                     }
+                                    outputDir += fileName;
+                                    alreadyExists = File.Exists(outputDir);
                                 }
                                 else {
-                                    if (File.Exists(saveTo + "\\" + fileName)) {
-                                        alreadyExists = true;
+                                    outputDir += "\\";
+                                    if (separateNonImages) {
+                                        if (fileName.EndsWith("gif")) {
+                                            outputDir += "gif\\";
+                                        }
+                                        else if (fileName.EndsWith("apng")) {
+                                            outputDir += "apng\\";
+                                        }
+                                        else if (fileName.EndsWith("webm")) {
+                                            outputDir += "webm\\";
+                                        }
+                                        else if (fileName.EndsWith("swf")) {
+                                            outputDir += "swf\\";
+                                        }
                                     }
+                                    alreadyExists = File.Exists(outputDir);
                                 }
+
                                 switch (xmlRating[i].InnerText.ToLower()) {
                                     case "e":
                                         if (alreadyExists) {
@@ -1564,10 +1621,28 @@ namespace aphrodite {
                                 this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading explicit file " + (y + 1) + " of " + (cleanExplicitCount)));
 
                                 string fileName = ExplicitFileNames[y];
-                                if (!File.Exists(saveTo + "\\explicit\\" + fileName)) {
+                                string outputDir = saveTo + "\\explicit\\";
+                                switch (separateNonImages) {
+                                    case true:
+                                        if (fileName.EndsWith("gif")) {
+                                            outputDir += "gif\\";
+                                        }
+                                        else if (fileName.EndsWith("apng")) {
+                                            outputDir += "apng\\";
+                                        }
+                                        else if (fileName.EndsWith("webm")) {
+                                            outputDir += "webm\\";
+                                        }
+                                        else if (fileName.EndsWith("swf")) {
+                                            outputDir += "swf\\";
+                                        }
+                                        break;
+                                }
+                                outputDir += fileName;
+                                if (!File.Exists(outputDir)) {
                                     this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                     lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(url), saveTo + "\\explicit\\" + fileName, sync);
+                                        wc.DownloadFileAsync(new Uri(url), outputDir, sync);
                                         Monitor.Wait(sync);
                                     }
                                 }
@@ -1584,10 +1659,28 @@ namespace aphrodite {
                                 this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading questionable file " + (y + 1) + " of " + (cleanQuestionableCount)));
 
                                 string fileName = QuestionableFileNames[y];
-                                if (!File.Exists(saveTo + "\\questionable\\" + fileName)) {
+                                string outputDir = saveTo + "\\questionable\\";
+                                switch (separateNonImages) {
+                                    case true:
+                                        if (fileName.EndsWith("gif")) {
+                                            outputDir += "gif\\";
+                                        }
+                                        else if (fileName.EndsWith("apng")) {
+                                            outputDir += "apng\\";
+                                        }
+                                        else if (fileName.EndsWith("webm")) {
+                                            outputDir += "webm\\";
+                                        }
+                                        else if (fileName.EndsWith("swf")) {
+                                            outputDir += "swf\\";
+                                        }
+                                        break;
+                                }
+                                outputDir += fileName;
+                                if (!File.Exists(outputDir)) {
                                     this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                     lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(url), saveTo + "\\questionable\\" + fileName, sync);
+                                        wc.DownloadFileAsync(new Uri(url), outputDir, sync);
                                         Monitor.Wait(sync);
                                     }
                                 }
@@ -1604,10 +1697,28 @@ namespace aphrodite {
                                 this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading safe file " + (y + 1) + " of " + (cleanSafeCount)));
 
                                 string fileName = SafeFileNames[y];
-                                if (!File.Exists(saveTo + "\\safe\\" + fileName)) {
+                                string outputDir = saveTo + "\\safe\\";
+                                switch (separateNonImages) {
+                                    case true:
+                                        if (fileName.EndsWith("gif")) {
+                                            outputDir += "gif\\";
+                                        }
+                                        else if (fileName.EndsWith("apng")) {
+                                            outputDir += "apng\\";
+                                        }
+                                        else if (fileName.EndsWith("webm")) {
+                                            outputDir += "webm\\";
+                                        }
+                                        else if (fileName.EndsWith("swf")) {
+                                            outputDir += "swf\\";
+                                        }
+                                        break;
+                                }
+                                outputDir += fileName;
+                                if (!File.Exists(outputDir)) {
                                     this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                     lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(url), saveTo + "\\safe\\" + fileName, sync);
+                                        wc.DownloadFileAsync(new Uri(url), outputDir, sync);
                                         Monitor.Wait(sync);
                                     }
                                 }
@@ -1625,10 +1736,28 @@ namespace aphrodite {
                                     this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted (e) file " + (y + 1) + " of " + (graylistExplicitCount)));
 
                                     string fileName = GraylistedExplicitFileNames[y];
-                                    if (!File.Exists(saveTo + "\\explicit\\blacklisted\\" + fileName)) {
+                                    string outputDir = saveTo + "\\explicit\\blacklisted\\";
+                                    switch (separateNonImages) {
+                                        case true:
+                                            if (fileName.EndsWith("gif")) {
+                                                outputDir += "gif\\";
+                                            }
+                                            else if (fileName.EndsWith("apng")) {
+                                                outputDir += "apng\\";
+                                            }
+                                            else if (fileName.EndsWith("webm")) {
+                                                outputDir += "webm\\";
+                                            }
+                                            else if (fileName.EndsWith("swf")) {
+                                                outputDir += "swf\\";
+                                            }
+                                            break;
+                                    }
+                                    outputDir += fileName;
+                                    if (!File.Exists(outputDir)) {
                                         this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                         lock (sync) {
-                                            wc.DownloadFileAsync(new Uri(url), saveTo + "\\explicit\\blacklisted\\" + fileName, sync);
+                                            wc.DownloadFileAsync(new Uri(url), outputDir, sync);
                                             Monitor.Wait(sync);
                                         }
                                     }
@@ -1646,10 +1775,28 @@ namespace aphrodite {
                                 this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted (q) file " + (y + 1) + " of " + (graylistQuestionableCount)));
 
                                 string fileName = GraylistedQuestionableFileNames[y];
-                                if (!File.Exists(saveTo + "\\questionable\\blacklisted\\" + fileName)) {
+                                string outputDir = saveTo + "\\questionable\\blacklisted\\";
+                                switch (separateNonImages) {
+                                    case true:
+                                        if (fileName.EndsWith("gif")) {
+                                            outputDir += "gif\\";
+                                        }
+                                        else if (fileName.EndsWith("apng")) {
+                                            outputDir += "apng\\";
+                                        }
+                                        else if (fileName.EndsWith("webm")) {
+                                            outputDir += "webm\\";
+                                        }
+                                        else if (fileName.EndsWith("swf")) {
+                                            outputDir += "swf\\";
+                                        }
+                                        break;
+                                }
+                                outputDir += fileName;
+                                if (!File.Exists(outputDir)) {
                                     this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                     lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(url), saveTo + "\\questionable\\blacklisted\\" + fileName, sync);
+                                        wc.DownloadFileAsync(new Uri(url), outputDir, sync);
                                         Monitor.Wait(sync);
                                     }
                                 }
@@ -1666,10 +1813,28 @@ namespace aphrodite {
                                 this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted (s) file " + (y + 1) + " of " + (graylistSafeCount)));
 
                                 string fileName = GraylistedSafeFileNames[y];
-                                if (!File.Exists(saveTo + "\\safe\\blacklisted\\" + fileName)) {
+                                string outputDir = saveTo + "\\safe\\blacklisted\\";
+                                switch (separateNonImages) {
+                                    case true:
+                                        if (fileName.EndsWith("gif")) {
+                                            outputDir += "gif\\";
+                                        }
+                                        else if (fileName.EndsWith("apng")) {
+                                            outputDir += "apng\\";
+                                        }
+                                        else if (fileName.EndsWith("webm")) {
+                                            outputDir += "webm\\";
+                                        }
+                                        else if (fileName.EndsWith("swf")) {
+                                            outputDir += "swf\\";
+                                        }
+                                        break;
+                                }
+                                outputDir += fileName;
+                                if (!File.Exists(outputDir)) {
                                     this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                     lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(url), saveTo + "\\safe\\blacklisted\\" + fileName, sync);
+                                        wc.DownloadFileAsync(new Uri(url), outputDir, sync);
                                         Monitor.Wait(sync);
                                     }
                                 }
@@ -1687,10 +1852,28 @@ namespace aphrodite {
                                 this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading file " + (y + 1) + " of " + (cleanTotalCount)));
 
                                 string fileName = FileNames[y];
-                                if (!File.Exists(saveTo + "\\" + fileName)) {
+                                string outputDir = saveTo;
+                                switch (separateNonImages) {
+                                    case true:
+                                        if (fileName.EndsWith("gif")) {
+                                            outputDir += "\\gif\\";
+                                        }
+                                        else if (fileName.EndsWith("apng")) {
+                                            outputDir += "\\apng\\";
+                                        }
+                                        else if (fileName.EndsWith("webm")) {
+                                            outputDir += "\\webm\\";
+                                        }
+                                        else if (fileName.EndsWith("swf")) {
+                                            outputDir += "\\swf\\";
+                                        }
+                                        break;
+                                }
+                                outputDir += fileName;
+                                if (!File.Exists(outputDir)) {
                                     this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                     lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(url), saveTo + "\\" + fileName, sync);
+                                        wc.DownloadFileAsync(new Uri(url), outputDir, sync);
                                         Monitor.Wait(sync);
                                     }
                                 }
@@ -1707,10 +1890,28 @@ namespace aphrodite {
                                 this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted file " + (y) + " of " + (graylistTotalCount)));
 
                                 string fileName = GraylistedFileNames[y];
-                                if (!File.Exists(saveTo + "\\blacklisted\\" + fileName)) {
+                                string outputDir = saveTo + "\\blacklisted\\";
+                                switch (separateNonImages) {
+                                    case true:
+                                        if (fileName.EndsWith("gif")) {
+                                            outputDir += "gif\\";
+                                        }
+                                        else if (fileName.EndsWith("apng")) {
+                                            outputDir += "apng\\";
+                                        }
+                                        else if (fileName.EndsWith("webm")) {
+                                            outputDir += "webm\\";
+                                        }
+                                        else if (fileName.EndsWith("swf")) {
+                                            outputDir += "swf\\";
+                                        }
+                                        break;
+                                }
+                                outputDir += fileName;
+                                if (!File.Exists(outputDir)) {
                                     this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                     lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(url), saveTo + "\\blacklisted\\" + fileName, sync);
+                                        wc.DownloadFileAsync(new Uri(url), outputDir, sync);
                                         Monitor.Wait(sync);
                                     }
                                 }

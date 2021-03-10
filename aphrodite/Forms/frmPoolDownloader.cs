@@ -145,7 +145,7 @@ namespace aphrodite {
         }
         private void downloadPool() {
             try {
-                // Set the saveTo to \\Pools.
+              // Set the saveTo to \\Pools.
                 if (!saveTo.EndsWith("\\Pools"))
                     saveTo += "\\Pools";
 
@@ -199,7 +199,7 @@ namespace aphrodite {
                 #endregion
 
                 #region initial api parse for main data
-                // XmlNodeLists for pool information.
+              // XmlNodeLists for pool information.
                 XmlNodeList xmlName = xmlDoc.DocumentElement.SelectNodes("/root/name");
                 XmlNodeList xmlDescription = xmlDoc.DocumentElement.SelectNodes("/root/description");
                 XmlNodeList xmlCount = xmlDoc.DocumentElement.SelectNodes("/root/post_count");
@@ -238,17 +238,17 @@ namespace aphrodite {
 
                 this.Invoke((MethodInvoker)(() => lbName.Text = xmlName[0].InnerText));
 
-                // Count the image count and do math for pages.
+              // Count the image count and do math for pages.
                 int pages = apiTools.CountPoolPages(Convert.ToDecimal(xmlCount[0].InnerText));
 
-                // Set the output folder name.
+              // Set the output folder name.
                 poolName = apiTools.ReplaceIllegalCharacters(xmlName[0].InnerText);
                 saveTo += "\\" + poolName;
                 writeToConsole("Updated saveTo to \\Pools\\" + poolName);
                 #endregion
 
                 #region First page rip
-                // Begin ripping the rest of the pool Json.
+              // Begin ripping the rest of the pool Json.
                 xmlDoc = new XmlDocument();
                 url = poolJsonPage;
                 postXML = apiTools.GetJSON(poolJsonPage + "&page=1", header);
@@ -376,29 +376,16 @@ namespace aphrodite {
                         artistsMetadata = "(no artist)";
                     }
 
-                    // Add to the metadata list
+                  // Add to the metadata list
                     if (saveMetadata) {
                         MetadataArtists.Add(artistsMetadata);
                         MetadataTags.Add(tagsMetadata);
                     }
 
                     string fileNamePage = string.Empty;
-                    fileNamePage = (PostIDs.IndexOf(xmlID[i].InnerText) + 1).ToString();
-                    if (fileNamePage.Length < 4) {
-                        do {
-                            fileNamePage = "0" + fileNamePage;
-                        } while (fileNamePage.Length < 4);
-                    }
-                    //    fileNamePage += "0";
-                    //    if (currentPage < 100) {
-                    //        fileNamePage += "0";
-                    //        if (currentPage < 10)
-                    //            fileNamePage += "0";
-                    //    }
-                    //}
-                    //fileNamePage += (currentPage);
+                    fileNamePage = (PostIDs.IndexOf(xmlID[i].InnerText) + 1).ToString("0000.##");
 
-                    // File name artist for the schema
+                  // File name artist for the schema
                     string fileNameArtist = "(none)";
                     bool useHardcodedFilter = false;
                     if (string.IsNullOrEmpty(General.Default.undesiredTags))
@@ -507,7 +494,7 @@ namespace aphrodite {
                 #endregion
 
                 #region consecutive pages
-                // Redo above but for other pages.
+              // Redo above but for other pages.
                 if (pages > 1) {
                     for (int i = 2; i < pages + 1; i++) {
                         writeToConsole("Starting JSON download for page " + i + "...", true);
@@ -648,29 +635,14 @@ namespace aphrodite {
                                 artistsMetadata = "(no artist)";
                             }
 
-                            // Add to the metadata list
+                          // Add to the metadata list
                             if (saveMetadata) {
                                 MetadataArtists.Add(artistsMetadata);
                                 MetadataTags.Add(tagsMetadata);
                             }
 
                             string fileNamePage = string.Empty;
-                            fileNamePage = (PostIDs.IndexOf(xmlID[j].InnerText) + 1).ToString();
-                            if (fileNamePage.Length < 4) {
-                                do {
-                                    fileNamePage = "0" + fileNamePage;
-                                } while (fileNamePage.Length < 4);
-                            }
-                            //string fileNamePage = string.Empty;
-                            //if (currentPage < 1000) {
-                            //    fileNamePage += "0";
-                            //    if (currentPage < 100) {
-                            //        fileNamePage += "0";
-                            //        if (currentPage < 10)
-                            //            fileNamePage += "0";
-                            //    }
-                            //}
-                            //fileNamePage += (currentPage);
+                            fileNamePage = (PostIDs.IndexOf(xmlID[j].InnerText) + 1).ToString("0000.##");
 
                             // File name artist for the schema
                             string fileNameArtist = "(none)";

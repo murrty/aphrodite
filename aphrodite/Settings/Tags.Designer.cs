@@ -145,13 +145,13 @@ namespace aphrodite {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool skipExistingFiles {
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool separateNonImages {
             get {
-                return ((bool)(this["skipExistingFiles"]));
+                return ((bool)(this["separateNonImages"]));
             }
             set {
-                this["skipExistingFiles"] = value;
+                this["separateNonImages"] = value;
             }
         }
     }

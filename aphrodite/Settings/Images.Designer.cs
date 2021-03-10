@@ -82,5 +82,17 @@ namespace aphrodite {
                 this["fileNameSchema"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool separateNonImages {
+            get {
+                return ((bool)(this["separateNonImages"]));
+            }
+            set {
+                this["separateNonImages"] = value;
+            }
+        }
     }
 }

@@ -95,7 +95,7 @@
             this.tbMain.Location = new System.Drawing.Point(0, 0);
             this.tbMain.Name = "tbMain";
             this.tbMain.SelectedIndex = 0;
-            this.tbMain.Size = new System.Drawing.Size(274, 194);
+            this.tbMain.Size = new System.Drawing.Size(272, 196);
             this.tbMain.TabIndex = 7;
             this.tbMain.SelectedIndexChanged += new System.EventHandler(this.tbMain_SelectedIndexChanged);
             // 
@@ -112,7 +112,7 @@
             this.tbTags.Location = new System.Drawing.Point(4, 22);
             this.tbTags.Name = "tbTags";
             this.tbTags.Padding = new System.Windows.Forms.Padding(3);
-            this.tbTags.Size = new System.Drawing.Size(266, 168);
+            this.tbTags.Size = new System.Drawing.Size(264, 170);
             this.tbTags.TabIndex = 0;
             this.tbTags.Text = "Tag(s)";
             this.tbTags.UseVisualStyleBackColor = true;
@@ -166,7 +166,7 @@
             this.chkSeparateRatings.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkSeparateRatings.Location = new System.Drawing.Point(12, 31);
             this.chkSeparateRatings.Name = "chkSeparateRatings";
-            this.chkSeparateRatings.Size = new System.Drawing.Size(103, 17);
+            this.chkSeparateRatings.Size = new System.Drawing.Size(102, 17);
             this.chkSeparateRatings.TabIndex = 4;
             this.chkSeparateRatings.Text = "Separate ratings";
             this.TouchingTips.SetToolTip(this.chkSeparateRatings, "Separates ratings into different folders");
@@ -179,7 +179,7 @@
             this.chkExplicit.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkExplicit.Location = new System.Drawing.Point(11, 14);
             this.chkExplicit.Name = "chkExplicit";
-            this.chkExplicit.Size = new System.Drawing.Size(33, 17);
+            this.chkExplicit.Size = new System.Drawing.Size(32, 17);
             this.chkExplicit.TabIndex = 1;
             this.chkExplicit.Text = "E";
             this.TouchingTips.SetToolTip(this.chkExplicit, "Download images rated Explicit");
@@ -192,7 +192,7 @@
             this.chkQuestionable.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkQuestionable.Location = new System.Drawing.Point(49, 14);
             this.chkQuestionable.Name = "chkQuestionable";
-            this.chkQuestionable.Size = new System.Drawing.Size(34, 17);
+            this.chkQuestionable.Size = new System.Drawing.Size(33, 17);
             this.chkQuestionable.TabIndex = 2;
             this.chkQuestionable.Text = "Q";
             this.TouchingTips.SetToolTip(this.chkQuestionable, "Download images rated Questionable");
@@ -205,7 +205,7 @@
             this.chkSafe.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkSafe.Location = new System.Drawing.Point(88, 14);
             this.chkSafe.Name = "chkSafe";
-            this.chkSafe.Size = new System.Drawing.Size(33, 17);
+            this.chkSafe.Size = new System.Drawing.Size(32, 17);
             this.chkSafe.TabIndex = 3;
             this.chkSafe.Text = "S";
             this.TouchingTips.SetToolTip(this.chkSafe, "Download images rated Safe");
@@ -282,7 +282,7 @@
             this.chkScoreAsTag.AutoSize = true;
             this.chkScoreAsTag.Location = new System.Drawing.Point(70, 18);
             this.chkScoreAsTag.Name = "chkScoreAsTag";
-            this.chkScoreAsTag.Size = new System.Drawing.Size(56, 17);
+            this.chkScoreAsTag.Size = new System.Drawing.Size(55, 17);
             this.chkScoreAsTag.TabIndex = 2;
             this.chkScoreAsTag.Text = "As tag";
             this.TouchingTips.SetToolTip(this.chkScoreAsTag, "If checked, uses the score minimum as a tag (ex: \"gay score:>25\").\r\nThis widly in" +
@@ -295,7 +295,7 @@
             this.chkMinimumScore.AutoSize = true;
             this.chkMinimumScore.Location = new System.Drawing.Point(8, 18);
             this.chkMinimumScore.Name = "chkMinimumScore";
-            this.chkMinimumScore.Size = new System.Drawing.Size(59, 17);
+            this.chkMinimumScore.Size = new System.Drawing.Size(58, 17);
             this.chkMinimumScore.TabIndex = 1;
             this.chkMinimumScore.Text = "Enable";
             this.TouchingTips.SetToolTip(this.chkMinimumScore, "Only downloads images with a score equal to or greater than provided");
@@ -351,7 +351,7 @@
             this.chkMerge.AutoSize = true;
             this.chkMerge.Location = new System.Drawing.Point(53, 107);
             this.chkMerge.Name = "chkMerge";
-            this.chkMerge.Size = new System.Drawing.Size(169, 17);
+            this.chkMerge.Size = new System.Drawing.Size(168, 17);
             this.chkMerge.TabIndex = 4;
             this.chkMerge.Text = "Merge blacklisted with the rest";
             this.chkMerge.UseVisualStyleBackColor = true;
@@ -361,7 +361,7 @@
             this.chkOpen.AutoSize = true;
             this.chkOpen.Location = new System.Drawing.Point(53, 84);
             this.chkOpen.Name = "chkOpen";
-            this.chkOpen.Size = new System.Drawing.Size(139, 17);
+            this.chkOpen.Size = new System.Drawing.Size(138, 17);
             this.chkOpen.TabIndex = 3;
             this.chkOpen.Text = "Open after downloading";
             this.chkOpen.UseVisualStyleBackColor = true;
@@ -417,7 +417,7 @@
             this.chkImageSeparateArtists.AutoSize = true;
             this.chkImageSeparateArtists.Location = new System.Drawing.Point(84, 114);
             this.chkImageSeparateArtists.Name = "chkImageSeparateArtists";
-            this.chkImageSeparateArtists.Size = new System.Drawing.Size(99, 17);
+            this.chkImageSeparateArtists.Size = new System.Drawing.Size(98, 17);
             this.chkImageSeparateArtists.TabIndex = 16;
             this.chkImageSeparateArtists.Text = "Separate artists";
             this.chkImageSeparateArtists.UseVisualStyleBackColor = true;
@@ -427,7 +427,7 @@
             this.chkImageUseForm.AutoSize = true;
             this.chkImageUseForm.Location = new System.Drawing.Point(61, 137);
             this.chkImageUseForm.Name = "chkImageUseForm";
-            this.chkImageUseForm.Size = new System.Drawing.Size(151, 17);
+            this.chkImageUseForm.Size = new System.Drawing.Size(150, 17);
             this.chkImageUseForm.TabIndex = 5;
             this.chkImageUseForm.Text = "Use form to show progress";
             this.chkImageUseForm.UseVisualStyleBackColor = true;
@@ -439,7 +439,7 @@
             this.chkImageSeparateBlacklisted.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkImageSeparateBlacklisted.Location = new System.Drawing.Point(77, 91);
             this.chkImageSeparateBlacklisted.Name = "chkImageSeparateBlacklisted";
-            this.chkImageSeparateBlacklisted.Size = new System.Drawing.Size(122, 17);
+            this.chkImageSeparateBlacklisted.Size = new System.Drawing.Size(121, 17);
             this.chkImageSeparateBlacklisted.TabIndex = 4;
             this.chkImageSeparateBlacklisted.Text = "Separate blacklisted";
             this.chkImageSeparateBlacklisted.UseVisualStyleBackColor = true;
@@ -451,7 +451,7 @@
             this.chkImageSeparateRatings.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkImageSeparateRatings.Location = new System.Drawing.Point(86, 68);
             this.chkImageSeparateRatings.Name = "chkImageSeparateRatings";
-            this.chkImageSeparateRatings.Size = new System.Drawing.Size(103, 17);
+            this.chkImageSeparateRatings.Size = new System.Drawing.Size(102, 17);
             this.chkImageSeparateRatings.TabIndex = 3;
             this.chkImageSeparateRatings.Text = "Separate ratings";
             this.chkImageSeparateRatings.UseVisualStyleBackColor = true;
@@ -588,7 +588,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(274, 194);
+            this.ClientSize = new System.Drawing.Size(272, 196);
             this.Controls.Add(this.tbMain);
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(290, 274);
