@@ -22,7 +22,7 @@ namespace aphrodite {
 
         public bool fromURL = false;                // Determines if the page is being downloaded or not.
 
-        public string saveTo = String.Empty;        // Global setting for the save directory for the downloader.
+        public string saveTo = null;                // Global setting for the save directory for the downloader.
         public bool openAfter = false;              // Global setting for opening the folder after download.
         public bool saveBlacklistedFiles = true;    // Global setting for saving graylisted files..
         public bool ignoreFinish = false;           // Global setting for closing after finishing
@@ -337,6 +337,16 @@ namespace aphrodite {
 
             bool morePages = false;                                             // Will determine if there are more than 1 page.
 
+            // the Boolean lists of if non-images exist to create the save folder
+            // 0 = gif, 1 = apng, 2 = webm, 3 = swf
+            List<bool> FileNonImages = new List<bool>{ false, false, false, false };
+            List<bool> GraylistedFileNonImages = new List<bool> { false, false, false, false };
+            List<bool> ExplicitNonImages = new List<bool> { false, false, false, false };
+            List<bool> QuestionableNonImages = new List<bool> { false, false, false, false };
+            List<bool> SafeNonImages = new List<bool> { false, false, false, false };
+            List<bool> GraylistedExplicitNonImages = new List<bool> { false, false, false, false };
+            List<bool> GraylistedQuestionableNonImages = new List<bool> { false, false, false, false };
+            List<bool> GraylistedSafeNonImages = new List<bool> { false, false, false, false };
             #endregion
 
             #region Downloader try-statement
@@ -617,17 +627,19 @@ namespace aphrodite {
                         if (separateRatings) {
                             outputDir += "\\" + rating.ToLower() + "\\blacklisted\\";
                             if (separateNonImages) {
-                                if (fileName.EndsWith("gif")) {
-                                    outputDir += "gif\\";
-                                }
-                                else if (fileName.EndsWith("apng")) {
-                                    outputDir += "apng\\";
-                                }
-                                else if (fileName.EndsWith("webm")) {
-                                    outputDir += "webm\\";
-                                }
-                                else if (fileName.EndsWith("swf")) {
-                                    outputDir += "swf\\";
+                                switch (xmlExt[i].InnerText.ToLower()) {
+                                    case "gif":
+                                        outputDir += "gif\\";
+                                        break;
+                                    case "apng":
+                                        outputDir += "apng\\";
+                                        break;
+                                    case "webm":
+                                        outputDir += "webm\\";
+                                        break;
+                                    case "swf":
+                                        outputDir += "swf\\";
+                                        break;
                                 }
                             }
                             outputDir += fileName;
@@ -636,17 +648,19 @@ namespace aphrodite {
                         else {
                             outputDir += "\\blacklisted\\";
                             if (separateNonImages) {
-                                if (fileName.EndsWith("gif")) {
-                                    outputDir += "gif\\";
-                                }
-                                else if (fileName.EndsWith("apng")) {
-                                    outputDir += "apng\\";
-                                }
-                                else if (fileName.EndsWith("webm")) {
-                                    outputDir += "webm\\";
-                                }
-                                else if (fileName.EndsWith("swf")) {
-                                    outputDir += "swf\\";
+                                switch (xmlExt[i].InnerText.ToLower()) {
+                                    case "gif":
+                                        outputDir += "gif\\";
+                                        break;
+                                    case "apng":
+                                        outputDir += "apng\\";
+                                        break;
+                                    case "webm":
+                                        outputDir += "webm\\";
+                                        break;
+                                    case "swf":
+                                        outputDir += "swf\\";
+                                        break;
                                 }
                             }
                             alreadyExists = File.Exists(outputDir);
@@ -659,6 +673,22 @@ namespace aphrodite {
                                     graylistExplicitExistCount++;
                                 }
                                 else {
+                                    if (separateNonImages) {
+                                        switch (xmlExt[i].InnerText.ToLower()) {
+                                            case "gif":
+                                                GraylistedExplicitNonImages[0] = true;
+                                                break;
+                                            case "apng":
+                                                GraylistedExplicitNonImages[1] = true;
+                                                break;
+                                            case "webm":
+                                                GraylistedExplicitNonImages[2] = true;
+                                                break;
+                                            case "swf":
+                                                GraylistedExplicitNonImages[3] = true;
+                                                break;
+                                        }
+                                    }
                                     graylistExplicitCount++;
                                 }
                                 break;
@@ -667,6 +697,22 @@ namespace aphrodite {
                                     graylistQuestionableExistCount++;
                                 }
                                 else {
+                                    if (separateNonImages) {
+                                        switch (xmlExt[i].InnerText.ToLower()) {
+                                            case "gif":
+                                                GraylistedQuestionableNonImages[0] = true;
+                                                break;
+                                            case "apng":
+                                                GraylistedQuestionableNonImages[1] = true;
+                                                break;
+                                            case "webm":
+                                                GraylistedQuestionableNonImages[2] = true;
+                                                break;
+                                            case "swf":
+                                                GraylistedQuestionableNonImages[3] = true;
+                                                break;
+                                        }
+                                    }
                                     graylistQuestionableCount++;
                                 }
                                 break;
@@ -675,6 +721,22 @@ namespace aphrodite {
                                     graylistSafeExistCount++;
                                 }
                                 else {
+                                    if (separateNonImages) {
+                                        switch (xmlExt[i].InnerText.ToLower()) {
+                                            case "gif":
+                                                GraylistedSafeNonImages[0] = true;
+                                                break;
+                                            case "apng":
+                                                GraylistedSafeNonImages[1] = true;
+                                                break;
+                                            case "webm":
+                                                GraylistedSafeNonImages[2] = true;
+                                                break;
+                                            case "swf":
+                                                GraylistedSafeNonImages[3] = true;
+                                                break;
+                                        }
+                                    }
                                     graylistSafeCount++;
                                 }
                                 break;
@@ -687,6 +749,22 @@ namespace aphrodite {
                             graylistTotalExistCount++;
                         }
                         else {
+                            if (separateNonImages) {
+                                switch (xmlExt[i].InnerText.ToLower()) {
+                                    case "gif":
+                                        GraylistedFileNonImages[0] = true;
+                                        break;
+                                    case "apng":
+                                        GraylistedFileNonImages[1] = true;
+                                        break;
+                                    case "webm":
+                                        GraylistedFileNonImages[2] = true;
+                                        break;
+                                    case "swf":
+                                        GraylistedFileNonImages[3] = true;
+                                        break;
+                                }
+                            }
                             graylistTotalCount++;
                         }
                         totalCount++;
@@ -736,6 +814,22 @@ namespace aphrodite {
                                     cleanExplicitExistCount++;
                                 }
                                 else {
+                                    if (separateNonImages) {
+                                        switch (xmlExt[i].InnerText.ToLower()) {
+                                            case "gif":
+                                                ExplicitNonImages[0] = true;
+                                                break;
+                                            case "apng":
+                                                ExplicitNonImages[1] = true;
+                                                break;
+                                            case "webm":
+                                                ExplicitNonImages[2] = true;
+                                                break;
+                                            case "swf":
+                                                ExplicitNonImages[3] = true;
+                                                break;
+                                        }
+                                    }
                                     cleanExplicitCount++;
                                 }
                                 break;
@@ -744,6 +838,22 @@ namespace aphrodite {
                                     cleanQuestionableExistCount++;
                                 }
                                 else {
+                                    if (separateNonImages) {
+                                        switch (xmlExt[i].InnerText.ToLower()) {
+                                            case "gif":
+                                                QuestionableNonImages[0] = true;
+                                                break;
+                                            case "apng":
+                                                QuestionableNonImages[1] = true;
+                                                break;
+                                            case "webm":
+                                                QuestionableNonImages[2] = true;
+                                                break;
+                                            case "swf":
+                                                QuestionableNonImages[3] = true;
+                                                break;
+                                        }
+                                    }
                                     cleanQuestionableCount++;
                                 }
                                 break;
@@ -752,6 +862,22 @@ namespace aphrodite {
                                     cleanSafeExistCount++;
                                 }
                                 else {
+                                    if (separateNonImages) {
+                                        switch (xmlExt[i].InnerText.ToLower()) {
+                                            case "gif":
+                                                SafeNonImages[0] = true;
+                                                break;
+                                            case "apng":
+                                                SafeNonImages[1] = true;
+                                                break;
+                                            case "webm":
+                                                SafeNonImages[2] = true;
+                                                break;
+                                            case "swf":
+                                                SafeNonImages[3] = true;
+                                                break;
+                                        }
+                                    }
                                     cleanSafeCount++;
                                 }
                                 break;
@@ -764,6 +890,22 @@ namespace aphrodite {
                             cleanTotalExistCount++;
                         }
                         else {
+                            if (separateNonImages) {
+                                switch (xmlExt[i].InnerText.ToLower()) {
+                                    case "gif":
+                                        FileNonImages[0] = true;
+                                        break;
+                                    case "apng":
+                                        FileNonImages[1] = true;
+                                        break;
+                                    case "webm":
+                                        FileNonImages[2] = true;
+                                        break;
+                                    case "swf":
+                                        FileNonImages[3] = true;
+                                        break;
+                                }
+                            }
                             cleanTotalCount++;
                         }
                         totalCount++;
@@ -1176,6 +1318,22 @@ namespace aphrodite {
                                             graylistExplicitExistCount++;
                                         }
                                         else {
+                                            if (separateNonImages) {
+                                                switch (xmlExt[i].InnerText.ToLower()) {
+                                                    case "gif":
+                                                        GraylistedExplicitNonImages[0] = true;
+                                                        break;
+                                                    case "apng":
+                                                        GraylistedExplicitNonImages[1] = true;
+                                                        break;
+                                                    case "webm":
+                                                        GraylistedExplicitNonImages[2] = true;
+                                                        break;
+                                                    case "swf":
+                                                        GraylistedExplicitNonImages[3] = true;
+                                                        break;
+                                                }
+                                            }
                                             graylistExplicitCount++;
                                         }
                                         break;
@@ -1184,6 +1342,22 @@ namespace aphrodite {
                                             graylistQuestionableExistCount++;
                                         }
                                         else {
+                                            if (separateNonImages) {
+                                                switch (xmlExt[i].InnerText.ToLower()) {
+                                                    case "gif":
+                                                        GraylistedQuestionableNonImages[0] = true;
+                                                        break;
+                                                    case "apng":
+                                                        GraylistedQuestionableNonImages[1] = true;
+                                                        break;
+                                                    case "webm":
+                                                        GraylistedQuestionableNonImages[2] = true;
+                                                        break;
+                                                    case "swf":
+                                                        GraylistedQuestionableNonImages[3] = true;
+                                                        break;
+                                                }
+                                            }
                                             graylistQuestionableCount++;
                                         }
                                         break;
@@ -1192,6 +1366,22 @@ namespace aphrodite {
                                             graylistSafeExistCount++;
                                         }
                                         else {
+                                            if (separateNonImages) {
+                                                switch (xmlExt[i].InnerText.ToLower()) {
+                                                    case "gif":
+                                                        GraylistedSafeNonImages[0] = true;
+                                                        break;
+                                                    case "apng":
+                                                        GraylistedSafeNonImages[1] = true;
+                                                        break;
+                                                    case "webm":
+                                                        GraylistedSafeNonImages[2] = true;
+                                                        break;
+                                                    case "swf":
+                                                        GraylistedSafeNonImages[3] = true;
+                                                        break;
+                                                }
+                                            }
                                             graylistSafeCount++;
                                         }
                                         break;
@@ -1204,6 +1394,22 @@ namespace aphrodite {
                                     graylistTotalExistCount++;
                                 }
                                 else {
+                                    if (separateNonImages) {
+                                        switch (xmlExt[i].InnerText.ToLower()) {
+                                            case "gif":
+                                                GraylistedFileNonImages[0] = true;
+                                                break;
+                                            case "apng":
+                                                GraylistedFileNonImages[1] = true;
+                                                break;
+                                            case "webm":
+                                                GraylistedFileNonImages[2] = true;
+                                                break;
+                                            case "swf":
+                                                GraylistedFileNonImages[3] = true;
+                                                break;
+                                        }
+                                    }
                                     graylistTotalCount++;
                                 }
                                 totalCount++;
@@ -1253,6 +1459,22 @@ namespace aphrodite {
                                             cleanExplicitExistCount++;
                                         }
                                         else {
+                                            if (separateNonImages) {
+                                                switch (xmlExt[i].InnerText.ToLower()) {
+                                                    case "gif":
+                                                        ExplicitNonImages[0] = true;
+                                                        break;
+                                                    case "apng":
+                                                        ExplicitNonImages[1] = true;
+                                                        break;
+                                                    case "webm":
+                                                        ExplicitNonImages[2] = true;
+                                                        break;
+                                                    case "swf":
+                                                        ExplicitNonImages[3] = true;
+                                                        break;
+                                                }
+                                            }
                                             cleanExplicitCount++;
                                         }
                                         break;
@@ -1261,6 +1483,22 @@ namespace aphrodite {
                                             cleanQuestionableExistCount++;
                                         }
                                         else {
+                                            if (separateNonImages) {
+                                                switch (xmlExt[i].InnerText.ToLower()) {
+                                                    case "gif":
+                                                        QuestionableNonImages[0] = true;
+                                                        break;
+                                                    case "apng":
+                                                        QuestionableNonImages[1] = true;
+                                                        break;
+                                                    case "webm":
+                                                        QuestionableNonImages[2] = true;
+                                                        break;
+                                                    case "swf":
+                                                        QuestionableNonImages[3] = true;
+                                                        break;
+                                                }
+                                            }
                                             cleanQuestionableCount++;
                                         }
                                         break;
@@ -1269,6 +1507,22 @@ namespace aphrodite {
                                             cleanSafeExistCount++;
                                         }
                                         else {
+                                            if (separateNonImages) {
+                                                switch (xmlExt[i].InnerText.ToLower()) {
+                                                    case "gif":
+                                                        SafeNonImages[0] = true;
+                                                        break;
+                                                    case "apng":
+                                                        SafeNonImages[1] = true;
+                                                        break;
+                                                    case "webm":
+                                                        SafeNonImages[2] = true;
+                                                        break;
+                                                    case "swf":
+                                                        SafeNonImages[3] = true;
+                                                        break;
+                                                }
+                                            }
                                             cleanSafeCount++;
                                         }
                                         break;
@@ -1281,6 +1535,22 @@ namespace aphrodite {
                                     cleanTotalExistCount++;
                                 }
                                 else {
+                                    if (separateNonImages) {
+                                        switch (xmlExt[i].InnerText.ToLower()) {
+                                            case "gif":
+                                                FileNonImages[0] = true;
+                                                break;
+                                            case "apng":
+                                                FileNonImages[1] = true;
+                                                break;
+                                            case "webm":
+                                                FileNonImages[2] = true;
+                                                break;
+                                            case "swf":
+                                                FileNonImages[3] = true;
+                                                break;
+                                        }
+                                    }
                                     cleanTotalCount++;
                                 }
                                 totalCount++;
@@ -1448,40 +1718,144 @@ namespace aphrodite {
             // Create output folders
                 if (separateRatings) {
                     if (ExplicitURLs.Count > 0) {
-                        if (!Directory.Exists(saveTo + "\\explicit"))
-                            Directory.CreateDirectory(saveTo + "\\explicit");
+                          Directory.CreateDirectory(saveTo + "\\explicit");
+                          if (separateNonImages) {
+                              if (ExplicitNonImages[0]) {
+                                  Directory.CreateDirectory(saveTo + "\\explicit\\gif");
+                              }
+                              if (ExplicitNonImages[1]) {
+                                  Directory.CreateDirectory(saveTo + "\\explicit\\apng");
+                              }
+                              if (ExplicitNonImages[2]) {
+                                  Directory.CreateDirectory(saveTo + "\\explicit\\webm");
+                              }
+                              if (ExplicitNonImages[3]) {
+                                  Directory.CreateDirectory(saveTo + "\\explicit\\swf");
+                              }
+                          }
                     }
                     if (QuestionableURLs.Count > 0) {
-                        if (!Directory.Exists(saveTo + "\\questionable"))
-                            Directory.CreateDirectory(saveTo + "\\questionable");
+                        Directory.CreateDirectory(saveTo + "\\questionable");
+                        if (separateNonImages) {
+                            if (QuestionableNonImages[0]) {
+                                Directory.CreateDirectory(saveTo + "\\questionable\\gif");
+                            }
+                            if (QuestionableNonImages[1]) {
+                                Directory.CreateDirectory(saveTo + "\\questionable\\apng");
+                            }
+                            if (QuestionableNonImages[2]) {
+                                Directory.CreateDirectory(saveTo + "\\questionable\\webm");
+                            }
+                            if (QuestionableNonImages[3]) {
+                                Directory.CreateDirectory(saveTo + "\\questionable\\swf");
+                            }
+                        }
                     }
                     if (SafeURLs.Count > 0) {
-                        if (!Directory.Exists(saveTo + "\\safe"))
-                            Directory.CreateDirectory(saveTo + "\\safe");
+                        Directory.CreateDirectory(saveTo + "\\safe");
+                        if (separateNonImages) {
+                            if (SafeNonImages[0]) {
+                                Directory.CreateDirectory(saveTo + "\\safe\\gif");
+                            }
+                            if (SafeNonImages[1]) {
+                                Directory.CreateDirectory(saveTo + "\\safe\\apng");
+                            }
+                            if (SafeNonImages[2]) {
+                                Directory.CreateDirectory(saveTo + "\\safe\\webm");
+                            }
+                            if (SafeNonImages[3]) {
+                                Directory.CreateDirectory(saveTo + "\\safe\\swf");
+                            }
+                        }
                     }
 
                     if (saveBlacklistedFiles) {
                         if (GraylistedExplicitURLs.Count > 0) {
-                            if (!Directory.Exists(saveTo + "\\explicit\\blacklisted"))
-                                Directory.CreateDirectory(saveTo + "\\explicit\\blacklisted");
+                            Directory.CreateDirectory(saveTo + "\\explicit\\blacklisted");
+                            if (separateNonImages) {
+                                if (GraylistedExplicitNonImages[0]) {
+                                    Directory.CreateDirectory(saveTo + "\\explicit\\blacklisted\\gif");
+                                }
+                                if (GraylistedExplicitNonImages[1]) {
+                                    Directory.CreateDirectory(saveTo + "\\explicit\\blacklisted\\apng");
+                                }
+                                if (GraylistedExplicitNonImages[2]) {
+                                    Directory.CreateDirectory(saveTo + "\\explicit\\blacklisted\\webm");
+                                }
+                                if (GraylistedExplicitNonImages[3]) {
+                                    Directory.CreateDirectory(saveTo + "\\explicit\\blacklisted\\swf");
+                                }
+                            }
                         }
                         if (GraylistedQuestionableURLs.Count > 0) {
-                            if (!Directory.Exists(saveTo + "\\questionable\\blacklisted"))
-                                Directory.CreateDirectory(saveTo + "\\questionable\\blacklisted");
+                            Directory.CreateDirectory(saveTo + "\\questionable\\blacklisted");
+                            if (separateNonImages) {
+                                if (GraylistedQuestionableNonImages[0]) {
+                                    Directory.CreateDirectory(saveTo + "\\questionable\\blacklisted\\gif");
+                                }
+                                if (GraylistedQuestionableNonImages[1]) {
+                                    Directory.CreateDirectory(saveTo + "\\questionable\\blacklisted\\apng");
+                                }
+                                if (GraylistedQuestionableNonImages[2]) {
+                                    Directory.CreateDirectory(saveTo + "\\questionable\\blacklisted\\webm");
+                                }
+                                if (GraylistedQuestionableNonImages[3]) {
+                                    Directory.CreateDirectory(saveTo + "\\questionable\\blacklisted\\swf");
+                                }
+                            }
                         }
                         if (GraylistedSafeURLs.Count > 0) {
-                            if (!Directory.Exists(saveTo + "\\safe\\blacklisted"))
-                                Directory.CreateDirectory(saveTo + "\\safe\\blacklisted");
+                            Directory.CreateDirectory(saveTo + "\\safe\\blacklisted");
+                            if (separateNonImages) {
+                                if (GraylistedSafeNonImages[0]) {
+                                    Directory.CreateDirectory(saveTo + "\\safe\\blacklisted\\gif");
+                                }
+                                if (GraylistedSafeNonImages[1]) {
+                                    Directory.CreateDirectory(saveTo + "\\safe\\blacklisted\\apng");
+                                }
+                                if (GraylistedSafeNonImages[2]) {
+                                    Directory.CreateDirectory(saveTo + "\\safe\\blacklisted\\webm");
+                                }
+                                if (GraylistedSafeNonImages[3]) {
+                                    Directory.CreateDirectory(saveTo + "\\safe\\blacklisted\\swf");
+                                }
+                            }
                         }
                     }
                 }
                 else {
-                    if (!Directory.Exists(saveTo))
-                        Directory.CreateDirectory(saveTo);
+                    Directory.CreateDirectory(saveTo);
+                    if (separateNonImages) {
+                        if (FileNonImages[0]) {
+                            Directory.CreateDirectory(saveTo + "\\gif");
+                        }
+                        if (FileNonImages[1]) {
+                            Directory.CreateDirectory(saveTo + "\\apng");
+                        }
+                        if (FileNonImages[2]) {
+                            Directory.CreateDirectory(saveTo + "\\webm");
+                        }
+                        if (FileNonImages[3]) {
+                            Directory.CreateDirectory(saveTo + "\\swf");
+                        }
+                    }
 
                     if (saveBlacklistedFiles && GraylistedURLs.Count > 0) {
-                        if (!Directory.Exists(saveTo + "\\blacklisted"))
-                            Directory.CreateDirectory(saveTo + "\\blacklisted");
+                        Directory.CreateDirectory(saveTo + "\\blacklisted");
+                        if (separateNonImages) {
+                            if (GraylistedFileNonImages[0]) {
+                                Directory.CreateDirectory(saveTo + "\\blacklisted\\gif");
+                            }
+                            if (GraylistedFileNonImages[1]) {
+                                Directory.CreateDirectory(saveTo + "\\blacklisted\\apng");
+                            }
+                            if (GraylistedFileNonImages[2]) {
+                                Directory.CreateDirectory(saveTo + "\\blacklisted\\webm");
+                            }
+                            if (GraylistedFileNonImages[3]) {
+                                Directory.CreateDirectory(saveTo + "\\blacklisted\\swf");
+                            }
+                        }
                     }
                 }
             #endregion
@@ -1971,7 +2345,7 @@ namespace aphrodite {
                 ErrorLog.ReportWebException(WebE,url, "frmTagDownloader.cs");
             }
             catch (Exception ex) {
-                apiTools.SendDebugMessage("A gneral exception has occured. (frmTagDownloader.cs)");
+                apiTools.SendDebugMessage("A general exception has occured. (frmTagDownloader.cs)");
                 this.BeginInvoke(new MethodInvoker(() => {
                     status.Text = "A Exception has occured";
                     pbDownloadStatus.State = ProgressBarState.Error;
