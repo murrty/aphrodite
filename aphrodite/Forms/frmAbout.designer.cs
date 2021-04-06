@@ -27,12 +27,12 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmAbout));
             this.lbVersion = new System.Windows.Forms.Label();
-            this.llbCheckForUpdates = new System.Windows.Forms.LinkLabel();
+            this.llbCheckForUpdates = new LinkLabelHand();
             this.lbHeader = new System.Windows.Forms.Label();
             this.lbBody = new System.Windows.Forms.Label();
             this.pbIcon = new System.Windows.Forms.PictureBox();
             this.tipWoof = new System.Windows.Forms.ToolTip(this.components);
-            this.lnkLicense = new System.Windows.Forms.LinkLabel();
+            this.lnkLicense = new LinkLabelHand();
             ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).BeginInit();
             this.SuspendLayout();
             // 
@@ -114,6 +114,7 @@
             this.Controls.Add(this.lbBody);
             this.Controls.Add(this.lbHeader);
             this.Controls.Add(this.llbCheckForUpdates);
+            this.Icon = Properties.Resources.Brad;
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(280, 180);
             this.MinimumSize = new System.Drawing.Size(280, 180);
@@ -123,7 +124,6 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "About aphrodite";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.About_FormClosing);
-            this.Shown += new System.EventHandler(this.About_Shown);
             ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -133,11 +133,11 @@
         #endregion
 
         private System.Windows.Forms.Label lbVersion;
-        private System.Windows.Forms.LinkLabel llbCheckForUpdates;
+        private LinkLabelHand llbCheckForUpdates;
         private System.Windows.Forms.Label lbHeader;
         private System.Windows.Forms.Label lbBody;
         private System.Windows.Forms.PictureBox pbIcon;
         private System.Windows.Forms.ToolTip tipWoof;
-        private System.Windows.Forms.LinkLabel lnkLicense;
+        private LinkLabelHand lnkLicense;
     }
 }

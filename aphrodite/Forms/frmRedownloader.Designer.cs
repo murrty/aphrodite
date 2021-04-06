@@ -130,6 +130,7 @@
             this.Controls.Add(this.btnRenumerate);
             this.Controls.Add(this.btnRedownload);
             this.Controls.Add(this.tcMain);
+            this.Icon = Properties.Resources.Brad;
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(300, 300);
             this.MinimumSize = new System.Drawing.Size(300, 300);

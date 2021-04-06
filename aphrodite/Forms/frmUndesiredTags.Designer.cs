@@ -125,6 +125,7 @@
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.label1);
+            this.Icon = Properties.Resources.Brad;
             this.MinimizeBox = false;
             this.Name = "frmUndesiredTags";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;

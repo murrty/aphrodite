@@ -132,6 +132,7 @@
             this.Controls.Add(this.lbUpdateAvailableCurrentVersion);
             this.Controls.Add(this.lbUpdateAvailableUpdateVersion);
             this.Controls.Add(this.lbUpdateAvailableHeader);
+            this.Icon = Properties.Resources.Brad;
             this.MaximizeBox = false;
             this.Name = "frmUpdateAvailable";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

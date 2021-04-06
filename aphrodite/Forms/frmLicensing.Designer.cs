@@ -44,6 +44,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(522, 261);
             this.Controls.Add(this.richTextBox1);
+            this.Icon = Properties.Resources.Brad;
             this.MaximizeBox = false;
             this.MinimumSize = new System.Drawing.Size(538, 300);
             this.Name = "frmLicensing";

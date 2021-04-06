@@ -390,6 +390,7 @@
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(367, 271);
             this.Controls.Add(this.tabMain);
+            this.Icon = Properties.Resources.Brad;
             this.MaximizeBox = false;
             this.Name = "frmParser";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

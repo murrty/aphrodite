@@ -13,35 +13,7 @@ namespace aphrodite {
     public partial class frmImageDownloader : Form {
 
     #region Public Variables
-        public string url;                      // The URL of the file to be downloaded.
-        public string postID;                   // The ID of the post.
-
-        public string header;                   // String for the header.
-        public string saveTo;                   // String for the save directory.
-        public string staticSaveTo;             // String for the initial saveTo string.
-        public string graylist;                 // String for the graylist.
-        public string blacklist;                // String for the blacklist.
-
-        public bool separateRatings;            // Setting for separating ratings.
-        public bool separateBlacklisted;        // Setting for separating blacklisted files.
-        public bool separateNonImages;          // Setting for separating non images (gif, apng, webm, swf)
-
-        public bool saveInfo;                   // Global setting for saving images.nfo file.
-        public bool ignoreFinish;               // Global setting for exiting after finishing.
-
-        public bool separateArtists;            // Setting to separate files by artist.
-        public string fileNameSchema;           // The schema used for the file name.
-                                                    // %md5%        = the md5 of the file
-                                                    // %id%         = the id of the page
-                                                    // %rating%     = the rating of the image (eg: safe)
-                                                    // %rating2%    = the lettered rating of the image (eg: s)
-                                                    // %artist%     = the first artist in the artists array
-                                                    // %ext%        = the extension
-                                                    // %fav_count%  = the amount of favorites the post has
-                                                    // %score%      = the score of the post
-                                                    // %author%     = the user who submitted the post to e621
-
-        public static readonly string postJsonBase = "https://e621.net/posts/{0}.json";
+        public ImageDownloadInfo DownloadInfo;
     #endregion
 
     #region PrivateVariables
@@ -55,7 +27,6 @@ namespace aphrodite {
     #region Form
         public frmImageDownloader() {
             InitializeComponent();
-            this.Icon = Properties.Resources.Brad;
         }
         private void frmImageDownloader_Load(object sender, EventArgs e) {
             startDownload();
@@ -81,7 +52,7 @@ namespace aphrodite {
             imageDownload.Start();
         }
         private void AfterDownload() {
-            if (ignoreFinish) {
+            if (DownloadInfo.IgnoreFinish) {
                 if (DownloadHasFinished) {
                     this.DialogResult = DialogResult.Yes;
                 }
@@ -100,7 +71,7 @@ namespace aphrodite {
                 pbDownloadStatus.Value = pbDownloadStatus.Maximum;
                 lbPercentage.Text = "Done";
                 tmrTitle.Stop();
-                this.Text = "Image " +  postID + " finished downloading";
+                this.Text = "Image " + DownloadInfo.PostId + " finished downloading";
                 status.Text = "Finished downloading pool";
             }
             else if (DownloadHasErrored) {
@@ -125,45 +96,42 @@ namespace aphrodite {
                 pbDownloadStatus.Value = pbDownloadStatus.Maximum;
                 lbPercentage.Text = "Done?";
                 tmrTitle.Stop();
-                this.Text = "Image " + postID + " finished downloading";
+                this.Text = "Image " + DownloadInfo.PostId + " finished downloading";
                 status.Text = "Download status booleans not set, assuming the download completed";
             }
         }
         public void downloadImage() {
             try {
-            // Set the saveto to \\Images.
-                if (!saveTo.EndsWith("\\Images"))
-                    saveTo += "\\Images";
-
-                staticSaveTo = saveTo;
+                string SaveTo = DownloadInfo.DownloadPath;
+            // Set the SaveTo to \\Images.
+                if (!SaveTo.EndsWith("\\Images"))
+                    SaveTo += "\\Images";
 
             // Check the start URL to add the extra forward-slash for the split.
-                if (url.StartsWith("http://")) {
-                    url.Replace("http://", "https://");
+                if (DownloadInfo.ImageUrl.StartsWith("http://")) {
+                    DownloadInfo.ImageUrl.Replace("http://", "https://");
                 }
-                if (!url.StartsWith("https://"))
-                    url = "https://" + url;
+                if (!DownloadInfo.ImageUrl.StartsWith("https://"))
+                    DownloadInfo.ImageUrl = "https://" + DownloadInfo.ImageUrl;
 
-            // Get postID from the split (if exists).
-                if (string.IsNullOrEmpty(postID))
-                    postID = url.Split('/')[5];
+            // Get DownloadInfo.PostID from the split (if exists).
+                if (string.IsNullOrEmpty(DownloadInfo.PostId))
+                    DownloadInfo.PostId = DownloadInfo.ImageUrl.Split('/')[5];
 
                 this.BeginInvoke(new MethodInvoker(() => {
-                    lbInfo.Text = "Downloading image id " + postID;
+                    lbInfo.Text = "Downloading image id " + DownloadInfo.PostId;
                     status.Text = "Waiting for JSON parse...";
                 }));
 
             // New varaibles for the API parse.
-                List<string> GraylistedTags = new List<string>(graylist.Split(' '));
-                List<string> BlacklistedTags = new List<string>(blacklist.Split(' '));
                 string imageInfo = string.Empty;
                 string blacklistInfo = string.Empty;
                 XmlDocument xmlDoc = new XmlDocument();
-                string postJson = string.Format("https://e621.net/posts/{0}.json", postID);
+                string postJson = string.Format("https://e621.net/posts/{0}.json", DownloadInfo.PostId);
 
             // Begin to get the XML
-                url = postJson;
-                string postXML = apiTools.GetJSON(postJson, header);
+                DownloadInfo.ImageUrl = postJson;
+                string postXML = apiTools.GetJsonToXml(postJson);
 
             // Check the XML.
                 if (postXML == apiTools.EmptyXML || string.IsNullOrWhiteSpace(postXML)) {
@@ -308,9 +276,9 @@ namespace aphrodite {
                 bool isBlacklisted = false;
                 string offendingTags = string.Empty;
                 for (int i = 0; i < foundTags.Count; i++) {
-                    if (GraylistedTags.Count > 0) {
-                        for (int j = 0; j < GraylistedTags.Count; j++) {
-                            if (foundTags[i] == GraylistedTags[j]) {
+                    if (DownloadInfo.Graylist.Length > 0) {
+                        for (int j = 0; j < DownloadInfo.Graylist.Length; j++) {
+                            if (foundTags[i] == DownloadInfo.Graylist[j]) {
                                 offendingTags += foundTags[i];
                                 isGraylisted = true;
                             }
@@ -319,9 +287,9 @@ namespace aphrodite {
                 // Since the image downloader is user specific, the blacklist won't cancel downloading.
                 // Image downloading is basically the user consenting to downloading it, therefore they want it despite the blacklist.
                 // Worst-case, just delete it after downloading.
-                    if (BlacklistedTags.Count > 0) {
-                        for (int j = 0; j < BlacklistedTags.Count; j++) {
-                            if (foundTags[i] == BlacklistedTags[j]) {
+                    if (DownloadInfo.Blacklist.Length > 0) {
+                        for (int j = 0; j < DownloadInfo.Blacklist.Length; j++) {
+                            if (foundTags[i] == DownloadInfo.Blacklist[j]) {
                                 offendingTags += foundTags[i];
                                 isGraylisted = true;
                                 isBlacklisted = true;
@@ -332,10 +300,10 @@ namespace aphrodite {
 
             // set the .nfo buffer.
                 if (isGraylisted || isBlacklisted) {
-                    if (separateBlacklisted) {
-                        blacklistInfo += "BLACKLISTED POST " + postID + ":\n" +
+                    if (DownloadInfo.SeparateBlacklisted) {
+                        blacklistInfo += "BLACKLISTED POST " + DownloadInfo.PostId + ":\n" +
                                          "    MD5: " + xmlMD5[0].InnerText + "\n" +
-                                         "    URL: https://e621.net/posts/" + postID + "\n" +
+                                         "    URL: https://e621.net/posts/" + DownloadInfo.PostId + "\n" +
                                          "    ARTIST(S): " + foundArtists + "\n" +
                                          "    TAGS:\n" + ReadTags +//xmlTags[0].InnerText + "\n" +
                                          "    SCORE: Up " + xmlScoreUp[0].InnerText + ", Down " + xmlScoreDown[0].InnerText + ", Total" + xmlScoreTotal[0].InnerText + "\n" +
@@ -345,9 +313,9 @@ namespace aphrodite {
                                          "\n\n";
                     }
                     else {
-                        imageInfo += "BLACKLISTED POST " + postID + ":\n" +
+                        imageInfo += "BLACKLISTED POST " + DownloadInfo.PostId + ":\n" +
                                      "    MD5: " + xmlMD5[0].InnerText + "\n" +
-                                     "    URL: https://e621.net/posts/" + postID + "\n" +
+                                     "    URL: https://e621.net/posts/" + DownloadInfo.PostId + "\n" +
                                      "    ARTIST(S): " + foundArtists + "\n" +
                                      "    TAGS:\n" + ReadTags +//xmlTags[0].InnerText + "\n" +
                                      "    SCORE: Up " + xmlScoreUp[0].InnerText + ", Down " + xmlScoreDown[0].InnerText + ", Total" + xmlScoreTotal[0].InnerText + "\n" +
@@ -357,9 +325,9 @@ namespace aphrodite {
                     }
                 }
                 else {
-                    imageInfo += "POST " + postID + ":\n" +
+                    imageInfo += "POST " + DownloadInfo.PostId + ":\n" +
                                  "    MD5: " + xmlMD5[0].InnerText + "\n" +
-                                 "    URL: https://e621.net/posts/" + postID + "\n" +
+                                 "    URL: https://e621.net/posts/" + DownloadInfo.PostId + "\n" +
                                  "    ARTIST(S): " + foundArtists + "\n" +
                                  "    TAGS:\n" + ReadTags + //xmlTags[0].InnerText + "\n" +
                                  "    SCORE: Up " + xmlScoreUp[0].InnerText + ", Down " + xmlScoreDown[0].InnerText + ", Total" + xmlScoreTotal[0].InnerText + "\n" +
@@ -397,90 +365,90 @@ namespace aphrodite {
                     }
                 }
 
-                string fileName = fileNameSchema.Replace("%md5%", xmlMD5[0].InnerText)
-                                                .Replace("%id%", xmlID[0].InnerText)
-                                                .Replace("%rating%", rating.ToLower())
-                                                .Replace("%rating2%", xmlRating[0].InnerText)
-                                                .Replace("%artist%", fileNameArtist)
-                                                .Replace("%ext%", xmlExt[0].InnerText)
-                                                .Replace("%fav_count%", xmlFavCount[0].InnerText)
-                                                .Replace("%score%", xmlScoreTotal[0].InnerText)
-                                                .Replace("%scoreup%", xmlScoreUp[0].InnerText)
-                                                .Replace("%scoredown%", xmlScoreDown[0].InnerText)
-                                                .Replace("%author%", xmlAuthor[0].InnerText) + "." + xmlExt[0].InnerText;
+                string fileName = DownloadInfo.FileNameSchema.Replace("%md5%", xmlMD5[0].InnerText)
+                                                             .Replace("%id%", xmlID[0].InnerText)
+                                                             .Replace("%rating%", rating.ToLower())
+                                                             .Replace("%rating2%", xmlRating[0].InnerText)
+                                                             .Replace("%artist%", fileNameArtist)
+                                                             .Replace("%ext%", xmlExt[0].InnerText)
+                                                             .Replace("%fav_count%", xmlFavCount[0].InnerText)
+                                                             .Replace("%score%", xmlScoreTotal[0].InnerText)
+                                                             .Replace("%scoreup%", xmlScoreUp[0].InnerText)
+                                                             .Replace("%scoredown%", xmlScoreDown[0].InnerText)
+                                                             .Replace("%author%", xmlAuthor[0].InnerText) + "." + xmlExt[0].InnerText;
 
-            // Start working on the saveTo string.
-                if (separateRatings) {
+            // Start working on the SaveTo string.
+                if (DownloadInfo.SeparateRatings) {
                     switch (xmlRating[0].InnerText.ToLower()) {
                         case "e": case "explicit":
-                            saveTo += "\\explicit";
+                            SaveTo += "\\explicit";
                             break;
                         case "q": case "questionable":
-                            saveTo += "\\questionable";
+                            SaveTo += "\\questionable";
                             break;
                         case "s": case "safe":
-                            saveTo += "\\safe";
+                            SaveTo += "\\safe";
                             break;
                     }
                 }
 
-                if (isGraylisted || isBlacklisted && separateBlacklisted)
-                    saveTo += "\\blacklisted";
-                if (separateArtists) {
-                    saveTo += "\\" + fileNameArtist;
+                if (isGraylisted || isBlacklisted && DownloadInfo.SeparateBlacklisted)
+                    SaveTo += "\\blacklisted";
+                if (DownloadInfo.SeparateArtists) {
+                    SaveTo += "\\" + fileNameArtist;
                 }
 
-                switch (separateNonImages) {
+                switch (DownloadInfo.SeparateNonImages) {
                     case true:
                         if (fileName.EndsWith("gif")) {
-                            saveTo += "\\gif";
+                            SaveTo += "\\gif";
                         }
                         else if (fileName.EndsWith("apng")) {
-                            saveTo += "\\apng";
+                            SaveTo += "\\apng";
                         }
                         else if (fileName.EndsWith("webm")) {
-                            saveTo += "\\webm";
+                            SaveTo += "\\webm";
                         }
                         else if (fileName.EndsWith("swf")) {
-                            saveTo += "\\swf";
+                            SaveTo += "\\swf";
                         }
                         break;
                 }
 
             // Create output directory.
-                if (!Directory.Exists(saveTo))
-                    Directory.CreateDirectory(saveTo);
+                if (!Directory.Exists(SaveTo))
+                    Directory.CreateDirectory(SaveTo);
 
             // Check file before continuing.
-                if (File.Exists(saveTo + "\\" + fileName)) {
+                if (File.Exists(SaveTo + "\\" + fileName)) {
                     DownloadHasFinished = true;
                     goto Finished;
                 }
 
             // Save image.nfo.
-                if (saveInfo) {
-                    if (isBlacklisted && separateBlacklisted) {
-                        if (!File.Exists(staticSaveTo + "\\images.blacklisted.nfo")) {
-                            File.WriteAllText(staticSaveTo + "\\images.blacklisted.nfo", blacklistInfo, Encoding.UTF8);
+                if (DownloadInfo.SaveInfo) {
+                    if (isBlacklisted && DownloadInfo.SeparateBlacklisted) {
+                        if (!File.Exists(DownloadInfo.DownloadPath + "\\images.blacklisted.nfo")) {
+                            File.WriteAllText(DownloadInfo.DownloadPath + "\\images.blacklisted.nfo", blacklistInfo, Encoding.UTF8);
                         }
                         else {
                             blacklistInfo = "\n\n" + blacklistInfo;
 
-                            string readInfo = File.ReadAllText(staticSaveTo + "\\images.blacklisted.nfo");
+                            string readInfo = File.ReadAllText(DownloadInfo.DownloadPath + "\\images.blacklisted.nfo");
                             if (!readInfo.Contains("MD5: " + xmlMD5[0].InnerText))
-                                File.AppendAllText(staticSaveTo + "\\images.blacklisted.nfo", blacklistInfo, Encoding.UTF8);
+                                File.AppendAllText(DownloadInfo.DownloadPath + "\\images.blacklisted.nfo", blacklistInfo, Encoding.UTF8);
                         }
                     }
                     else {
-                        if (!File.Exists(staticSaveTo + "\\images.nfo")) {
-                            File.WriteAllText(staticSaveTo + "\\images.nfo", imageInfo, Encoding.UTF8);
+                        if (!File.Exists(DownloadInfo.DownloadPath + "\\images.nfo")) {
+                            File.WriteAllText(DownloadInfo.DownloadPath + "\\images.nfo", imageInfo, Encoding.UTF8);
                         }
                         else {
                             imageInfo = "\n\n" + imageInfo;
 
-                            string readInfo = File.ReadAllText(staticSaveTo + "\\images.nfo");
+                            string readInfo = File.ReadAllText(DownloadInfo.DownloadPath + "\\images.nfo");
                             if (!readInfo.Contains("MD5: " + xmlMD5[0].InnerText))
-                                File.AppendAllText(staticSaveTo + "\\images.nfo", imageInfo, Encoding.UTF8);
+                                File.AppendAllText(DownloadInfo.DownloadPath + "\\images.nfo", imageInfo, Encoding.UTF8);
                         }
                     }
                 }
@@ -493,7 +461,7 @@ namespace aphrodite {
                 }));
 
             // Download file.
-                url = DownloadUrl;
+                DownloadInfo.ImageUrl = DownloadUrl;
                 using (ExWebClient wc = new ExWebClient()) {
                     wc.DownloadProgressChanged += (s, e) => {
                         this.BeginInvoke(new MethodInvoker(() => {
@@ -514,11 +482,11 @@ namespace aphrodite {
                     };
 
                     wc.Proxy = WebRequest.GetSystemWebProxy();
-                    wc.Headers.Add(header);
+                    wc.Headers.Add("User-Agent: " + Program.UserAgent);
                     wc.Method = "GET";
                     apiTools.SendDebugMessage("Beginning download of file " + DownloadUrl);
 
-                    wc.DownloadFile(DownloadUrl, saveTo + "\\" + fileName);
+                    wc.DownloadFile(DownloadUrl, SaveTo + "\\" + fileName);
                 }
 
                 DownloadHasFinished = true;
@@ -538,7 +506,7 @@ Finished:
                     status.Text = "A WebException has occured";
                     pbDownloadStatus.State = ProgressBarState.Error;
                 }));
-                ErrorLog.ReportWebException(WebE, url, "frmImageDownloader.cs");
+                ErrorLog.ReportWebException(WebE, DownloadInfo.ImageUrl, "frmImageDownloader.cs");
                 DownloadHasErrored = true;
             }
             catch (Exception ex) {
@@ -558,6 +526,388 @@ Finished:
         }
     #endregion
 
+    }
 
+    class ImageDownloader {
+
+        #region Variables
+        public ImageDownloadInfo DownloadInfo;
+        #endregion
+
+        #region Downloader
+        public bool downloadImage() {
+            try {
+                string SaveTo = DownloadInfo.DownloadPath;
+                // Set the saveto to \\Images.
+                if (!SaveTo.EndsWith("\\Images"))
+                    SaveTo += "\\Images";
+
+                // Check the start URL to add the extra forward-slash for the split.
+                if (!string.IsNullOrEmpty(DownloadInfo.ImageUrl)) {
+                    if (DownloadInfo.ImageUrl.StartsWith("http://")) {
+                        DownloadInfo.ImageUrl.Replace("http://", "https://");
+                    }
+                    if (!DownloadInfo.ImageUrl.StartsWith("https://")) {
+                        DownloadInfo.ImageUrl = "https://" + DownloadInfo.ImageUrl;
+                    }
+                }
+
+                // New varaibles for the API parse.
+                string imageInfo = string.Empty;
+                string blacklistInfo = string.Empty;
+                XmlDocument xmlDoc = new XmlDocument();
+                string postJson = string.Format("https://e621.net/posts/{0}.json", DownloadInfo.PostId);
+
+                // Begin to get the XML
+                DownloadInfo.ImageUrl = postJson;
+                string postXML = apiTools.GetJsonToXml(postJson);
+
+                // Check the XML.
+                if (postXML == apiTools.EmptyXML || string.IsNullOrWhiteSpace(postXML)) {
+                    apiTools.SendDebugMessage("Xml is empty, aborting.");
+                    return false;
+                }
+
+                // Begin parsing XML.
+                xmlDoc.LoadXml(postXML);
+                apiTools.SendDebugMessage("Gathering post information from XML");
+                XmlNodeList xmlID = xmlDoc.DocumentElement.SelectNodes("/root/post/id");
+                XmlNodeList xmlMD5 = xmlDoc.DocumentElement.SelectNodes("/root/post/file/md5");
+                XmlNodeList xmlExt = xmlDoc.DocumentElement.SelectNodes("/root/post/file/ext");
+                XmlNodeList xmlURL = xmlDoc.DocumentElement.SelectNodes("/root/post/file/url");
+                XmlNodeList xmlTagsGeneral = xmlDoc.DocumentElement.SelectNodes("/root/post/tags/general");
+                XmlNodeList xmlTagsSpecies = xmlDoc.DocumentElement.SelectNodes("/root/post/tags/species");
+                XmlNodeList xmlTagsCharacter = xmlDoc.DocumentElement.SelectNodes("/root/post/tags/character");
+                XmlNodeList xmlTagsCopyright = xmlDoc.DocumentElement.SelectNodes("/root/post/tags/copyright");
+                XmlNodeList xmlTagsArtist = xmlDoc.DocumentElement.SelectNodes("/root/post/tags/artist");
+                XmlNodeList xmlTagsInvalid = xmlDoc.DocumentElement.SelectNodes("/root/post/tags/invalid");
+                XmlNodeList xmlTagsLore = xmlDoc.DocumentElement.SelectNodes("/root/post/tags/lore");
+                XmlNodeList xmlTagsMeta = xmlDoc.DocumentElement.SelectNodes("/root/post/tags/meta");
+                XmlNodeList xmlTagsLocked = xmlDoc.DocumentElement.SelectNodes("/root/post/locked_tags");
+                XmlNodeList xmlScoreUp = xmlDoc.DocumentElement.SelectNodes("/root/post/score/up");
+                XmlNodeList xmlScoreDown = xmlDoc.DocumentElement.SelectNodes("/root/post/score/down");
+                XmlNodeList xmlScoreTotal = xmlDoc.DocumentElement.SelectNodes("/root/post/score/total");
+                XmlNodeList xmlRating = xmlDoc.DocumentElement.SelectNodes("/root/post/rating");
+                XmlNodeList xmlFavCount = xmlDoc.DocumentElement.SelectNodes("/root/post/fav_count");
+                XmlNodeList xmlAuthor = xmlDoc.DocumentElement.SelectNodes("/root/post/uploader_id");
+                XmlNodeList xmlDescription = xmlDoc.DocumentElement.SelectNodes("/root/post/description");
+                XmlNodeList xmlDeleted = xmlDoc.DocumentElement.SelectNodes("/root/post/flags/deleted");
+
+                if (xmlDeleted[0].InnerText.ToLower() == "true") {
+                    //return false;
+                }
+
+                string DownloadUrl = xmlURL[0].InnerText;
+                if (string.IsNullOrEmpty(DownloadUrl)) {
+                    DownloadUrl = apiTools.GetBlacklistedImageUrl(xmlMD5[0].InnerText, xmlExt[0].InnerText);
+                    if (DownloadUrl == null) {
+                        ErrorLog.ReportCustomException("DownloadUrl was still null after attempting to bypass blacklist with MD5", "ImageDownloader.cs");
+                        return false;
+                    }
+                }
+
+                List<string> foundTags = new List<string>();
+                string ReadTags = string.Empty;
+
+                ReadTags += "          General: [";
+                for (int x = 0; x < xmlTagsGeneral[0].ChildNodes.Count; x++) {
+                    foundTags.Add(xmlTagsGeneral[0].ChildNodes[x].InnerText);
+                    ReadTags += xmlTagsGeneral[0].ChildNodes[x].InnerText + ", ";
+                }
+                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                ReadTags += "]\n          Species: [";
+                for (int x = 0; x < xmlTagsSpecies[0].ChildNodes.Count; x++) {
+                    foundTags.Add(xmlTagsSpecies[0].ChildNodes[x].InnerText);
+                    ReadTags += xmlTagsSpecies[0].ChildNodes[x].InnerText + ", ";
+                }
+                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                ReadTags += "]\n          Character: [";
+                for (int x = 0; x < xmlTagsCharacter[0].ChildNodes.Count; x++) {
+                    foundTags.Add(xmlTagsCharacter[0].ChildNodes[x].InnerText);
+                    ReadTags += xmlTagsCharacter[0].ChildNodes[x].InnerText + ", ";
+                }
+                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                ReadTags += "]\n          Copyright: [";
+                for (int x = 0; x < xmlTagsCopyright[0].ChildNodes.Count; x++) {
+                    foundTags.Add(xmlTagsCopyright[0].ChildNodes[x].InnerText);
+                    ReadTags += xmlTagsCopyright[0].ChildNodes[x].InnerText + ", ";
+                }
+                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                ReadTags += "]\n          Artist: [";
+                for (int x = 0; x < xmlTagsArtist[0].ChildNodes.Count; x++) {
+                    foundTags.Add(xmlTagsArtist[0].ChildNodes[x].InnerText);
+                    ReadTags += xmlTagsArtist[0].ChildNodes[x].InnerText + ", ";
+                }
+                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                ReadTags += "]\n          Invalid: [";
+                for (int x = 0; x < xmlTagsInvalid[0].ChildNodes.Count; x++) {
+                    foundTags.Add(xmlTagsInvalid[0].ChildNodes[x].InnerText);
+                    ReadTags += xmlTagsInvalid[0].ChildNodes[x].InnerText + ", ";
+                }
+                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                ReadTags += "]\n          Lore: [";
+                for (int x = 0; x < xmlTagsLore[0].ChildNodes.Count; x++) {
+                    foundTags.Add(xmlTagsLore[0].ChildNodes[x].InnerText);
+                    ReadTags += xmlTagsLore[0].ChildNodes[x].InnerText + ", ";
+                }
+                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                ReadTags += "]\n          Meta: [";
+                for (int x = 0; x < xmlTagsMeta[0].ChildNodes.Count; x++) {
+                    foundTags.Add(xmlTagsMeta[0].ChildNodes[x].InnerText);
+                    ReadTags += xmlTagsMeta[0].ChildNodes[x].InnerText + ", ";
+                }
+                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                ReadTags += "]\n          Locked tags: [";
+                for (int x = 0; x < xmlTagsLocked[0].ChildNodes.Count; x++) {
+                    foundTags.Add(xmlTagsLocked[0].ChildNodes[x].InnerText);
+                    ReadTags += xmlTagsLocked[0].ChildNodes[x].InnerText + ", ";
+                }
+                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                ReadTags += "]\n";
+
+                // Get the rating.
+                string rating = xmlRating[0].InnerText;
+                switch (rating.ToLower()) {
+                    case "e":
+                    case "explicit":
+                        rating = "Explicit";
+                        break;
+                    case "q":
+                    case "questionable":
+                        rating = "Questionable";
+                        break;
+                    case "s":
+                    case "safe":
+                        rating = "Safe";
+                        break;
+                }
+
+                // Set the description
+                string imageDescription = " No description";
+                if (xmlDescription[0].InnerText != "") {
+                    imageDescription = "\n                \"" + xmlDescription[0].InnerText + "\"";
+                }
+
+                // Get the artists.
+                string foundArtists = string.Empty;
+                if (xmlTagsArtist[0].ChildNodes.Count > 0) {
+                    for (int i = 0; i < xmlTagsArtist[0].ChildNodes.Count; i++) {
+                        foundArtists += xmlTagsArtist[0].ChildNodes[i].InnerText + "\n               ";
+                    }
+                    foundArtists = foundArtists.TrimEnd(' ');
+                    foundArtists = foundArtists.TrimEnd('\n');
+                }
+                else {
+                    foundArtists = "(none)";
+                }
+
+                // Read blacklists if it's blacklisted.
+                bool isGraylisted = false;
+                bool isBlacklisted = false;
+                string offendingTags = string.Empty;
+                for (int i = 0; i < foundTags.Count; i++) {
+                    if (DownloadInfo.Graylist.Length > 0) {
+                        for (int j = 0; j < DownloadInfo.Graylist.Length; j++) {
+                            if (foundTags[i] == DownloadInfo.Graylist[j]) {
+                                offendingTags += foundTags[i];
+                                isGraylisted = true;
+                            }
+                        }
+                    }
+                    // Since the image downloader is user specific, the blacklist won't cancel downloading.
+                    // Image downloading is basically the user consenting to downloading it, therefore they want it despite the blacklist.
+                    // Worst-case, just delete it after downloading.
+                    if (DownloadInfo.Blacklist.Length > 0) {
+                        for (int j = 0; j < DownloadInfo.Blacklist.Length; j++) {
+                            if (foundTags[i] == DownloadInfo.Graylist[j]) {
+                                offendingTags += foundTags[i];
+                                isGraylisted = true;
+                                isBlacklisted = true;
+                            }
+                        }
+                    }
+                }
+
+                // set the .nfo buffer.
+                if (isGraylisted || isBlacklisted) {
+                    if (DownloadInfo.SeparateBlacklisted) {
+                        blacklistInfo += "BLACKLISTED POST " + DownloadInfo.PostId + ":\n" +
+                                         "    MD5: " + xmlMD5[0].InnerText + "\n" +
+                                         "    URL: https://e621.net/posts/" + DownloadInfo.PostId + "\n" +
+                                         "    ARTIST(S): " + foundArtists + "\n" +
+                                         "    TAGS:\n" + ReadTags +//xmlTags[0].InnerText + "\n" +
+                                         "    SCORE: Up " + xmlScoreUp[0].InnerText + ", Down " + xmlScoreDown[0].InnerText + ", Total" + xmlScoreTotal[0].InnerText + "\n" +
+                                         "    RATING: " + rating + "\n" +
+                                         "    OFFENDING TAGS: " + offendingTags + "\n" +
+                                         "    DESCRIPITON:" + imageDescription +
+                                         "\n\n";
+                    }
+                    else {
+                        imageInfo += "BLACKLISTED POST " + DownloadInfo.PostId + ":\n" +
+                                     "    MD5: " + xmlMD5[0].InnerText + "\n" +
+                                     "    URL: https://e621.net/posts/" + DownloadInfo.PostId + "\n" +
+                                     "    ARTIST(S): " + foundArtists + "\n" +
+                                     "    TAGS:\n" + ReadTags +//xmlTags[0].InnerText + "\n" +
+                                     "    SCORE: Up " + xmlScoreUp[0].InnerText + ", Down " + xmlScoreDown[0].InnerText + ", Total" + xmlScoreTotal[0].InnerText + "\n" +
+                                     "    RATING: " + rating + "\n" +
+                                     "    DESCRIPITON:" + imageDescription +
+                                     "\n\n";
+                    }
+                }
+                else {
+                    imageInfo += "POST " + DownloadInfo.PostId + ":\n" +
+                                 "    MD5: " + xmlMD5[0].InnerText + "\n" +
+                                 "    URL: https://e621.net/posts/" + DownloadInfo.PostId + "\n" +
+                                 "    ARTIST(S): " + foundArtists + "\n" +
+                                 "    TAGS:\n" + ReadTags + //xmlTags[0].InnerText + "\n" +
+                                 "    SCORE: Up " + xmlScoreUp[0].InnerText + ", Down " + xmlScoreDown[0].InnerText + ", Total" + xmlScoreTotal[0].InnerText + "\n" +
+                                 "    RATING: " + rating + "\n" +
+                                 "    DESCRIPITON:" + imageDescription +
+                                 "\n\n";
+                }
+
+                // Trim the excess in the buffer.
+                imageInfo = imageInfo.TrimEnd('\n');
+                blacklistInfo = blacklistInfo.TrimEnd('\n');
+
+                // Work on the filename
+                string fileNameArtist = "unknown";
+                bool useHardcodedFilter = false;
+                if (string.IsNullOrEmpty(General.Default.undesiredTags))
+                    useHardcodedFilter = true;
+
+                if (xmlTagsArtist.Count > 0) {
+                    if (!string.IsNullOrEmpty(xmlTagsArtist[0].InnerText)) {
+                        for (int i = 0; i < xmlTagsArtist.Count; i++) {
+                            if (useHardcodedFilter) {
+                                if (!UndesiredTags.isUndesiredHardcoded(xmlTagsArtist[i].InnerText)) {
+                                    fileNameArtist = xmlTagsArtist[i].InnerText;
+                                    break;
+                                }
+                            }
+                            else {
+                                if (!UndesiredTags.isUndesired(xmlTagsArtist[i].InnerText)) {
+                                    fileNameArtist = xmlTagsArtist[i].InnerText;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                string fileName = DownloadInfo.FileNameSchema.Replace("%md5%", xmlMD5[0].InnerText)
+                                                             .Replace("%id%", xmlID[0].InnerText)
+                                                             .Replace("%rating%", rating.ToLower())
+                                                             .Replace("%rating2%", xmlRating[0].InnerText)
+                                                             .Replace("%artist%", fileNameArtist)
+                                                             .Replace("%ext%", xmlExt[0].InnerText)
+                                                             .Replace("%fav_count%", xmlFavCount[0].InnerText)
+                                                             .Replace("%score%", xmlScoreTotal[0].InnerText)
+                                                             .Replace("%scoreup%", xmlScoreUp[0].InnerText)
+                                                             .Replace("%scoredown%", xmlScoreDown[0].InnerText)
+                                                             .Replace("%author%", xmlAuthor[0].InnerText) + "." + xmlExt[0].InnerText;
+
+                // Start working on the saveTo string.
+                if (DownloadInfo.SeparateRatings) {
+                    switch (xmlRating[0].InnerText.ToLower()) {
+                        case "e":
+                        case "explicit":
+                            SaveTo += "\\explicit";
+                            break;
+                        case "q":
+                        case "questionable":
+                            SaveTo += "\\questionable";
+                            break;
+                        case "s":
+                        case "safe":
+                            SaveTo += "\\safe";
+                            break;
+                    }
+                }
+
+                if (isGraylisted || isBlacklisted && DownloadInfo.SeparateBlacklisted)
+                    SaveTo += "\\blacklisted";
+                if (DownloadInfo.SeparateArtists) {
+                    SaveTo += "\\" + fileNameArtist;
+                }
+
+                switch (DownloadInfo.SeparateNonImages) {
+                    case true:
+                        if (fileName.EndsWith("gif")) {
+                            SaveTo += "\\gif";
+                        }
+                        else if (fileName.EndsWith("apng")) {
+                            SaveTo += "\\apng";
+                        }
+                        else if (fileName.EndsWith("webm")) {
+                            SaveTo += "\\webm";
+                        }
+                        else if (fileName.EndsWith("swf")) {
+                            SaveTo += "\\swf";
+                        }
+                        break;
+                }
+
+                // Create output directory.
+                if (!Directory.Exists(SaveTo))
+                    Directory.CreateDirectory(SaveTo);
+
+                // Check file before continuing.
+                if (File.Exists(SaveTo + "\\" + fileName))
+                    return true;
+
+                // Save image.nfo.
+                if (DownloadInfo.SaveInfo) {
+                    if (isGraylisted && DownloadInfo.SeparateBlacklisted) {
+                        if (!File.Exists(DownloadInfo.DownloadPath + "\\images.blacklisted.nfo")) {
+                            File.WriteAllText(DownloadInfo.DownloadPath + "\\images.blacklisted.nfo", blacklistInfo, Encoding.UTF8);
+                        }
+                        else {
+                            blacklistInfo = "\n\n" + blacklistInfo;
+
+                            string readInfo = File.ReadAllText(DownloadInfo.DownloadPath + "\\images.blacklisted.nfo");
+                            if (!readInfo.Contains("MD5: " + xmlMD5[0].InnerText))
+                                File.AppendAllText(DownloadInfo.DownloadPath + "\\images.blacklisted.nfo", blacklistInfo, Encoding.UTF8);
+                        }
+                    }
+                    else {
+                        if (!File.Exists(DownloadInfo.DownloadPath + "\\images.nfo")) {
+                            File.WriteAllText(DownloadInfo.DownloadPath + "\\images.nfo", imageInfo, Encoding.UTF8);
+                        }
+                        else {
+                            imageInfo = "\n\n" + imageInfo;
+
+                            string readInfo = File.ReadAllText(DownloadInfo.DownloadPath + "\\images.nfo");
+                            if (!readInfo.Contains("MD5: " + xmlMD5[0].InnerText))
+                                File.AppendAllText(DownloadInfo.DownloadPath + "\\images.nfo", imageInfo, Encoding.UTF8);
+                        }
+                    }
+                }
+
+                // Download file.
+                DownloadInfo.ImageUrl = DownloadUrl;
+                apiTools.DownloadImage(DownloadUrl, SaveTo + "\\" + fileName);
+                return true;
+            }
+            catch (ThreadAbortException) {
+                apiTools.SendDebugMessage("Thread was requested to be, and has been, aborted. (ImageDownloader.cs)");
+                return false;
+            }
+            catch (ObjectDisposedException) {
+                apiTools.SendDebugMessage("An ObjectDiposedException occured. (ImageDownloader.cs)");
+                return false;
+            }
+            catch (WebException WebE) {
+                apiTools.SendDebugMessage("A WebException has occured. (ImageDownloader.cs)");
+                ErrorLog.ReportWebException(WebE, DownloadInfo.ImageUrl, "ImageDownloader.cs");
+                return false;
+            }
+            catch (Exception ex) {
+                apiTools.SendDebugMessage("A gneral exception has occured. (ImageDownloader.cs)");
+                ErrorLog.ReportException(ex, "ImageDownloader.cs");
+                return false;
+            }
+        }
+        #endregion
     }
 }

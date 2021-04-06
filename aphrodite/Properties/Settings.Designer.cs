@@ -25,7 +25,7 @@ namespace aphrodite.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2.0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2.1")]
         public decimal currentVersion {
             get {
                 return ((decimal)(this["currentVersion"]));
@@ -34,10 +34,34 @@ namespace aphrodite.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2020-05-14")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2021-04-06")]
         public string debugDate {
             get {
                 return ((string)(this["debugDate"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool IsBetaVersion {
+            get {
+                return ((bool)(this["IsBetaVersion"]));
+            }
+            set {
+                this["IsBetaVersion"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2.2-pre1")]
+        public string BetaVersion {
+            get {
+                return ((string)(this["BetaVersion"]));
+            }
+            set {
+                this["BetaVersion"] = value;
             }
         }
     }

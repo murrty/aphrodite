@@ -72,17 +72,19 @@
     <Compile Include="Classes\apiTools.cs" />
     <Compile Include="Classes\Downloader.cs" />
     <Compile Include="Classes\ErrorLog.cs" />
-    <Compile Include="Classes\ExProgressBar.cs">
+    <Compile Include="Controls\ExProgressBar.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Classes\ExWebClient.cs">
+    <Compile Include="Controls\ExWebClient.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Classes\IniFile.cs" />
+    <Compile Include="Classes\Config.cs" />
     <Compile Include="Classes\Metadata.cs" />
-    <Compile Include="Classes\Settings.cs" />
-    <Compile Include="Classes\UndesiredTags.cs" />
+    <Compile Include="Classes\NativeMethods.cs" />
     <Compile Include="Classes\Updater.cs" />
+    <Compile Include="Controls\LinkLabelHand.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Forms\frmException.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -101,16 +103,12 @@
     <Compile Include="Forms\frmUpdateAvailable.Designer.cs">
       <DependentUpon>frmUpdateAvailable.cs</DependentUpon>
     </Compile>
-    <Compile Include="Ookii\Interop\ComDlgResources.cs" />
     <Compile Include="Ookii\Interop\COMGuids.cs" />
     <Compile Include="Ookii\Interop\ErrorHelper.cs" />
-    <Compile Include="Ookii\Interop\IProgressDialog.cs" />
     <Compile Include="Ookii\Interop\ShellComInterfaces.cs" />
     <Compile Include="Ookii\Interop\ShellWrapperDefinitions.cs" />
-    <Compile Include="Ookii\Interop\Win32Resources.cs" />
     <Compile Include="Ookii\Interop\WindowHandleWrapper.cs" />
     <Compile Include="Ookii\NativeMethods.cs" />
-    <Compile Include="Ookii\SafeHandle.cs" />
     <Compile Include="Settings\FormSettings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -170,7 +168,6 @@
     <Compile Include="Forms\frmSettings.Designer.cs">
       <DependentUpon>frmSettings.cs</DependentUpon>
     </Compile>
-    <Compile Include="Classes\ImageDownloader.cs" />
     <Compile Include="Forms\frmRedownloader.cs">
       <SubType>Form</SubType>
     </Compile>

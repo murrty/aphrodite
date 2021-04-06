@@ -84,6 +84,7 @@
             this.Controls.Add(this.lbPercentage);
             this.Controls.Add(this.status);
             this.Controls.Add(this.pbDownloadStatus);
+            this.Icon = Properties.Resources.Brad;
             this.MaximumSize = new System.Drawing.Size(292, 130);
             this.MinimumSize = new System.Drawing.Size(292, 130);
             this.Name = "frmImageDownloader";

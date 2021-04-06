@@ -12,7 +12,6 @@ namespace aphrodite {
     public partial class frmLicensing : Form {
         public frmLicensing() {
             InitializeComponent();
-            this.Icon = Properties.Resources.Brad;
         }
     }
 }

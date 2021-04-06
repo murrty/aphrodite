@@ -8,7 +8,12 @@ namespace aphrodite {
     public partial class frmAbout : Form {
         List<Thread> thr = new List<Thread>();
 
-        public frmAbout() { InitializeComponent(); this.Icon = Properties.Resources.Brad; }
+        public frmAbout() {
+            InitializeComponent();
+            pbIcon.Cursor = NativeMethods.SystemHandCursor;
+            llbCheckForUpdates.Cursor = NativeMethods.SystemHandCursor;
+            lnkLicense.Cursor = NativeMethods.SystemHandCursor;
+        }
 
         private void About_Shown(object sender, EventArgs e) {
             lbVersion.Text = "v" + Properties.Settings.Default.currentVersion.ToString();

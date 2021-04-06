@@ -3,10 +3,16 @@
   <Profiles />
   <Settings>
     <Setting Name="currentVersion" Type="System.Decimal" Scope="Application">
-      <Value Profile="(Default)">2.0</Value>
+      <Value Profile="(Default)">2.1</Value>
     </Setting>
     <Setting Name="debugDate" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">2020-05-14</Value>
+      <Value Profile="(Default)">2021-04-06</Value>
+    </Setting>
+    <Setting Name="IsBetaVersion" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="BetaVersion" Type="System.String" Scope="User">
+      <Value Profile="(Default)">2.2-pre1</Value>
     </Setting>
   </Settings>
 </SettingsFile>

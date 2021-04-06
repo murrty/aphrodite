@@ -12,47 +12,11 @@ using System.Xml;
 namespace aphrodite {
     public partial class frmTagDownloader : Form {
 
-    #region Public Variables
-        public string tags = string.Empty;          // The tags that will be downloaded.
-        public string downloadUrl = string.Empty;   // The URL that will be downloaded.
-        public string webHeader = string.Empty;     // The WebClient header.
-
-        public string graylist = string.Empty;      // The graylist (Will be downloaded into separate folder).
-        public string blacklist = string.Empty;     // The blacklist (Will never be downloaded or saved into tags.nfo).
-
-        public bool fromURL = false;                // Determines if the page is being downloaded or not.
-
-        public string saveTo = null;                // Global setting for the save directory for the downloader.
-        public bool openAfter = false;              // Global setting for opening the folder after download.
-        public bool saveBlacklistedFiles = true;    // Global setting for saving graylisted files..
-        public bool ignoreFinish = false;           // Global setting for closing after finishing
-
-        public bool useMinimumScore = false;        // Setting for using minimum score.
-        public bool scoreAsTag = false;             // Setting for using the score as a tag.
-        public int minimumScore = 0;                // Setting for the minimum score.
-        public int imageLimit = 0;                  // Setting for image limit.
-        public int pageLimit = 0;                   // Setting for page limit.
-        public bool saveInfo = false;               // Setting for saving the info.
-        public string[] ratings = null;             // Setting for the ratings.
-        public bool separateRatings = true;         // Setting for separating the ratings.
-        public bool separateNonImages = true;      // Setting for separating non images (gif, apng, webm, swf)
-        public bool skipExistingFile = false;       // Skip files if they exist
-        public string fileNameSchema = "%md5%";     // The schema used for the file name.
-                                                    // %md5%        = the md5 of the file
-                                                    // %id%         = the id of the page
-                                                    // %rating%     = the rating of the image (eg: safe)
-                                                    // %rating2%    = the lettered rating of the image (eg: s)
-                                                    // %artist%     = the first artist in the artists array
-                                                    // %ext%        = the extension
-                                                    // %fav_count%  = the amount of favorites the post has
-                                                    // %score%      = the score of the post
-                                                    // %author%     = the user who submitted the post to e621
-
-        //public static readonly string tagJson = "https://e621.net/post/index.json?tags="; // Old API url.
-        public static readonly string tagJson = "https://e621.net/posts.json?tags=";        // Updated API url.
+        #region Public Variables
+        public TagDownloadInfo DownloadInfo;
+        public static readonly string tagJson = "https://e621.net/posts.json?tags=";        // API url.
         public static readonly string limitJson = "&limit=320";                             // Maximum limit suffix
         public static readonly string pageJson = "&page=";                                  // Page suffix.
-        public static readonly string imgUrl = "https://static1.e621.net/data/";
 
         //       \ = %5C
         //       / = %2F
@@ -64,9 +28,9 @@ namespace aphrodite {
         //       > = %3E
         //       | = %7C
         // (space) = %20
-    #endregion
+        #endregion
 
-    #region Private Variables
+        #region Private Variables
         private Thread tagDownload;                     // New thread for the downloader.
 
         private int cleanTotalCount = 0;                // Will be the count of how many files that are set for download.
@@ -98,79 +62,83 @@ namespace aphrodite {
         private bool DownloadHasFinished = false;
         private bool DownloadHasErrored = false;
         private bool DownloadHasAborted = false;
-    #endregion
+        #endregion
 
-    #region Form
+        #region Form
         public frmTagDownloader() {
             InitializeComponent();
-            this.Icon = Properties.Resources.Brad;
         }
         private void frmDownload_Load(object sender, EventArgs e) {
-            if (fromURL)
-                txtTags.Text = downloadUrl.Split('/')[6].Replace("%20", " ");
-            else
-                txtTags.Text = tags.Replace("%25-2F", "/");
+            if (DownloadInfo.ImageLimit == 0 && DownloadInfo.PageLimit == 0) {
+                if (MessageBox.Show("Downloading won't be limited. This may take a long while or even blacklist you. Continue anyway?", "aphrodite", MessageBoxButtons.YesNo) == DialogResult.No) {
+                    this.Opacity = 0;
+                    DownloadHasAborted = true;
+                    this.DialogResult = DialogResult.No;
+                }
+                else {
+                    tmrTitle.Start();
+                    txtTags.Text = DownloadInfo.Tags.Replace("%25-2F", "/");
 
-            lbBlacklist.Text = "No file counts.\nWaiting for first json parse.";
+                    lbBlacklist.Text = "No file counts.\nWaiting for first json parse.";
 
-            string minScore = "Minimum score: disabled";
-            string imgLim = "Image limit: disabled";
-            string pageLim = "Page limit: disabled";
+                    string minScore = "Minimum score: disabled";
+                    string imgLim = "Image limit: disabled";
+                    string pageLim = "Page limit: disabled";
 
-            int tagCount = tags.Split(' ').Length;
+                    int tagCount = DownloadInfo.Tags.Split(' ').Length;
 
-            if (tagCount == 6 && scoreAsTag)
-                scoreAsTag = false;
+                    if (tagCount == 6 && DownloadInfo.MinimumScoreAsTag)
+                        DownloadInfo.MinimumScoreAsTag = false;
 
-            if (useMinimumScore)
-                minScore = "Minimum score: " + minimumScore.ToString();
+                    if (DownloadInfo.UseMinimumScore)
+                        minScore = "Minimum score: " + DownloadInfo.MinimumScore.ToString();
 
-            if (scoreAsTag)
-                minScore += " (as tag)";
+                    if (DownloadInfo.MinimumScoreAsTag)
+                        minScore += " (as tag)";
 
-            if (imageLimit > 0)
-                imgLim = "Image limit: " + imageLimit.ToString() + "images";
+                    if (DownloadInfo.ImageLimit > 0)
+                        imgLim = "Image limit: " + DownloadInfo.ImageLimit.ToString() + "images";
 
-            if (pageLimit > 0)
-                pageLim = "Page limit: " + pageLimit.ToString() + " pages";
+                    if (DownloadInfo.PageLimit > 0)
+                        pageLim = "Page limit: " + DownloadInfo.PageLimit.ToString() + " pages";
 
-            string ratingBuffer = "\nRatings: ";
-            if (ratings.Contains("e"))
-                ratingBuffer += "e";
-            if (ratings.Contains("q")) {
-                if (ratingBuffer.EndsWith("e"))
-                    ratingBuffer += ", ";
+                    string ratingBuffer = "\nRatings: ";
+                    if (DownloadInfo.SaveExplicit)
+                        ratingBuffer += "e";
+                    if (DownloadInfo.SaveQuestionable) {
+                        if (ratingBuffer.EndsWith("e"))
+                            ratingBuffer += ", ";
 
-                ratingBuffer += "q";
+                        ratingBuffer += "q";
+                    }
+                    if (DownloadInfo.SaveSafe) {
+                        if (ratingBuffer.EndsWith("e") || ratingBuffer.EndsWith("q"))
+                            ratingBuffer += ", ";
+
+                        ratingBuffer += "s";
+                    }
+
+                    if (DownloadInfo.SeparateRatings)
+                        ratingBuffer += " (separating)";
+                    else
+                        ratingBuffer = string.Empty;
+
+                    lbLimits.Text = minScore + "\r\n" + imgLim + "\r\n" + pageLim + ratingBuffer;
+                    StartDownload();
+                    this.CenterToScreen();
+                }
             }
-            if (ratings.Contains("s")) {
-                if (ratingBuffer.EndsWith("e") || ratingBuffer.EndsWith("q"))
-                    ratingBuffer += ", ";
-
-                ratingBuffer += "s";
-            }
-
-            if (separateRatings)
-                ratingBuffer += " (separating)";
-            else
-                ratingBuffer = string.Empty;
-
-            lbLimits.Text = minScore + "\n" + imgLim + "\n" + pageLim + ratingBuffer;
-        }
-        private void frmDownload_Shown(object sender, EventArgs e) {
-            startDownload();
-            this.CenterToScreen();
         }
         private void frmDownload_FormClosing(object sender, FormClosingEventArgs e) {
             if (!DownloadHasFinished && !DownloadHasErrored && !DownloadHasAborted) {
                 tmrTitle.Stop();
                 DownloadHasAborted = true;
 
-                if (tagDownload.IsAlive) {
+                if (tagDownload != null && tagDownload.IsAlive) {
                     tagDownload.Abort();
                 }
 
-                if (!ignoreFinish) {
+                if (!DownloadInfo.IgnoreFinish) {
                     e.Cancel = true;
                 }
                 else {
@@ -193,38 +161,41 @@ namespace aphrodite {
             else
                 this.Text += ".";
         }
-    #endregion
+        #endregion
 
-    #region Downloader
-        private void startDownload() {
+        #region Downloader
+        private void StartDownload() {
             try {
                 tagDownload = new Thread(() => {
                     Thread.CurrentThread.IsBackground = true;
 
-                    if (fromURL) {
-                        if (downloadPage(downloadUrl)) {
-                            if (ignoreFinish)
-                                this.DialogResult = DialogResult.OK;
-                        }
-                        else
-                            this.DialogResult = DialogResult.Abort;
-                    }
-                    else {
-                        downloadTags();
-                    }
+                    DownloadPosts();
+
+                    //if (DownloadInfo.FromUrl) {
+                    //    if (DownloadPage(DownloadInfo.PageUrl)) {
+                    //        if (DownloadInfo.IgnoreFinish) {
+                    //            this.DialogResult = DialogResult.OK;
+                    //        }
+                    //    }
+                    //    else {
+                    //        this.DialogResult = DialogResult.Abort;
+                    //    }
+                    //}
+                    //else {
+                    //    DownloadTags();
+                    //}
                 });
 
                 tagDownload.Start();
                 tmrTitle.Start();
             }
-            catch (ObjectDisposedException obDis) {
-                MessageBox.Show("Caught a disposed object exception.\n\n" + obDis.ToString());
-                this.DialogResult = DialogResult.Abort;
+            catch {
+                throw;
             }
         }
 
         private void AfterDownload(int ErrorType = 0) {
-            if (ignoreFinish) {
+            if (DownloadInfo.IgnoreFinish) {
                 if (DownloadHasFinished) {
                     this.DialogResult = DialogResult.Yes;
                 }
@@ -243,7 +214,7 @@ namespace aphrodite {
                 pbDownloadStatus.Value = pbDownloadStatus.Maximum;
                 lbPercentage.Text = "Done";
                 tmrTitle.Stop();
-                this.Text = "Finished downloading tags " + tags;
+                this.Text = "Finished downloading tags " + DownloadInfo.Tags;
                 status.Text = "Finished downloading tags";
             }
             else if (DownloadHasErrored) {
@@ -283,59 +254,51 @@ namespace aphrodite {
             }
         }
 
-        private void downloadTags() {
-            changeTask("Awaiting API call");
+        private void DownloadPosts() {
+            ChangeTask("Awaiting API call");
+
             #region Download variables
-            string url = string.Empty;                                          // The URL being accessed, changes per API call/File download.
+            string CurrentUrl = string.Empty;               // The URL being accessed, changes per API call/File download.
+            string TagInfoBuffer = string.Empty;            // The buffer for the 'tag.nfo' file that will be created.
+            string BlacklistInfoBuffer = string.Empty;      // The buffer for the 'tag.blacklisted.nfo' file that will be created.
 
-            string tagInfo = string.Empty;                                      // The buffer for the 'tag.nfo' file that will be created.
-            string blacklistInfo = string.Empty;                                // The buffer for the 'tag.blacklisted.nfo' file that will be created.
+            string CuurentXml = string.Empty;               // The XML string.
+            int CurrentPage = 1;                            // Will be the count of the pages parsed.
+            bool HasMorePages = false;                      // Will determine if there are more than 1 page.
 
-            string xml = string.Empty;                                          // The XML string.
+            List<string> URLs = new List<string>();             // The URLs that will be downloaded (if separateRatings = false).
+            List<string> GraylistedURLs = new List<string>();   // The Blacklisted URLs that will be downloaded (if separateRatings = false).
 
-            List<string> GraylistedTags = new List<string>();                   // The list of files that will be downloaded into a separate folder (if saveBlacklisted = true).
-            List<string> BlacklistedTags = new List<string>();                  // The list of files that will be skipped entirely.
-
-            List<string> URLs = new List<string>();                             // The URLs that will be downloaded (if separateRatings = false).
-            List<string> GraylistedURLs = new List<string>();                   // The Blacklisted URLs that will be downloaded (if separateRatings = false).
-
-            List<string> FileNames = new List<string>();                        // Contains the file names of the images
-            List<string> GraylistedFileNames = new List<string>();              // Contains the file names of the graylisted images
+            List<string> FileNames = new List<string>();            // Contains the file names of the images
+            List<string> GraylistedFileNames = new List<string>();  // Contains the file names of the graylisted images
 
             List<bool> FileExists = new List<bool>();
             List<bool> GraylistedFileExists = new List<bool>();
 
-            List<string> ExplicitURLs = new List<string>();                     // The list of Explicit files.
-            List<string> ExplicitFileNames = new List<string>();                // The list of Explicit file names.
-            List<bool> ExplicitFileExists = new List<bool>();
+            List<string> ExplicitURLs = new List<string>();         // The list of Explicit files.
+            List<string> ExplicitFileNames = new List<string>();    // The list of Explicit file names.
+            List<bool> ExplicitFileExists = new List<bool>();       // The list of existing Explicit files.
 
-            List<string> QuestionableURLs = new List<string>();                 // The list of Questionable files.
-            List<string> QuestionableFileNames = new List<string>();            // The list of Questionable file names.
+            List<string> QuestionableURLs = new List<string>();         // The list of Questionable files.
+            List<string> QuestionableFileNames = new List<string>();    // The list of Questionable file names.
             List<bool> QuestionableFileExists = new List<bool>();
 
-            List<string> SafeURLs = new List<string>();                         // The list of Safe files.
-            List<string> SafeFileNames = new List<string>();                    // The list of Safe file names.
+            List<string> SafeURLs = new List<string>();                     // The list of Safe files.
+            List<string> SafeFileNames = new List<string>();                // The list of Safe file names.
             List<bool> SafeFileExists = new List<bool>();
 
-            List<string> GraylistedExplicitURLs = new List<string>();           // The list of Graylisted Explicit files.
-            List<string> GraylistedExplicitFileNames = new List<string>();      // The list of Graylisted Explicit file names.
+            List<string> GraylistedExplicitURLs = new List<string>();       // The list of Graylisted Explicit files.
+            List<string> GraylistedExplicitFileNames = new List<string>();  // The list of Graylisted Explicit file names.
             List<bool> GraylistedExplicitFileExists = new List<bool>();
 
             List<string> GraylistedQuestionableURLs = new List<string>();       // The list of Graylisted Questionable files.
             List<string> GraylistedQuestionableFileNames = new List<string>();  // The list of Graylitsed Questionable file names.
             List<bool> GraylistedQuestionableFileExists = new List<bool>();
 
-            List<string> GraylistedSafeURLs = new List<string>();               // The list of Graylisted Safe files.
-            List<string> GraylistedSafeFileNames = new List<string>();          // The list of Graylisted Safe file names.
+            List<string> GraylistedSafeURLs = new List<string>();           // The list of Graylisted Safe files.
+            List<string> GraylistedSafeFileNames = new List<string>();      // The list of Graylisted Safe file names.
             List<bool> GraylistedSafeFileExists = new List<bool>();
 
-            int tagLength = 0;                                                  // Will be the count of tags being downloaded (1-6).
-            int pageCount = 1;                                                  // Will be the count of the pages parsed.
-
-            int count = -1;
-            int presentCount = -1;
-
-            bool morePages = false;                                             // Will determine if there are more than 1 page.
 
             // the Boolean lists of if non-images exist to create the save folder
             // 0 = gif, 1 = apng, 2 = webm, 3 = swf
@@ -352,61 +315,62 @@ namespace aphrodite {
             #region Downloader try-statement
             try {
             #region initialization
-            //Properties.Settings.Default.Log += "Tag downloader starting for tags " + tags + "\n";
+            //Properties.Settings.Default.Log += "Tag downloader starting for tags " + tags + "\r\n";
             // Set the saveTo.
-                string newTagName = apiTools.ReplaceIllegalCharacters(tags);
-                if (useMinimumScore)                                                                    // Add minimum score to folder name.
-                    newTagName += " (scores " + (minimumScore) + "+)";
-                if (!this.saveTo.EndsWith("\\Tags\\" + newTagName))                                     // Set the output folder.
-                    this.saveTo += "\\Tags\\" + newTagName;
+                string newTagName = apiTools.ReplaceIllegalCharacters(DownloadInfo.Tags);
+                if (DownloadInfo.UseMinimumScore) { // Add minimum score to folder name.
+                    newTagName += " (scores " + (DownloadInfo.MinimumScore) + "+)";
+                }
 
-            // Start the buffer for the .nfo files.
-                if (useMinimumScore) {
-                    tagInfo = "TAGS: " + tags + "\n" +
-                              "MINIMUM SCORE: " + minimumScore + "\n" +
-                              "DOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") +
-                              "\n\n";
-
-                    blacklistInfo = "TAGS: " + tags + "\n" +
-                                    "MINIMUM SCORE: " + minimumScore + "\n" +
-                                    "DOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\n" +
-                                    "BLACKLISTED TAGS: " + graylist +
-                                    "\n\n";
+                if (DownloadInfo.FromUrl) {
+                    if (!DownloadInfo.DownloadPath.EndsWith("\\Pages\\" + newTagName + " (page " + DownloadInfo.PageNumber + ")")) {
+                        DownloadInfo.DownloadPath += "\\Pages\\" + newTagName + " (page " + DownloadInfo.PageNumber + ")";
+                    }
                 }
                 else {
-                    tagInfo = "TAGS: " + tags + "\n" +
-                              "MINIMUM SCORE: n/a\n" +
-                              "DOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") +
-                              "\n\n";
-
-                    blacklistInfo = "TAGS: " + tags + "\n" +
-                                    "MINIMUM SCORE: n/a\n" +
-                                    "DOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\n" +
-                                    "BLACKLISTED TAGS: " + graylist +
-                                    "\n\n";
+                    if (!DownloadInfo.DownloadPath.EndsWith("\\Tags\\" + newTagName)) { // Set the output folder.
+                        DownloadInfo.DownloadPath += "\\Tags\\" + newTagName;
+                    }
                 }
 
-            // Get the tag length.
-                tagLength = tags.Split(' ').Length;
+            // Start the buffer for the .nfo files.
+                if (DownloadInfo.UseMinimumScore) {
+                    TagInfoBuffer = "TAGS: " + DownloadInfo.Tags + "\r\n" +
+                              "MINIMUM SCORE: " + DownloadInfo.MinimumScore + "\r\n" +
+                              "DOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") +
+                              "\r\n\r\n";
+
+                    BlacklistInfoBuffer = "TAGS: " + DownloadInfo.Tags + "\r\n" +
+                                    "MINIMUM SCORE: " + DownloadInfo.MinimumScore + "\r\n" +
+                                    "DOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\r\n" +
+                                    "BLACKLISTED TAGS: " + string.Join(" ", DownloadInfo.Graylist) +
+                                    "\r\n\r\n";
+                }
+                else {
+                    TagInfoBuffer = "TAGS: " + DownloadInfo.Tags + "\r\n" +
+                              "MINIMUM SCORE: n/a\r\n" +
+                              "DOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") +
+                              "\r\n\r\n";
+
+                    BlacklistInfoBuffer = "TAGS: " + DownloadInfo.Tags + "\r\n" +
+                                    "MINIMUM SCORE: n/a\r\n" +
+                                    "DOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\r\n" +
+                                    "BLACKLISTED TAGS: " + string.Join(" ", DownloadInfo.Graylist) +
+                                    "\r\n\r\n";
+                }
 
             // Add the minimum score to the search tags (if applicable).
-                if (tagLength < 6 && scoreAsTag) {
-                    tags += " score:>" + (minimumScore - 1);
+                if (DownloadInfo.Tags.Split(' ').Length < 6 && DownloadInfo.MinimumScoreAsTag) {
+                    DownloadInfo.Tags += " score:>" + (DownloadInfo.MinimumScore - 1);
                 }
-
-            // Set the blacklist.. lists...
-                if (!string.IsNullOrWhiteSpace(graylist))
-                    GraylistedTags = graylist.Split(' ').ToList();
-                if (!string.IsNullOrWhiteSpace(blacklist))
-                    BlacklistedTags = blacklist.Split(' ').ToList();
             #endregion
 
-            #region first page of the tag
+            #region first page of the download
             // Get XML of page.
-                changeTask("Downloading tag information for page 1...");
-                url = tagJson + tags + limitJson;
-                xml = apiTools.GetJSON(url, webHeader);
-                if (apiTools.IsXmlDead(xml)) {
+                ChangeTask("Downloading tag information for page 1...");
+                CurrentUrl = DownloadInfo.PageUrl.Replace("e621.net/posts", "e621.net/posts.json");
+                CuurentXml = apiTools.GetJsonToXml(CurrentUrl);
+                if (apiTools.IsXmlDead(CuurentXml)) {
                     throw new ApiReturnedNullOrEmptyException(ApiReturnedNullOrEmptyException.ReportedEmpty);
                 }
             #endregion
@@ -414,7 +378,7 @@ namespace aphrodite {
             #region first page parsing
             // Parse the XML file.
                 XmlDocument doc = new XmlDocument();
-                doc.LoadXml(xml);
+                doc.LoadXml(CuurentXml);
                 XmlNodeList xmlID = doc.DocumentElement.SelectNodes("/root/posts/item/id");
                 XmlNodeList xmlMD5 = doc.DocumentElement.SelectNodes("/root/posts/item/file/md5");
                 XmlNodeList xmlURL = doc.DocumentElement.SelectNodes("/root/posts/item/file/url");
@@ -441,14 +405,13 @@ namespace aphrodite {
                 int itemCount = xmlID.Count;
                 if (itemCount == 320) {
                 //if (itemCount == 10) { // Debug count
-                    morePages = true;
-                    pageCount++;
+                    HasMorePages = true;
+                    CurrentPage++;
                 }
 
             // Begin parsing the XML for tag information per item.
                 for (int i = 0; i < xmlID.Count; i++) {
-                    string artists = string.Empty;                                          // The artists that worked on the file.
-                    //Properties.Settings.Default.Log += "Finding rating at " + i + "\n";
+                    //Properties.Settings.Default.Log += "Finding rating at " + i + "\r\n";
                     string rating = xmlRating[i].InnerText;                                 // Get the rating of the current file.
                     bool isGraylisted = false;                                              // Will determine if the file is graylisted.
                     bool isBlacklisted = false;                                             // Will determine if the file is blacklisted.
@@ -457,70 +420,69 @@ namespace aphrodite {
                     string foundGraylistedTags = string.Empty;                              // The buffer for the tags that are graylisted.
                     string ReadTags = string.Empty;
 
-                // Check the image limit & break if reached.
-                    if (imageLimit > 0 && imageLimit == totalCount) {
-                        morePages = false;
+                  // Check the image limit & break if reached.
+                    if (DownloadInfo.ImageLimit > 0 && DownloadInfo.ImageLimit == totalCount) {
+                        HasMorePages = false;
                         break;
                     }
 
-                // Create new tag list to merge all the tag groups into one.
+                  // Create new tag list to merge all the tag groups into one.
                     ReadTags += "          General: [";
                     for (int x = 0; x < xmlTagsGeneral[i].ChildNodes.Count; x++) {
                         foundTags.Add(xmlTagsGeneral[i].ChildNodes[x].InnerText);
                         ReadTags += xmlTagsGeneral[i].ChildNodes[x].InnerText + ", ";
                     }
                     ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                    ReadTags += "]\n          Species: [";
+                    ReadTags += "]\r\n          Species: [";
                     for (int x = 0; x < xmlTagsSpecies[i].ChildNodes.Count; x++) {
                         foundTags.Add(xmlTagsSpecies[i].ChildNodes[x].InnerText);
                         ReadTags += xmlTagsSpecies[i].ChildNodes[x].InnerText + ", ";
                     }
                     ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                    ReadTags += "]\n          Character: [";
+                    ReadTags += "]\r\n          Character: [";
                     for (int x = 0; x < xmlTagsCharacter[i].ChildNodes.Count; x++) {
                         foundTags.Add(xmlTagsCharacter[i].ChildNodes[x].InnerText);
                         ReadTags += xmlTagsCharacter[i].ChildNodes[x].InnerText + ", ";
                     }
                     ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                    ReadTags += "]\n          Copyright: [";
+                    ReadTags += "]\r\n          Copyright: [";
                     for (int x = 0; x < xmlTagsCopyright[i].ChildNodes.Count; x++) {
                         foundTags.Add(xmlTagsCopyright[i].ChildNodes[x].InnerText);
                         ReadTags += xmlTagsCopyright[i].ChildNodes[x].InnerText + ", ";
                     }
                     ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                    ReadTags += "]\n          Artist: [";
+                    ReadTags += "]\r\n          Artist: [";
                     for (int x = 0; x < xmlTagsArtist[i].ChildNodes.Count; x++) {
                         foundTags.Add(xmlTagsArtist[i].ChildNodes[x].InnerText);
                         ReadTags += xmlTagsArtist[i].ChildNodes[x].InnerText + ", ";
                     }
                     ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                    ReadTags += "]\n          Invalid: [";
+                    ReadTags += "]\r\n          Invalid: [";
                     for (int x = 0; x < xmlTagsInvalid[i].ChildNodes.Count; x++) {
                         foundTags.Add(xmlTagsInvalid[i].ChildNodes[x].InnerText);
                         ReadTags += xmlTagsInvalid[i].ChildNodes[x].InnerText + ", ";
                     }
                     ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                    ReadTags += "]\n          Lore: [";
+                    ReadTags += "]\r\n          Lore: [";
                     for (int x = 0; x < xmlTagsLore[i].ChildNodes.Count; x++) {
                         foundTags.Add(xmlTagsLore[i].ChildNodes[x].InnerText);
                         ReadTags += xmlTagsLore[i].ChildNodes[x].InnerText + ", ";
                     }
                     ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                    ReadTags += "]\n          Meta: [";
+                    ReadTags += "]\r\n          Meta: [";
                     for (int x = 0; x < xmlTagsMeta[i].ChildNodes.Count; x++) {
                         foundTags.Add(xmlTagsMeta[i].ChildNodes[x].InnerText);
                         ReadTags += xmlTagsMeta[i].ChildNodes[x].InnerText + ", ";
                     }
                     ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                    ReadTags += "]\n          Locked tags: [";
+                    ReadTags += "]\r\n          Locked tags: [";
                     for (int x = 0; x < xmlTagsLocked[i].ChildNodes.Count; x++) {
                         foundTags.Add(xmlTagsLocked[i].ChildNodes[x].InnerText);
                         ReadTags += xmlTagsLocked[i].ChildNodes[x].InnerText + ", ";
                     }
-                    ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                    ReadTags += "]\n";
+                    ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',') + "]";
 
-                // Set the rating for the .nfo file.
+                  // Set the rating for the .nfo file.
                     if (rating == "e")
                         rating = "Explicit";
                     else if (rating == "q")
@@ -530,23 +492,18 @@ namespace aphrodite {
                     else
                         rating = "Unknown";
 
-                // Set the description
-                    string imageDescription = " No description";
-                    if (xmlDescription[i].InnerText != "") {
-                        imageDescription = "\n                \"" + xmlDescription[0].InnerText + "\"";
+                  // Set the description
+                    string ImageDescription = " No description";
+                    if (!string.IsNullOrWhiteSpace(xmlDescription[i].InnerText)) {
+                        ImageDescription = xmlDescription[i].InnerText;
                     }
 
-                // Gets the artists of the file and then trims the end of garbage.
-                    for (int j = 0; j < xmlTagsArtist[i].ChildNodes.Count; j++)
-                        artists += xmlTagsArtist[i].ChildNodes[j].InnerText + "\n               ";
-                    artists = artists.TrimEnd(' ');
-                    artists = artists.TrimEnd('\n');
-
-                // File name artist for the schema
+                  // File name artist for the schema
                     string fileNameArtist = "(none)";
                     bool useHardcodedFilter = false;
-                    if (string.IsNullOrEmpty(General.Default.undesiredTags))
+                    if (string.IsNullOrWhiteSpace(DownloadInfo.UndesiredTags)) {
                         useHardcodedFilter = true;
+                    }
 
                     if (xmlTagsArtist[i].ChildNodes.Count > 0) {
                         for (int j = 0; j < xmlTagsArtist[i].ChildNodes.Count; j++) {
@@ -571,33 +528,32 @@ namespace aphrodite {
                         }
                     }
 
-                    string fileName = fileNameSchema.Replace("%md5%", xmlMD5[i].InnerText)
-                                                    .Replace("%id%", xmlID[i].InnerText)
-                                                    .Replace("%rating%", rating.ToLower())
-                                                    .Replace("%rating2%", xmlRating[i].InnerText)
-                                                    .Replace("%artist%", fileNameArtist)
-                                                    .Replace("%ext%", xmlExt[i].InnerText)
-                                                    .Replace("%fav_count%", xmlFavCount[i].InnerText)
-                                                    .Replace("%score%", xmlScore[i].InnerText)
-                                                    .Replace("%scoreup%", xmlScoreUp[i].InnerText)
-                                                    .Replace("%scoredown%", xmlScoreDown[i].InnerText)
-                                                    .Replace("%author%", xmlAuthor[i].InnerText) + "." + xmlExt[i].InnerText;
+                    string fileName = DownloadInfo.FileNameSchema.Replace("%md5%", xmlMD5[i].InnerText)
+                                .Replace("%id%", xmlID[i].InnerText)
+                                .Replace("%rating%", rating.ToLower())
+                                .Replace("%rating2%", xmlRating[i].InnerText)
+                                .Replace("%artist%", fileNameArtist)
+                                .Replace("%ext%", xmlExt[i].InnerText)
+                                .Replace("%fav_count%", xmlFavCount[i].InnerText)
+                                .Replace("%score%", xmlScore[i].InnerText)
+                                .Replace("%scoreup%", xmlScoreUp[i].InnerText)
+                                .Replace("%scoredown%", xmlScoreDown[i].InnerText)
+                                .Replace("%author%", xmlAuthor[i].InnerText) + "." + xmlExt[i].InnerText;
 
-                // Check for null file url + fix for files that are auto blacklisted :)
+                  // Check for null file url + fix for files that are auto blacklisted :)
                     string fileUrl = xmlURL[i].InnerText;
                     if (string.IsNullOrEmpty(fileUrl)) {
                         if (xmlDeleted[i].InnerText.ToLower() == "false") {
-                            //fileUrl = imgUrl + xmlMD5[i].InnerText.Substring(0, 2) + "/" + xmlMD5[i].InnerText.Substring(2, 2) + "." + xmlExt[i].InnerText;
                             fileUrl = apiTools.GetBlacklistedImageUrl(xmlMD5[i].InnerText, xmlExt[i].InnerText);
                         }
                     }
-                    
 
-                // Check for blacklisted and graylisted tags.
+
+                  // Check for blacklisted and graylisted tags.
                     for (int j = 0; j < foundTags.Count; j++) {
-                        if (BlacklistedTags.Count > 0) {
-                            for (int k = 0; k < BlacklistedTags.Count; k++) {
-                                if (foundTags[j] == BlacklistedTags[k]) {
+                        if (DownloadInfo.Blacklist.Length > 0) {
+                            for (int k = 0; k < DownloadInfo.Blacklist.Length; k++) {
+                                if (foundTags[j] == DownloadInfo.Blacklist[k]) {
                                     isBlacklisted = true;
                                     continue;
                                 }
@@ -607,26 +563,26 @@ namespace aphrodite {
                         if (isBlacklisted)
                             break;
 
-                        if (GraylistedTags.Count > 0) {
-                            for (int k = 0; k < GraylistedTags.Count; k++) {
-                                if (foundTags[j] == GraylistedTags[k]) {
+                        if (DownloadInfo.Graylist.Length > 0) {
+                            for (int k = 0; k < DownloadInfo.Graylist.Length; k++) {
+                                if (foundTags[j] == DownloadInfo.Graylist[k]) {
                                     isGraylisted = true;
-                                    foundGraylistedTags += GraylistedTags[k] + " ";
+                                    foundGraylistedTags += DownloadInfo.Graylist[k] + " ";
                                 }
                             }
                         }
                     }
 
-                // Add to the counts (and break for blacklisted)
-                    string outputDir = saveTo;
+                  // Add to the counts (and break for blacklisted)
+                    string outputDir = DownloadInfo.DownloadPath;
                     if (isBlacklisted) {
                         blacklistCount++;
                         totalCount++;
                     }
                     else if (isGraylisted) {
-                        if (separateRatings) {
+                        if (DownloadInfo.SeparateRatings) {
                             outputDir += "\\" + rating.ToLower() + "\\blacklisted\\";
-                            if (separateNonImages) {
+                            if (DownloadInfo.SeparateNonImages) {
                                 switch (xmlExt[i].InnerText.ToLower()) {
                                     case "gif":
                                         outputDir += "gif\\";
@@ -647,7 +603,7 @@ namespace aphrodite {
                         }
                         else {
                             outputDir += "\\blacklisted\\";
-                            if (separateNonImages) {
+                            if (DownloadInfo.SeparateNonImages) {
                                 switch (xmlExt[i].InnerText.ToLower()) {
                                     case "gif":
                                         outputDir += "gif\\";
@@ -665,7 +621,7 @@ namespace aphrodite {
                             }
                             alreadyExists = File.Exists(outputDir);
                         }
-                        
+
 
                         switch (xmlRating[i].InnerText.ToLower()) {
                             case "e":
@@ -673,7 +629,7 @@ namespace aphrodite {
                                     graylistExplicitExistCount++;
                                 }
                                 else {
-                                    if (separateNonImages) {
+                                    if (DownloadInfo.SeparateNonImages) {
                                         switch (xmlExt[i].InnerText.ToLower()) {
                                             case "gif":
                                                 GraylistedExplicitNonImages[0] = true;
@@ -697,7 +653,7 @@ namespace aphrodite {
                                     graylistQuestionableExistCount++;
                                 }
                                 else {
-                                    if (separateNonImages) {
+                                    if (DownloadInfo.SeparateNonImages) {
                                         switch (xmlExt[i].InnerText.ToLower()) {
                                             case "gif":
                                                 GraylistedQuestionableNonImages[0] = true;
@@ -721,7 +677,7 @@ namespace aphrodite {
                                     graylistSafeExistCount++;
                                 }
                                 else {
-                                    if (separateNonImages) {
+                                    if (DownloadInfo.SeparateNonImages) {
                                         switch (xmlExt[i].InnerText.ToLower()) {
                                             case "gif":
                                                 GraylistedSafeNonImages[0] = true;
@@ -741,7 +697,7 @@ namespace aphrodite {
                                 }
                                 break;
                             default:
-                                MessageBox.Show("An error occured when determining the rating. Open an issue.\n\nFound rating: " + xmlRating[i].InnerText);
+                                MessageBox.Show("An error occured when determining the rating. Open an issue.\r\n\nFound rating: " + xmlRating[i].InnerText);
                                 break;
                         }
 
@@ -749,7 +705,7 @@ namespace aphrodite {
                             graylistTotalExistCount++;
                         }
                         else {
-                            if (separateNonImages) {
+                            if (DownloadInfo.SeparateNonImages) {
                                 switch (xmlExt[i].InnerText.ToLower()) {
                                     case "gif":
                                         GraylistedFileNonImages[0] = true;
@@ -770,9 +726,9 @@ namespace aphrodite {
                         totalCount++;
                     }
                     else {
-                        if (separateRatings) {
+                        if (DownloadInfo.SeparateRatings) {
                             outputDir += "\\" + rating.ToLower() + "\\";
-                            if (separateNonImages) {
+                            if (DownloadInfo.SeparateNonImages) {
                                 if (fileName.EndsWith("gif")) {
                                     outputDir += "gif\\";
                                 }
@@ -791,7 +747,7 @@ namespace aphrodite {
                         }
                         else {
                             outputDir += "\\";
-                            if (separateNonImages) {
+                            if (DownloadInfo.SeparateNonImages) {
                                 if (fileName.EndsWith("gif")) {
                                     outputDir += "gif\\";
                                 }
@@ -814,7 +770,7 @@ namespace aphrodite {
                                     cleanExplicitExistCount++;
                                 }
                                 else {
-                                    if (separateNonImages) {
+                                    if (DownloadInfo.SeparateNonImages) {
                                         switch (xmlExt[i].InnerText.ToLower()) {
                                             case "gif":
                                                 ExplicitNonImages[0] = true;
@@ -838,7 +794,7 @@ namespace aphrodite {
                                     cleanQuestionableExistCount++;
                                 }
                                 else {
-                                    if (separateNonImages) {
+                                    if (DownloadInfo.SeparateNonImages) {
                                         switch (xmlExt[i].InnerText.ToLower()) {
                                             case "gif":
                                                 QuestionableNonImages[0] = true;
@@ -862,7 +818,7 @@ namespace aphrodite {
                                     cleanSafeExistCount++;
                                 }
                                 else {
-                                    if (separateNonImages) {
+                                    if (DownloadInfo.SeparateNonImages) {
                                         switch (xmlExt[i].InnerText.ToLower()) {
                                             case "gif":
                                                 SafeNonImages[0] = true;
@@ -882,7 +838,7 @@ namespace aphrodite {
                                 }
                                 break;
                             default:
-                                MessageBox.Show("An error occured when determining the rating. Open an issue.\n\nFound rating: " + xmlRating[i].InnerText);
+                                MessageBox.Show("An error occured when determining the rating. Open an issue.\r\n\nFound rating: " + xmlRating[i].InnerText);
                                 break;
                         }
 
@@ -890,7 +846,7 @@ namespace aphrodite {
                             cleanTotalExistCount++;
                         }
                         else {
-                            if (separateNonImages) {
+                            if (DownloadInfo.SeparateNonImages) {
                                 switch (xmlExt[i].InnerText.ToLower()) {
                                     case "gif":
                                         FileNonImages[0] = true;
@@ -914,13 +870,10 @@ namespace aphrodite {
                     if (isBlacklisted)
                         continue;
 
-                // Graylist check & options check
+                  // Graylist check & options check
                     if (isGraylisted) {
-                        if (saveBlacklistedFiles) {
-                            if (useMinimumScore && Int32.Parse(xmlScore[i].InnerText) < minimumScore)
-                                continue;
-
-                            if (!ratings.Any(xmlRating[i].InnerText.Contains))
+                        if (DownloadInfo.SaveBlacklistedFiles) {
+                            if (DownloadInfo.UseMinimumScore && Int32.Parse(xmlScore[i].InnerText) < DownloadInfo.MinimumScore)
                                 continue;
                         }
                         else {
@@ -928,17 +881,32 @@ namespace aphrodite {
                         }
                     }
                     else { // Not blacklisted
-                        if (useMinimumScore && Int32.Parse(xmlScore[i].InnerText) < minimumScore)
-                            continue;
-
-                        if (!ratings.Any(xmlRating[i].InnerText.Contains))
+                        if (DownloadInfo.UseMinimumScore && Int32.Parse(xmlScore[i].InnerText) < DownloadInfo.MinimumScore)
                             continue;
                     }
 
-                // Start adding to the nfo buffer and URL lists
-                    if (isGraylisted && saveBlacklistedFiles) {
-                        if (separateRatings) {
-                            if (xmlRating[i].InnerText == "e")  {
+                    switch (rating.ToLower()) {
+                        case "explicit":
+                            if (!DownloadInfo.SaveExplicit) {
+                                continue;
+                            }
+                            break;
+                        case "questionable":
+                            if (!DownloadInfo.SaveQuestionable) {
+                                continue;
+                            }
+                            break;
+                        case "safe":
+                            if (!DownloadInfo.SaveSafe) {
+                                continue;
+                            }
+                            break;
+                    }
+
+                  // Start adding to the nfo buffer and URL lists
+                    if (isGraylisted && DownloadInfo.SaveBlacklistedFiles) {
+                        if (DownloadInfo.SeparateRatings) {
+                            if (xmlRating[i].InnerText == "e") {
                                 //GraylistedExplicitURLs.Add(xmlURL[i].InnerText);
                                 GraylistedExplicitURLs.Add(fileUrl);
                                 GraylistedExplicitFileNames.Add(fileName);
@@ -964,19 +932,18 @@ namespace aphrodite {
                             GraylistedFileExists.Add(alreadyExists);
                         }
 
-                        blacklistInfo += "POST " + xmlID[i].InnerText + ":\n" +
-                                         "    MD5: " + xmlMD5[i].InnerText + "\n" +
-                                         "    URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\n" +
-                                         "    ARTIST(S): " + artists + "\n" +
-                                         "    TAGS: " + ReadTags + //string.Concat(foundTags.ToArray()) + "\n" +
+                        BlacklistInfoBuffer += "POST " + xmlID[i].InnerText + ":\r\n" +
+                                         "    MD5: " + xmlMD5[i].InnerText + "\r\n" +
+                                         "    URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\r\n" +
+                                         "    TAGS: " + ReadTags + "\r\n" +
                                          "    OFFENDING TAGS: " + foundGraylistedTags +
-                                         "    SCORE: Up " + xmlScoreUp[i].InnerText + ", Down " + xmlScoreDown[i].InnerText + ", Total " + xmlScore[i].InnerText + "\n" +
-                                         "    RATING: " + rating + "\n" +
-                                         "    DESCRIPITON:" + imageDescription +
-                                         "\n\n";
+                                         "    SCORE: Up " + xmlScoreUp[i].InnerText + ", Down " + xmlScoreDown[i].InnerText + ", Total " + xmlScore[i].InnerText + "\r\n" +
+                                         "    RATING: " + rating + "\r\n" +
+                                         "    DESCRIPITON:" + ImageDescription +
+                                         "\r\n\r\n";
                     }
                     else {
-                        if (separateRatings) {
+                        if (DownloadInfo.SeparateRatings) {
                             if (xmlRating[i].InnerText == "e") {
                                 //ExplicitURLs.Add(xmlURL[i].InnerText);
                                 ExplicitURLs.Add(fileUrl);
@@ -1003,22 +970,21 @@ namespace aphrodite {
                             FileExists.Add(alreadyExists);
                         }
 
-                        tagInfo += "POST " + xmlID[i].InnerText + ":\n" +
-                                   "    MD5: " + xmlMD5[i].InnerText + "\n" +
-                                   "    URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\n" +
-                                   "    ARTIST(S): " + artists + "\n" +
-                                   "    TAGS:\n" + ReadTags + //string.Concat(foundTags.ToArray()) + "\n" +
-                                   "    SCORE: Up " + xmlScoreUp[i].InnerText + ", Down " + xmlScoreDown[i].InnerText + ", Total " + xmlScore[i].InnerText + "\n" +
-                                   "    RATING: " + rating + "\n" +
-                                   "    DESCRIPITON:" + imageDescription +
-                                   "\n\n";
+                        TagInfoBuffer += "POST " + xmlID[i].InnerText + ":\r\n" +
+                                   "    MD5: " + xmlMD5[i].InnerText + "\r\n" +
+                                   "    URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\r\n" +
+                                   "    TAGS:\r\n" + ReadTags + "\r\n" +
+                                   "    SCORE: Up " + xmlScoreUp[i].InnerText + ", Down " + xmlScoreDown[i].InnerText + ", Total " + xmlScore[i].InnerText + "\r\n" +
+                                   "    RATING: " + rating + "\r\n" +
+                                   "    DESCRIPITON:" + ImageDescription +
+                                   "\r\n\r\n";
                     }
                 }
 
 
                 this.BeginInvoke(new MethodInvoker(() => {
                     string labelBuffer = "";
-                    if (separateRatings) {
+                    if (DownloadInfo.SeparateRatings) {
                         object[] counts = new object[] {
                             cleanTotalCount.ToString(),                 // 0
                             cleanExplicitCount.ToString(),              // 1
@@ -1040,11 +1006,11 @@ namespace aphrodite {
                             graylistSafeExistCount.ToString()           // 17
                         };
 
-                        labelBuffer = string.Format("Files: {0} ( {1} E | {2} Q | {3} S )\n" +
-                                                    "Blacklisted: {4} ( {5} E | {6} Q | {7} S )\n" +
-                                                    "Zero Tolerance: {8}\n" +
-                                                    "Total: {9}\n\n" +
-                                                    "Files that exist: {10} ( {11} E | {12} Q | {13} S )\n" +
+                        labelBuffer = string.Format("Files: {0} ( {1} E | {2} Q | {3} S )\r\n" +
+                                                    "Blacklisted: {4} ( {5} E | {6} Q | {7} S )\r\n" +
+                                                    "Zero Tolerance: {8}\r\n" +
+                                                    "Total: {9}\r\n\r\n" +
+                                                    "Files that exist: {10} ( {11} E | {12} Q | {13} S )\r\n" +
                                                     "Blacklisted that exist: {14} ( {15} E | {16} Q | {17} S )", counts);
                     }
                     else {
@@ -1057,11 +1023,11 @@ namespace aphrodite {
                             graylistTotalExistCount.ToString()
                         };
 
-                        labelBuffer = string.Format("Files: {0}\n" +
-                                                    "Blacklisted: {1}\n" +
-                                                    "Zero Tolerance: {2}\n" +
-                                                    "Total: {3}\n\n" +
-                                                    "Files that exist: {4}\n" +
+                        labelBuffer = string.Format("Files: {0}\r\n" +
+                                                    "Blacklisted: {1}\r\n" +
+                                                    "Zero Tolerance: {2}\r\n" +
+                                                    "Total: {3}\r\n\r\n" +
+                                                    "Files that exist: {4}\r\n" +
                                                     "Blacklisted that exist: {5}", counts);
                     }
                     lbBlacklist.Text = labelBuffer;
@@ -1070,24 +1036,25 @@ namespace aphrodite {
 
             #region parse extra pages past the initial 320 images (copy + paste of the first block)
             // Check for extra pages and then parse them as well.
-                if (morePages) {
-                    //Properties.Settings.Default.Log += "More pages detected\n";
-                    bool deadPage = false;
-                    while (!deadPage) {
-                        changeTask("Downloading tag information for page " + (pageCount) + "...");
-                        url = tagJson + tags + limitJson + pageJson + pageCount;
-                        xml = apiTools.GetJSON(url, webHeader);
+                if (HasMorePages && !DownloadInfo.FromUrl) {
+                    //Properties.Settings.Default.Log += "More pages detected\r\n";
+                    bool PageIsDead = false;
+                    while (!PageIsDead) {
+                        ChangeTask("Downloading tag information for page " + (CurrentPage) + "...");
+                        //CurrentUrl = tagJson + DownloadInfo.Tags + limitJson + pageJson + CurrentPage;
+                        CurrentUrl = DownloadInfo.PageUrl.Replace("e621.net/posts", "e621.net/posts.json");
+                        CuurentXml = apiTools.GetJsonToXml(CurrentUrl);
 
-                        if (pageLimit > 0 && pageCount > pageLimit)
+                        if (DownloadInfo.PageLimit > 0 && CurrentPage > DownloadInfo.PageLimit)
                             break;
 
-                        if (apiTools.IsXmlDead(xml)) {
-                            deadPage = true;
+                        if (apiTools.IsXmlDead(CuurentXml)) {
+                            PageIsDead = true;
                             break;
                         }
 
                         // Everything below here is basically a copy & paste from above.
-                        doc.LoadXml(xml);
+                        doc.LoadXml(CuurentXml);
                         xmlID = doc.DocumentElement.SelectNodes("/root/posts/item/id");
                         xmlMD5 = doc.DocumentElement.SelectNodes("/root/posts/item/file/md5");
                         xmlURL = doc.DocumentElement.SelectNodes("/root/posts/item/file/url");
@@ -1114,7 +1081,6 @@ namespace aphrodite {
                             if (xmlDeleted[i].InnerText == "true") {
                                 continue;
                             }
-                            string artists = string.Empty;
                             string rating = xmlRating[i].InnerText;
                             bool isGraylisted = false;
                             bool isBlacklisted = false;
@@ -1123,8 +1089,8 @@ namespace aphrodite {
                             string foundGraylistedTags = string.Empty;
                             string ReadTags = string.Empty;
 
-                            if (imageLimit > 0 && imageLimit == totalCount) {
-                                morePages = false;
+                            if (DownloadInfo.ImageLimit > 0 && DownloadInfo.ImageLimit == totalCount) {
+                                HasMorePages = false;
                                 break;
                             }
 
@@ -1134,55 +1100,54 @@ namespace aphrodite {
                                 ReadTags += xmlTagsGeneral[i].ChildNodes[x].InnerText + ", ";
                             }
                             ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                            ReadTags += "]\n          Species: [";
+                            ReadTags += "]\r\n          Species: [";
                             for (int x = 0; x < xmlTagsSpecies[i].ChildNodes.Count; x++) {
                                 foundTags.Add(xmlTagsSpecies[i].ChildNodes[x].InnerText);
                                 ReadTags += xmlTagsSpecies[i].ChildNodes[x].InnerText + ", ";
                             }
                             ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                            ReadTags += "]\n          Character: [";
+                            ReadTags += "]\r\n          Character: [";
                             for (int x = 0; x < xmlTagsCharacter[i].ChildNodes.Count; x++) {
                                 foundTags.Add(xmlTagsCharacter[i].ChildNodes[x].InnerText);
                                 ReadTags += xmlTagsCharacter[i].ChildNodes[x].InnerText + ", ";
                             }
                             ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                            ReadTags += "]\n          Copyright: [";
+                            ReadTags += "]\r\n          Copyright: [";
                             for (int x = 0; x < xmlTagsCopyright[i].ChildNodes.Count; x++) {
                                 foundTags.Add(xmlTagsCopyright[i].ChildNodes[x].InnerText);
                                 ReadTags += xmlTagsCopyright[i].ChildNodes[x].InnerText + ", ";
                             }
                             ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                            ReadTags += "]\n          Artist: [";
+                            ReadTags += "]\r\n          Artist: [";
                             for (int x = 0; x < xmlTagsArtist[i].ChildNodes.Count; x++) {
                                 foundTags.Add(xmlTagsArtist[i].ChildNodes[x].InnerText);
                                 ReadTags += xmlTagsArtist[i].ChildNodes[x].InnerText + ", ";
                             }
                             ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                            ReadTags += "]\n          Invalid: [";
+                            ReadTags += "]\r\n          Invalid: [";
                             for (int x = 0; x < xmlTagsInvalid[i].ChildNodes.Count; x++) {
                                 foundTags.Add(xmlTagsInvalid[i].ChildNodes[x].InnerText);
                                 ReadTags += xmlTagsInvalid[i].ChildNodes[x].InnerText + ", ";
                             }
                             ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                            ReadTags += "]\n          Lore: [";
+                            ReadTags += "]\r\n          Lore: [";
                             for (int x = 0; x < xmlTagsLore[i].ChildNodes.Count; x++) {
                                 foundTags.Add(xmlTagsLore[i].ChildNodes[x].InnerText);
                                 ReadTags += xmlTagsLore[i].ChildNodes[x].InnerText + ", ";
                             }
                             ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                            ReadTags += "]\n          Meta: [";
+                            ReadTags += "]\r\n          Meta: [";
                             for (int x = 0; x < xmlTagsMeta[i].ChildNodes.Count; x++) {
                                 foundTags.Add(xmlTagsMeta[i].ChildNodes[x].InnerText);
                                 ReadTags += xmlTagsMeta[i].ChildNodes[x].InnerText + ", ";
                             }
                             ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                            ReadTags += "]\n          Locked tags: [";
+                            ReadTags += "]\r\n          Locked tags: [";
                             for (int x = 0; x < xmlTagsLocked[i].ChildNodes.Count; x++) {
                                 foundTags.Add(xmlTagsLocked[i].ChildNodes[x].InnerText);
                                 ReadTags += xmlTagsLocked[i].ChildNodes[x].InnerText + ", ";
                             }
-                            ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                            ReadTags += "]\n";
+                            ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',') + "]";
 
                             if (rating == "e")
                                 rating = "Explicit";
@@ -1192,21 +1157,17 @@ namespace aphrodite {
                                 rating = "Safe";
                             else
                                 rating = "Unknown";
-                            
-                            string imageDescription = " No description";
-                            if (xmlDescription[0].InnerText != "") {
-                                imageDescription = "\n                \"" + xmlDescription[i].InnerText + "\"";
-                            }
 
-                            for (int j = 0; j < xmlTagsArtist[i].ChildNodes.Count; j++)
-                                artists += xmlTagsArtist[i].ChildNodes[j].InnerText + "\n               ";
-                            artists = artists.TrimEnd(' ');
-                            artists = artists.TrimEnd('\n');
+                            string ImageDescription = " No description";
+                            if (!string.IsNullOrWhiteSpace(xmlDescription[i].InnerText)) {
+                                ImageDescription = xmlDescription[i].InnerText;
+                            }
 
                             string fileNameArtist = "(none)";
                             bool useHardcodedFilter = false;
-                            if (string.IsNullOrEmpty(General.Default.undesiredTags))
+                            if (string.IsNullOrWhiteSpace(DownloadInfo.UndesiredTags)) {
                                 useHardcodedFilter = true;
+                            }
 
                             if (xmlTagsArtist[i].ChildNodes.Count > 0) {
                                 for (int j = 0; j < xmlTagsArtist[i].ChildNodes.Count; j++) {
@@ -1225,17 +1186,18 @@ namespace aphrodite {
                                 }
                             }
 
-                            string fileName = fileNameSchema.Replace("%md5%", xmlMD5[i].InnerText)
-                                                            .Replace("%id%", xmlID[i].InnerText)
-                                                            .Replace("%rating%", rating.ToLower())
-                                                            .Replace("%rating2%", xmlRating[i].InnerText)
-                                                            .Replace("%artist%", fileNameArtist)
-                                                            .Replace("%ext%", xmlExt[i].InnerText)
-                                                            .Replace("%fav_count%", xmlFavCount[i].InnerText)
-                                                            .Replace("%score%", xmlScore[i].InnerText)
-                                                            .Replace("%scoreup%", xmlScoreUp[i].InnerText)
-                                                            .Replace("%scoredown%", xmlScoreDown[i].InnerText)
-                                                            .Replace("%author%", xmlAuthor[i].InnerText) + "." + xmlExt[i].InnerText;
+                            string fileName = DownloadInfo.FileNameSchema
+                                    .Replace("%md5%", xmlMD5[i].InnerText)
+                                    .Replace("%id%", xmlID[i].InnerText)
+                                    .Replace("%rating%", rating.ToLower())
+                                    .Replace("%rating2%", xmlRating[i].InnerText)
+                                    .Replace("%artist%", fileNameArtist)
+                                    .Replace("%ext%", xmlExt[i].InnerText)
+                                    .Replace("%fav_count%", xmlFavCount[i].InnerText)
+                                    .Replace("%score%", xmlScore[i].InnerText)
+                                    .Replace("%scoreup%", xmlScoreUp[i].InnerText)
+                                    .Replace("%scoredown%", xmlScoreDown[i].InnerText)
+                                    .Replace("%author%", xmlAuthor[i].InnerText) + "." + xmlExt[i].InnerText;
 
                             string fileUrl = xmlURL[i].InnerText;
                             if (string.IsNullOrEmpty(fileUrl)) {
@@ -1245,9 +1207,9 @@ namespace aphrodite {
                             }
 
                             for (int j = 0; j < foundTags.Count; j++) {
-                                if (BlacklistedTags.Count > 0) {
-                                    for (int k = 0; k < BlacklistedTags.Count; k++) {
-                                        if (foundTags[j] == BlacklistedTags[k]) {
+                                if (DownloadInfo.Blacklist.Length > 0) {
+                                    for (int k = 0; k < DownloadInfo.Blacklist.Length; k++) {
+                                        if (foundTags[j] == DownloadInfo.Blacklist[k]) {
                                             isBlacklisted = true;
                                             continue;
                                         }
@@ -1257,25 +1219,25 @@ namespace aphrodite {
                                 if (isBlacklisted)
                                     break;
 
-                                if (GraylistedTags.Count > 0) {
-                                    for (int k = 0; k < GraylistedTags.Count; k++) {
-                                        if (foundTags[j] == GraylistedTags[k]) {
+                                if (DownloadInfo.Graylist.Length > 0) {
+                                    for (int k = 0; k < DownloadInfo.Graylist.Length; k++) {
+                                        if (foundTags[j] == DownloadInfo.Graylist[k]) {
                                             isGraylisted = true;
-                                            foundGraylistedTags += GraylistedTags[k] + " ";
+                                            foundGraylistedTags += DownloadInfo.Graylist[k] + " ";
                                         }
                                     }
                                 }
                             }
 
-                            string outputDir = saveTo;
+                            string outputDir = DownloadInfo.DownloadPath;
                             if (isBlacklisted) {
                                 blacklistCount++;
                                 totalCount++;
                             }
                             else if (isGraylisted) {
-                                if (separateRatings) {
+                                if (DownloadInfo.SeparateRatings) {
                                     outputDir += "\\" + rating.ToLower() + "\\blacklisted\\";
-                                    if (separateNonImages) {
+                                    if (DownloadInfo.SeparateNonImages) {
                                         if (fileName.EndsWith("gif")) {
                                             outputDir += "gif\\";
                                         }
@@ -1294,7 +1256,7 @@ namespace aphrodite {
                                 }
                                 else {
                                     outputDir += "\\blacklisted\\";
-                                    if (separateNonImages) {
+                                    if (DownloadInfo.SeparateNonImages) {
                                         if (fileName.EndsWith("gif")) {
                                             outputDir += "gif\\";
                                         }
@@ -1318,7 +1280,7 @@ namespace aphrodite {
                                             graylistExplicitExistCount++;
                                         }
                                         else {
-                                            if (separateNonImages) {
+                                            if (DownloadInfo.SeparateNonImages) {
                                                 switch (xmlExt[i].InnerText.ToLower()) {
                                                     case "gif":
                                                         GraylistedExplicitNonImages[0] = true;
@@ -1342,7 +1304,7 @@ namespace aphrodite {
                                             graylistQuestionableExistCount++;
                                         }
                                         else {
-                                            if (separateNonImages) {
+                                            if (DownloadInfo.SeparateNonImages) {
                                                 switch (xmlExt[i].InnerText.ToLower()) {
                                                     case "gif":
                                                         GraylistedQuestionableNonImages[0] = true;
@@ -1366,7 +1328,7 @@ namespace aphrodite {
                                             graylistSafeExistCount++;
                                         }
                                         else {
-                                            if (separateNonImages) {
+                                            if (DownloadInfo.SeparateNonImages) {
                                                 switch (xmlExt[i].InnerText.ToLower()) {
                                                     case "gif":
                                                         GraylistedSafeNonImages[0] = true;
@@ -1386,7 +1348,7 @@ namespace aphrodite {
                                         }
                                         break;
                                     default:
-                                        MessageBox.Show("An error occured when determining the rating. Open an issue.\n\nFound rating: " + xmlRating[i].InnerText);
+                                        MessageBox.Show("An error occured when determining the rating. Open an issue.\r\n\nFound rating: " + xmlRating[i].InnerText);
                                         break;
                                 }
 
@@ -1394,7 +1356,7 @@ namespace aphrodite {
                                     graylistTotalExistCount++;
                                 }
                                 else {
-                                    if (separateNonImages) {
+                                    if (DownloadInfo.SeparateNonImages) {
                                         switch (xmlExt[i].InnerText.ToLower()) {
                                             case "gif":
                                                 GraylistedFileNonImages[0] = true;
@@ -1415,9 +1377,9 @@ namespace aphrodite {
                                 totalCount++;
                             }
                             else {
-                                if (separateRatings) {
+                                if (DownloadInfo.SeparateRatings) {
                                     outputDir += "\\" + rating.ToLower() + "\\";
-                                    if (separateNonImages) {
+                                    if (DownloadInfo.SeparateNonImages) {
                                         if (fileName.EndsWith("gif")) {
                                             outputDir += "gif\\";
                                         }
@@ -1436,7 +1398,7 @@ namespace aphrodite {
                                 }
                                 else {
                                     outputDir += "\\";
-                                    if (separateNonImages) {
+                                    if (DownloadInfo.SeparateNonImages) {
                                         if (fileName.EndsWith("gif")) {
                                             outputDir += "gif\\";
                                         }
@@ -1459,7 +1421,7 @@ namespace aphrodite {
                                             cleanExplicitExistCount++;
                                         }
                                         else {
-                                            if (separateNonImages) {
+                                            if (DownloadInfo.SeparateNonImages) {
                                                 switch (xmlExt[i].InnerText.ToLower()) {
                                                     case "gif":
                                                         ExplicitNonImages[0] = true;
@@ -1483,7 +1445,7 @@ namespace aphrodite {
                                             cleanQuestionableExistCount++;
                                         }
                                         else {
-                                            if (separateNonImages) {
+                                            if (DownloadInfo.SeparateNonImages) {
                                                 switch (xmlExt[i].InnerText.ToLower()) {
                                                     case "gif":
                                                         QuestionableNonImages[0] = true;
@@ -1507,7 +1469,7 @@ namespace aphrodite {
                                             cleanSafeExistCount++;
                                         }
                                         else {
-                                            if (separateNonImages) {
+                                            if (DownloadInfo.SeparateNonImages) {
                                                 switch (xmlExt[i].InnerText.ToLower()) {
                                                     case "gif":
                                                         SafeNonImages[0] = true;
@@ -1527,7 +1489,7 @@ namespace aphrodite {
                                         }
                                         break;
                                     default:
-                                        MessageBox.Show("An error occured when determining the rating. Open an issue.\n\nFound rating: " + xmlRating[i].InnerText);
+                                        MessageBox.Show("An error occured when determining the rating. Open an issue.\r\n\nFound rating: " + xmlRating[i].InnerText);
                                         break;
                                 }
 
@@ -1535,7 +1497,7 @@ namespace aphrodite {
                                     cleanTotalExistCount++;
                                 }
                                 else {
-                                    if (separateNonImages) {
+                                    if (DownloadInfo.SeparateNonImages) {
                                         switch (xmlExt[i].InnerText.ToLower()) {
                                             case "gif":
                                                 FileNonImages[0] = true;
@@ -1556,15 +1518,13 @@ namespace aphrodite {
                                 totalCount++;
                             }
 
-                            if (isBlacklisted)
+                            if (isBlacklisted) {
                                 continue;
+                            }
 
                             if (isGraylisted) {
-                                if (saveBlacklistedFiles) {
-                                    if (useMinimumScore && Int32.Parse(xmlScore[i].InnerText) < minimumScore)
-                                        continue;
-
-                                    if (!ratings.Any(xmlRating[i].InnerText.Contains))
+                                if (DownloadInfo.SaveBlacklistedFiles) {
+                                    if (DownloadInfo.UseMinimumScore && Int32.Parse(xmlScore[i].InnerText) < DownloadInfo.MinimumScore)
                                         continue;
                                 }
                                 else {
@@ -1572,15 +1532,30 @@ namespace aphrodite {
                                 }
                             }
                             else { // Not blacklisted
-                                if (useMinimumScore && Int32.Parse(xmlScore[i].InnerText) < minimumScore)
-                                    continue;
-
-                                if (!ratings.Any(xmlRating[i].InnerText.Contains))
+                                if (DownloadInfo.UseMinimumScore && Int32.Parse(xmlScore[i].InnerText) < DownloadInfo.MinimumScore)
                                     continue;
                             }
 
-                            if (isGraylisted && saveBlacklistedFiles) {
-                                if (separateRatings) {
+                            switch (rating.ToLower()) {
+                                case "explicit":
+                                    if (!DownloadInfo.SaveExplicit) {
+                                        continue;
+                                    }
+                                    break;
+                                case "questionable":
+                                    if (!DownloadInfo.SaveQuestionable) {
+                                        continue;
+                                    }
+                                    break;
+                                case "safe":
+                                    if (!DownloadInfo.SaveSafe) {
+                                        continue;
+                                    }
+                                    break;
+                            }
+
+                            if (isGraylisted && DownloadInfo.SaveBlacklistedFiles) {
+                                if (DownloadInfo.SeparateRatings) {
                                     if (xmlRating[i].InnerText == "e") {
                                         //GraylistedExplicitURLs.Add(xmlURL[i].InnerText);
                                         GraylistedExplicitURLs.Add(fileUrl);
@@ -1607,19 +1582,18 @@ namespace aphrodite {
                                     GraylistedFileExists.Add(alreadyExists);
                                 }
 
-                                blacklistInfo += "POST " + xmlID[i].InnerText + ":\n" +
-                                                 "    MD5: " + xmlMD5[i].InnerText + "\n" +
-                                                 "    URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\n" +
-                                                 "    ARTIST(S): " + artists + "\n" +
-                                                 "    TAGS: " + ReadTags + //string.Concat(foundTags.ToArray()) + "\n" +
+                                BlacklistInfoBuffer += "POST " + xmlID[i].InnerText + ":\r\n" +
+                                                 "    MD5: " + xmlMD5[i].InnerText + "\r\n" +
+                                                 "    URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\r\n" +
+                                                 "    TAGS: " + ReadTags + "\r\n" +
                                                  "    OFFENDING TAGS: " + foundGraylistedTags +
-                                                 "    SCORE: Up " + xmlScoreUp[i].InnerText + ", Down " + xmlScoreDown[i].InnerText + ", Total " + xmlScore[i].InnerText + "\n" +
-                                                 "    RATING: " + rating + "\n" +
-                                                 "    DESCRIPITON:" + imageDescription +
-                                                 "\n\n";
+                                                 "    SCORE: Up " + xmlScoreUp[i].InnerText + ", Down " + xmlScoreDown[i].InnerText + ", Total " + xmlScore[i].InnerText + "\r\n" +
+                                                 "    RATING: " + rating + "\r\n" +
+                                                 "    DESCRIPITON:" + ImageDescription +
+                                                 "\r\n\r\n";
                             }
                             else {
-                                if (separateRatings) {
+                                if (DownloadInfo.SeparateRatings) {
                                     if (xmlRating[i].InnerText == "e") {
                                         //ExplicitURLs.Add(xmlURL[i].InnerText);
                                         ExplicitURLs.Add(fileUrl);
@@ -1646,21 +1620,20 @@ namespace aphrodite {
                                     FileExists.Add(alreadyExists);
                                 }
 
-                                tagInfo += "POST " + xmlID[i].InnerText + ":\n" +
-                                           "    MD5: " + xmlMD5[i].InnerText + "\n" +
-                                           "    URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\n" +
-                                           "    ARTIST(S): " + artists + "\n" +
-                                           "    TAGS:\n" + ReadTags + //string.Concat(foundTags.ToArray()) + "\n" +
-                                           "    SCORE: Up " + xmlScoreUp[i].InnerText + ", Down " + xmlScoreDown[i].InnerText + ", Total " + xmlScore[i].InnerText + "\n" +
-                                           "    RATING: " + rating + "\n" +
-                                           "    DESCRIPITON:" + imageDescription +
-                                           "\n\n";
+                                TagInfoBuffer += "POST " + xmlID[i].InnerText + ":\r\n" +
+                                           "    MD5: " + xmlMD5[i].InnerText + "\r\n" +
+                                           "    URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\r\n" +
+                                           "    TAGS:\r\n" + ReadTags + "\r\n" +
+                                           "    SCORE: Up " + xmlScoreUp[i].InnerText + ", Down " + xmlScoreDown[i].InnerText + ", Total " + xmlScore[i].InnerText + "\r\n" +
+                                           "    RATING: " + rating + "\r\n" +
+                                           "    DESCRIPITON:" + ImageDescription +
+                                           "\r\n\r\n";
                             }
                         }
 
                         this.BeginInvoke(new MethodInvoker(() => {
                             string labelBuffer = "";
-                            if (separateRatings) {
+                            if (DownloadInfo.SeparateRatings) {
                                 object[] counts = new object[] {
                                 cleanTotalCount.ToString(),                 // 0
                                 cleanExplicitCount.ToString(),              // 1
@@ -1682,11 +1655,11 @@ namespace aphrodite {
                                 graylistSafeExistCount.ToString()           // 17
                             };
 
-                                labelBuffer = string.Format("Files: {0} ( {1} E | {2} Q | {3} S )\n" +
-                                                            "Blacklisted: {4} ( {5} E | {6} Q | {7} S )\n" +
-                                                            "Zero Tolerance: {8}\n" +
-                                                            "Total: {9}\n\n" +
-                                                            "Files that exist: {10} ( {11} E | {12} Q | {13} S )\n" +
+                                labelBuffer = string.Format("Files: {0} ( {1} E | {2} Q | {3} S )\r\n" +
+                                                            "Blacklisted: {4} ( {5} E | {6} Q | {7} S )\r\n" +
+                                                            "Zero Tolerance: {8}\r\n" +
+                                                            "Total: {9}\r\n\r\n" +
+                                                            "Files that exist: {10} ( {11} E | {12} Q | {13} S )\r\n" +
                                                             "Blacklisted that exist: {14} ( {15} E | {16} Q | {17} S )", counts);
                             }
                             else {
@@ -1699,161 +1672,161 @@ namespace aphrodite {
                                     graylistTotalExistCount.ToString()
                                 };
 
-                                labelBuffer = string.Format("Files: {0}\n" +
-                                                            "Blacklisted: {1}\n" +
-                                                            "Zero Tolerance: {2}\n" +
-                                                            "Total: {3}\n\n" +
-                                                            "Files that exist: {4}\n" +
+                                labelBuffer = string.Format("Files: {0}\r\n" +
+                                                            "Blacklisted: {1}\r\n" +
+                                                            "Zero Tolerance: {2}\r\n" +
+                                                            "Total: {3}\r\n\r\n" +
+                                                            "Files that exist: {4}\r\n" +
                                                             "Blacklisted that exist: {5}", counts);
                             }
                             lbBlacklist.Text = labelBuffer;
                         }));
 
-                        pageCount++;
+                        CurrentPage++;
                     }
                 }
             #endregion
 
             #region output logic
             // Create output folders
-                if (separateRatings) {
+                if (DownloadInfo.SeparateRatings) {
                     if (ExplicitURLs.Count > 0) {
-                          Directory.CreateDirectory(saveTo + "\\explicit");
-                          if (separateNonImages) {
-                              if (ExplicitNonImages[0]) {
-                                  Directory.CreateDirectory(saveTo + "\\explicit\\gif");
-                              }
-                              if (ExplicitNonImages[1]) {
-                                  Directory.CreateDirectory(saveTo + "\\explicit\\apng");
-                              }
-                              if (ExplicitNonImages[2]) {
-                                  Directory.CreateDirectory(saveTo + "\\explicit\\webm");
-                              }
-                              if (ExplicitNonImages[3]) {
-                                  Directory.CreateDirectory(saveTo + "\\explicit\\swf");
-                              }
-                          }
+                        Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit");
+                        if (DownloadInfo.SeparateNonImages) {
+                            if (ExplicitNonImages[0]) {
+                                Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\gif");
+                            }
+                            if (ExplicitNonImages[1]) {
+                                Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\apng");
+                            }
+                            if (ExplicitNonImages[2]) {
+                                Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\webm");
+                            }
+                            if (ExplicitNonImages[3]) {
+                                Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\swf");
+                            }
+                        }
                     }
                     if (QuestionableURLs.Count > 0) {
-                        Directory.CreateDirectory(saveTo + "\\questionable");
-                        if (separateNonImages) {
+                        Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable");
+                        if (DownloadInfo.SeparateNonImages) {
                             if (QuestionableNonImages[0]) {
-                                Directory.CreateDirectory(saveTo + "\\questionable\\gif");
+                                Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\gif");
                             }
                             if (QuestionableNonImages[1]) {
-                                Directory.CreateDirectory(saveTo + "\\questionable\\apng");
+                                Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\apng");
                             }
                             if (QuestionableNonImages[2]) {
-                                Directory.CreateDirectory(saveTo + "\\questionable\\webm");
+                                Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\webm");
                             }
                             if (QuestionableNonImages[3]) {
-                                Directory.CreateDirectory(saveTo + "\\questionable\\swf");
+                                Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\swf");
                             }
                         }
                     }
                     if (SafeURLs.Count > 0) {
-                        Directory.CreateDirectory(saveTo + "\\safe");
-                        if (separateNonImages) {
+                        Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe");
+                        if (DownloadInfo.SeparateNonImages) {
                             if (SafeNonImages[0]) {
-                                Directory.CreateDirectory(saveTo + "\\safe\\gif");
+                                Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\gif");
                             }
                             if (SafeNonImages[1]) {
-                                Directory.CreateDirectory(saveTo + "\\safe\\apng");
+                                Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\apng");
                             }
                             if (SafeNonImages[2]) {
-                                Directory.CreateDirectory(saveTo + "\\safe\\webm");
+                                Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\webm");
                             }
                             if (SafeNonImages[3]) {
-                                Directory.CreateDirectory(saveTo + "\\safe\\swf");
+                                Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\swf");
                             }
                         }
                     }
 
-                    if (saveBlacklistedFiles) {
+                    if (DownloadInfo.SaveBlacklistedFiles) {
                         if (GraylistedExplicitURLs.Count > 0) {
-                            Directory.CreateDirectory(saveTo + "\\explicit\\blacklisted");
-                            if (separateNonImages) {
+                            Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\blacklisted");
+                            if (DownloadInfo.SeparateNonImages) {
                                 if (GraylistedExplicitNonImages[0]) {
-                                    Directory.CreateDirectory(saveTo + "\\explicit\\blacklisted\\gif");
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\blacklisted\\gif");
                                 }
                                 if (GraylistedExplicitNonImages[1]) {
-                                    Directory.CreateDirectory(saveTo + "\\explicit\\blacklisted\\apng");
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\blacklisted\\apng");
                                 }
                                 if (GraylistedExplicitNonImages[2]) {
-                                    Directory.CreateDirectory(saveTo + "\\explicit\\blacklisted\\webm");
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\blacklisted\\webm");
                                 }
                                 if (GraylistedExplicitNonImages[3]) {
-                                    Directory.CreateDirectory(saveTo + "\\explicit\\blacklisted\\swf");
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\blacklisted\\swf");
                                 }
                             }
                         }
                         if (GraylistedQuestionableURLs.Count > 0) {
-                            Directory.CreateDirectory(saveTo + "\\questionable\\blacklisted");
-                            if (separateNonImages) {
+                            Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\blacklisted");
+                            if (DownloadInfo.SeparateNonImages) {
                                 if (GraylistedQuestionableNonImages[0]) {
-                                    Directory.CreateDirectory(saveTo + "\\questionable\\blacklisted\\gif");
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\blacklisted\\gif");
                                 }
                                 if (GraylistedQuestionableNonImages[1]) {
-                                    Directory.CreateDirectory(saveTo + "\\questionable\\blacklisted\\apng");
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\blacklisted\\apng");
                                 }
                                 if (GraylistedQuestionableNonImages[2]) {
-                                    Directory.CreateDirectory(saveTo + "\\questionable\\blacklisted\\webm");
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\blacklisted\\webm");
                                 }
                                 if (GraylistedQuestionableNonImages[3]) {
-                                    Directory.CreateDirectory(saveTo + "\\questionable\\blacklisted\\swf");
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\blacklisted\\swf");
                                 }
                             }
                         }
                         if (GraylistedSafeURLs.Count > 0) {
-                            Directory.CreateDirectory(saveTo + "\\safe\\blacklisted");
-                            if (separateNonImages) {
+                            Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\blacklisted");
+                            if (DownloadInfo.SeparateNonImages) {
                                 if (GraylistedSafeNonImages[0]) {
-                                    Directory.CreateDirectory(saveTo + "\\safe\\blacklisted\\gif");
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\blacklisted\\gif");
                                 }
                                 if (GraylistedSafeNonImages[1]) {
-                                    Directory.CreateDirectory(saveTo + "\\safe\\blacklisted\\apng");
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\blacklisted\\apng");
                                 }
                                 if (GraylistedSafeNonImages[2]) {
-                                    Directory.CreateDirectory(saveTo + "\\safe\\blacklisted\\webm");
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\blacklisted\\webm");
                                 }
                                 if (GraylistedSafeNonImages[3]) {
-                                    Directory.CreateDirectory(saveTo + "\\safe\\blacklisted\\swf");
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\blacklisted\\swf");
                                 }
                             }
                         }
                     }
                 }
                 else {
-                    Directory.CreateDirectory(saveTo);
-                    if (separateNonImages) {
+                    Directory.CreateDirectory(DownloadInfo.DownloadPath);
+                    if (DownloadInfo.SeparateNonImages) {
                         if (FileNonImages[0]) {
-                            Directory.CreateDirectory(saveTo + "\\gif");
+                            Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\gif");
                         }
                         if (FileNonImages[1]) {
-                            Directory.CreateDirectory(saveTo + "\\apng");
+                            Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\apng");
                         }
                         if (FileNonImages[2]) {
-                            Directory.CreateDirectory(saveTo + "\\webm");
+                            Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\webm");
                         }
                         if (FileNonImages[3]) {
-                            Directory.CreateDirectory(saveTo + "\\swf");
+                            Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\swf");
                         }
                     }
 
-                    if (saveBlacklistedFiles && GraylistedURLs.Count > 0) {
-                        Directory.CreateDirectory(saveTo + "\\blacklisted");
-                        if (separateNonImages) {
+                    if (DownloadInfo.SaveBlacklistedFiles && GraylistedURLs.Count > 0) {
+                        Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\blacklisted");
+                        if (DownloadInfo.SeparateNonImages) {
                             if (GraylistedFileNonImages[0]) {
-                                Directory.CreateDirectory(saveTo + "\\blacklisted\\gif");
+                                Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\blacklisted\\gif");
                             }
                             if (GraylistedFileNonImages[1]) {
-                                Directory.CreateDirectory(saveTo + "\\blacklisted\\apng");
+                                Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\blacklisted\\apng");
                             }
                             if (GraylistedFileNonImages[2]) {
-                                Directory.CreateDirectory(saveTo + "\\blacklisted\\webm");
+                                Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\blacklisted\\webm");
                             }
                             if (GraylistedFileNonImages[3]) {
-                                Directory.CreateDirectory(saveTo + "\\blacklisted\\swf");
+                                Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\blacklisted\\swf");
                             }
                         }
                     }
@@ -1862,29 +1835,29 @@ namespace aphrodite {
 
             #region pre-download logic
             // Update totals
-                if (separateRatings) {
+                if (DownloadInfo.SeparateRatings) {
                     cleanTotalCount = cleanExplicitCount + cleanQuestionableCount + cleanSafeCount;
                     graylistTotalCount = graylistExplicitCount + graylistQuestionableCount + graylistSafeCount;
                 }
 
             // Save the info files from the buffer
-                if (saveInfo) {
-                    tagInfo.TrimEnd('\n');
-                    File.WriteAllText(saveTo + "\\tags.nfo", tagInfo, Encoding.UTF8);
+                if (DownloadInfo.SaveInfo) {
+                    TagInfoBuffer.TrimEnd('\r').TrimEnd('\n');
+                    File.WriteAllText(DownloadInfo.DownloadPath + "\\tags.nfo", TagInfoBuffer, Encoding.UTF8);
 
-                    if (saveBlacklistedFiles && graylistTotalCount > 0) {
-                        blacklistInfo.TrimEnd('\n');
-                        if (separateRatings)
-                            File.WriteAllText(saveTo + "\\tags.blacklisted.nfo", blacklistInfo, Encoding.UTF8);
+                    if (DownloadInfo.SaveBlacklistedFiles && graylistTotalCount > 0) {
+                        BlacklistInfoBuffer.TrimEnd('\r').TrimEnd('\n');
+                        if (DownloadInfo.SeparateRatings)
+                            File.WriteAllText(DownloadInfo.DownloadPath + "\\tags.blacklisted.nfo", BlacklistInfoBuffer, Encoding.UTF8);
                         else
-                            File.WriteAllText(saveTo + "\\blacklisted\\tags.blacklisted.nfo", blacklistInfo, Encoding.UTF8);
+                            File.WriteAllText(DownloadInfo.DownloadPath + "\\blacklisted\\tags.blacklisted.nfo", BlacklistInfoBuffer, Encoding.UTF8);
                     }
                 }
 
             // Set the progressbar style.
                 this.BeginInvoke(new MethodInvoker(() => {
                     string labelBuffer = "";
-                    if (separateRatings) {
+                    if (DownloadInfo.SeparateRatings) {
                         object[] counts = new object[] {
                             cleanTotalCount.ToString(),                 // 0
                             cleanExplicitCount.ToString(),              // 1
@@ -1906,11 +1879,11 @@ namespace aphrodite {
                             graylistSafeExistCount.ToString()           // 17
                         };
 
-                        labelBuffer = string.Format("Files: {0} ( {1} E | {2} Q | {3} S )\n" +
-                                                    "Blacklisted: {4} ( {5} E | {6} Q | {7} S )\n" +
-                                                    "Zero Tolerance: {8}\n" +
-                                                    "Total: {9}\n\n" +
-                                                    "Files that exist: {10} ( {11} E | {12} Q | {13} S )\n" +
+                        labelBuffer = string.Format("Files: {0} ( {1} E | {2} Q | {3} S )\r\n" +
+                                                    "Blacklisted: {4} ( {5} E | {6} Q | {7} S )\r\n" +
+                                                    "Zero Tolerance: {8}\r\n" +
+                                                    "Total: {9}\r\n\r\n" +
+                                                    "Files that exist: {10} ( {11} E | {12} Q | {13} S )\r\n" +
                                                     "Blacklisted that exist: {14} ( {15} E | {16} Q | {17} S )", counts);
                     }
                     else {
@@ -1923,16 +1896,16 @@ namespace aphrodite {
                             graylistTotalExistCount.ToString()
                         };
 
-                        labelBuffer = string.Format("Files: {0}\n" +
-                                                    "Blacklisted: {1}\n" +
-                                                    "Zero Tolerance: {2}\n" +
-                                                    "Total: {3}\n\n" +
-                                                    "Files that exist: {4}\n" +
+                        labelBuffer = string.Format("Files: {0}\r\n" +
+                                                    "Blacklisted: {1}\r\n" +
+                                                    "Zero Tolerance: {2}\r\n" +
+                                                    "Total: {3}\r\n\r\n" +
+                                                    "Files that exist: {4}\r\n" +
                                                     "Blacklisted that exist: {5}", counts);
                     }
                     lbBlacklist.Text = labelBuffer;
 
-                    if (saveBlacklistedFiles)
+                    if (DownloadInfo.SaveBlacklistedFiles)
                         pbTotalStatus.Maximum = cleanTotalCount + graylistTotalCount;
                     else
                         pbTotalStatus.Maximum = cleanTotalCount;
@@ -1984,19 +1957,19 @@ namespace aphrodite {
                     var sync = new Object();
 
                     wc.Proxy = WebRequest.GetSystemWebProxy();
-                    wc.Headers.Add(webHeader);
+                    wc.Headers.Add("user-agent", Program.UserAgent);
                     wc.Method = "GET";
 
-                    if (separateRatings) {
+                    if (DownloadInfo.SeparateRatings) {
                         if (ExplicitURLs.Count > 0) {
                             for (int y = 0; y < ExplicitURLs.Count; y++) {
                                 if (string.IsNullOrEmpty(ExplicitURLs[y])) { continue; }
-                                url = ExplicitURLs[y];
+                                CurrentUrl = ExplicitURLs[y];
                                 this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading explicit file " + (y + 1) + " of " + (cleanExplicitCount)));
 
                                 string fileName = ExplicitFileNames[y];
-                                string outputDir = saveTo + "\\explicit\\";
-                                switch (separateNonImages) {
+                                string outputDir = DownloadInfo.DownloadPath + "\\explicit\\";
+                                switch (DownloadInfo.SeparateNonImages) {
                                     case true:
                                         if (fileName.EndsWith("gif")) {
                                             outputDir += "gif\\";
@@ -2016,7 +1989,7 @@ namespace aphrodite {
                                 if (!File.Exists(outputDir)) {
                                     this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                     lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(url), outputDir, sync);
+                                        wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
                                         Monitor.Wait(sync);
                                     }
                                 }
@@ -2029,12 +2002,12 @@ namespace aphrodite {
                         if (QuestionableURLs.Count > 0) {
                             for (int y = 0; y < QuestionableURLs.Count; y++) {
                                 if (string.IsNullOrEmpty(QuestionableURLs[y])) { continue; }
-                                url = QuestionableURLs[y];
+                                CurrentUrl = QuestionableURLs[y];
                                 this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading questionable file " + (y + 1) + " of " + (cleanQuestionableCount)));
 
                                 string fileName = QuestionableFileNames[y];
-                                string outputDir = saveTo + "\\questionable\\";
-                                switch (separateNonImages) {
+                                string outputDir = DownloadInfo.DownloadPath + "\\questionable\\";
+                                switch (DownloadInfo.SeparateNonImages) {
                                     case true:
                                         if (fileName.EndsWith("gif")) {
                                             outputDir += "gif\\";
@@ -2054,7 +2027,7 @@ namespace aphrodite {
                                 if (!File.Exists(outputDir)) {
                                     this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                     lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(url), outputDir, sync);
+                                        wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
                                         Monitor.Wait(sync);
                                     }
                                 }
@@ -2067,12 +2040,12 @@ namespace aphrodite {
                         if (SafeURLs.Count > 0) {
                             for (int y = 0; y < SafeURLs.Count; y++) {
                                 if (string.IsNullOrEmpty(SafeURLs[y])) { continue; }
-                                url = SafeURLs[y];
+                                CurrentUrl = SafeURLs[y];
                                 this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading safe file " + (y + 1) + " of " + (cleanSafeCount)));
 
                                 string fileName = SafeFileNames[y];
-                                string outputDir = saveTo + "\\safe\\";
-                                switch (separateNonImages) {
+                                string outputDir = DownloadInfo.DownloadPath + "\\safe\\";
+                                switch (DownloadInfo.SeparateNonImages) {
                                     case true:
                                         if (fileName.EndsWith("gif")) {
                                             outputDir += "gif\\";
@@ -2092,7 +2065,7 @@ namespace aphrodite {
                                 if (!File.Exists(outputDir)) {
                                     this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                     lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(url), outputDir, sync);
+                                        wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
                                         Monitor.Wait(sync);
                                     }
                                 }
@@ -2102,16 +2075,16 @@ namespace aphrodite {
                             }
                         }
 
-                        if (saveBlacklistedFiles) {
+                        if (DownloadInfo.SaveBlacklistedFiles) {
                             if (GraylistedExplicitURLs.Count > 0) {
                                 for (int y = 0; y < GraylistedExplicitURLs.Count; y++) {
                                     if (string.IsNullOrEmpty(GraylistedExplicitURLs[y])) { continue; }
-                                    url = GraylistedExplicitURLs[y];
+                                    CurrentUrl = GraylistedExplicitURLs[y];
                                     this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted (e) file " + (y + 1) + " of " + (graylistExplicitCount)));
 
                                     string fileName = GraylistedExplicitFileNames[y];
-                                    string outputDir = saveTo + "\\explicit\\blacklisted\\";
-                                    switch (separateNonImages) {
+                                    string outputDir = DownloadInfo.DownloadPath + "\\explicit\\blacklisted\\";
+                                    switch (DownloadInfo.SeparateNonImages) {
                                         case true:
                                             if (fileName.EndsWith("gif")) {
                                                 outputDir += "gif\\";
@@ -2131,7 +2104,7 @@ namespace aphrodite {
                                     if (!File.Exists(outputDir)) {
                                         this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                         lock (sync) {
-                                            wc.DownloadFileAsync(new Uri(url), outputDir, sync);
+                                            wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
                                             Monitor.Wait(sync);
                                         }
                                     }
@@ -2145,12 +2118,12 @@ namespace aphrodite {
                         if (GraylistedQuestionableURLs.Count > 0) {
                             for (int y = 0; y < GraylistedQuestionableURLs.Count; y++) {
                                 if (string.IsNullOrEmpty(GraylistedQuestionableURLs[y])) { continue; }
-                                url = GraylistedQuestionableURLs[y];
+                                CurrentUrl = GraylistedQuestionableURLs[y];
                                 this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted (q) file " + (y + 1) + " of " + (graylistQuestionableCount)));
 
                                 string fileName = GraylistedQuestionableFileNames[y];
-                                string outputDir = saveTo + "\\questionable\\blacklisted\\";
-                                switch (separateNonImages) {
+                                string outputDir = DownloadInfo.DownloadPath + "\\questionable\\blacklisted\\";
+                                switch (DownloadInfo.SeparateNonImages) {
                                     case true:
                                         if (fileName.EndsWith("gif")) {
                                             outputDir += "gif\\";
@@ -2170,7 +2143,7 @@ namespace aphrodite {
                                 if (!File.Exists(outputDir)) {
                                     this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                     lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(url), outputDir, sync);
+                                        wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
                                         Monitor.Wait(sync);
                                     }
                                 }
@@ -2183,12 +2156,12 @@ namespace aphrodite {
                         if (GraylistedSafeURLs.Count > 0) {
                             for (int y = 0; y < GraylistedSafeURLs.Count; y++) {
                                 if (string.IsNullOrEmpty(GraylistedSafeURLs[y])) { continue; }
-                                url = GraylistedSafeURLs[y];
+                                CurrentUrl = GraylistedSafeURLs[y];
                                 this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted (s) file " + (y + 1) + " of " + (graylistSafeCount)));
 
                                 string fileName = GraylistedSafeFileNames[y];
-                                string outputDir = saveTo + "\\safe\\blacklisted\\";
-                                switch (separateNonImages) {
+                                string outputDir = DownloadInfo.DownloadPath + "\\safe\\blacklisted\\";
+                                switch (DownloadInfo.SeparateNonImages) {
                                     case true:
                                         if (fileName.EndsWith("gif")) {
                                             outputDir += "gif\\";
@@ -2208,7 +2181,7 @@ namespace aphrodite {
                                 if (!File.Exists(outputDir)) {
                                     this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                     lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(url), outputDir, sync);
+                                        wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
                                         Monitor.Wait(sync);
                                     }
                                 }
@@ -2222,12 +2195,12 @@ namespace aphrodite {
                         if (URLs.Count > 0) {
                             for (int y = 0; y < URLs.Count; y++) {
                                 if (string.IsNullOrEmpty(URLs[y])) { continue; }
-                                url = URLs[y];
+                                CurrentUrl = URLs[y];
                                 this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading file " + (y + 1) + " of " + (cleanTotalCount)));
 
                                 string fileName = FileNames[y];
-                                string outputDir = saveTo;
-                                switch (separateNonImages) {
+                                string outputDir = DownloadInfo.DownloadPath;
+                                switch (DownloadInfo.SeparateNonImages) {
                                     case true:
                                         if (fileName.EndsWith("gif")) {
                                             outputDir += "\\gif\\";
@@ -2247,7 +2220,7 @@ namespace aphrodite {
                                 if (!File.Exists(outputDir)) {
                                     this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                     lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(url), outputDir, sync);
+                                        wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
                                         Monitor.Wait(sync);
                                     }
                                 }
@@ -2257,15 +2230,15 @@ namespace aphrodite {
                             }
                         }
 
-                        if (saveBlacklistedFiles && GraylistedURLs.Count > 0) {
+                        if (DownloadInfo.SaveBlacklistedFiles && GraylistedURLs.Count > 0) {
                             for (int y = 0; y < GraylistedURLs.Count; y++) {
                                 if (string.IsNullOrEmpty(GraylistedURLs[y])) { continue; }
-                                url = GraylistedURLs[y];
+                                CurrentUrl = GraylistedURLs[y];
                                 this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted file " + (y) + " of " + (graylistTotalCount)));
 
                                 string fileName = GraylistedFileNames[y];
-                                string outputDir = saveTo + "\\blacklisted\\";
-                                switch (separateNonImages) {
+                                string outputDir = DownloadInfo.DownloadPath + "\\blacklisted\\";
+                                switch (DownloadInfo.SeparateNonImages) {
                                     case true:
                                         if (fileName.EndsWith("gif")) {
                                             outputDir += "gif\\";
@@ -2285,7 +2258,7 @@ namespace aphrodite {
                                 if (!File.Exists(outputDir)) {
                                     this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                     lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(url), outputDir, sync);
+                                        wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
                                         Monitor.Wait(sync);
                                     }
                                 }
@@ -2299,10 +2272,10 @@ namespace aphrodite {
             #endregion
 
             #region post download
-                if (separateRatings) {
+                if (DownloadInfo.SeparateRatings) {
                     TotalFiles += (ExplicitURLs.Count + QuestionableURLs.Count + SafeURLs.Count);
                     PresentFiles += cleanTotalCount;
-                    if (saveBlacklistedFiles) {
+                    if (DownloadInfo.SaveBlacklistedFiles) {
                         TotalFiles += (GraylistedExplicitURLs.Count + GraylistedQuestionableURLs.Count + GraylistedSafeURLs.Count);
                         PresentFiles += graylistTotalCount;
                     }
@@ -2310,7 +2283,7 @@ namespace aphrodite {
                 else {
                     TotalFiles += URLs.Count;
                     PresentFiles += cleanTotalCount;
-                    if (saveBlacklistedFiles) {
+                    if (DownloadInfo.SaveBlacklistedFiles) {
                         TotalFiles += GraylistedURLs.Count;
                         PresentFiles += graylistTotalCount;
                     }
@@ -2342,7 +2315,7 @@ namespace aphrodite {
                     pbTotalStatus.State = ProgressBarState.Error;
                 }));
                 DownloadHasErrored = true;
-                ErrorLog.ReportWebException(WebE,url, "frmTagDownloader.cs");
+                ErrorLog.ReportWebException(WebE,CurrentUrl, "frmTagDownloader.cs");
             }
             catch (Exception ex) {
                 apiTools.SendDebugMessage("A general exception has occured. (frmTagDownloader.cs)");
@@ -2364,626 +2337,13 @@ namespace aphrodite {
             }
             #endregion
         }
-        private bool downloadPage(string pageURL) {
-            string pageNumber = pageURL.Split('/')[5];
-            tags = pageURL.Split('/')[6].Split('#')[0].Replace("%20", " ");
 
-            changeTask("Awaiting API call");
-            string url = string.Empty;                                      // The URL being accessed, changes per API call/File download.
-
-            string tagInfo = string.Empty;                                  // The buffer for the 'tag.nfo' file that will be created.
-            string blacklistInfo = string.Empty;                            // The buffer for the 'tag.blacklisted.nfo' file that will be created.
-
-            string xml = string.Empty;                                      // The XML string.
-
-            List<string> GraylistedTags = new List<string>();               // The list of files that will be downloaded into a separate folder (if saveBlacklisted = true).
-            List<string> BlacklistedTags = new List<string>();              // The list of files that will be skipped entirely.
-
-            List<string> URLs = new List<string>();                         // The URLs that will be downloaded (if separateRatings = false).
-            List<string> GraylistedURLs = new List<string>();               // The Blacklisted URLs that will be downloaded (if separateRatings = false).
-
-            List<string> ExplicitURLs = new List<string>();                 // The list of Explicit files.
-            List<string> QuestionableURLs = new List<string>();             // The list of Questionable files.
-            List<string> SafeURLs = new List<string>();                     // The list of Safe files.
-            List<string> GraylistedExplicitURLs = new List<string>();       // The list of Graylisted Explicit files.
-            List<string> GraylistedQuestionableURLs = new List<string>();   // The list of Graylisted Questionable files.
-            List<string> GraylistedSafeURLs = new List<string>();           // The list of Graylisted Safe files.
-
-            int tagLength = 0;                                              // Will be the count of tags being downloaded (1-6).
-
-            try {
-            // Set the saveTo.
-                string newTagName = apiTools.ReplaceIllegalCharacters(tags);
-                if (useMinimumScore)                                                                        // Add minimum score to folder name.
-                    newTagName += " (scores " + (minimumScore) + "+)";
-                if (!this.saveTo.EndsWith("\\Pages\\" + newTagName + " (page " + pageNumber + ")"))   // Set the output folder.
-                    this.saveTo += "\\Pages\\" + newTagName + " (page " + pageNumber + ")";
-
-            // Start the buffer for the .nfo files.
-                if (useMinimumScore) {
-                    tagInfo = "TAGS: " + tags + "\n" +
-                              "MINIMUM SCORE: " + minimumScore + "\n" +
-                              "DOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") +
-                              "\n\n";
-
-                    blacklistInfo = "TAGS: " + tags + "\n" +
-                                    "MINIMUM SCORE: " + minimumScore + "\n" +
-                                    "DOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\n" +
-                                    "BLACKLISTED TAGS: " + graylist +
-                                    "\n\n";
-                }
-                else {
-                    tagInfo = "TAGS: " + tags + "\n" +
-                              "MINIMUM SCORE: n/a\n" +
-                              "DOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") +
-                              "\n\n";
-
-                    blacklistInfo = "TAGS: " + tags + "\n" +
-                                    "MINIMUM SCORE: n/a\n" +
-                                    "DOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\n" +
-                                    "BLACKLISTED TAGS: " + graylist +
-                                    "\n\n";
-                }
-
-            // Get the tag length.
-                tagLength = tags.Split(' ').Length;
-
-            // Add the minimum score to the search tags (if applicable).
-                if (tagLength < 6 && scoreAsTag) {
-                    tags += " score:>" + (minimumScore - 1);
-                }
-
-            // Set the blacklist.. lists...
-                if (!string.IsNullOrWhiteSpace(graylist))
-                    GraylistedTags = graylist.Split(' ').ToList();
-                if (!string.IsNullOrWhiteSpace(blacklist))
-                    BlacklistedTags = blacklist.Split(' ').ToList();
-
-            // Get XML of page.
-                changeTask("Downloading page information...");
-                url = tagJson + tags + pageJson + pageNumber;
-                xml = apiTools.GetJSON(url, webHeader);
-                if (xml == null)
-                    return false;
-
-            // Parse the XML file.
-                XmlDocument doc = new XmlDocument();
-                doc.LoadXml(xml);
-                XmlNodeList xmlID = doc.DocumentElement.SelectNodes("/root/item/id");
-                XmlNodeList xmlMD5 = doc.DocumentElement.SelectNodes("/root/item/md5");
-                XmlNodeList xmlURL = doc.DocumentElement.SelectNodes("/root/item/file_url");
-                XmlNodeList xmlArtist = doc.DocumentElement.SelectNodes("/root/item/artist");
-                XmlNodeList xmlTags = doc.DocumentElement.SelectNodes("/root/item/tags");
-                XmlNodeList xmlScore = doc.DocumentElement.SelectNodes("/root/item/score");
-                XmlNodeList xmlRating = doc.DocumentElement.SelectNodes("/root/item/rating");
-                XmlNodeList xmlDescription = doc.DocumentElement.SelectNodes("/root/item/description");
-
-           // Begin parsing the XML for tag information per item.
-                for (int i = 0; i < xmlID.Count; i++) {
-                    totalCount++;   // Add to the total count.
-
-                    string artists = string.Empty;                                          // The artists that worked on the file.
-                    string rating = xmlRating[i].InnerText;                                 // Get the rating of the current file.
-                    bool isGraylisted = false;                                              // Will determine if the file is graylisted.
-                    bool isBlacklisted = false;                                             // Will determine if the file is blacklisted.
-                    List<string> foundTags = xmlTags[i].InnerText.Split(' ').ToList();      // Get the entire tag list of the file.
-                    string foundGraylistedTags = string.Empty;                              // The buffer for the tags that are graylisted.
-
-                // Check the image limit & break if reached.
-                    if (imageLimit > 0 && imageLimit == totalCount)
-                        break;
-
-                // Set the rating for the .nfo file.
-                    if (rating == "e")
-                        rating = "Explicit";
-                    else if (rating == "q")
-                        rating = "Questionable";
-                    else if (rating == "s")
-                        rating = "Safe";
-                    else
-                        rating = "Unknown";
-
-                // Gets the artists of the file and then trims the end of garbage.
-                    for (int j = 0; j < xmlArtist[i].ChildNodes.Count; j++)
-                        artists += xmlArtist[i].ChildNodes[j].InnerText + "\n               ";
-                    artists = artists.TrimEnd(' ');
-                    artists = artists.TrimEnd('\n');
-
-                // Check for blacklisted and graylisted tags.
-                    for (int j = 0; j < foundTags.Count; j++) {
-                        if (BlacklistedTags.Count > 0) {
-                            for (int k = 0; k < BlacklistedTags.Count; k++) {
-                                if (foundTags[j] == BlacklistedTags[k]) {
-                                    isBlacklisted = true;
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (isBlacklisted)
-                            break;
-
-                        if (GraylistedTags.Count > 0) {
-                            for (int k = 0; k < GraylistedTags.Count; k++) {
-                                if (foundTags[j] == GraylistedTags[k]) {
-                                    isGraylisted = true;
-                                    foundGraylistedTags += GraylistedTags[k] + " ";
-                                }
-                            }
-                        }
-                    }
-
-                // Add to the counts (and break for blacklisted)
-                    if (isBlacklisted) {
-                                blacklistCount++;
-                            }
-                            else if (isGraylisted) {
-                                graylistTotalCount++;
-                                switch (xmlRating[i].InnerText.ToLower()) {
-                                    case "e":
-                                        graylistExplicitCount++;
-                                        break;
-                                    case "q":
-                                        graylistQuestionableCount++;
-                                        break;
-                                    case "s":
-                                        graylistSafeCount++;
-                                        break;
-                                }
-                            }
-                            else {
-                                cleanTotalCount++;
-                                switch (xmlRating[i].InnerText.ToLower()) {
-                                    case "e":
-                                        cleanExplicitCount++;
-                                        break;
-                                    case "q":
-                                        cleanQuestionableCount++;
-                                        break;
-                                    case "s":
-                                        cleanSafeCount++;
-                                        break;
-                                }
-                            }
-                            totalCount++;
-
-                            this.BeginInvoke(new MethodInvoker(() => {
-                                string labelBuffer = "";
-                                if (separateRatings) {
-                                    object[] counts = new object[] { cleanTotalCount.ToString(), cleanExplicitCount.ToString(), cleanQuestionableCount.ToString(), cleanSafeCount.ToString(), graylistTotalCount.ToString(), graylistExplicitCount.ToString(), graylistQuestionableCount.ToString(), graylistSafeCount.ToString(), blacklistCount.ToString(), totalCount.ToString() };
-
-                                    labelBuffer = string.Format("{0} posts ({1} e, {2} q, {3} s)\n" +
-                                                                "{4} blacklisted posts ({5} e, {6} q, {7} s)\n" +
-                                                                "{8} skipped (zero-tolerance)\n" +
-                                                                "{9} total files", counts);
-                                }
-                                else {
-                                    object[] counts = new object[] { cleanTotalCount.ToString(), graylistTotalCount.ToString(), blacklistCount.ToString(), totalCount.ToString() };
-
-                                    labelBuffer = string.Format("{0} posts\n" +
-                                                                "{1} blacklisted\n" +
-                                                                "{2} skipped (zero-tolerance)\n" +
-                                                                "{3} total files", counts);
-                                }
-                                lbBlacklist.Text = labelBuffer;
-                            }));
-
-                            if (isBlacklisted)
-                                continue;
-
-                // Graylist check & options check
-                    if (isGraylisted) {
-                        if (saveBlacklistedFiles) {
-                            if (useMinimumScore && Int32.Parse(xmlScore[i].InnerText) < minimumScore)
-                                continue;
-
-                            if (!ratings.Any(xmlRating[i].InnerText.Contains))
-                                continue;
-                        }
-                        else {
-                            continue;
-                        }
-                    }
-                    else { // Not blacklisted
-                        if (useMinimumScore && Int32.Parse(xmlScore[i].InnerText) < minimumScore)
-                            continue;
-
-                        if (!ratings.Any(xmlRating[i].InnerText.Contains))
-                            continue;
-                    }
-
-                // Start adding to the nfo buffer and URL lists
-                    if (isGraylisted && saveBlacklistedFiles) {
-                        if (separateRatings) {
-                            if (xmlRating[i].InnerText == "e")
-                                GraylistedExplicitURLs.Add(xmlURL[i].InnerText);
-                            else if (xmlRating[i].InnerText == "q")
-                                GraylistedQuestionableURLs.Add(xmlURL[i].InnerText);
-                            else if (xmlRating[i].InnerText == "s")
-                                GraylistedSafeURLs.Add(xmlURL[i].InnerText);
-                        }
-                        else {
-                            GraylistedURLs.Add(xmlURL[i].InnerText);
-                        }
-
-                        blacklistInfo += "POST " + xmlID[i].InnerText + ":\n" +
-                                         "    MD5: " + xmlMD5[i].InnerText + "\n" +
-                                         "    URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\n" +
-                                         "    ARTIST(S): " + artists + "\n" +
-                                         "    TAGS: " + xmlTags[i].InnerText + "\n" +
-                                         "    SCORE: " + xmlScore[i].InnerText + "\n" +
-                                         "    RATING: " + rating + "\n" +
-                                         "    DESCRIPITON:\n\"" + xmlDescription[i].InnerText + "\"\n" +
-                                         "    OFFENDING TAGS: " + foundGraylistedTags +
-                                         "\n\n";
-                    }
-                    else {
-                        if (separateRatings) {
-                            if (xmlRating[i].InnerText == "e")
-                                ExplicitURLs.Add(xmlURL[i].InnerText);
-                            else if (xmlRating[i].InnerText == "q")
-                                QuestionableURLs.Add(xmlURL[i].InnerText);
-                            else if (xmlRating[i].InnerText == "s")
-                                SafeURLs.Add(xmlURL[i].InnerText);
-                        }
-                        else {
-                            URLs.Add(xmlURL[i].InnerText);
-                        }
-
-                        tagInfo += "POST " + xmlID[i].InnerText + ":\n" +
-                                   "    MD5: " + xmlMD5[i].InnerText + "\n" +
-                                   "    URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\n" +
-                                   "    ARTIST(S): " + artists + "\n" +
-                                   "    TAGS: " + xmlTags[i].InnerText + "\n" +
-                                   "    SCORE: " + xmlScore[i].InnerText + "\n" +
-                                   "    RATING: " + rating + "\n" +
-                                   "    DESCRIPITON:\n\"" + xmlDescription[i].InnerText + "\"" +
-                                   "\n\n";
-                    }
-                }
-
-            // Create output folders
-                if (separateRatings) {
-                    if (ExplicitURLs.Count > 0) {
-                        if (!Directory.Exists(saveTo + "\\explicit"))
-                            Directory.CreateDirectory(saveTo + "\\explicit");
-                        else
-                            cleanExplicitCount -= apiTools.CountFiles(saveTo + "\\explicit");
-                    }
-                    if (QuestionableURLs.Count > 0) {
-                        if (!Directory.Exists(saveTo + "\\questionable"))
-                            Directory.CreateDirectory(saveTo + "\\questionable");
-                        else
-                            cleanQuestionableCount -= apiTools.CountFiles(saveTo + "\\questionable");
-                    }
-                    if (SafeURLs.Count > 0) {
-                        if (!Directory.Exists(saveTo + "\\safe"))
-                            Directory.CreateDirectory(saveTo + "\\safe");
-                        else
-                            cleanSafeCount -= apiTools.CountFiles(saveTo + "\\safe");
-                    }
-
-                    if (saveBlacklistedFiles) {
-                        if (GraylistedExplicitURLs.Count > 0) {
-                            if (!Directory.Exists(saveTo + "\\explicit\\blacklisted"))
-                                Directory.CreateDirectory(saveTo + "\\explicit\\blacklisted");
-                            else
-                                graylistExplicitCount -= apiTools.CountFiles(saveTo + "\\explicit\\blacklisted");
-                        }
-                        if (GraylistedQuestionableURLs.Count > 0) {
-                            if (!Directory.Exists(saveTo + "\\questionable\\blacklisted"))
-                                Directory.CreateDirectory(saveTo + "\\questionable\\blacklisted");
-                            else
-                                graylistQuestionableCount -= apiTools.CountFiles(saveTo + "\\questionable\\blacklisted");
-                        }
-                        if (GraylistedSafeURLs.Count > 0) {
-                            if (!Directory.Exists(saveTo + "\\safe\\blacklisted"))
-                                Directory.CreateDirectory(saveTo + "\\safe\\blacklisted");
-                            else
-                                graylistSafeCount -= apiTools.CountFiles(saveTo + "\\safe\\blacklisted");
-                        }
-                    }
-                }
-                else {
-                    if (!Directory.Exists(saveTo))
-                        Directory.CreateDirectory(saveTo);
-                    else
-                        cleanTotalCount -= apiTools.CountFiles(saveTo);
-
-                    if (saveBlacklistedFiles && GraylistedURLs.Count > 0) {
-                        if (!Directory.Exists(saveTo + "\\blacklisted"))
-                            Directory.CreateDirectory(saveTo + "\\blacklisted");
-                        else
-                            graylistTotalCount -= apiTools.CountFiles(saveTo + "\\blacklisted");
-                    }
-                }
-
-            // Update totals
-                if (separateRatings) {
-                    cleanTotalCount = cleanExplicitCount + cleanQuestionableCount + cleanSafeCount;
-                    graylistTotalCount = graylistExplicitCount + graylistQuestionableCount + graylistSafeCount;
-                }
-
-            // Save the info files from the buffer
-                if (saveInfo) {
-                    tagInfo.TrimEnd('\n');
-                    File.WriteAllText(saveTo + "\\tags.nfo", tagInfo, Encoding.UTF8);
-
-                    if (saveBlacklistedFiles && graylistTotalCount > 0) {
-                        blacklistInfo.TrimEnd('\n');
-                        if (separateRatings)
-                            File.WriteAllText(saveTo + "\\tags.blacklisted.nfo", blacklistInfo, Encoding.UTF8);
-                        else
-                            File.WriteAllText(saveTo + "\\blacklisted\\tags.blacklisted.nfo", blacklistInfo, Encoding.UTF8);
-                    }
-                }
-
-            // Set the progressbar style.
-                this.Invoke((MethodInvoker)(() => pbDownloadStatus.Style = ProgressBarStyle.Continuous));
-
-                this.BeginInvoke(new MethodInvoker(() => {
-                    string labelBuffer = "";
-                    if (separateRatings) {
-                        object[] counts = new object[] { cleanTotalCount.ToString(), cleanExplicitCount.ToString(), cleanQuestionableCount.ToString(), cleanSafeCount.ToString(), graylistTotalCount.ToString(), graylistExplicitCount.ToString(), graylistQuestionableCount.ToString(), graylistSafeCount.ToString(), blacklistCount.ToString(), totalCount.ToString() };
-
-                        labelBuffer = string.Format("{0} posts ({1} e, {2} q, {3} s)\n" +
-                                                    "{4} blacklisted posts ({5} e, {6} q, {7} s)\n" +
-                                                    "{8} skipped (zero-tolerance)\n" +
-                                                    "{9} total files", counts);
-                    }
-                    else {
-                        object[] counts = new object[] { cleanTotalCount.ToString(), graylistTotalCount.ToString(), blacklistCount.ToString(), totalCount.ToString() };
-
-                        labelBuffer = string.Format("{0} posts\n" +
-                                                    "{1} blacklisted\n" +
-                                                    "{2} skipped (zero-tolerance)\n" +
-                                                    "{3} total files", counts);
-                    }
-                    lbBlacklist.Text = labelBuffer;
-                }));
-
-            // Start the download
-                using (ExWebClient wc = new ExWebClient()) {
-                    wc.DownloadProgressChanged += (s, e) => {
-                        if (!this.IsDisposed) {
-                            this.BeginInvoke(new MethodInvoker(() => {
-                                pbDownloadStatus.Value = e.ProgressPercentage;
-                                pbDownloadStatus.Value++;
-                                pbDownloadStatus.Value--;
-                                lbPercentage.Text = e.ProgressPercentage.ToString() + "%";
-                            }));
-                        }
-                    };
-                    wc.DownloadFileCompleted += (s, e) => {
-                        if (!pbDownloadStatus.IsDisposed && !lbPercentage.IsDisposed) {
-                            lock (e.UserState) {
-                                this.BeginInvoke(new MethodInvoker(() => {
-                                    pbDownloadStatus.Value = 0;
-                                    lbPercentage.Text = "0%";
-                                }));
-                                Monitor.Pulse(e.UserState);
-                            }
-                        }
-                    };
-
-                    wc.Proxy = WebRequest.GetSystemWebProxy();
-                    wc.Headers.Add("user-agent", webHeader);
-                    wc.Method = "GET";
-
-                    if (separateRatings) {
-                        if (ExplicitURLs.Count > 0) {
-                            for (int y = 0; y < ExplicitURLs.Count; y++) {
-                                url = ExplicitURLs[y];
-                                this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading explicit file " + (y + 1) + " of " + (ExplicitURLs.Count)));
-
-                                string filename = url.Split('/')[6];
-                                if (!File.Exists(saveTo + "\\explicit\\" + filename)) {
-                                    this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + filename));
-                                    var sync = new Object();
-                                    lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(url), saveTo + "\\explicit\\" + filename, sync);
-                                        Monitor.Wait(sync);
-                                    }
-                                }
-                                else {
-                                    this.Invoke((MethodInvoker)(() => status.Text = filename + " already exists"));
-                                }
-                            }
-                        }
-
-                        if (QuestionableURLs.Count > 0) {
-                            for (int y = 0; y < QuestionableURLs.Count; y++) {
-                                url = QuestionableURLs[y];
-                                this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading questionable file " + (y + 1) + " of " + (QuestionableURLs.Count)));
-
-                                string filename = url.Split('/')[6];
-                                if (!File.Exists(saveTo + "\\questionable\\" + filename)) {
-                                    this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + filename));
-                                    var sync = new Object();
-                                    lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(url), saveTo + "\\questionable\\" + filename, sync);
-                                        Monitor.Wait(sync);
-                                    }
-                                }
-                                else {
-                                    this.Invoke((MethodInvoker)(() => status.Text = filename + " already exists"));
-                                }
-                            }
-                        }
-
-                        if (SafeURLs.Count > 0) {
-                            for (int y = 0; y < SafeURLs.Count; y++) {
-                                url = SafeURLs[y];
-                                this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading safe file " + (y + 1) + " of " + (SafeURLs.Count)));
-
-                                string filename = url.Split('/')[6];
-                                if (!File.Exists(saveTo + "\\safe\\" + filename)) {
-                                    this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + filename));
-                                    var sync = new Object();
-                                    lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(url), saveTo + "\\safe\\" + filename, sync);
-                                        Monitor.Wait(sync);
-                                    }
-                                }
-                                else {
-                                    this.Invoke((MethodInvoker)(() => status.Text = filename + " already exists"));
-                                }
-                            }
-                        }
-
-                        if (saveBlacklistedFiles) {
-                            if (GraylistedExplicitURLs.Count > 0) {
-                                for (int y = 0; y < GraylistedExplicitURLs.Count; y++) {
-                                    url = GraylistedExplicitURLs[y];
-                                    this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted (e) file " + (y + 1) + " of " + (GraylistedExplicitURLs.Count)));
-
-                                    string filename = url.Split('/')[6];
-                                    if (!File.Exists(saveTo + "\\explicit\\blacklisted\\" + filename)) {
-                                        this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + filename));
-                                        var sync = new Object();
-                                        lock (sync) {
-                                            wc.DownloadFileAsync(new Uri(url), saveTo + "\\explicit\\blacklisted\\" + filename, sync);
-                                            Monitor.Wait(sync);
-                                        }
-                                    }
-                                    else {
-                                        this.Invoke((MethodInvoker)(() => status.Text = filename + " already exists"));
-                                    }
-                                }
-                            }
-                        }
-
-                        if (GraylistedQuestionableURLs.Count > 0) {
-                            for (int y = 0; y < GraylistedQuestionableURLs.Count; y++) {
-                                url = GraylistedQuestionableURLs[y];
-                                this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted (q) file " + (y + 1) + " of " + (GraylistedQuestionableURLs.Count)));
-
-                                string filename = url.Split('/')[6];
-                                if (!File.Exists(saveTo + "\\questionable\\blacklisted\\" + filename)) {
-                                    this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + filename));
-                                    var sync = new Object();
-                                    lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(url), saveTo + "\\questionable\\blacklisted\\" + filename, sync);
-                                        Monitor.Wait(sync);
-                                    }
-                                }
-                                else {
-                                    this.Invoke((MethodInvoker)(() => status.Text = filename + " already exists"));
-                                }
-                            }
-                        }
-
-                        if (GraylistedSafeURLs.Count > 0) {
-                            for (int y = 0; y < GraylistedSafeURLs.Count; y++) {
-                                url = GraylistedSafeURLs[y];
-                                this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted (s) file " + (y + 1) + " of " + (GraylistedSafeURLs.Count)));
-
-                                string filename = url.Split('/')[6];
-                                if (!File.Exists(saveTo + "\\safe\\blacklisted\\" + filename)) {
-                                    this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + filename));
-                                    var sync = new Object();
-                                    lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(url), saveTo + "\\safe\\blacklisted\\" + filename, sync);
-                                        Monitor.Wait(sync);
-                                    }
-                                }
-                                else {
-                                    this.Invoke((MethodInvoker)(() => status.Text = filename + " already exists"));
-                                }
-                            }
-                        }
-                    }
-                    else {
-                        if (URLs.Count > 0) {
-                            for (int y = 0; y < URLs.Count; y++) {
-                                url = URLs[y];
-                                this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading file " + (y + 1) + " of " + (URLs.Count)));
-
-                                string filename = url.Split('/')[6];
-                                if (!File.Exists(saveTo + "\\" + filename)) {
-                                    this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + filename));
-                                    var sync = new Object();
-                                    lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(url), saveTo + "\\" + filename, sync);
-                                        Monitor.Wait(sync);
-                                    }
-                                }
-                                else {
-                                    this.Invoke((MethodInvoker)(() => status.Text = filename + " already exists"));
-                                }
-                            }
-                        }
-
-                        if (saveBlacklistedFiles && GraylistedURLs.Count > 0) {
-                            for (int y = 0; y < GraylistedURLs.Count; y++) {
-                                url = GraylistedURLs[y];
-                                this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted file " + (y) + " of " + (GraylistedURLs.Count)));
-
-                                string filename = url.Split('/')[6];
-                                if (!File.Exists(saveTo + "\\blacklisted\\" + filename)) {
-                                    this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + filename));
-                                    var sync = new Object();
-                                    lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(url), saveTo + "\\blacklisted\\" + filename, sync);
-                                        Monitor.Wait(sync);
-                                    }
-                                }
-                                else {
-                                    this.Invoke((MethodInvoker)(() => status.Text = filename + " already exists"));
-                                }
-                            }
-                        }
-                    }
-                }
-
-                int count = 0;
-                if (separateRatings) {
-                    count += (ExplicitURLs.Count + QuestionableURLs.Count + SafeURLs.Count);
-                    if (saveBlacklistedFiles)
-                        count += (GraylistedExplicitURLs.Count + GraylistedQuestionableURLs.Count + GraylistedSafeURLs.Count);
-                }
-                else {
-                    count += URLs.Count;
-                    if (saveBlacklistedFiles)
-                        count += GraylistedURLs.Count;
-                }
-
-                this.BeginInvoke(new MethodInvoker(() => {
-                    lbFile.Text = "All " + (count) + " files downloaded.";
-                    pbDownloadStatus.Value = pbDownloadStatus.Maximum;
-                    lbPercentage.Text = "Done";
-                    tmrTitle.Stop();
-                    status.Text = "Finished downloading page";
-                    this.Text = "Page download completed";
-                }));
-                return true;
-            }
-            catch (ThreadAbortException) {
-                apiTools.SendDebugMessage("Thread was requested to be, and has been, aborted. (frmTagDownloader.cs)");
-                return false;
-            }
-            catch (ObjectDisposedException) {
-                apiTools.SendDebugMessage("An ObjectDisposedException occured. (frmTagDownloader.cs)");
-                return false;
-            }
-            catch (WebException WebE) {
-                apiTools.SendDebugMessage("A WebException has occured. (frmTagDownloader.cs)");
-                ErrorLog.ReportWebException(WebE, url, "frmTagDownloader.cs");
-                return false;
-            }
-            catch (Exception ex) {
-                apiTools.SendDebugMessage("A gneral exception has occured. (frmTagDowloader.cs)");
-                ErrorLog.ReportException(ex, "frmTagDownloader.cs");
-                return false;
-            }
-        }
-
-        private void changeTask(string curStatus) {
+        private void ChangeTask(string curStatus) {
             this.BeginInvoke(new MethodInvoker(() => {
                 status.Text = curStatus;
             }));
         }
-    #endregion
+        #endregion
 
     }
 }

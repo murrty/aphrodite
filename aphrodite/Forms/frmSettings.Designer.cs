@@ -899,6 +899,7 @@
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.tbMain);
+            this.Icon = Properties.Resources.Brad;
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(426, 290);
             this.MinimumSize = new System.Drawing.Size(426, 290);

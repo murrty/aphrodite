@@ -1,62 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
+using System.IO;
 using System.Windows.Forms;
 
 namespace aphrodite {
+
     public partial class frmPoolWishlist : Form {
-
-        public bool useIni = false;
-        IniFile ini = new IniFile();
-
-        public bool addToWishlist = false;
-        public string addURL = string.Empty;
-        public string addTitle = string.Empty;
-
         List<string>PoolNames = new List<string>();
         List<string>PoolURLS = new List<string>();
 
-        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-        private static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wp, string lp);
-        private void SetTextBoxHint(IntPtr TextboxHandle, string Hint) {
-            SendMessage(TextboxHandle, 0x1501, (IntPtr)1, Hint);
-        }
-
-        public frmPoolWishlist() {
+        public frmPoolWishlist(bool AddToWishlist = false, string AddUrl = null, string AddTitle = null) {
             InitializeComponent();
-            this.Icon = Properties.Resources.Brad;
-            SetTextBoxHint(txtName.Handle, "Pool name...");
-            SetTextBoxHint(txtURL.Handle, "Pool url...");
+            NativeMethods.SendMessage(txtName.Handle, 0x1501, (IntPtr)1, "Pool name...");
+            NativeMethods.SendMessage(txtURL.Handle, 0x1501, (IntPtr)1, "Pool url...");
+
+            if (AddToWishlist) {
+                txtName.Text = AddTitle.Replace('|', '_');
+                txtURL.Text = AddUrl;
+            }
         }
 
         private void frmPoolWishlist_Load(object sender, EventArgs e) {
             lPoolLink.Text = string.Empty;
-            if (!string.IsNullOrWhiteSpace(Pools.Default.wishlist) && !string.IsNullOrWhiteSpace(Pools.Default.wishhlistNames)) {
-                lbWish.Items.AddRange(Pools.Default.wishhlistNames.Split('|'));
-                PoolNames.AddRange(Pools.Default.wishhlistNames.Split('|'));
-                PoolURLS.AddRange(Pools.Default.wishlist.Split('|'));
+            if (Program.UseIni) {
+                if (File.Exists(WishlistManager.WishlistFile)) {
+                    string[] Wishlist = File.ReadAllLines(WishlistManager.WishlistFile);
+                    if (Wishlist.Length > 0) {
+                        for (int i = 0; i < Wishlist.Length; i++) {
+                            PoolURLS.Add(Wishlist[i].Split('|')[0]);
+                            PoolNames.Add(Wishlist[i].Split('|')[1]);
+                        }
+                        if (PoolNames.Count == PoolURLS.Count) {
+                            lbWish.Items.AddRange(PoolNames.ToArray());
+                        }
+                    }
+                }
             }
-
-            if (addToWishlist) {
-                txtName.Text = addTitle;
-                txtURL.Text = addURL;
+            else {
+                if (!string.IsNullOrWhiteSpace(Pools.Default.wishlist) && !string.IsNullOrWhiteSpace(Pools.Default.wishlistNames)) {
+                    PoolNames.AddRange(Pools.Default.wishlistNames.Split('|'));
+                    PoolURLS.AddRange(Pools.Default.wishlist.Split('|'));
+                    lbWish.Items.AddRange(PoolNames.ToArray());
+                }
             }
         }
 
         private void frmPoolWishlist_FormClosing(object sender, FormClosingEventArgs e) {
-            string urls = string.Empty;
-            string names = string.Empty;
-            for (int i = 0; i < lbWish.Items.Count; i++) {
-                urls += PoolURLS[i] + "|";
-                names += PoolNames[i] + "|";
-            }
-
-            urls = urls.TrimEnd('|');
-            names = names.TrimEnd('|');
-            Pools.Default.wishlist = urls;
-            Pools.Default.wishhlistNames = names;
-            Pools.Default.Save();
+            WishlistManager.WriteWishlist(PoolURLS, PoolNames);
         }
 
         private void btnAdd_Click(object sender, EventArgs e) {
@@ -84,7 +75,7 @@ namespace aphrodite {
                 PoolURLS.RemoveAt(lbWish.SelectedIndex);
                 PoolNames.RemoveAt(lbWish.SelectedIndex);
                 lbWish.Items.RemoveAt(lbWish.SelectedIndex);
-                if (indx == 0) {
+                if (indx == 0 && lbWish.Items.Count > 0) {
                     lbWish.SelectedIndex = 0;
                 }
                 else {
@@ -101,7 +92,7 @@ namespace aphrodite {
                 poolID = poolID.Split('?')[0];
             poolID = poolID.Split('/')[5];
             
-            Downloader.Arguments.downloadPool(poolID, useIni);
+            Downloader.Arguments.DownloadPool(poolID);
         }
 
         private void lbWish_SelectedIndexChanged(object sender, EventArgs e) {
@@ -112,6 +103,9 @@ namespace aphrodite {
             }
             else if (lbWish.SelectedItem != null) {
                 lPoolLink.Text = PoolURLS[lbWish.SelectedIndex];
+            }
+            else {
+                lPoolLink.Text = string.Empty;
             }
         }
 
@@ -132,6 +126,78 @@ namespace aphrodite {
 
         private void lPoolLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
             Process.Start(PoolURLS[lbWish.SelectedIndex]);
+        }
+    }
+
+    public class WishlistManager {
+        public static readonly string WishlistFile = Environment.CurrentDirectory + "\\PoolWishlist.cfg";
+
+        public static void WriteWishlist(List<string> UrlList, List<string> NameList) {
+            string Urls = string.Empty;
+            string Names = string.Empty;
+            string PortableFile = string.Empty;
+
+
+            if (Program.UseIni) {
+                if (UrlList.Count == NameList.Count && UrlList.Count > 0) {
+                    for (int i = 0; i < UrlList.Count; i++) {
+                        PortableFile += UrlList[i] + "|" + NameList[i].Replace("|", "_") + "\r\n";
+                    }
+
+                    PortableFile = PortableFile.Trim('\n').Trim('\r');
+
+                    if (!string.IsNullOrWhiteSpace(PortableFile)) {
+                        File.WriteAllText(WishlistFile, PortableFile);
+                    }
+                    else {
+                        if (File.Exists(WishlistFile)) {
+                            File.Delete(WishlistFile);
+                        }
+                    }
+                }
+                else {
+                    if (File.Exists(WishlistFile)) {
+                        File.Delete(WishlistFile);
+                    }
+                }
+            }
+            else {
+                if (UrlList.Count == NameList.Count && UrlList.Count > 0) {
+                    Urls = string.Join("|", UrlList);
+                    Names = string.Join("|", NameList);
+
+                    if (Pools.Default.wishlist != Urls && Pools.Default.wishlistNames != Names) {
+                        Pools.Default.wishlist = Urls;
+                        Pools.Default.wishlistNames = Names;
+                        Pools.Default.Save();
+                    }
+                }
+            }
+        }
+
+        public static void WriteWishlist(string URL, string Name) {
+            if (!string.IsNullOrWhiteSpace(URL) && !string.IsNullOrWhiteSpace(Name)) {
+                if (Program.UseIni) {
+                    if (File.Exists(WishlistFile)) {
+                        File.AppendAllText(WishlistFile, Environment.NewLine + URL + "|" + Name);
+                    }
+                    else {
+                        File.Create(WishlistFile).Dispose();
+                        File.AppendAllText(WishlistFile, URL + "|" + Name);
+                    }
+                }
+                else {
+                    if (!string.IsNullOrWhiteSpace(Pools.Default.wishlistNames) && !string.IsNullOrWhiteSpace(Pools.Default.wishlist)) {
+                        Pools.Default.wishlist += "|" + URL;
+                        Pools.Default.wishlistNames += "|" + Name;
+                    }
+                    else {
+                        Pools.Default.wishlist = URL;
+                        Pools.Default.wishlistNames = Name;
+                    }
+                    Pools.Default.Save();
+                }
+            }
         }
     }
 }

@@ -25,25 +25,13 @@ namespace aphrodite {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-999999")]
-        public int frmMainX {
+        [global::System.Configuration.DefaultSettingValueAttribute("-32000, -32000")]
+        public global::System.Drawing.Point frmMainLocation {
             get {
-                return ((int)(this["frmMainX"]));
+                return ((global::System.Drawing.Point)(this["frmMainLocation"]));
             }
             set {
-                this["frmMainX"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-999999")]
-        public int frmMainY {
-            get {
-                return ((int)(this["frmMainY"]));
-            }
-            set {
-                this["frmMainY"] = value;
+                this["frmMainLocation"] = value;
             }
         }
     }

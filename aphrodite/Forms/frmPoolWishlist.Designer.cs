@@ -125,6 +125,7 @@
             this.Controls.Add(this.btnAdd);
             this.Controls.Add(this.txtURL);
             this.Controls.Add(this.lbWish);
+            this.Icon = Properties.Resources.Brad;
             this.MaximizeBox = false;
             this.MinimumSize = new System.Drawing.Size(318, 280);
             this.Name = "frmPoolWishlist";

@@ -12,7 +12,7 @@ namespace aphrodite {
         public bool SetCustomDescription = false;
         public string CustomDescription = null;
         //Language lang = Language.GetInstance();
-        //public bool FromLanguage = false;
+        public bool FromLanguage = false;
 
         public frmException() {
             InitializeComponent();
@@ -73,14 +73,14 @@ namespace aphrodite {
             }
 
             string outputBuffer = "\n\nVersion: {0}\n" + Exception;
-            //if (Properties.Settings.Default.IsBetaVersion) {
-            //    outputBuffer = string.Format(outputBuffer, Properties.Settings.Default.BetaVersion);
-            //    lbVersion.Text = "v" + Properties.Settings.Default.BetaVersion;
-            //}
-            //else {
+            if (Properties.Settings.Default.IsBetaVersion) {
+                outputBuffer = string.Format(outputBuffer, Properties.Settings.Default.BetaVersion);
+                lbVersion.Text = "v" + Properties.Settings.Default.BetaVersion;
+            }
+            else {
                 outputBuffer = string.Format(outputBuffer, Properties.Settings.Default.currentVersion.ToString());
                 lbVersion.Text = "v" + Properties.Settings.Default.currentVersion.ToString();
-            //}
+            }
             rtbExceptionDetails.Text += outputBuffer;
             System.Media.SystemSounds.Hand.Play();
         }

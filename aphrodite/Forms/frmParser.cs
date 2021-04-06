@@ -16,7 +16,6 @@ namespace aphrodite {
 
         public frmParser() {
             InitializeComponent();
-            this.Icon = Properties.Resources.Brad;
         }
 
         private void listImages_SelectedIndexChanged(object sender, EventArgs e) {

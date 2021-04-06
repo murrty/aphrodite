@@ -6,16 +6,13 @@ using System.Windows.Forms;
 
 namespace aphrodite {
     public partial class frmBlacklist : Form {
-        public bool useIni = false;
-        IniFile ini = new IniFile();
 
         public frmBlacklist() {
             InitializeComponent();
-            this.Icon = Properties.Resources.Brad;
         }
 
         private void frmBlacklist_Load(object sender, EventArgs e) {
-            if (useIni) {
+            if (Program.UseIni) {
                 if (File.Exists(Environment.CurrentDirectory + "\\graylist.cfg"))
                     rtbBlacklist.Text = File.ReadAllText(Environment.CurrentDirectory + "\\graylist.cfg").Replace(' ', '\n');
 
@@ -77,7 +74,7 @@ namespace aphrodite {
         }
 
         private void btnSave_Click(object sender, EventArgs e) {
-            if (useIni) {
+            if (Program.UseIni) {
                 if (rtbBlacklist.TextLength > 0)
                     File.WriteAllText(Environment.CurrentDirectory + "\\graylist.cfg", rtbBlacklist.Text.Replace('\n', ' '));
                 else

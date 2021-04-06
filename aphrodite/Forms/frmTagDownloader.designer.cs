@@ -93,7 +93,6 @@
             // 
             // tmrTitle
             // 
-            this.tmrTitle.Enabled = true;
             this.tmrTitle.Interval = 1000;
             this.tmrTitle.Tick += new System.EventHandler(this.tmrTitle_Tick);
             // 
@@ -183,6 +182,7 @@
             this.Controls.Add(this.lbBlacklist);
             this.Controls.Add(this.lbLimits);
             this.Controls.Add(this.pbDownloadStatus);
+            this.Icon = global::aphrodite.Properties.Resources.Brad;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(300, 184);
@@ -191,7 +191,6 @@
             this.Text = "Downloading tags ";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmDownload_FormClosing);
             this.Load += new System.EventHandler(this.frmDownload_Load);
-            this.Shown += new System.EventHandler(this.frmDownload_Shown);
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -13,47 +13,16 @@ namespace aphrodite {
     public partial class frmPoolDownloader : Form {
 
         #region Public Variables
-        public string poolID;                   // String for the pool id.
-        public string header;                   // String for the header.
-        public string saveTo;                   // String for the save directory.
-        public string staticSaveTo;             // String for the initial saveTo string.
-        public string graylist;                 // String for the graylist.
-        public string blacklist;                // String for the blacklist.
-        public string url;                      // String for the currently downloading URL.
-
-        public bool saveInfo;                   // Global setting for saving images.nfo file.
-        public bool ignoreFinish;               // Global setting for exiting after finishing.
-        public bool saveBlacklisted;            // Global setting for saving blacklisted files.
-        public bool saveMetadata;               // Global setting for saving metadata to files
-        public bool saveArtistMetadata;         // Global setting for saving artists to the file's metadata
-        public bool saveTagMetadata;            // Global setting for saving tags to the file's metadata
-
-        public bool usePoolName;                // Setting for using the pool name in the file name.
-        public bool mergeBlacklisted;           // Setting for merging blacklisted pages with regular pages.
-        public bool openAfter;                  // Setting for opening the folder after download.
-        public string fileNameSchema;           // The name of the files to be created
-        // %poolname%   = the name of the pool
-        // %poolid%     = the id of the pool
-        // %page%       = the page number of the page
-        // %md5%        = the md5 of the file
-        // %id%         = the id of the page
-        // %rating%     = the rating of the page (eg: safe)
-        // %rating2%    = the lettered rating of the page (eg: s)
-        // %artist%     = the first artist in the artists array
-        // %ext%        = the extension
-        // %fav_count%  = the amount of favorites the post has
-        // %score%      = the score of the post
-        // %author%     = the user who submitted the post to e621
-
+        public PoolDownloadInfo DownloadInfo;
         public int pageCount = 0;               // Will update the page count before download.
         public int blacklistedPageCount = 0;    // Will count the blacklisted pages before download.
-
         #endregion
 
         #region Private Variables
         private bool DownloadHasFinished = false;
         private bool DownloadHasErrored = false;
         private bool DownloadHasAborted = false;
+        private string CurrentURL;
 
         private Thread poolDownloader;
         #endregion
@@ -61,11 +30,10 @@ namespace aphrodite {
         #region Form
         public frmPoolDownloader() {
             InitializeComponent();
-            this.Icon = Properties.Resources.Brad;
         }
 
         private void frmDownload_Load(object sender, EventArgs e) {
-            lbID.Text = "Pool ID " + poolID;
+            lbID.Text = "Pool ID " + DownloadInfo.PoolId;
         }
         private void frmDownload_Shown(object sender, EventArgs e) {
             startDownload();
@@ -95,7 +63,7 @@ namespace aphrodite {
             poolDownloader.Start();
         }
         private void AfterDownload() {
-            if (ignoreFinish) {
+            if (DownloadInfo.IgnoreFinish) {
                 if (DownloadHasFinished) {
                     this.DialogResult = DialogResult.Yes;
                 }
@@ -114,7 +82,7 @@ namespace aphrodite {
                 pbDownloadStatus.Value = pbDownloadStatus.Maximum;
                 lbPercentage.Text = "Done";
                 tmrTitle.Stop();
-                this.Text = "Pool " + poolID + " finished downloading";
+                this.Text = "Pool " + DownloadInfo.PoolId + " finished downloading";
                 status.Text = "Finished downloading pool";
             }
             else if (DownloadHasErrored) {
@@ -139,31 +107,29 @@ namespace aphrodite {
                 pbDownloadStatus.Value = pbDownloadStatus.Maximum;
                 lbPercentage.Text = "Done?";
                 tmrTitle.Stop();
-                this.Text = "Pool " + poolID + " finished downloading";
+                this.Text = "Pool " + DownloadInfo.PoolId + " finished downloading";
                 status.Text = "Download status booleans not set, assuming the download completed";
             }
         }
         private void downloadPool() {
             try {
               // Set the saveTo to \\Pools.
-                if (!saveTo.EndsWith("\\Pools"))
-                    saveTo += "\\Pools";
+                if (!DownloadInfo.DownloadPath.EndsWith("\\Pools")) {
+                    DownloadInfo.DownloadPath += "\\Pools";
+                }
 
-                staticSaveTo = saveTo;
-                writeToConsole("Set output to " + saveTo);
+                writeToConsole("Set output to " + DownloadInfo.DownloadPath);
 
                 #region define new variables
                 // New variables for the API parse
-                string poolJson = string.Format("https://e621.net/pools/{0}.json", poolID);
-                string poolJsonPage = string.Format("https://e621.net/posts.json?tags=pool:{0}+order:id&limit=320", poolID);
+                string poolJson = string.Format("https://e621.net/pools/{0}.json", DownloadInfo.PoolId);
+                string poolJsonPage = string.Format("https://e621.net/posts.json?tags=pool:{0}+order:id&limit=320", DownloadInfo.PoolId);
 
                 List<string> URLs = new List<string>();
                 List<string> FileNames = new List<string>();
                 List<string> MetadataArtists = new List<string>();
                 List<string> MetadataTags = new List<string>();
                 List<bool> urlBlacklisted = new List<bool>();
-                List<string> GraylistedTags = new List<string>(graylist.Split(' '));
-                List<string> BlacklistedTags = new List<string>(blacklist.Split(' '));
                 List<string> PostIDs = new List<string>();
                 string poolName = string.Empty;
                 string poolInfo = string.Empty;
@@ -179,8 +145,8 @@ namespace aphrodite {
                 // Begin the XML download
                 this.Invoke((MethodInvoker)(() => status.Text = "Getting pool information for page 1"));
                 writeToConsole("Starting JSON download for page 1...", true);
-                url = poolJson;
-                string postXML = apiTools.GetJSON(poolJson, header);
+                CurrentURL = poolJson;
+                string postXML = apiTools.GetJsonToXml(poolJson);
                 writeToConsole("JSON Downloaded.", true);
 
                 // Check the XML.
@@ -215,21 +181,21 @@ namespace aphrodite {
                     poolDescription = "\"" + xmlDescription[0].InnerText + "\"";
                 }
 
-                poolInfo += "POOL: " + poolID + "\n" +
+                poolInfo += "POOL: " + DownloadInfo.PoolId + "\n" +
                             "DOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\n" +
                             "    NAME: " + xmlName[0].InnerText + "\n" +
                             "    PAGES: " + xmlCount[0].InnerText + "\n" +
-                            "    URL: https://e621.net/pool/show/" + poolID + "\n" +
+                            "    URL: https://e621.net/pool/show/" + DownloadInfo.PoolId + "\n" +
                             "    DESCRIPTION:\n    " + poolDescription +
                             "\n\n";
 
-                blacklistInfo += "POOL: " + poolID + "\n" +
+                blacklistInfo += "POOL: " + DownloadInfo.PoolId + "\n" +
                                  "DOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\n" +
                                  "    NAME: " + xmlName[0].InnerText + "\n" +
                                  "    PAGES: " + xmlCount[0].InnerText + "\n" +
-                                 "    URL: https://e621.net/pool/show/" + poolID + "\n" +
+                                 "    URL: https://e621.net/pool/show/" + DownloadInfo.PoolId + "\n" +
                                  "    DESCRIPTION:\n    " + poolDescription +
-                                 "    BLACKLISTED TAGS: " + graylist +
+                                 "    BLACKLISTED TAGS: " + string.Join(" ", DownloadInfo.Graylist) +
                                  "\n\n";
 
                 for (int i = 0; i < xmlPostIDs.Count; i++) {
@@ -243,15 +209,15 @@ namespace aphrodite {
 
               // Set the output folder name.
                 poolName = apiTools.ReplaceIllegalCharacters(xmlName[0].InnerText);
-                saveTo += "\\" + poolName;
+                DownloadInfo.DownloadPath += "\\" + poolName;
                 writeToConsole("Updated saveTo to \\Pools\\" + poolName);
                 #endregion
 
                 #region First page rip
               // Begin ripping the rest of the pool Json.
                 xmlDoc = new XmlDocument();
-                url = poolJsonPage;
-                postXML = apiTools.GetJSON(poolJsonPage + "&page=1", header);
+                CurrentURL = poolJsonPage;
+                postXML = apiTools.GetJsonToXml(poolJsonPage + "&page=1");
                 xmlDoc.LoadXml(postXML);
 
                 XmlNodeList xmlID = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/id");
@@ -376,12 +342,6 @@ namespace aphrodite {
                         artistsMetadata = "(no artist)";
                     }
 
-                  // Add to the metadata list
-                    if (saveMetadata) {
-                        MetadataArtists.Add(artistsMetadata);
-                        MetadataTags.Add(tagsMetadata);
-                    }
-
                     string fileNamePage = string.Empty;
                     fileNamePage = (PostIDs.IndexOf(xmlID[i].InnerText) + 1).ToString("0000.##");
 
@@ -408,20 +368,20 @@ namespace aphrodite {
                         }
                     }
 
-                    string fileName = fileNameSchema.Replace("%poolname%", poolName)
-                                                    .Replace("%poolid%", poolID)
-                                                    .Replace("%page%", fileNamePage)
-                                                    .Replace("%md5%", xmlMD5[i].InnerText)
-                                                    .Replace("%id%", xmlID[i].InnerText)
-                                                    .Replace("%rating%", rating.ToLower())
-                                                    .Replace("%rating2%", xmlRating[i].InnerText)
-                                                    .Replace("%artist%", fileNameArtist)
-                                                    .Replace("%ext%", xmlExt[i].InnerText)
-                                                    .Replace("%fav_count%", xmlFavCount[i].InnerText)
-                                                    .Replace("%score%", xmlScore[i].InnerText)
-                                                    .Replace("%scoreup%", xmlScoreUp[i].InnerText)
-                                                    .Replace("%scoredown%", xmlScoreDown[i].InnerText)
-                                                    .Replace("%author%", xmlAuthor[i].InnerText) + "." + xmlExt[i].InnerText;
+                    string fileName = DownloadInfo.FileNameSchema.Replace("%poolname%", poolName)
+                                .Replace("%poolid%", DownloadInfo.PoolId)
+                                .Replace("%page%", fileNamePage)
+                                .Replace("%md5%", xmlMD5[i].InnerText)
+                                .Replace("%id%", xmlID[i].InnerText)
+                                .Replace("%rating%", rating.ToLower())
+                                .Replace("%rating2%", xmlRating[i].InnerText)
+                                .Replace("%artist%", fileNameArtist)
+                                .Replace("%ext%", xmlExt[i].InnerText)
+                                .Replace("%fav_count%", xmlFavCount[i].InnerText)
+                                .Replace("%score%", xmlScore[i].InnerText)
+                                .Replace("%scoreup%", xmlScoreUp[i].InnerText)
+                                .Replace("%scoredown%", xmlScoreDown[i].InnerText)
+                                .Replace("%author%", xmlAuthor[i].InnerText) + "." + xmlExt[i].InnerText;
 
                     string fileUrl = xmlURL[i].InnerText;
                     if (string.IsNullOrEmpty(fileUrl)) {
@@ -431,20 +391,20 @@ namespace aphrodite {
                     }
 
                     for (int j = 0; j < foundTags.Count; j++) {
-                        if (GraylistedTags.Count > 0) {
-                            for (int k = 0; k < GraylistedTags.Count; k++) {
-                                if (foundTags[j] == GraylistedTags[k]) {
-                                    foundBlacklistedTags += " " + GraylistedTags[k];
+                        if (DownloadInfo.Graylist.Length > 0) {
+                            for (int k = 0; k < DownloadInfo.Graylist.Length; k++) {
+                                if (foundTags[j] == DownloadInfo.Graylist[k]) {
+                                    foundBlacklistedTags += " " + DownloadInfo.Graylist[k];
                                     isBlacklisted = true;
                                     hasBlacklistedFiles = true;
                                 }
                             }
                         }
 
-                        if (BlacklistedTags.Count > 0) {
-                            for (int k = 0; k < BlacklistedTags.Count; k++) {
-                                if (foundTags[j] == BlacklistedTags[k]) {
-                                    foundBlacklistedTags += " " + BlacklistedTags[k];
+                        if (DownloadInfo.Blacklist.Length > 0) {
+                            for (int k = 0; k < DownloadInfo.Blacklist.Length; k++) {
+                                if (foundTags[j] == DownloadInfo.Blacklist[k]) {
+                                    foundBlacklistedTags += " " + DownloadInfo.Blacklist[k];
                                     isBlacklisted = true;
                                     hasBlacklistedFiles = true;
                                 }
@@ -466,7 +426,7 @@ namespace aphrodite {
 
                     updateTotals();
 
-                    if (isBlacklisted && saveBlacklisted && !mergeBlacklisted) {
+                    if (isBlacklisted && DownloadInfo.SaveBlacklistedFiles && !DownloadInfo.MergeBlacklisted) {
                         blacklistInfo += "    BLACKLISTED PAGE " + fileNamePage + ":\n" +
                                          "        MD5: " + xmlMD5[i].InnerText + "\n" +
                                          "        URL: https://e621.net/posts/" + xmlID[i].InnerText + "\n" +
@@ -501,8 +461,8 @@ namespace aphrodite {
                         this.Invoke((MethodInvoker)(() => status.Text = "Getting pool information for page " + i));
                         xmlDoc = new XmlDocument();
 
-                        url = poolJson + poolID;
-                        postXML = apiTools.GetJSON(poolJson + poolID + "&page=" + i, header);
+                        CurrentURL = poolJson + DownloadInfo.PoolId;
+                        postXML = apiTools.GetJsonToXml(poolJson + DownloadInfo.PoolId + "&page=" + i);
                         writeToConsole("JSON Downloaded.", true);
 
                         writeToConsole("Checking XML...");
@@ -635,16 +595,9 @@ namespace aphrodite {
                                 artistsMetadata = "(no artist)";
                             }
 
-                          // Add to the metadata list
-                            if (saveMetadata) {
-                                MetadataArtists.Add(artistsMetadata);
-                                MetadataTags.Add(tagsMetadata);
-                            }
-
                             string fileNamePage = string.Empty;
                             fileNamePage = (PostIDs.IndexOf(xmlID[j].InnerText) + 1).ToString("0000.##");
 
-                            // File name artist for the schema
                             string fileNameArtist = "(none)";
                             bool useHardcodedFilter = false;
                             if (string.IsNullOrEmpty(General.Default.undesiredTags))
@@ -667,20 +620,20 @@ namespace aphrodite {
                                 }
                             }
 
-                            string fileName = fileNameSchema.Replace("%poolname%", poolName)
-                                                            .Replace("%poolid%", poolID)
-                                                            .Replace("%page%", fileNamePage)
-                                                            .Replace("%md5%", xmlMD5[j].InnerText)
-                                                            .Replace("%id%", xmlID[j].InnerText)
-                                                            .Replace("%rating%", rating.ToLower())
-                                                            .Replace("%rating2%", xmlRating[j].InnerText)
-                                                            .Replace("%artist%", fileNameArtist)
-                                                            .Replace("%ext%", xmlExt[j].InnerText)
-                                                            .Replace("%fav_count%", xmlFavCount[j].InnerText)
-                                                            .Replace("%score%", xmlScore[j].InnerText)
-                                                            .Replace("%scoreup%", xmlScoreUp[j].InnerText)
-                                                            .Replace("%scoredown%", xmlScoreDown[j].InnerText)
-                                                            .Replace("%author%", xmlAuthor[j].InnerText) + "." + xmlExt[j].InnerText;
+                            string fileName = DownloadInfo.FileNameSchema.Replace("%poolname%", poolName)
+                                        .Replace("%poolid%", DownloadInfo.PoolId)
+                                        .Replace("%page%", fileNamePage)
+                                        .Replace("%md5%", xmlMD5[j].InnerText)
+                                        .Replace("%id%", xmlID[j].InnerText)
+                                        .Replace("%rating%", rating.ToLower())
+                                        .Replace("%rating2%", xmlRating[j].InnerText)
+                                        .Replace("%artist%", fileNameArtist)
+                                        .Replace("%ext%", xmlExt[j].InnerText)
+                                        .Replace("%fav_count%", xmlFavCount[j].InnerText)
+                                        .Replace("%score%", xmlScore[j].InnerText)
+                                        .Replace("%scoreup%", xmlScoreUp[j].InnerText)
+                                        .Replace("%scoredown%", xmlScoreDown[j].InnerText)
+                                        .Replace("%author%", xmlAuthor[j].InnerText) + "." + xmlExt[j].InnerText;
 
                             string fileUrl = xmlURL[j].InnerText;
                             if (string.IsNullOrEmpty(fileUrl)) {
@@ -693,20 +646,20 @@ namespace aphrodite {
                             }
 
                             for (int k = 0; k < foundTags.Count; k++) {
-                                if (GraylistedTags.Count > 0) {
-                                    for (int l = 0; l < GraylistedTags.Count; l++) {
-                                        if (foundTags[k] == GraylistedTags[l]) {
-                                            foundBlacklistedTags += " " + GraylistedTags[l];
+                                if (DownloadInfo.Graylist.Length > 0) {
+                                    for (int l = 0; l < DownloadInfo.Graylist.Length; l++) {
+                                        if (foundTags[k] == DownloadInfo.Graylist[l]) {
+                                            foundBlacklistedTags += " " + DownloadInfo.Graylist[l];
                                             isBlacklisted = true;
                                             hasBlacklistedFiles = true;
                                         }
                                     }
                                 }
 
-                                if (BlacklistedTags.Count > 0) {
-                                    for (int l = 0; l < BlacklistedTags.Count; l++) {
-                                        if (foundTags[k] == BlacklistedTags[l]) {
-                                            foundBlacklistedTags += " " + BlacklistedTags[l];
+                                if (DownloadInfo.Blacklist.Length > 0) {
+                                    for (int l = 0; l < DownloadInfo.Blacklist.Length; l++) {
+                                        if (foundTags[k] == DownloadInfo.Blacklist[l]) {
+                                            foundBlacklistedTags += " " + DownloadInfo.Blacklist[l];
                                             isBlacklisted = true;
                                             hasBlacklistedFiles = true;
                                         }
@@ -728,7 +681,7 @@ namespace aphrodite {
 
                             updateTotals();
 
-                            if (isBlacklisted && saveBlacklisted && !mergeBlacklisted) {
+                            if (isBlacklisted && DownloadInfo.SaveBlacklistedFiles && !DownloadInfo.MergeBlacklisted) {
                                 blacklistInfo += "    BLACKLISTED PAGE " + fileNamePage + ":\n" +
                                                  "        MD5: " + xmlMD5[j].InnerText + "\n" +
                                                  "        URL: https://e621.net/posts/" + xmlID[j].InnerText + "\n" +
@@ -773,22 +726,22 @@ namespace aphrodite {
                 writeToConsole("There are " + URLs.Count + " files in total.", true);
 
                 // Create directories.
-                if (!Directory.Exists(saveTo))
-                    Directory.CreateDirectory(saveTo);
-                if (hasBlacklistedFiles && saveBlacklisted && !mergeBlacklisted && !Directory.Exists(saveTo + "\\blacklisted"))
-                    Directory.CreateDirectory(saveTo + "\\blacklisted");
+                if (!Directory.Exists(DownloadInfo.DownloadPath))
+                    Directory.CreateDirectory(DownloadInfo.DownloadPath);
+                if (hasBlacklistedFiles && DownloadInfo.SaveBlacklistedFiles && !DownloadInfo.MergeBlacklisted && !Directory.Exists(DownloadInfo.DownloadPath + "\\blacklisted"))
+                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\blacklisted");
                 #endregion
 
                 #region Downloading
                 // Save .nfo files.
-                if (saveInfo) {
+                if (DownloadInfo.SaveInfo) {
                     poolInfo = poolInfo.TrimEnd('\n');
                     blacklistInfo = blacklistInfo.TrimEnd('\n');
                     writeToConsole("Saving pool.nfo");
-                    File.WriteAllText(saveTo + "\\pool.nfo", poolInfo, Encoding.UTF8);
-                    if (hasBlacklistedFiles && saveBlacklisted && !mergeBlacklisted) {
+                    File.WriteAllText(DownloadInfo.DownloadPath + "\\pool.nfo", poolInfo, Encoding.UTF8);
+                    if (hasBlacklistedFiles && DownloadInfo.SaveBlacklistedFiles && !DownloadInfo.MergeBlacklisted) {
                         writeToConsole("Saving pool.blacklisted.nfo");
-                        File.WriteAllText(saveTo + "\\blacklisted\\pool.blacklisted.nfo", blacklistInfo, Encoding.UTF8);
+                        File.WriteAllText(DownloadInfo.DownloadPath + "\\blacklisted\\pool.blacklisted.nfo", blacklistInfo, Encoding.UTF8);
                     }
                 }
 
@@ -796,18 +749,18 @@ namespace aphrodite {
                     pbDownloadStatus.Style = ProgressBarStyle.Blocks;
                     int total;
 
-                    if (saveBlacklisted) {
+                    if (DownloadInfo.SaveBlacklistedFiles) {
                         total = (pageCount + blacklistedPageCount);
 
-                        if (Directory.Exists(saveTo)) {
-                            total -= apiTools.CountFiles(saveTo);
-                            if (File.Exists(saveTo + "\\pool.nfo")) {
+                        if (Directory.Exists(DownloadInfo.DownloadPath)) {
+                            total -= apiTools.CountFiles(DownloadInfo.DownloadPath);
+                            if (File.Exists(DownloadInfo.DownloadPath + "\\pool.nfo")) {
                                 total--;
                             }
 
-                            if (Directory.Exists(saveTo + "\\blacklisted")) {
-                                total -= apiTools.CountFiles(saveTo + "\\blacklisted");
-                                if (File.Exists(saveTo + "\\blacklisted\\pool.blacklisted.nfo")) {
+                            if (Directory.Exists(DownloadInfo.DownloadPath + "\\blacklisted")) {
+                                total -= apiTools.CountFiles(DownloadInfo.DownloadPath + "\\blacklisted");
+                                if (File.Exists(DownloadInfo.DownloadPath + "\\blacklisted\\pool.blacklisted.nfo")) {
                                     total--;
                                 }
                             }
@@ -817,7 +770,7 @@ namespace aphrodite {
                     }
                     else {
                         total = pageCount;
-                        total -= apiTools.CountFiles(saveTo) - 1;
+                        total -= apiTools.CountFiles(DownloadInfo.DownloadPath) - 1;
 
                         pbTotalStatus.Maximum = total;
                         //pbTotalStatus.Maximum = pageCount - apiTools.countFiles(saveTo);
@@ -855,13 +808,13 @@ namespace aphrodite {
                     };
 
                     wc.Proxy = WebRequest.GetSystemWebProxy();
-                    wc.Headers.Add(header);
+                    wc.Headers.Add("user-agent", Program.UserAgent);
                     wc.Method = "GET";
 
                     for (int y = 0; y < URLs.Count; y++) {
-                        url = URLs[y].Replace("www.", "");
+                        CurrentURL = URLs[y].Replace("www.", "");
                         currentPage++;
-                        if (urlBlacklisted[y] && !saveBlacklisted)
+                        if (urlBlacklisted[y] && !DownloadInfo.SaveBlacklistedFiles)
                             continue;
 
                         string fileName = "\\" + FileNames[y];
@@ -871,31 +824,25 @@ namespace aphrodite {
                             status.Text = "Downloading " + fileName;
                         }));
 
-                        if (urlBlacklisted[y] && !mergeBlacklisted) {
-                            if (File.Exists(saveTo + "\\blacklisted" + fileName))
+                        if (urlBlacklisted[y] && !DownloadInfo.MergeBlacklisted) {
+                            if (File.Exists(DownloadInfo.DownloadPath + "\\blacklisted" + fileName))
                                 continue;
 
                             var sync = new Object();
                             lock (sync) {
-                                wc.DownloadFileAsync(new Uri(url), saveTo + "\\blacklisted" + fileName, sync);
+                                wc.DownloadFileAsync(new Uri(CurrentURL), DownloadInfo.DownloadPath + "\\blacklisted" + fileName, sync);
                                 Monitor.Wait(sync);
                             }
                         }
                         else {
-                            if (File.Exists(saveTo + fileName))
+                            if (File.Exists(DownloadInfo.DownloadPath + fileName))
                                 continue;
 
                             var sync = new Object();
                             lock (sync) {
-                                wc.DownloadFileAsync(new Uri(url), saveTo + fileName, sync);
+                                wc.DownloadFileAsync(new Uri(CurrentURL), DownloadInfo.DownloadPath + fileName, sync);
                                 Monitor.Wait(sync);
                             }
-                        }
-
-                        // Save metadata to file, and update it if one exists
-                        if (saveMetadata) {
-                            if (fileName.EndsWith(".jpg") || fileName.EndsWith(".jpeg"))
-                                Metadata.setMetadata(saveTo + "\\blacklisted" + fileName, MetadataArtists[y], MetadataTags[y]);
                         }
                     }
                 }
@@ -926,7 +873,7 @@ namespace aphrodite {
                     pbDownloadStatus.State = ProgressBarState.Error;
                     pbTotalStatus.State = ProgressBarState.Error;
                 }));
-                ErrorLog.ReportWebException(WebE, "frmPoolDownloader.cs", url);
+                ErrorLog.ReportWebException(WebE, "frmPoolDownloader.cs", CurrentURL);
                 DownloadHasErrored = true;
             }
             catch (Exception ex) {
@@ -950,7 +897,7 @@ namespace aphrodite {
                 lbTotal.Text = (pageCount) + " clean pages\n" +
                                (blacklistedPageCount) + " blacklisted pages\n" +
                                (pageCount + blacklistedPageCount) + " total pages";
-                if (saveBlacklisted)
+                if (DownloadInfo.SaveBlacklistedFiles)
                     lbFile.Text = "File 1 of " + (pageCount + blacklistedPageCount);
                 else
                     lbFile.Text = "File 1 of " + (pageCount);

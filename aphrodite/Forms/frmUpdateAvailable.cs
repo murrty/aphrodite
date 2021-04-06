@@ -26,7 +26,6 @@ namespace aphrodite {
             //btnUpdateAvailableUpdate.Text = lang.btnUpdateAvailableUpdate;
             //btnUpdateAvailableSkip.Text = lang.btnUpdateAvailableSkipVersion;
             //btnUpdateAvailableOk.Text = lang.btnUpdateAvailableOk;
-            this.Icon = Properties.Resources.Brad;
 
         }
         private void frmUpdateAvailable_Load(object sender, EventArgs e) {

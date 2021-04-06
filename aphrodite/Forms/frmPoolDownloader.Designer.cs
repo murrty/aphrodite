@@ -164,6 +164,7 @@
             this.Controls.Add(this.lbTotal);
             this.Controls.Add(this.pbDownloadStatus);
             this.Controls.Add(this.lbBytes);
+            this.Icon = Properties.Resources.Brad;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(276, 206);

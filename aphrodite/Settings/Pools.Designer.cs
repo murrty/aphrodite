@@ -37,18 +37,6 @@ namespace aphrodite {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool openAfter {
-            get {
-                return ((bool)(this["openAfter"]));
-            }
-            set {
-                this["openAfter"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string wishlist {
             get {
@@ -62,12 +50,12 @@ namespace aphrodite {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string wishhlistNames {
+        public string wishlistNames {
             get {
-                return ((string)(this["wishhlistNames"]));
+                return ((string)(this["wishlistNames"]));
             }
             set {
-                this["wishhlistNames"] = value;
+                this["wishlistNames"] = value;
             }
         }
         
@@ -92,6 +80,18 @@ namespace aphrodite {
             }
             set {
                 this["fileNameSchema"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool openAfter {
+            get {
+                return ((bool)(this["openAfter"]));
+            }
+            set {
+                this["openAfter"] = value;
             }
         }
     }

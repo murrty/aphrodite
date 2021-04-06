@@ -159,6 +159,7 @@
             this.Controls.Add(this.rtbBlacklist);
             this.Controls.Add(this.btnSort);
             this.Controls.Add(this.panel1);
+            this.Icon = Properties.Resources.Brad;
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(510, 346);
             this.MinimumSize = new System.Drawing.Size(510, 346);
