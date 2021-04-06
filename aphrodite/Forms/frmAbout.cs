@@ -13,13 +13,18 @@ namespace aphrodite {
             pbIcon.Cursor = NativeMethods.SystemHandCursor;
             llbCheckForUpdates.Cursor = NativeMethods.SystemHandCursor;
             lnkLicense.Cursor = NativeMethods.SystemHandCursor;
-        }
-
-        private void About_Shown(object sender, EventArgs e) {
-            lbVersion.Text = "v" + Properties.Settings.Default.currentVersion.ToString();
             if (Program.IsDebug) {
                 lbVersion.Text += " (" + Properties.Settings.Default.debugDate + ")";
                 this.Text = "About aphrodite (debug)";
+            }
+            else {
+                if (Properties.Settings.Default.IsBetaVersion) {
+                    lbVersion.Text = "v" + Properties.Settings.Default.BetaVersion;
+                }
+                else {
+
+                    lbVersion.Text = "v" + Properties.Settings.Default.currentVersion;
+                }
             }
         }
 
