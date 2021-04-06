@@ -12,12 +12,13 @@ namespace aphrodite {
         public bool SetCustomDescription = false;
         public string CustomDescription = null;
         //Language lang = Language.GetInstance();
-        public bool FromLanguage = false;
+        //public bool FromLanguage = false;
 
         public frmException() {
             InitializeComponent();
             //loadLanguage();
-            this.Icon = Properties.Resources.Brad;
+            DateTime TimeNow = DateTime.Now;
+            lbDate.Text = string.Format("{0}/{1}/{2} {3}:{4}:{5}", TimeNow.Year, TimeNow.Month, TimeNow.Day, TimeNow.Hour, TimeNow.Minute, TimeNow.Second);
         }
 
         void loadLanguage() {
@@ -41,42 +42,46 @@ namespace aphrodite {
 
         private void frmException_Load(object sender, EventArgs e) {
             string Exception = string.Empty;
-            if (SetCustomDescription && CustomDescription != null) {
+            if (ReportedException != null) {
+                Exception += "An exception occured" + "\n";
+                Exception += "Message: " + ReportedException.Message + "\n";
+                Exception += "Stacktrace: " + ReportedException.StackTrace + "\n";
+                Exception += "Source: " + ReportedException.Source + "\n";
+                Exception += "Target Site: " + ReportedException.TargetSite + "\n";
+
+
+                Exception += "Full report:\n" + ReportedException.ToString();
+            }
+            else if (ReportedWebException != null) {
+                Exception += "A web exception occured" + "\n";
+                Exception += "Message: " + ReportedWebException.Message + "\n";
+                Exception += "Stacktrace: " + ReportedWebException.StackTrace + "\n";
+                Exception += "Source: " + ReportedWebException.Source + "\n";
+                Exception += "Target Site: " + ReportedWebException.TargetSite + "\n";
+                Exception += "Inner Exception: " + ReportedWebException.InnerException + "\n";
+                Exception += "Response: " + ReportedWebException.Response + "\n";
+                Exception += "Web Address: " + WebAddress + "\n";
+
+
+                Exception += "Full report:\n" + ReportedWebException.ToString();
+            }
+            else if (CustomDescription != null) {
                 rtbExceptionDetails.Text = CustomDescription;
             }
             else {
-                if (ReportedException != null) {
-                    Exception += "An exception occured" + "\n";
-                    Exception += "Message: " + ReportedException.Message + "\n";
-                    Exception += "Stacktrace: " + ReportedException.StackTrace + "\n";
-                    Exception += "Source: " + ReportedException.Source + "\n";
-                    Exception += "TargetSite: " + ReportedException.TargetSite + "\n";
-
-
-                    Exception += "Full report:\n" + ReportedException.ToString();
-                }
-                else if (ReportedWebException != null) {
-                    Exception += "A web exception occured" + "\n";
-                    Exception += "Message: " + ReportedWebException.Message + "\n";
-                    Exception += "Stacktrace: " + ReportedWebException.StackTrace + "\n";
-                    Exception += "Source: " + ReportedWebException.Source + "\n";
-                    Exception += "TargetSite: " + ReportedWebException.TargetSite + "\n";
-                    Exception += "InnerException: " + ReportedWebException.InnerException + "\n";
-                    Exception += "Response: " + ReportedWebException.Response + "\n";
-                    Exception += "WebAddress: " + WebAddress + "\n";
-
-
-                    Exception += "Full report:\n" + ReportedWebException.ToString();
-                }
-                else {
-                    Exception = "An exception occured, but it didn't parse properly.\nCreate a new issue and tell me how you got here.";
-                }
-
-                //string outputBuffer = lang.rtbExceptionDetails + "\n\nVersion: " + Properties.Settings.Default.currentVersion + "\nReported Exception: " + Exception;
-                string outputBuffer = "Feel free to copy + paste this entire text wall into a new issue on Github\n\nVersion: " + Properties.Settings.Default.currentVersion + "\nReported Exception: " + Exception;
-                rtbExceptionDetails.Text = outputBuffer;
+                Exception = "An exception occured, but it didn't parse properly.\nCreate a new issue and tell me how you got here.";
             }
-            lbVersion.Text = "v" + Properties.Settings.Default.currentVersion.ToString();
+
+            string outputBuffer = "\n\nVersion: {0}\n" + Exception;
+            //if (Properties.Settings.Default.IsBetaVersion) {
+            //    outputBuffer = string.Format(outputBuffer, Properties.Settings.Default.BetaVersion);
+            //    lbVersion.Text = "v" + Properties.Settings.Default.BetaVersion;
+            //}
+            //else {
+                outputBuffer = string.Format(outputBuffer, Properties.Settings.Default.currentVersion.ToString());
+                lbVersion.Text = "v" + Properties.Settings.Default.currentVersion.ToString();
+            //}
+            rtbExceptionDetails.Text += outputBuffer;
             System.Media.SystemSounds.Hand.Play();
         }
 
