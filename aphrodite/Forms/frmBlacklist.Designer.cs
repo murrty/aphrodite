@@ -34,8 +34,8 @@
             this.btnSortZTB = new System.Windows.Forms.Button();
             this.llGraylist = new aphrodite.LinkLabelHand();
             this.llBlacklist = new aphrodite.LinkLabelHand();
-            this.transparentLabel2 = new aphrodite.TransparentLabel();
-            this.transparentLabel1 = new aphrodite.TransparentLabel();
+            this.lbBlacklist = new aphrodite.TransparentLabel();
+            this.lbGraylist = new aphrodite.TransparentLabel();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -161,26 +161,26 @@
             this.llBlacklist.Text = "?";
             this.llBlacklist.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.llBlacklist_LinkClicked);
             // 
-            // transparentLabel2
+            // lbBlacklist
             // 
-            this.transparentLabel2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.transparentLabel2.Location = new System.Drawing.Point(254, 10);
-            this.transparentLabel2.Name = "transparentLabel2";
-            this.transparentLabel2.Size = new System.Drawing.Size(46, 13);
-            this.transparentLabel2.TabIndex = 11;
-            this.transparentLabel2.TabStop = false;
-            this.transparentLabel2.Text = "Blacklist";
-            this.transparentLabel2.TextAlign = System.Drawing.ContentAlignment.TopLeft;
+            this.lbBlacklist.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lbBlacklist.Location = new System.Drawing.Point(254, 10);
+            this.lbBlacklist.Name = "lbBlacklist";
+            this.lbBlacklist.Size = new System.Drawing.Size(46, 13);
+            this.lbBlacklist.TabIndex = 11;
+            this.lbBlacklist.TabStop = false;
+            this.lbBlacklist.Text = "Blacklist";
+            this.lbBlacklist.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
-            // transparentLabel1
+            // lbGraylist
             // 
-            this.transparentLabel1.Location = new System.Drawing.Point(4, 10);
-            this.transparentLabel1.Name = "transparentLabel1";
-            this.transparentLabel1.Size = new System.Drawing.Size(41, 13);
-            this.transparentLabel1.TabIndex = 10;
-            this.transparentLabel1.TabStop = false;
-            this.transparentLabel1.Text = "Graylist";
-            this.transparentLabel1.TextAlign = System.Drawing.ContentAlignment.TopLeft;
+            this.lbGraylist.Location = new System.Drawing.Point(4, 10);
+            this.lbGraylist.Name = "lbGraylist";
+            this.lbGraylist.Size = new System.Drawing.Size(41, 13);
+            this.lbGraylist.TabIndex = 10;
+            this.lbGraylist.TabStop = false;
+            this.lbGraylist.Text = "Graylist";
+            this.lbGraylist.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
             // frmBlacklist
             // 
@@ -193,8 +193,8 @@
             this.Controls.Add(this.btnSortZTB);
             this.Controls.Add(this.btnSort);
             this.Controls.Add(this.panel1);
-            this.Controls.Add(this.transparentLabel2);
-            this.Controls.Add(this.transparentLabel1);
+            this.Controls.Add(this.lbBlacklist);
+            this.Controls.Add(this.lbGraylist);
             this.Controls.Add(this.rtbZTB);
             this.Controls.Add(this.rtbBlacklist);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -227,7 +227,7 @@
         private System.Windows.Forms.Label lbIni;
         private LinkLabelHand llBlacklist;
         private LinkLabelHand llGraylist;
-        private TransparentLabel transparentLabel1;
-        private TransparentLabel transparentLabel2;
+        private TransparentLabel lbGraylist;
+        private TransparentLabel lbBlacklist;
     }
 }

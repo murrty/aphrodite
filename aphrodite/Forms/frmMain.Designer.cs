@@ -26,6 +26,7 @@
             this.components = new System.ComponentModel.Container();
             this.tbMain = new System.Windows.Forms.TabControl();
             this.tbTags = new System.Windows.Forms.TabPage();
+            this.chkTagsOpenAfterDownload = new System.Windows.Forms.CheckBox();
             this.chkTagSeparateNonImages = new System.Windows.Forms.CheckBox();
             this.gbtPageLimit = new System.Windows.Forms.GroupBox();
             this.numTagsPageLimit = new System.Windows.Forms.NumericUpDown();
@@ -44,11 +45,12 @@
             this.numTagsMinimumScore = new System.Windows.Forms.NumericUpDown();
             this.label2 = new System.Windows.Forms.Label();
             this.tbPools = new System.Windows.Forms.TabPage();
-            this.chkPoolsMergeBlacklisted = new System.Windows.Forms.CheckBox();
-            this.chkPoolsOpenAfter = new System.Windows.Forms.CheckBox();
+            this.chkPoolMergeBlacklisted = new System.Windows.Forms.CheckBox();
+            this.chkPoolOpenAfter = new System.Windows.Forms.CheckBox();
             this.btnDownloadPool = new System.Windows.Forms.Button();
             this.txtPoolId = new System.Windows.Forms.TextBox();
             this.tbImages = new System.Windows.Forms.TabPage();
+            this.chkImageOpenAfter = new System.Windows.Forms.CheckBox();
             this.chkImageSeparateNonImages = new System.Windows.Forms.CheckBox();
             this.chkImageSeparateArtists = new System.Windows.Forms.CheckBox();
             this.chkImageUseForm = new System.Windows.Forms.CheckBox();
@@ -67,8 +69,6 @@
             this.mReverseSearch = new System.Windows.Forms.MenuItem();
             this.mAbout = new System.Windows.Forms.MenuItem();
             this.TouchingTips = new System.Windows.Forms.ToolTip(this.components);
-            this.chkTagOpenAfterDownload = new System.Windows.Forms.CheckBox();
-            this.chkImageOpenAfter = new System.Windows.Forms.CheckBox();
             this.tbMain.SuspendLayout();
             this.tbTags.SuspendLayout();
             this.gbtPageLimit.SuspendLayout();
@@ -99,7 +99,7 @@
             // 
             // tbTags
             // 
-            this.tbTags.Controls.Add(this.chkTagOpenAfterDownload);
+            this.tbTags.Controls.Add(this.chkTagsOpenAfterDownload);
             this.tbTags.Controls.Add(this.chkTagSeparateNonImages);
             this.tbTags.Controls.Add(this.gbtPageLimit);
             this.tbTags.Controls.Add(this.gbtRatings);
@@ -116,10 +116,23 @@
             this.tbTags.Text = "Tag(s)";
             this.tbTags.UseVisualStyleBackColor = true;
             // 
+            // chkTagsOpenAfterDownload
+            // 
+            this.chkTagsOpenAfterDownload.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.chkTagsOpenAfterDownload.AutoSize = true;
+            this.chkTagsOpenAfterDownload.Location = new System.Drawing.Point(8, 159);
+            this.chkTagsOpenAfterDownload.Name = "chkTagsOpenAfterDownload";
+            this.chkTagsOpenAfterDownload.Size = new System.Drawing.Size(154, 17);
+            this.chkTagsOpenAfterDownload.TabIndex = 9;
+            this.chkTagsOpenAfterDownload.Text = "Open after downloading";
+            this.chkTagsOpenAfterDownload.UseVisualStyleBackColor = true;
+            // 
             // chkTagSeparateNonImages
             // 
             this.chkTagSeparateNonImages.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.chkTagSeparateNonImages.AutoSize = true;
+            this.chkTagSeparateNonImages.Checked = true;
+            this.chkTagSeparateNonImages.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkTagSeparateNonImages.Location = new System.Drawing.Point(163, 159);
             this.chkTagSeparateNonImages.Name = "chkTagSeparateNonImages";
             this.chkTagSeparateNonImages.Size = new System.Drawing.Size(134, 17);
@@ -284,6 +297,8 @@
             // chkTagsUseScoreAsTag
             // 
             this.chkTagsUseScoreAsTag.AutoSize = true;
+            this.chkTagsUseScoreAsTag.Checked = true;
+            this.chkTagsUseScoreAsTag.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkTagsUseScoreAsTag.Enabled = false;
             this.chkTagsUseScoreAsTag.Location = new System.Drawing.Point(74, 18);
             this.chkTagsUseScoreAsTag.Name = "chkTagsUseScoreAsTag";
@@ -339,8 +354,8 @@
             // 
             // tbPools
             // 
-            this.tbPools.Controls.Add(this.chkPoolsMergeBlacklisted);
-            this.tbPools.Controls.Add(this.chkPoolsOpenAfter);
+            this.tbPools.Controls.Add(this.chkPoolMergeBlacklisted);
+            this.tbPools.Controls.Add(this.chkPoolOpenAfter);
             this.tbPools.Controls.Add(this.btnDownloadPool);
             this.tbPools.Controls.Add(this.txtPoolId);
             this.tbPools.Location = new System.Drawing.Point(4, 22);
@@ -351,27 +366,29 @@
             this.tbPools.Text = "Pool";
             this.tbPools.UseVisualStyleBackColor = true;
             // 
-            // chkPoolsMergeBlacklisted
+            // chkPoolMergeBlacklisted
             // 
-            this.chkPoolsMergeBlacklisted.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.chkPoolsMergeBlacklisted.AutoSize = true;
-            this.chkPoolsMergeBlacklisted.Location = new System.Drawing.Point(60, 115);
-            this.chkPoolsMergeBlacklisted.Name = "chkPoolsMergeBlacklisted";
-            this.chkPoolsMergeBlacklisted.Size = new System.Drawing.Size(184, 17);
-            this.chkPoolsMergeBlacklisted.TabIndex = 3;
-            this.chkPoolsMergeBlacklisted.Text = "Merge blacklisted with the rest";
-            this.chkPoolsMergeBlacklisted.UseVisualStyleBackColor = true;
+            this.chkPoolMergeBlacklisted.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.chkPoolMergeBlacklisted.AutoSize = true;
+            this.chkPoolMergeBlacklisted.Checked = true;
+            this.chkPoolMergeBlacklisted.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkPoolMergeBlacklisted.Location = new System.Drawing.Point(60, 115);
+            this.chkPoolMergeBlacklisted.Name = "chkPoolMergeBlacklisted";
+            this.chkPoolMergeBlacklisted.Size = new System.Drawing.Size(184, 17);
+            this.chkPoolMergeBlacklisted.TabIndex = 3;
+            this.chkPoolMergeBlacklisted.Text = "Merge blacklisted with the rest";
+            this.chkPoolMergeBlacklisted.UseVisualStyleBackColor = true;
             // 
-            // chkPoolsOpenAfter
+            // chkPoolOpenAfter
             // 
-            this.chkPoolsOpenAfter.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.chkPoolsOpenAfter.AutoSize = true;
-            this.chkPoolsOpenAfter.Location = new System.Drawing.Point(75, 92);
-            this.chkPoolsOpenAfter.Name = "chkPoolsOpenAfter";
-            this.chkPoolsOpenAfter.Size = new System.Drawing.Size(154, 17);
-            this.chkPoolsOpenAfter.TabIndex = 2;
-            this.chkPoolsOpenAfter.Text = "Open after downloading";
-            this.chkPoolsOpenAfter.UseVisualStyleBackColor = true;
+            this.chkPoolOpenAfter.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.chkPoolOpenAfter.AutoSize = true;
+            this.chkPoolOpenAfter.Location = new System.Drawing.Point(75, 92);
+            this.chkPoolOpenAfter.Name = "chkPoolOpenAfter";
+            this.chkPoolOpenAfter.Size = new System.Drawing.Size(154, 17);
+            this.chkPoolOpenAfter.TabIndex = 2;
+            this.chkPoolOpenAfter.Text = "Open after downloading";
+            this.chkPoolOpenAfter.UseVisualStyleBackColor = true;
             // 
             // btnDownloadPool
             // 
@@ -414,10 +431,23 @@
             this.tbImages.Text = "Image";
             this.tbImages.UseVisualStyleBackColor = true;
             // 
+            // chkImageOpenAfter
+            // 
+            this.chkImageOpenAfter.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.chkImageOpenAfter.AutoSize = true;
+            this.chkImageOpenAfter.Location = new System.Drawing.Point(75, 133);
+            this.chkImageOpenAfter.Name = "chkImageOpenAfter";
+            this.chkImageOpenAfter.Size = new System.Drawing.Size(154, 17);
+            this.chkImageOpenAfter.TabIndex = 10;
+            this.chkImageOpenAfter.Text = "Open after downloading";
+            this.chkImageOpenAfter.UseVisualStyleBackColor = true;
+            // 
             // chkImageSeparateNonImages
             // 
             this.chkImageSeparateNonImages.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.chkImageSeparateNonImages.AutoSize = true;
+            this.chkImageSeparateNonImages.Checked = true;
+            this.chkImageSeparateNonImages.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkImageSeparateNonImages.Location = new System.Drawing.Point(140, 87);
             this.chkImageSeparateNonImages.Name = "chkImageSeparateNonImages";
             this.chkImageSeparateNonImages.Size = new System.Drawing.Size(134, 17);
@@ -573,28 +603,6 @@
             this.mAbout.Text = "about";
             this.mAbout.Click += new System.EventHandler(this.mAbout_Click);
             // 
-            // chkTagOpenAfterDownload
-            // 
-            this.chkTagOpenAfterDownload.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.chkTagOpenAfterDownload.AutoSize = true;
-            this.chkTagOpenAfterDownload.Location = new System.Drawing.Point(8, 159);
-            this.chkTagOpenAfterDownload.Name = "chkTagOpenAfterDownload";
-            this.chkTagOpenAfterDownload.Size = new System.Drawing.Size(154, 17);
-            this.chkTagOpenAfterDownload.TabIndex = 9;
-            this.chkTagOpenAfterDownload.Text = "Open after downloading";
-            this.chkTagOpenAfterDownload.UseVisualStyleBackColor = true;
-            // 
-            // chkImageOpenAfter
-            // 
-            this.chkImageOpenAfter.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.chkImageOpenAfter.AutoSize = true;
-            this.chkImageOpenAfter.Location = new System.Drawing.Point(75, 133);
-            this.chkImageOpenAfter.Name = "chkImageOpenAfter";
-            this.chkImageOpenAfter.Size = new System.Drawing.Size(154, 17);
-            this.chkImageOpenAfter.TabIndex = 10;
-            this.chkImageOpenAfter.Text = "Open after downloading";
-            this.chkImageOpenAfter.UseVisualStyleBackColor = true;
-            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -653,8 +661,8 @@
         private System.Windows.Forms.CheckBox chkTagsUseMinimumScore;
         private System.Windows.Forms.NumericUpDown numTagsMinimumScore;
         private System.Windows.Forms.TextBox txtTags;
-        private System.Windows.Forms.CheckBox chkPoolsMergeBlacklisted;
-        private System.Windows.Forms.CheckBox chkPoolsOpenAfter;
+        private System.Windows.Forms.CheckBox chkPoolMergeBlacklisted;
+        private System.Windows.Forms.CheckBox chkPoolOpenAfter;
         private System.Windows.Forms.Button btnDownloadPool;
         private System.Windows.Forms.TextBox txtPoolId;
         private System.Windows.Forms.MenuItem mTools;
@@ -681,7 +689,7 @@
         private System.Windows.Forms.CheckBox chkImageSeparateArtists;
         private System.Windows.Forms.CheckBox chkImageSeparateNonImages;
         private System.Windows.Forms.CheckBox chkTagSeparateNonImages;
-        private System.Windows.Forms.CheckBox chkTagOpenAfterDownload;
+        private System.Windows.Forms.CheckBox chkTagsOpenAfterDownload;
         private System.Windows.Forms.CheckBox chkImageOpenAfter;
     }
 }

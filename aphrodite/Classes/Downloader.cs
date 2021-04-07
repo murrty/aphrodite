@@ -215,6 +215,7 @@ namespace aphrodite {
     public class ImageDownloadInfo {
         public bool Valid;
         public bool UseForm;
+        public bool IsUrl;
 
         public string ImageUrl;
         public string PostId;
@@ -239,6 +240,15 @@ namespace aphrodite {
             if (Image == null) {
                 Valid = false;
                 return;
+            }
+
+            if (apiTools.IsValidImageLink(Image)) {
+                IsUrl = true;
+                ImageUrl = Image;
+            }
+            else {
+                IsUrl = false;
+                PostId = Image;
             }
 
             DownloadPath = Environment.CurrentDirectory;

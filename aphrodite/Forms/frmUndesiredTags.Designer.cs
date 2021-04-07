@@ -23,7 +23,7 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            this.label1 = new System.Windows.Forms.Label();
+            this.lbHeader = new System.Windows.Forms.Label();
             this.btnReset = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
@@ -33,17 +33,17 @@
             this.listTags = new aphrodite.AeroListBox();
             this.SuspendLayout();
             // 
-            // label1
+            // lbHeader
             // 
-            this.label1.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(12, 9);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(295, 79);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Undesired tags are tags that are filtered out of the artist parsing due to e621 u" +
+            this.lbHeader.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbHeader.Location = new System.Drawing.Point(12, 9);
+            this.lbHeader.Name = "lbHeader";
+            this.lbHeader.Size = new System.Drawing.Size(295, 79);
+            this.lbHeader.TabIndex = 0;
+            this.lbHeader.Text = "Undesired tags are tags that are filtered out of the artist parsing due to e621 u" +
     "sing artist tags as warning tags.\r\n\r\nThis does not affect the blacklist, only th" +
     "e file name schema.";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lbHeader.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // btnReset
             // 
@@ -127,7 +127,7 @@
             this.Controls.Add(this.listTags);
             this.Controls.Add(this.btnReset);
             this.Controls.Add(this.btnCancel);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.lbHeader);
             this.Controls.Add(this.btnSave);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = global::aphrodite.Properties.Resources.Brad;
@@ -144,7 +144,7 @@
 
         #endregion
 
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lbHeader;
         private System.Windows.Forms.Button btnReset;
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.Button btnCancel;

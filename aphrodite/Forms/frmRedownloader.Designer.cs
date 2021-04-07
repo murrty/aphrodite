@@ -25,9 +25,9 @@
         private void InitializeComponent() {
             this.tcMain = new System.Windows.Forms.TabControl();
             this.tbTags = new System.Windows.Forms.TabPage();
-            this.lbTags = new System.Windows.Forms.ListBox();
+            this.lbTags = new AeroListBox();
             this.tbPools = new System.Windows.Forms.TabPage();
-            this.lbPools = new System.Windows.Forms.ListBox();
+            this.lbPools = new AeroListBox();
             this.btnRedownload = new System.Windows.Forms.Button();
             this.btnRenumerate = new System.Windows.Forms.Button();
             this.lbDownloadedOn = new System.Windows.Forms.Label();
@@ -155,10 +155,10 @@
         private System.Windows.Forms.TabControl tcMain;
         private System.Windows.Forms.TabPage tbTags;
         private System.Windows.Forms.TabPage tbPools;
-        private System.Windows.Forms.ListBox lbTags;
+        private AeroListBox lbTags;
         private System.Windows.Forms.Button btnRedownload;
         private System.Windows.Forms.Button btnRenumerate;
-        private System.Windows.Forms.ListBox lbPools;
+        private AeroListBox lbPools;
         private System.Windows.Forms.Label lbDownloadedOn;
     }
 }

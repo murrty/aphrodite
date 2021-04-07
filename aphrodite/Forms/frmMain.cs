@@ -1,15 +1,8 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security.Principal;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using System.Windows.Shell;
 
 namespace aphrodite {
     public partial class frmMain : Form {
@@ -69,15 +62,14 @@ namespace aphrodite {
             numTagsImageLimit.Value = Convert.ToDecimal(Config.Settings.Tags.imageLimit);
             numTagsPageLimit.Value = Convert.ToDecimal(Config.Settings.Tags.pageLimit);
 
-            chkPoolsMergeBlacklisted.Checked = Config.Settings.Pools.mergeBlacklisted;
-            chkPoolsOpenAfter.Checked = Config.Settings.Pools.openAfter;
+            chkPoolMergeBlacklisted.Checked = Config.Settings.Pools.mergeBlacklisted;
 
             chkImageSeparateRatings.Checked = Config.Settings.Images.separateRatings;
             chkImageSeparateBlacklisted.Checked = Config.Settings.Images.separateBlacklisted;
             chkImageUseForm.Checked = Config.Settings.Images.useForm;
 
-            if (Config.Settings.FormSettings.frmMainLocation.X != -32000 && Config.Settings.FormSettings.frmMainLocation.Y != -32000) {
-                this.Location = Config.Settings.FormSettings.frmMainLocation;
+            if (Config.Settings.FormSettings.frmMain_Location.X != -32000 && Config.Settings.FormSettings.frmMain_Location.Y != -32000) {
+                this.Location = Config.Settings.FormSettings.frmMain_Location;
             }
         }
         private void frmMain_Shown(object sender, EventArgs e) {
@@ -90,8 +82,8 @@ namespace aphrodite {
                 this.WindowState = FormWindowState.Normal;
             }
 
-            Config.Settings.FormSettings.frmMainLocation = this.Location;
-            Config.Settings.Save();
+            Config.Settings.FormSettings.frmMain_Location = this.Location;
+            Config.Settings.Save(ConfigType.FormSettings);
         }
         private void tbMain_SelectedIndexChanged(object sender, EventArgs e) {
             if (tbMain.SelectedTab == tbTags) {
@@ -139,22 +131,58 @@ namespace aphrodite {
         #region Tags
         private void txtTags_KeyPress(object sender, KeyPressEventArgs e) {
             // Enforce 6 tag limit
-            if (txtTags.Text.Count(x => x == ' ') >= 5 &&
-                e.KeyChar != (char)Keys.Back &&
-                e.KeyChar == (char)Keys.Space &&
-                txtTags.SelectionLength != txtTags.TextLength)
-            {
-                e.Handled = true;
-            }
-            else {
-                e.Handled = false;
+            switch (txtTags.Text.Count(x => x == ' ') >= 5 && e.KeyChar == (char)Keys.Space) {
+                case true:
+                    e.Handled = true;
+                    System.Media.SystemSounds.Beep.Play();
+                    break;
             }
         }
         private void txtTags_KeyDown(object sender, KeyEventArgs e) {
-            if (e.KeyCode == Keys.Enter) {
-                btnDownloadTags_Click(this, new EventArgs());
-                e.Handled = true;
+            switch (e.KeyCode == Keys.Enter) {
+                case true:
+                    btnDownloadTags_Click(this, new EventArgs());
+                    e.Handled = true;
+                    break;
+
+                case false:
+                    switch (e.KeyCode == Keys.V && e.Modifiers == Keys.Control) {
+                        case true:
+                            switch (Clipboard.ContainsText()) {
+                                case true:
+                                    string[] input = Clipboard.GetText().Split(' ');
+                                    switch (input.Length > 6) {
+                                        case true:
+                                            txtTags.Text = string.Format("{0} {1} {2} {3} {4} {5}",
+                                                input[0],
+                                                input[1],
+                                                input[2],
+                                                input[3],
+                                                input[4],
+                                                input[5]
+                                            );
+                                            System.Media.SystemSounds.Beep.Play();
+                                            break;
+
+                                        case false:
+                                            txtTags.Text = Clipboard.GetText();
+                                            break;
+                                    }
+                                    txtTags.SelectionLength = 0;
+                                    txtTags.SelectionStart = txtTags.Text.Length;
+                                    break;
+
+                                case false:
+                                    System.Media.SystemSounds.Beep.Play();
+                                    break;
+                            }
+                            e.Handled = true;
+                            e.SuppressKeyPress = true;
+                            break;
+                    }
+                    break;
             }
+
         }
 
         private void btnDownloadTags_Click(object sender, EventArgs e) {
@@ -190,7 +218,7 @@ namespace aphrodite {
             NewInfo.SaveSafe = chkTagsDownloadSafe.Checked;
             NewInfo.SeparateRatings = chkTagsSeparateRatings.Checked;
             NewInfo.SeparateNonImages = chkTagSeparateNonImages.Checked;
-            NewInfo.OpenAfter = chkTagOpenAfterDownload.Checked;
+            NewInfo.OpenAfter = chkTagsOpenAfterDownload.Checked;
             frmTagDownloader Downloader = new frmTagDownloader();
             Downloader.DownloadInfo = NewInfo;
             Downloader.Show();
@@ -214,14 +242,14 @@ namespace aphrodite {
             }
 
             PoolDownloadInfo NewInfo = new PoolDownloadInfo(txtPoolId.Text);
-            NewInfo.OpenAfter = chkPoolsOpenAfter.Checked;
-            NewInfo.MergeBlacklisted = chkPoolsMergeBlacklisted.Checked;
+            NewInfo.OpenAfter = chkPoolOpenAfter.Checked;
+            NewInfo.MergeBlacklisted = chkPoolMergeBlacklisted.Checked;
             frmPoolDownloader Downloader = new frmPoolDownloader();
-
+            Downloader.DownloadInfo = NewInfo;
+            Downloader.Show();
         }
 
         private void txtPoolId_KeyPress(object sender, KeyPressEventArgs e) {
-            e.Handled = true;
             switch (e.KeyChar) {
                 case '0': case (char)Keys.Back:
                 case '1': case '2': case '3':
@@ -229,12 +257,77 @@ namespace aphrodite {
                 case '7': case '8': case '9':
                     e.Handled = false;
                     break;
+
+                case 'v': case 'V': case (char)22:
+                case 'a': case 'A': case (char)1:
+                    e.Handled = true;
+                    break;
+
+                default:
+                    e.Handled = true;
+                    System.Media.SystemSounds.Beep.Play();
+                    break;
             }
         }
         private void txtPoolId_KeyDown(object sender, KeyEventArgs e) {
-            if (e.KeyCode == Keys.Enter) {
-                btnDownloadPool_Click(this, new EventArgs());
-                e.Handled = true;
+            switch (e.KeyCode) {
+                case Keys.Enter:
+                    btnDownloadPool_Click(this, new EventArgs());
+                    e.Handled = true;
+                    break;
+
+                case Keys.A:
+                    switch (e.Modifiers) {
+                        case Keys.Control:
+                            txtPoolId.SelectAll();
+                            break;
+
+                        default:
+                            System.Media.SystemSounds.Beep.Play();
+                            break;
+                    }
+                    e.Handled = true;
+                    break;
+
+                case Keys.V:
+                    switch (e.Modifiers) {
+                        case Keys.Control:
+                            switch (Clipboard.ContainsText()) {
+                                case true:
+                                    string cb = Clipboard.GetText().Replace("e621.net", "").Split('?')[0];
+                                    string output = string.Empty;
+                                    for (int i = 0; i < cb.Length; i++) {
+                                        switch (char.IsDigit(cb[i])) {
+                                            case true:
+                                                output += cb[i];
+                                                break;
+                                        }
+                                    }
+
+                                    switch (string.IsNullOrWhiteSpace(output)) {
+                                        case false:
+                                            txtPoolId.Text = output;
+                                            break;
+
+                                        case true:
+                                            System.Media.SystemSounds.Beep.Play();
+                                            break;
+                                    }
+                                    break;
+
+                                case false:
+                                    System.Media.SystemSounds.Beep.Play();
+                                    break;
+                            }
+                            break;
+
+                        default:
+                            System.Media.SystemSounds.Beep.Play();
+                            break;
+                    }
+
+                    e.Handled = true;
+                    break;
             }
         }
         #endregion
@@ -260,13 +353,13 @@ namespace aphrodite {
             NewInfo.SeparateNonImages = chkImageSeparateNonImages.Checked;
             NewInfo.OpenAfter = chkImageOpenAfter.Checked;
 
-            if (NewInfo.UseForm) {
-                ImageDownloader Downloader = new ImageDownloader(NewInfo);
-            }
-            else {
+            if (chkImageUseForm.Checked) {
                 frmImageDownloader Downloader = new frmImageDownloader();
                 Downloader.DownloadInfo = NewInfo;
                 Downloader.Show();
+            }
+            else {
+                ImageDownloader Downloader = new ImageDownloader(NewInfo);
             }
         }
         private void txtImageUrl_KeyDown(object sender, KeyEventArgs e) {

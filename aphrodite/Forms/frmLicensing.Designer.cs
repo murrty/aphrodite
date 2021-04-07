@@ -24,26 +24,26 @@
         /// </summary>
         private void InitializeComponent() {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmLicensing));
-            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.rtbLicenses = new System.Windows.Forms.RichTextBox();
             this.SuspendLayout();
             // 
-            // richTextBox1
+            // rtbLicenses
             // 
-            this.richTextBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.richTextBox1.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.richTextBox1.Location = new System.Drawing.Point(0, 0);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.ReadOnly = true;
-            this.richTextBox1.Size = new System.Drawing.Size(522, 263);
-            this.richTextBox1.TabIndex = 0;
-            this.richTextBox1.Text = resources.GetString("richTextBox1.Text");
+            this.rtbLicenses.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.rtbLicenses.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.rtbLicenses.Location = new System.Drawing.Point(0, 0);
+            this.rtbLicenses.Name = "rtbLicenses";
+            this.rtbLicenses.ReadOnly = true;
+            this.rtbLicenses.Size = new System.Drawing.Size(522, 263);
+            this.rtbLicenses.TabIndex = 0;
+            this.rtbLicenses.Text = resources.GetString("rtbLicenses.Text");
             // 
             // frmLicensing
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(522, 263);
-            this.Controls.Add(this.richTextBox1);
+            this.Controls.Add(this.rtbLicenses);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = global::aphrodite.Properties.Resources.Brad;
             this.MaximizeBox = false;
@@ -58,6 +58,6 @@
 
         #endregion
 
-        private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.RichTextBox rtbLicenses;
     }
 }

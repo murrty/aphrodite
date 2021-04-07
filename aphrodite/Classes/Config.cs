@@ -4,14 +4,30 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 
 namespace aphrodite {
+    public enum ConfigType : int {
+        None = -1,
 
+        All = 0,
+
+        Initialization = 1,
+
+        FormSettings = 2,
+
+        General = 3,
+
+        Tags = 4,
+
+        Pools = 5,
+
+        Images = 6
+    }
     class Config {
         public static volatile Config Settings;
 
+        public Config_Initialization Initialization;
         public Config_FormSettings FormSettings;
         public Config_General General;
         public Config_Tags Tags;
@@ -24,24 +40,123 @@ namespace aphrodite {
                 Debug.Print("Using ini file at " + Program.ApplicationPath + "\\aphrodite.ini");
             }
 
-            FormSettings = new Config_FormSettings();
-
-            General = new Config_General();
-
-            Tags = new Config_Tags();
-
-            Pools = new Config_Pools();
-
-            Images = new Config_Images();
+            Initialization = new Config_Initialization();
 
         }
 
-        public void Save() {
-            FormSettings.Save();
-            General.Save();
-            Tags.Save();
-            Pools.Save();
-            Images.Save();
+        public void Load(ConfigType Type) {
+            switch (Type) {
+                case ConfigType.All:
+                    FormSettings = new Config_FormSettings();
+                    General = new Config_General();
+                    Images = new Config_Images();
+                    Pools = new Config_Pools();
+                    Tags = new Config_Tags();
+                    break;
+
+                case ConfigType.FormSettings:
+                    FormSettings = new Config_FormSettings();
+                    break;
+
+                case ConfigType.General:
+                    General = new Config_General();
+                    break;
+
+                case ConfigType.Images:
+                    Images = new Config_Images();
+                    break;
+
+                case ConfigType.Pools:
+                    Pools = new Config_Pools();
+                    break;
+
+                case ConfigType.Tags:
+                    Tags = new Config_Tags();
+                    break;
+            }
+        }
+
+        public void Save(ConfigType Type) {
+            switch (Type) {
+                case ConfigType.All:
+                    FormSettings.Save();
+                    General.Save();
+                    Tags.Save();
+                    Pools.Save();
+                    Images.Save();
+                    break;
+
+                case ConfigType.Initialization:
+                    Initialization.Save();
+                    break;
+
+                case ConfigType.FormSettings:
+                    FormSettings.Save();
+                    break;
+
+                case ConfigType.General:
+                    General.Save();
+                    break;
+
+                case ConfigType.Images:
+                    Images.Save();
+                    break;
+
+                case ConfigType.Pools:
+                    Pools.Save();
+                    break;
+
+                case ConfigType.Tags:
+                    Tags.Save();
+                    break;
+            }
+        }
+
+        public class Config_Initialization {
+            public Config_Initialization() {
+                Load();
+            }
+
+            public bool firstTime = true;
+
+            public void Save() {
+                switch (Program.UseIni) {
+                    case true:
+                        Program.Ini.WriteBool("firstTime", firstTime, "General");
+                        break;
+
+                    case false: {
+                            bool Save = false;
+
+                            switch (aphrodite.Settings.General.Default.firstTime != firstTime) {
+                                case true:
+                                    aphrodite.Settings.General.Default.firstTime = firstTime;
+                                    Save = true;
+                                    break;
+                            }
+
+                            switch (Save) {
+                                case true:
+                                    aphrodite.Settings.General.Default.Save();
+                                    break;
+                            }
+                            break;
+                        }
+                }
+            }
+            public void Load() {
+                switch (Program.UseIni) {
+                    case true:
+                        if (Program.Ini.KeyExists("firstTime", "General")) {
+                            firstTime = Program.Ini.ReadBool("firstTime", "General");
+                        }
+                        break;
+
+                    case false:
+                        firstTime = aphrodite.Settings.General.Default.firstTime;
+                        break;
+                }
+            }
         }
 
         public class Config_FormSettings {
@@ -51,16 +166,57 @@ namespace aphrodite {
                 }
             }
 
-            public Point frmMainLocation = new Point(-32000, -32000);
-            private Point frmMainLocation_First = new Point(-32000, -32000);
+            #region
+            public Point frmMain_Location = new Point(-32000, -32000);
+            //public decimal frmMain_numTagsPageLimit = 0;
+            //public decimal frmMain_numTagsImageLimit = 0;
+            //public bool frmMain_chkTagsUseMinimumScore = false;
+            //public bool frmMain_chkTagsUseScoreAsTag = true;
+            //public decimal frmMain_numTagsMinimumScore = 0;
+            //public bool frmMain_chkTagsDownloadExplicit = true;
+            //public bool frmMain_chkTagsDownloadQuestionable = true;
+            //public bool frmMain_chkTagsDownloadSafe = true;
+            //public bool frmMain_chkTagsSeparateRatings = true;
+            //public bool frmMain_chkTagsOpenAfterDownload = false;
+            //public bool frmMain_chkTagSeparateNonImages = true;
+            //public bool frmMain_chkPoolOpenAfter = false;
+            //public bool frmMain_chkPoolMergeBlacklisted = true;
+            //public bool frmMain_chkImageSeparateRatings = true;
+            //public bool frmMain_chkImageSeparateBlacklisted = true;
+            //public bool frmMain_chkImageSeparateArtists = false;
+            //public bool frmMain_chkImageSeparateNonImages = true;
+            //public bool frmMain_chkImageUseForm = false;
+            //public bool frmMain_chkImageOpenAfter = false;
+
+            private Point frmMain_Location_First = new Point(-32000, -32000);
+            //private decimal frmMain_numTagsPageLimit_First = 0;
+            //private decimal frmMain_numTagsImageLimit_First = 0;
+            //private bool frmMain_chkTagsUseMinimumScore_First = false;
+            //private bool frmMain_chkTagsUseScoreAsTag_First = true;
+            //private decimal frmMain_numTagsMinimumScore_First = 0;
+            //private bool frmMain_chkTagsDownloadExplicit_First = true;
+            //private bool frmMain_chkTagsDownloadQuestionable_First = true;
+            //private bool frmMain_chkTagsDownloadSafe_First = true;
+            //private bool frmMain_chkTagsSeparateRatings_First = true;
+            //private bool frmMain_chkTagsOpenAfterDownload_First = false;
+            //private bool frmMain_chkTagSeparateNonImages_First = true;
+            //private bool frmMain_chkPoolOpenAfter_First = false;
+            //private bool frmMain_chkPoolMergeBlacklisted_First = true;
+            //private bool frmMain_chkImageSeparateRatings_First = true;
+            //private bool frmMain_chkImageSeparateBlacklisted_First = true;
+            //private bool frmMain_chkImageSeparateArtists_First = false;
+            //private bool frmMain_chkImageSeparateNonImages_First = true;
+            //private bool frmMain_chkImageUseForm_First = false;
+            //private bool frmMain_chkImageOpenAfter_First = false;
+            #endregion
 
             public void Save() {
                 switch (Program.UseIni) {
                     case true:
-                        switch (frmMainLocation != frmMainLocation_First) {
+                        switch (frmMain_Location != frmMain_Location_First) {
                             case true:
-                                Program.Ini.WritePoint("frmMainLocation", frmMainLocation, "FormSettings");
-                                frmMainLocation_First = frmMainLocation;
+                                Program.Ini.WritePoint("frmMain_Location", frmMain_Location, "FormSettings");
+                                frmMain_Location_First = frmMain_Location;
                                 break;
                         }
                         break;
@@ -68,9 +224,9 @@ namespace aphrodite {
                     case false: {
                             bool Save = false;
 
-                            switch (aphrodite.Settings.FormSettings.Default.frmMainLocation != frmMainLocation) {
+                            switch (aphrodite.Settings.FormSettings.Default.frmMain_Location != frmMain_Location) {
                                 case true:
-                                    aphrodite.Settings.FormSettings.Default.frmMainLocation = frmMainLocation;
+                                    aphrodite.Settings.FormSettings.Default.frmMain_Location = frmMain_Location;
                                     Save = true;
                                     break;
                             }
@@ -87,14 +243,14 @@ namespace aphrodite {
             public void Load() {
                 switch (Program.UseIni) {
                     case true:
-                        if (Program.Ini.KeyExists("frmMainLocation", "FormSettings")) {
-                            frmMainLocation = Program.Ini.ReadPoint("frmMainLocation", "FormSettings");
-                            frmMainLocation_First = frmMainLocation;
+                        if (Program.Ini.KeyExists("frmMain_Location", "FormSettings")) {
+                            frmMain_Location = Program.Ini.ReadPoint("frmMain_Location", "FormSettings");
+                            frmMain_Location_First = frmMain_Location;
                         }
                         break;
 
                     case false:
-                        frmMainLocation = aphrodite.Settings.FormSettings.Default.frmMainLocation;
+                        frmMain_Location = aphrodite.Settings.FormSettings.Default.frmMain_Location;
                         break;
                 }
             }
@@ -114,7 +270,6 @@ namespace aphrodite {
             public bool saveInfo = true;
             public bool ignoreFinish = false;
             public string zeroToleranceBlacklist = string.Empty;
-            public bool firstTime = true;
             public string undesiredTags = string.Empty;
             public bool openAfter = false;
 
@@ -124,7 +279,6 @@ namespace aphrodite {
             private bool saveInfo_First = true;
             private bool ignoreFinish_First = false;
             private string zeroToleranceBlacklist_First = string.Empty;
-            private bool firstTime_First = true;
             private string undesiredTags_First = string.Empty;
             private bool openAfter_First = false;
             #endregion
@@ -174,12 +328,6 @@ namespace aphrodite {
                                 else {
                                     File.Delete(Program.ApplicationPath + "\\blacklist.cfg");
                                 }
-                                break;
-                        }
-                        switch (firstTime != firstTime_First) {
-                            case true:
-                                Program.Ini.WriteBool("firstTime", firstTime, "General");
-                                firstTime_First = firstTime;
                                 break;
                         }
                         switch (undesiredTags != undesiredTags_First) {
@@ -232,12 +380,6 @@ namespace aphrodite {
                         switch (aphrodite.Settings.General.Default.zeroToleranceBlacklist != zeroToleranceBlacklist) {
                             case true:
                                 aphrodite.Settings.General.Default.zeroToleranceBlacklist = zeroToleranceBlacklist;
-                                Save = true;
-                                break;
-                        }
-                        switch (aphrodite.Settings.General.Default.firstTime != firstTime) {
-                            case true:
-                                aphrodite.Settings.General.Default.firstTime = firstTime;
                                 Save = true;
                                 break;
                         }
@@ -301,12 +443,6 @@ namespace aphrodite {
                                 zeroToleranceBlacklist_First = zeroToleranceBlacklist;
                                 break;
                         }
-                        switch (Program.Ini.KeyExists("firstTime", "General")) {
-                            case true:
-                                firstTime = Program.Ini.ReadBool("firstTime", "General");
-                                firstTime_First = firstTime;
-                                break;
-                        }
                         switch (Program.Ini.KeyExists("undesiredTags", "General")) {
                             case true:
                                 undesiredTags = Program.Ini.ReadString("undesiredTags", "General");
@@ -328,7 +464,6 @@ namespace aphrodite {
                         saveInfo = aphrodite.Settings.General.Default.saveInfo;
                         ignoreFinish = aphrodite.Settings.General.Default.ignoreFinish;
                         zeroToleranceBlacklist = aphrodite.Settings.General.Default.zeroToleranceBlacklist;
-                        firstTime = aphrodite.Settings.General.Default.firstTime;
                         undesiredTags = aphrodite.Settings.General.Default.undesiredTags;
                         openAfter = aphrodite.Settings.General.Default.openAfter;
                         break;
@@ -609,17 +744,17 @@ namespace aphrodite {
                     }
                 }
                 else {
-                    if (!aphrodite.Settings.Pools.Default.wishlist.Contains(URL)) {
-                        if (aphrodite.Settings.Pools.Default.addWishlistSilent) {
-                            if (!string.IsNullOrWhiteSpace(aphrodite.Settings.Pools.Default.wishlistNames) && !string.IsNullOrWhiteSpace(aphrodite.Settings.Pools.Default.wishlist)) {
-                                aphrodite.Settings.Pools.Default.wishlist += "|" + URL;
-                                aphrodite.Settings.Pools.Default.wishlistNames += "|" + Name;
+                    if (!Config.Settings.Pools.wishlist.Contains(URL)) {
+                        if (Config.Settings.Pools.addWishlistSilent) {
+                            if (!string.IsNullOrWhiteSpace(aphrodite.Settings.Pools.Default.wishlistNames) && !string.IsNullOrWhiteSpace(Config.Settings.Pools.wishlist)) {
+                                Config.Settings.Pools.wishlist += "|" + URL;
+                                Config.Settings.Pools.wishlistNames += "|" + Name;
                             }
                             else {
-                                aphrodite.Settings.Pools.Default.wishlist = URL;
-                                aphrodite.Settings.Pools.Default.wishlistNames = Name;
+                                Config.Settings.Pools.wishlist = URL;
+                                Config.Settings.Pools.wishlistNames = Name;
                             }
-                            aphrodite.Settings.Pools.Default.Save();
+                            Config.Settings.Save(ConfigType.Pools);
                         }
                         else {
                             frmPoolWishlist WishList = new frmPoolWishlist(true, URL, Name);
@@ -644,6 +779,7 @@ namespace aphrodite {
 
                         Settings.Pools.wishlist = string.Join("|", URLs);
                         Settings.Pools.wishlistNames = string.Join("|", Names);
+                        Settings.Save(ConfigType.Pools);
                         break;
                 }
             }
@@ -765,6 +901,7 @@ namespace aphrodite {
                 }
             }
         }
+
         public class Config_Images {
             public Config_Images() {
                 Load();
@@ -775,14 +912,14 @@ namespace aphrodite {
             public bool separateBlacklisted = true;
             public bool useForm = false;
             public bool separateArtists = false;
-            public string fileNameSchema = "%artist%_%md5";
+            public string fileNameSchema = "%artist%_%md5%";
             public bool separateNonImages = true;
 
             private bool separateRatings_First = true;
             private bool separateBlacklisted_First = true;
             private bool useForm_First = false;
             private bool separateArtists_First = false;
-            private string fileNameSchema_First = "%artist%_%md5";
+            private string fileNameSchema_First = "%artist%_%md5%";
             private bool separateNonImages_First = true;
             #endregion
 

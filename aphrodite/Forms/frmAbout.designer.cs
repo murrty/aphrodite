@@ -25,7 +25,6 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmAbout));
             this.lbVersion = new System.Windows.Forms.Label();
             this.llbCheckForUpdates = new aphrodite.LinkLabelHand();
             this.lbHeader = new System.Windows.Forms.Label();
@@ -81,7 +80,8 @@
             // pbIcon
             // 
             this.pbIcon.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.pbIcon.Image = ((System.Drawing.Image)(resources.GetObject("pbIcon.Image")));
+            this.pbIcon.ErrorImage = null;
+            this.pbIcon.Image = Properties.Resources.Icon32;
             this.pbIcon.InitialImage = null;
             this.pbIcon.Location = new System.Drawing.Point(64, 3);
             this.pbIcon.Name = "pbIcon";

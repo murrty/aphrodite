@@ -23,14 +23,14 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            this.listWishlistItems = new System.Windows.Forms.ListBox();
+            this.listWishlistItems = new AeroListBox();
             this.txtURL = new System.Windows.Forms.TextBox();
             this.btnAddUpdate = new System.Windows.Forms.Button();
             this.btnRemove = new System.Windows.Forms.Button();
             this.btnDownload = new System.Windows.Forms.Button();
             this.txtName = new System.Windows.Forms.TextBox();
             this.chkUpdate = new System.Windows.Forms.CheckBox();
-            this.lPoolLink = new System.Windows.Forms.LinkLabel();
+            this.lPoolLink = new LinkLabelHand();
             this.SuspendLayout();
             // 
             // listWishlistItems
@@ -142,13 +142,13 @@
 
         #endregion
 
-        private System.Windows.Forms.ListBox listWishlistItems;
+        private AeroListBox listWishlistItems;
         private System.Windows.Forms.TextBox txtURL;
         private System.Windows.Forms.Button btnAddUpdate;
         private System.Windows.Forms.Button btnRemove;
         private System.Windows.Forms.Button btnDownload;
         private System.Windows.Forms.TextBox txtName;
         private System.Windows.Forms.CheckBox chkUpdate;
-        private System.Windows.Forms.LinkLabel lPoolLink;
+        private LinkLabelHand lPoolLink;
     }
 }

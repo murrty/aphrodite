@@ -112,6 +112,7 @@ namespace aphrodite {
             Config.Settings.General.saveInfo = chkSaveInfoFiles.Checked;
             Config.Settings.General.saveBlacklisted = chkSaveBlacklistedImages.Checked;
             Config.Settings.General.ignoreFinish = chkIgnoreFinish.Checked;
+            Config.Settings.General.openAfter = chkOpenAfterDownload.Checked;
             //Config.Settings.General.saveMetadata = chkSaveMetadata.Checked;
             //Config.Settings.General.saveArtistMetadata = chkSaveArtistMetadata.Checked;
             //Config.Settings.General.saveTagMetadata = chkSaveTagMetadata.Checked;
@@ -132,7 +133,6 @@ namespace aphrodite {
           // Pools
             Config.Settings.Pools.fileNameSchema = apiTools.ReplaceIllegalCharacters(txtPoolSchema.Text.ToLower());
             Config.Settings.Pools.mergeBlacklisted = chkPoolsMergeBlacklistedImages.Checked;
-            Config.Settings.Pools.openAfter = chkPoolsOpenAfterDownload.Checked;
             Config.Settings.Pools.addWishlistSilent = chkPoolsAddToWishlistSilently.Checked;
 
           // Images
@@ -142,8 +142,8 @@ namespace aphrodite {
             Config.Settings.Images.separateArtists = chkImagesSeparateArtists.Checked;
             Config.Settings.Images.useForm = chkImagesUseForm.Checked;
 
-          // Save all 4
-            Config.Settings.Save();
+          // Save all
+            Config.Settings.Save(ConfigType.All);
         }
         private void loadSettings() {
             // General
@@ -156,6 +156,7 @@ namespace aphrodite {
             chkSaveInfoFiles.Checked = Config.Settings.General.saveInfo;
             chkSaveBlacklistedImages.Checked = Config.Settings.General.saveBlacklisted;
             chkIgnoreFinish.Checked = Config.Settings.General.ignoreFinish;
+            chkOpenAfterDownload.Checked = Config.Settings.General.openAfter;
             //chkSaveMetadata.Checked = Config.Settings.General.saveMetadata;
             //chkSaveArtistMetadata.Checked = Config.Settings.General.saveArtistMetadata;
             //chkSaveTagMetadata.Checked = Config.Settings.General.saveTagMetadata;
@@ -176,7 +177,6 @@ namespace aphrodite {
             // Pools
             txtPoolSchema.Text = apiTools.ReplaceIllegalCharacters(Config.Settings.Pools.fileNameSchema.ToLower());
             chkPoolsMergeBlacklistedImages.Checked = Config.Settings.Pools.mergeBlacklisted;
-            chkPoolsOpenAfterDownload.Checked = Config.Settings.Pools.openAfter;
             chkPoolsAddToWishlistSilently.Checked = Config.Settings.Pools.addWishlistSilent;
 
             // Images
@@ -193,95 +193,103 @@ namespace aphrodite {
                     var exeName = Process.GetCurrentProcess().MainModule.FileName;
                     ProcessStartInfo startInfo = new ProcessStartInfo(exeName);
                     startInfo.Verb = "runas";
-                    startInfo.Arguments = "installProtocol";
                     Process.Start(startInfo);
                     Environment.Exit(0);
                 }
             }
         }
         private void checkProtocols() {
-            RegistryKey keyTags = Registry.ClassesRoot.OpenSubKey("tags\\shell\\open\\command", false);
-            RegistryKey keyPools = Registry.ClassesRoot.OpenSubKey("pools\\shell\\open\\command", false);
-            RegistryKey keyPoolWl = Registry.ClassesRoot.OpenSubKey("poolwl\\shell\\open\\command", false);
-            RegistryKey keyImages = Registry.ClassesRoot.OpenSubKey("images\\shell\\open\\command", false);
+            switch (Program.UseIni) {
+                case false:
+                    RegistryKey keyTags = Registry.ClassesRoot.OpenSubKey("tags\\shell\\open\\command", false);
+                    RegistryKey keyPools = Registry.ClassesRoot.OpenSubKey("pools\\shell\\open\\command", false);
+                    RegistryKey keyPoolWl = Registry.ClassesRoot.OpenSubKey("poolwl\\shell\\open\\command", false);
+                    RegistryKey keyImages = Registry.ClassesRoot.OpenSubKey("images\\shell\\open\\command", false);
 
-            if (Registry.ClassesRoot.GetValue("tags", "URL Protocol") == null || keyTags == null) {
-                TagsProtocol = false;
-            }
-            else {
-                TagsProtocol = true;
-            }
+                    if (Registry.ClassesRoot.GetValue("tags", "URL Protocol") == null || keyTags == null) {
+                        TagsProtocol = false;
+                    }
+                    else {
+                        TagsProtocol = true;
+                    }
 
-            if (Registry.ClassesRoot.GetValue("pools", "URL Protocol") == null || keyPools == null) {
-                PoolsProtocol = false;
-            }
-            else {
-                PoolsProtocol = true;
-            }
+                    if (Registry.ClassesRoot.GetValue("pools", "URL Protocol") == null || keyPools == null) {
+                        PoolsProtocol = false;
+                    }
+                    else {
+                        PoolsProtocol = true;
+                    }
 
-            if (Registry.ClassesRoot.GetValue("poolwl", "URL Protocol") == null || keyPoolWl == null) {
-                PoolsWishlistProtocol = false;
-            }
-            else {
-                PoolsWishlistProtocol = true;
-            }
+                    if (Registry.ClassesRoot.GetValue("poolwl", "URL Protocol") == null || keyPoolWl == null) {
+                        PoolsWishlistProtocol = false;
+                    }
+                    else {
+                        PoolsWishlistProtocol = true;
+                    }
 
-            if (Registry.ClassesRoot.GetValue("images", "URL Protocol") == null || keyImages == null) {
-                ImagesProtocol = false;
-            }
-            else {
-                ImagesProtocol = true;
-            }
+                    if (Registry.ClassesRoot.GetValue("images", "URL Protocol") == null || keyImages == null) {
+                        ImagesProtocol = false;
+                    }
+                    else {
+                        ImagesProtocol = true;
+                    }
 
-            if (TagsProtocol == false && PoolsProtocol == false && ImagesProtocol == false) {
-                NoProtocols = true;
-            }
-            else {
-                NoProtocols = false;
+                    if (TagsProtocol == false && PoolsProtocol == false && ImagesProtocol == false) {
+                        NoProtocols = true;
+                    }
+                    else {
+                        NoProtocols = false;
+                    }
+                    break;
             }
         }
         private string createProtocolDir() {
-            if (!string.IsNullOrWhiteSpace(Config.Settings.General.saveLocation)) {
-                return Config.Settings.General.saveLocation;
-            }
-
-            string directory = Environment.CurrentDirectory;
-            string filename = AppDomain.CurrentDomain.FriendlyName;
-            switch (MessageBox.Show("Would you like to specifiy a location to store aphrodite? Select no to use current directory.\n\nThis is required for the plugin to work properly, and is recommended that you select a place that won't be messed with AND have permission to write files to.", "aphrodite", MessageBoxButtons.YesNoCancel)) {
-                case System.Windows.Forms.DialogResult.Yes:
-                    using (FolderBrowserDialog fbd = new FolderBrowserDialog() { Description = "Select a directory to store aphrodite.exe", SelectedPath = Environment.CurrentDirectory, ShowNewFolderButton = true }) {
-                        if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
-                            directory = fbd.SelectedPath;
-                        }
-                        else {
-                            return null;
-                        }
+            switch (Program.UseIni) {
+                case false:
+                    if (!string.IsNullOrWhiteSpace(Config.Settings.General.saveLocation)) {
+                        return Config.Settings.General.saveLocation;
                     }
-                    break;
-                case System.Windows.Forms.DialogResult.Cancel:
-                    return null;
+
+                    string directory = Environment.CurrentDirectory;
+                    string filename = AppDomain.CurrentDomain.FriendlyName;
+                    switch (MessageBox.Show("Would you like to specifiy a location to store aphrodite? Select no to use current directory.\n\nThis is required for the plugin to work properly, and is recommended that you select a place that won't be messed with AND have permission to write files to.", "aphrodite", MessageBoxButtons.YesNoCancel)) {
+                        case System.Windows.Forms.DialogResult.Yes:
+                            using (FolderBrowserDialog fbd = new FolderBrowserDialog() { Description = "Select a directory to store aphrodite.exe", SelectedPath = Environment.CurrentDirectory, ShowNewFolderButton = true }) {
+                                if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
+                                    directory = fbd.SelectedPath;
+                                }
+                                else {
+                                    return null;
+                                }
+                            }
+                            break;
+                        case System.Windows.Forms.DialogResult.Cancel:
+                            return null;
+                    }
+
+                    if (directory != Environment.CurrentDirectory) {
+                        if (File.Exists(directory + "\\aphrodite.exe")) {
+                            File.Delete(directory + "\\aphrodite.exe");
+                        }
+                        File.Copy(Program.ApplicationPath + "\\" + filename, directory + "\\aphrodite.exe");
+                    }
+
+                    // Create directories
+                    if (!Directory.Exists(directory + "\\Tags")) {
+                        Directory.CreateDirectory(directory + "\\Tags");
+                    }
+                    if (!Directory.Exists(directory + "\\Pools")) {
+                        Directory.CreateDirectory(directory + "\\Pools");
+                    }
+                    if (!Directory.Exists(directory + "\\Images")) {
+                        Directory.CreateDirectory(directory + "\\Images");
+                    }
+
+                    // Return selected directory
+                    return directory;
             }
 
-            if (directory != Environment.CurrentDirectory) {
-                if (File.Exists(directory + "\\aphrodite.exe")) {
-                    File.Delete(directory + "\\aphrodite.exe");
-                }
-                File.Copy(Program.ApplicationPath + "\\" + filename, directory + "\\aphrodite.exe");
-            }
-
-            // Create directories
-            if (!Directory.Exists(directory + "\\Tags")) {
-                Directory.CreateDirectory(directory + "\\Tags");
-            }
-            if (!Directory.Exists(directory + "\\Pools")) {
-                Directory.CreateDirectory(directory + "\\Pools");
-            }
-            if (!Directory.Exists(directory + "\\Images")) {
-                Directory.CreateDirectory(directory + "\\Images");
-            }
-
-            // Return selected directory
-            return directory;
+            return null;
         }
 
         private void btnBrws_Click(object sender, EventArgs e) {
@@ -516,7 +524,6 @@ namespace aphrodite {
             bufferINI += "\n\n[Pools]";
             bufferINI += "\nfileNameSchema=" + apiTools.ReplaceIllegalCharacters(Config.Settings.Pools.fileNameSchema);
             bufferINI += "\nmergeBlacklisted=" + Config.Settings.Pools.mergeBlacklisted;
-            bufferINI += "\nopenAfter=" + Config.Settings.Pools.openAfter;
 
             bufferINI += "\n\n[Images]";
             bufferINI += "\nfileNameSchema=" + apiTools.ReplaceIllegalCharacters(Config.Settings.Images.fileNameSchema);
@@ -526,7 +533,7 @@ namespace aphrodite {
             bufferINI += "\nuseForm=" + Config.Settings.Images.useForm;
 
             bufferINI += "\n\n[Forms]";
-            bufferINI += "\nfrmMainLocation=" + Config.Settings.FormSettings.frmMainLocation.X + ", " + Config.Settings.FormSettings.frmMainLocation.Y;
+            bufferINI += "\nfrmMainLocation=" + Config.Settings.FormSettings.frmMain_Location.X + ", " + Config.Settings.FormSettings.frmMain_Location.Y;
 
             File.WriteAllText(Program.ApplicationPath + "\\aphrodite.ini", bufferINI);
         }
@@ -550,6 +557,7 @@ namespace aphrodite {
                 case (char)62:  // >
                 case (char)124: // |
                     e.Handled = true;
+                    System.Media.SystemSounds.Beep.Play();
                     break;
             }
         }
@@ -565,6 +573,7 @@ namespace aphrodite {
                 case (char)62:  // >
                 case (char)124: // |
                     e.Handled = true;
+                    System.Media.SystemSounds.Beep.Play();
                     break;
             }
         }
@@ -580,6 +589,7 @@ namespace aphrodite {
                 case (char)62:  // >
                 case (char)124: // |
                     e.Handled = true;
+                    System.Media.SystemSounds.Beep.Play();
                     break;
             }
         }

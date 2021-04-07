@@ -26,12 +26,240 @@ namespace aphrodite.Settings {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("-32000, -32000")]
-        public global::System.Drawing.Point frmMainLocation {
+        public global::System.Drawing.Point frmMain_Location {
             get {
-                return ((global::System.Drawing.Point)(this["frmMainLocation"]));
+                return ((global::System.Drawing.Point)(this["frmMain_Location"]));
             }
             set {
-                this["frmMainLocation"] = value;
+                this["frmMain_Location"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public decimal frmMain_numTagsPageLimit {
+            get {
+                return ((decimal)(this["frmMain_numTagsPageLimit"]));
+            }
+            set {
+                this["frmMain_numTagsPageLimit"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public decimal frmMain_numTagsImageLimit {
+            get {
+                return ((decimal)(this["frmMain_numTagsImageLimit"]));
+            }
+            set {
+                this["frmMain_numTagsImageLimit"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool frmMain_chkTagsUseMinimumScore {
+            get {
+                return ((bool)(this["frmMain_chkTagsUseMinimumScore"]));
+            }
+            set {
+                this["frmMain_chkTagsUseMinimumScore"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool frmMain_chkTagsUseScoreAsTag {
+            get {
+                return ((bool)(this["frmMain_chkTagsUseScoreAsTag"]));
+            }
+            set {
+                this["frmMain_chkTagsUseScoreAsTag"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public decimal frmMain_numTagsMinimumScore {
+            get {
+                return ((decimal)(this["frmMain_numTagsMinimumScore"]));
+            }
+            set {
+                this["frmMain_numTagsMinimumScore"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool frmMain_chkTagsDownloadExplicit {
+            get {
+                return ((bool)(this["frmMain_chkTagsDownloadExplicit"]));
+            }
+            set {
+                this["frmMain_chkTagsDownloadExplicit"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool frmMain_chkTagsDownloadQuestionable {
+            get {
+                return ((bool)(this["frmMain_chkTagsDownloadQuestionable"]));
+            }
+            set {
+                this["frmMain_chkTagsDownloadQuestionable"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool frmMain_chkTagsDownloadSafe {
+            get {
+                return ((bool)(this["frmMain_chkTagsDownloadSafe"]));
+            }
+            set {
+                this["frmMain_chkTagsDownloadSafe"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool frmMain_chkTagsSeparateRatings {
+            get {
+                return ((bool)(this["frmMain_chkTagsSeparateRatings"]));
+            }
+            set {
+                this["frmMain_chkTagsSeparateRatings"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool frmMain_chkTagsOpenAfterDownload {
+            get {
+                return ((bool)(this["frmMain_chkTagsOpenAfterDownload"]));
+            }
+            set {
+                this["frmMain_chkTagsOpenAfterDownload"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool frmMain_chkTagSeparateNonImages {
+            get {
+                return ((bool)(this["frmMain_chkTagSeparateNonImages"]));
+            }
+            set {
+                this["frmMain_chkTagSeparateNonImages"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool frmMain_chkPoolOpenAfter {
+            get {
+                return ((bool)(this["frmMain_chkPoolOpenAfter"]));
+            }
+            set {
+                this["frmMain_chkPoolOpenAfter"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool frmMain_chkPoolMergeBlacklisted {
+            get {
+                return ((bool)(this["frmMain_chkPoolMergeBlacklisted"]));
+            }
+            set {
+                this["frmMain_chkPoolMergeBlacklisted"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool frmMain_chkImageSeparateRatings {
+            get {
+                return ((bool)(this["frmMain_chkImageSeparateRatings"]));
+            }
+            set {
+                this["frmMain_chkImageSeparateRatings"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool frmMain_chkImageSeparateBlacklisted {
+            get {
+                return ((bool)(this["frmMain_chkImageSeparateBlacklisted"]));
+            }
+            set {
+                this["frmMain_chkImageSeparateBlacklisted"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool frmMain_chkImageSeparateArtists {
+            get {
+                return ((bool)(this["frmMain_chkImageSeparateArtists"]));
+            }
+            set {
+                this["frmMain_chkImageSeparateArtists"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool frmMain_chkImageSeparateNonImages {
+            get {
+                return ((bool)(this["frmMain_chkImageSeparateNonImages"]));
+            }
+            set {
+                this["frmMain_chkImageSeparateNonImages"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool frmMain_chkImageUseForm {
+            get {
+                return ((bool)(this["frmMain_chkImageUseForm"]));
+            }
+            set {
+                this["frmMain_chkImageUseForm"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool frmMain_chkImageOpenAfter {
+            get {
+                return ((bool)(this["frmMain_chkImageOpenAfter"]));
+            }
+            set {
+                this["frmMain_chkImageOpenAfter"] = value;
             }
         }
     }

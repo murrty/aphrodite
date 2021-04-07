@@ -48,17 +48,18 @@ namespace aphrodite {
                     IsAdmin = false;
                 }
 
-                if (Config.Settings.General.firstTime) {
+                if (Config.Settings.Initialization.firstTime) {
                     MessageBox.Show(
                         "This is your first time running aphrodite, so read this before continuing:\n\n" +
                         "This program is \"advertised\" as a porn downloader. You don't have to download any 18+ material using it, but it's emphasised on porn.\n" +
                         "As soon as you get access into the program, change the settings and set your prefered file name schema. I don't want to be responsible for any excess files being downloaded.\n\n" +
                         "Just so you know."
                     );
-                    Config.Settings.General.firstTime = false;
-                    Config.Settings.General.Save();
+                    Config.Settings.Initialization.firstTime = false;
+                    Config.Settings.Save(ConfigType.Initialization);
                 }
                 if (!HasArgumentsThatSkipMainForm()) {
+                    Config.Settings.Load(ConfigType.All);
                     Application.Run(new frmMain(arg, type));
                 }
             }
@@ -72,7 +73,8 @@ namespace aphrodite {
 
                 #region "installProtocol"
                 if (CurrentArg.StartsWith("installProtocol")) { // if the argument is installProtocol
-                    frmSettings Settings = new frmSettings(); // start the protocol section of the settings.
+                    Config.Settings.Load(ConfigType.All);
+                    frmSettings Settings = new frmSettings();
                     Settings.InstallProtocol = true;
                     Settings.ShowDialog();
                     Settings.Dispose();
@@ -82,6 +84,8 @@ namespace aphrodite {
 
                 #region "-settings", "*:configuresettings", "protocol", "-portable", "-schema", "configuresettings"
                 else if (CurrentArg.StartsWith("-settings") || CurrentArg.StartsWith("tags:configuresettings") || CurrentArg.StartsWith("pools:configuresettings") || CurrentArg.StartsWith("images:configuresettings") || CurrentArg.StartsWith("-protocol") || CurrentArg.StartsWith("-portable") || CurrentArg.StartsWith("-schema") || CurrentArg.StartsWith("configuresettings")) {
+                    Config.Settings.Load(ConfigType.All);
+
                     frmSettings Settings = new frmSettings();
                     Settings.SwitchTab = true;
 
@@ -121,6 +125,9 @@ namespace aphrodite {
                     CurrentArg = CurrentArg.Substring(5).Replace("|", " ");
 
                     if (apiTools.IsValidPageLink(CurrentArg)) {
+
+                        Config.Settings.Load(ConfigType.General);
+                        Config.Settings.Load(ConfigType.Tags);
                         Downloader.Arguments.DownloadPage(CurrentArg);
                         return true;
                     }
@@ -134,6 +141,7 @@ namespace aphrodite {
 
                 #region "poolwl:*"
                 else if (CurrentArg.StartsWith("poolwl:")) {
+                    Config.Settings.Load(ConfigType.Pools);
                     if (CurrentArg == "poolwl:showwl") {
                         frmPoolWishlist WishList = new frmPoolWishlist();
                         WishList.ShowDialog();
@@ -178,6 +186,8 @@ namespace aphrodite {
                     CurrentArg = CurrentArg.Replace("http://", "https://").Replace("https://www.", "https://");
 
                     if (apiTools.IsValidPoolLink(CurrentArg)) {
+                        Config.Settings.Load(ConfigType.General);
+                        Config.Settings.Load(ConfigType.Pools);
                         if (CurrentArg.Contains("?")) {
                             CurrentArg = CurrentArg.Split('?')[0];
                         }
@@ -201,6 +211,8 @@ namespace aphrodite {
                     CurrentArg = CurrentArg.Substring(7);
                     CurrentArg = CurrentArg.Split('?')[0];
                     if (apiTools.IsValidImageLink(CurrentArg)) {
+                        Config.Settings.Load(ConfigType.General);
+                        Config.Settings.Load(ConfigType.Images);
                         Downloader.Arguments.DownloadImage(CurrentArg);
                         return true;
                     }
@@ -214,6 +226,7 @@ namespace aphrodite {
 
                 #region "-redownloader"
                 else if (CurrentArg.StartsWith("-redownloader")) {
+                    Config.Settings.Load(ConfigType.All);
                     frmRedownloader rDownloader = new frmRedownloader();
                     rDownloader.ShowDialog();
                     return true;
@@ -222,6 +235,7 @@ namespace aphrodite {
 
                 #region "-blacklist"
                 else if (CurrentArg.StartsWith("-blacklist")) {
+                    Config.Settings.Load(ConfigType.General);
                     frmBlacklist bList = new frmBlacklist();
                     bList.ShowDialog();
                     return true;

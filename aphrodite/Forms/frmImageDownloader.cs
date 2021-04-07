@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -56,7 +55,7 @@ namespace aphrodite {
         }
         private void AfterDownload() {
             if (DownloadInfo.OpenAfter) {
-                Process.Start(DownloadInfo.DownloadPath);
+                Process.Start("explorer.exe", "/select, \"" + DownloadInfo.DownloadPath + "\\" + DownloadInfo.FileName + "\"");
             }
             if (DownloadInfo.IgnoreFinish) {
                 if (DownloadHasFinished) {
@@ -113,15 +112,19 @@ namespace aphrodite {
                     DownloadInfo.DownloadPath += "\\Images";
 
             // Check the start URL to add the extra forward-slash for the split.
-                if (DownloadInfo.ImageUrl.StartsWith("http://")) {
-                    DownloadInfo.ImageUrl.Replace("http://", "https://");
-                }
-                if (!DownloadInfo.ImageUrl.StartsWith("https://"))
-                    DownloadInfo.ImageUrl = "https://" + DownloadInfo.ImageUrl;
+                if (DownloadInfo.IsUrl) {
+                    if (DownloadInfo.ImageUrl.StartsWith("http://")) {
+                        DownloadInfo.ImageUrl.Replace("http://", "https://");
+                    }
+                    if (!DownloadInfo.ImageUrl.StartsWith("https://")) {
+                        DownloadInfo.ImageUrl = "https://" + DownloadInfo.ImageUrl;
+                    }
 
-            // Get DownloadInfo.PostID from the split (if exists).
-                if (string.IsNullOrEmpty(DownloadInfo.PostId))
-                    DownloadInfo.PostId = DownloadInfo.ImageUrl.Split('/')[5];
+                // Get DownloadInfo.PostID from the split (if exists).
+                    if (string.IsNullOrEmpty(DownloadInfo.PostId)) {
+                        DownloadInfo.PostId = DownloadInfo.ImageUrl.Split('/')[5];
+                    }
+                }
 
                 this.BeginInvoke(new MethodInvoker(() => {
                     lbInfo.Text = "Downloading image id " + DownloadInfo.PostId;
@@ -135,7 +138,6 @@ namespace aphrodite {
                 string postJson = string.Format("https://e621.net/posts/{0}.json", DownloadInfo.PostId);
 
             // Begin to get the XML
-                DownloadInfo.ImageUrl = postJson;
                 string postXML = apiTools.GetJsonToXml(postJson);
 
             // Check the XML.
@@ -376,7 +378,6 @@ namespace aphrodite {
                         for (int j = 0; j < DownloadInfo.Blacklist.Length; j++) {
                             if (PostTags[i] == DownloadInfo.Blacklist[j]) {
                                 offendingTags += PostTags[i];
-                                isGraylisted = true;
                                 isBlacklisted = true;
                             }
                         }
@@ -429,7 +430,6 @@ namespace aphrodite {
                 string fileNameArtist = "(none)";
                 bool useHardcodedFilter = false;
                 if (string.IsNullOrEmpty(Config.Settings.General.undesiredTags)) {
-
                     useHardcodedFilter = true;
                 }
 
@@ -632,7 +632,7 @@ Finished:
             switch (DownloadImage()) {
                 case true:
                     if (DownloadInfo.OpenAfter) {
-                        Process.Start("explorer.exe", "/select, \"" + DownloadInfo.FileName + "\"");
+                        Process.Start("explorer.exe", "/select, \"" + DownloadInfo.DownloadPath + "\\" + DownloadInfo.FileName + "\"");
                     }
                     break;
             }
@@ -646,12 +646,17 @@ Finished:
                     DownloadInfo.DownloadPath += "\\Images";
 
                 // Check the start URL to add the extra forward-slash for the split.
-                if (!string.IsNullOrEmpty(DownloadInfo.ImageUrl)) {
+                if (DownloadInfo.IsUrl) {
                     if (DownloadInfo.ImageUrl.StartsWith("http://")) {
                         DownloadInfo.ImageUrl.Replace("http://", "https://");
                     }
                     if (!DownloadInfo.ImageUrl.StartsWith("https://")) {
                         DownloadInfo.ImageUrl = "https://" + DownloadInfo.ImageUrl;
+                    }
+
+                    // Get DownloadInfo.PostID from the split (if exists).
+                    if (string.IsNullOrEmpty(DownloadInfo.PostId)) {
+                        DownloadInfo.PostId = DownloadInfo.ImageUrl.Split('/')[5];
                     }
                 }
 
@@ -662,7 +667,6 @@ Finished:
                 string postJson = string.Format("https://e621.net/posts/{0}.json", DownloadInfo.PostId);
 
                 // Begin to get the XML
-                DownloadInfo.ImageUrl = postJson;
                 string postXML = apiTools.GetJsonToXml(postJson);
 
                 // Check the XML.
@@ -902,9 +906,8 @@ Finished:
                     // Worst-case, just delete it after downloading.
                     if (DownloadInfo.Blacklist.Length > 0) {
                         for (int j = 0; j < DownloadInfo.Blacklist.Length; j++) {
-                            if (PostTags[i] == DownloadInfo.Graylist[j]) {
+                            if (PostTags[i] == DownloadInfo.Blacklist[j]) {
                                 offendingTags += PostTags[i];
-                                isGraylisted = true;
                                 isBlacklisted = true;
                             }
                         }

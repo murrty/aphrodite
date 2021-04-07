@@ -29,7 +29,7 @@ namespace aphrodite {
                 using (var ResponseStream = Response.GetResponseStream())
                 using (var Reader = new StreamReader(ResponseStream)) {
                     string JSONString = Reader.ReadToEnd();
-                    byte[] JSONBytes = Encoding.ASCII.GetBytes(JSONString);
+                    byte[] JSONBytes = Encoding.UTF8.GetBytes(JSONString);
                     using (var MemoryStream = new MemoryStream(JSONBytes)) {
                         var Quotas = new XmlDictionaryReaderQuotas();
                         var JSONReader = JsonReaderWriterFactory.CreateJsonReader(MemoryStream, Quotas);
