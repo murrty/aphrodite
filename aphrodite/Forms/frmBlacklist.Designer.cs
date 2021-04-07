@@ -46,7 +46,7 @@
             this.panel1.Controls.Add(this.btnSave);
             this.panel1.Controls.Add(this.btnCancel);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel1.Location = new System.Drawing.Point(0, 262);
+            this.panel1.Location = new System.Drawing.Point(0, 266);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(492, 47);
             this.panel1.TabIndex = 0;
@@ -56,7 +56,7 @@
             this.lbIni.AutoSize = true;
             this.lbIni.Location = new System.Drawing.Point(12, 9);
             this.lbIni.Name = "lbIni";
-            this.lbIni.Size = new System.Drawing.Size(93, 13);
+            this.lbIni.Size = new System.Drawing.Size(105, 13);
             this.lbIni.TabIndex = 8;
             this.lbIni.Text = "Editing ini blacklist";
             this.lbIni.Visible = false;
@@ -66,14 +66,14 @@
             this.lbMutual.AutoSize = true;
             this.lbMutual.Location = new System.Drawing.Point(12, 17);
             this.lbMutual.Name = "lbMutual";
-            this.lbMutual.Size = new System.Drawing.Size(237, 13);
+            this.lbMutual.Size = new System.Drawing.Size(261, 13);
             this.lbMutual.TabIndex = 21;
             this.lbMutual.Text = "Blacklisted tags are mutual between pools && tags";
             // 
             // btnSave
             // 
             this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSave.Location = new System.Drawing.Point(324, 12);
+            this.btnSave.Location = new System.Drawing.Point(405, 12);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(75, 23);
             this.btnSave.TabIndex = 5;
@@ -84,7 +84,7 @@
             // btnCancel
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCancel.Location = new System.Drawing.Point(405, 12);
+            this.btnCancel.Location = new System.Drawing.Point(324, 12);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 6;
@@ -94,7 +94,8 @@
             // 
             // btnSort
             // 
-            this.btnSort.Location = new System.Drawing.Point(12, 240);
+            this.btnSort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnSort.Location = new System.Drawing.Point(7, 242);
             this.btnSort.Name = "btnSort";
             this.btnSort.Size = new System.Drawing.Size(60, 23);
             this.btnSort.TabIndex = 3;
@@ -104,25 +105,32 @@
             // 
             // rtbBlacklist
             // 
-            this.rtbBlacklist.Location = new System.Drawing.Point(10, 26);
+            this.rtbBlacklist.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.rtbBlacklist.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.rtbBlacklist.Location = new System.Drawing.Point(7, 26);
             this.rtbBlacklist.Name = "rtbBlacklist";
-            this.rtbBlacklist.Size = new System.Drawing.Size(231, 208);
+            this.rtbBlacklist.Size = new System.Drawing.Size(231, 212);
             this.rtbBlacklist.TabIndex = 1;
             this.rtbBlacklist.Text = "";
             this.rtbBlacklist.TextChanged += new System.EventHandler(this.rtbBlacklist_TextChanged);
             // 
             // rtbZTB
             // 
-            this.rtbZTB.Location = new System.Drawing.Point(260, 26);
+            this.rtbZTB.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.rtbZTB.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.rtbZTB.Location = new System.Drawing.Point(257, 26);
             this.rtbZTB.Name = "rtbZTB";
-            this.rtbZTB.Size = new System.Drawing.Size(231, 208);
+            this.rtbZTB.Size = new System.Drawing.Size(231, 212);
             this.rtbZTB.TabIndex = 2;
             this.rtbZTB.Text = "";
             this.rtbZTB.TextChanged += new System.EventHandler(this.rtbZTB_TextChanged);
             // 
             // btnSortZTB
             // 
-            this.btnSortZTB.Location = new System.Drawing.Point(262, 240);
+            this.btnSortZTB.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSortZTB.Location = new System.Drawing.Point(257, 242);
             this.btnSortZTB.Name = "btnSortZTB";
             this.btnSortZTB.Size = new System.Drawing.Size(60, 23);
             this.btnSortZTB.TabIndex = 4;
@@ -133,9 +141,9 @@
             // llGraylist
             // 
             this.llGraylist.AutoSize = true;
-            this.llGraylist.Location = new System.Drawing.Point(48, 10);
+            this.llGraylist.Location = new System.Drawing.Point(45, 10);
             this.llGraylist.Name = "llGraylist";
-            this.llGraylist.Size = new System.Drawing.Size(13, 13);
+            this.llGraylist.Size = new System.Drawing.Size(12, 13);
             this.llGraylist.TabIndex = 9;
             this.llGraylist.TabStop = true;
             this.llGraylist.Text = "?";
@@ -143,10 +151,11 @@
             // 
             // llBlacklist
             // 
+            this.llBlacklist.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.llBlacklist.AutoSize = true;
-            this.llBlacklist.Location = new System.Drawing.Point(301, 10);
+            this.llBlacklist.Location = new System.Drawing.Point(298, 10);
             this.llBlacklist.Name = "llBlacklist";
-            this.llBlacklist.Size = new System.Drawing.Size(13, 13);
+            this.llBlacklist.Size = new System.Drawing.Size(12, 13);
             this.llBlacklist.TabIndex = 8;
             this.llBlacklist.TabStop = true;
             this.llBlacklist.Text = "?";
@@ -154,7 +163,8 @@
             // 
             // transparentLabel2
             // 
-            this.transparentLabel2.Location = new System.Drawing.Point(257, 10);
+            this.transparentLabel2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.transparentLabel2.Location = new System.Drawing.Point(254, 10);
             this.transparentLabel2.Name = "transparentLabel2";
             this.transparentLabel2.Size = new System.Drawing.Size(46, 13);
             this.transparentLabel2.TabIndex = 11;
@@ -164,7 +174,7 @@
             // 
             // transparentLabel1
             // 
-            this.transparentLabel1.Location = new System.Drawing.Point(7, 10);
+            this.transparentLabel1.Location = new System.Drawing.Point(4, 10);
             this.transparentLabel1.Name = "transparentLabel1";
             this.transparentLabel1.Size = new System.Drawing.Size(41, 13);
             this.transparentLabel1.TabIndex = 10;
@@ -177,20 +187,21 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(492, 309);
+            this.ClientSize = new System.Drawing.Size(492, 313);
             this.Controls.Add(this.llGraylist);
             this.Controls.Add(this.llBlacklist);
             this.Controls.Add(this.btnSortZTB);
-            this.Controls.Add(this.rtbZTB);
-            this.Controls.Add(this.rtbBlacklist);
             this.Controls.Add(this.btnSort);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.transparentLabel2);
             this.Controls.Add(this.transparentLabel1);
+            this.Controls.Add(this.rtbZTB);
+            this.Controls.Add(this.rtbBlacklist);
+            this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = global::aphrodite.Properties.Resources.Brad;
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(510, 346);
-            this.MinimumSize = new System.Drawing.Size(510, 346);
+            this.MaximumSize = new System.Drawing.Size(510, 350);
+            this.MinimumSize = new System.Drawing.Size(510, 350);
             this.Name = "frmBlacklist";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

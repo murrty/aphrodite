@@ -8,11 +8,10 @@ using System.Windows.Forms;
 namespace aphrodite {
     static class Program {
         public static readonly string UserAgent = "aphrodite/" + (Properties.Settings.Default.currentVersion) + " (Contact: https://github.com/murrty/aphrodite ... open an issue)";
-        public static readonly string ApplicationPath = Assembly.GetExecutingAssembly().Location;
-        public static readonly string ApplicationName = Assembly.GetExecutingAssembly().GetName().Name;
+        public static readonly string ApplicationPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         public static volatile bool IsDebug = false;
         public static volatile bool IsAdmin = false;
-        public static volatile IniFile Ini = new IniFile();
+        public static volatile IniFile Ini = new IniFile(ApplicationPath + "\\aphrodite.ini");
         public static volatile bool UseIni = false;
 
         private static volatile DownloadType type = DownloadType.None;
@@ -32,7 +31,7 @@ namespace aphrodite {
             else {
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
-                if (File.Exists(Assembly.GetExecutingAssembly().Location + "\\aphrodite.ini")) {
+                if (File.Exists(ApplicationPath + "\\aphrodite.ini")) {
                     if (Ini.KeyExists("useIni")) {
                         if (Ini.ReadBool("useIni")) {
                             UseIni = true;

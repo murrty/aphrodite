@@ -53,19 +53,10 @@ namespace aphrodite {
             }
 
             if (Program.UseIni) {
-                mProtocol.Visible = false;
-                mProtocol.Enabled = false;
                 lbIni.Visible = true;
             }
             else {
                 tbMain.TabPages.Remove(tbIni);
-                RegistryKey keyPools = Registry.ClassesRoot.OpenSubKey("pools\\shell\\open\\command", false);
-                RegistryKey keyPoolWl = Registry.ClassesRoot.OpenSubKey("poolwl\\shell\\open\\command", false);
-                RegistryKey keyTags = Registry.ClassesRoot.OpenSubKey("tags\\shell\\open\\command", false);
-                if (keyPools == null || keyPoolWl == null || keyTags == null) {
-                    mProtocol.Visible = true;
-                    mProtocol.Enabled = true;
-                }
             }
 
             chkTagsDownloadExplicit.Checked = Config.Settings.Tags.Explicit;
@@ -138,19 +129,10 @@ namespace aphrodite {
             frmRedownloader rd = new frmRedownloader();
             rd.Show();
         }
-        private void mParser_Click(object sender, EventArgs e) {
-            frmParser psr = new frmParser();
-            psr.ShowDialog();
-        }
 
         private void mAbout_Click(object sender, EventArgs e) {
             frmAbout frAbout = new frmAbout();
             frAbout.Show();
-        }
-        private void mProtocol_Click(object sender, EventArgs e) {
-            frmSettings settings = new frmSettings();
-            settings.InstallProtocol = true;
-            settings.ShowDialog();
         }
         #endregion
 
@@ -207,6 +189,8 @@ namespace aphrodite {
             NewInfo.SaveQuestionable = chkTagsDownloadQuestionable.Checked;
             NewInfo.SaveSafe = chkTagsDownloadSafe.Checked;
             NewInfo.SeparateRatings = chkTagsSeparateRatings.Checked;
+            NewInfo.SeparateNonImages = chkTagSeparateNonImages.Checked;
+            NewInfo.OpenAfter = chkTagOpenAfterDownload.Checked;
             frmTagDownloader Downloader = new frmTagDownloader();
             Downloader.DownloadInfo = NewInfo;
             Downloader.Show();
@@ -273,6 +257,8 @@ namespace aphrodite {
             NewInfo.SeparateBlacklisted = chkImageSeparateBlacklisted.Checked;
             NewInfo.SeparateArtists = chkImageSeparateArtists.Checked;
             NewInfo.UseForm = chkImageUseForm.Checked;
+            NewInfo.SeparateNonImages = chkImageSeparateNonImages.Checked;
+            NewInfo.OpenAfter = chkImageOpenAfter.Checked;
 
             if (NewInfo.UseForm) {
                 ImageDownloader Downloader = new ImageDownloader(NewInfo);

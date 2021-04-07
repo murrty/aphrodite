@@ -72,7 +72,7 @@
             // 
             this.lbPercentage.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.lbPercentage.BackColor = System.Drawing.Color.Transparent;
-            this.lbPercentage.Location = new System.Drawing.Point(114, 127);
+            this.lbPercentage.Location = new System.Drawing.Point(110, 127);
             this.lbPercentage.Name = "lbPercentage";
             this.lbPercentage.Size = new System.Drawing.Size(41, 14);
             this.lbPercentage.TabIndex = 4;
@@ -100,7 +100,6 @@
             // 
             // tmrTitle
             // 
-            this.tmrTitle.Enabled = true;
             this.tmrTitle.Interval = 1000;
             this.tmrTitle.Tick += new System.EventHandler(this.tmrTitle_Tick);
             // 
@@ -130,9 +129,9 @@
             // 
             this.lbRemoved.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.lbRemoved.AutoSize = true;
-            this.lbRemoved.Location = new System.Drawing.Point(67, 150);
+            this.lbRemoved.Location = new System.Drawing.Point(60, 150);
             this.lbRemoved.Name = "lbRemoved";
-            this.lbRemoved.Size = new System.Drawing.Size(134, 13);
+            this.lbRemoved.Size = new System.Drawing.Size(141, 13);
             this.lbRemoved.TabIndex = 12;
             this.lbRemoved.Text = "Removed images detected";
             this.lbRemoved.Visible = false;
@@ -164,7 +163,8 @@
             this.Controls.Add(this.lbTotal);
             this.Controls.Add(this.pbDownloadStatus);
             this.Controls.Add(this.lbBytes);
-            this.Icon = Properties.Resources.Brad;
+            this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Icon = global::aphrodite.Properties.Resources.Brad;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(276, 206);

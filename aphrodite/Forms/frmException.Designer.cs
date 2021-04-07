@@ -49,7 +49,7 @@
             this.lbVersion.AutoSize = true;
             this.lbVersion.Location = new System.Drawing.Point(14, 223);
             this.lbVersion.Name = "lbVersion";
-            this.lbVersion.Size = new System.Drawing.Size(50, 13);
+            this.lbVersion.Size = new System.Drawing.Size(55, 13);
             this.lbVersion.TabIndex = 9;
             this.lbVersion.Text = "lbVersion";
             // 
@@ -69,6 +69,7 @@
             this.rtbExceptionDetails.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.rtbExceptionDetails.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.rtbExceptionDetails.Location = new System.Drawing.Point(12, 61);
             this.rtbExceptionDetails.Name = "rtbExceptionDetails";
             this.rtbExceptionDetails.ReadOnly = true;
@@ -118,6 +119,7 @@
             this.Controls.Add(this.rtbExceptionDetails);
             this.Controls.Add(this.lbExceptionDescription);
             this.Controls.Add(this.lbExceptionHeader);
+            this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = global::aphrodite.Properties.Resources.Brad;
             this.MaximizeBox = false;
             this.MinimizeBox = false;

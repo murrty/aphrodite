@@ -17,6 +17,7 @@ namespace aphrodite {
 
             if (Program.UseIni) {
                 lbIni.Visible = true;
+                lbMutual.Location = new Point(lbMutual.Location.X, (lbIni.Location.X + lbIni.Size.Height));
             }
         }
 

@@ -72,6 +72,9 @@
     <Compile Include="Classes\apiTools.cs" />
     <Compile Include="Classes\Downloader.cs" />
     <Compile Include="Classes\ErrorLog.cs" />
+    <Compile Include="Controls\AeroListBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\ExProgressBar.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -134,12 +137,6 @@
     </Compile>
     <Compile Include="Forms\frmImageDownloader.Designer.cs">
       <DependentUpon>frmImageDownloader.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\frmParser.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\frmParser.Designer.cs">
-      <DependentUpon>frmParser.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\frmPoolDownloader.cs">
       <SubType>Form</SubType>
@@ -222,9 +219,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmLicensing.resx">
       <DependentUpon>frmLicensing.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\frmParser.resx">
-      <DependentUpon>frmParser.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmPoolDownloader.resx">
       <DependentUpon>frmPoolDownloader.cs</DependentUpon>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace aphrodite {
@@ -30,17 +31,27 @@ namespace aphrodite {
         }
 
         private void btnRemove_Click(object sender, EventArgs e) {
-            listTags.Items.RemoveAt(listTags.SelectedIndex);
+            for (int i = listTags.SelectedIndices.Count - 1; i > -1; i--) {
+                listTags.Items.RemoveAt(listTags.SelectedIndices[i]);
+            }
         }
 
         private void btnAdd_Click(object sender, EventArgs e) {
-            listTags.Items.Add(txtUndesired.Text.Replace(' ', '_'));
+            if (!string.IsNullOrWhiteSpace(txtUndesired.Text)) {
+                listTags.Items.Add(txtUndesired.Text.Replace(' ', '_'));
+            }
         }
 
         private void btnReset_Click(object sender, EventArgs e) {
-            if (string.IsNullOrEmpty(Config.Settings.General.undesiredTags)) {
-                listTags.Items.AddRange(UndesiredTags.HardcodedUndesiredTags);
-            }
+            listTags.Items.Clear();
+            listTags.Items.AddRange(UndesiredTags.HardcodedUndesiredTags);
+        }
+
+        private void txtUndesired_TextChanged(object sender, EventArgs e) {
+            var txtSender = (TextBox)sender;
+            var curPos = txtSender.SelectionStart;
+            txtSender.Text = Regex.Replace(txtSender.Text, " ", "_");
+            txtSender.SelectionStart = curPos;
         }
     }
 

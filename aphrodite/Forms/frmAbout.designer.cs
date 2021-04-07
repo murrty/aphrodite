@@ -27,12 +27,12 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmAbout));
             this.lbVersion = new System.Windows.Forms.Label();
-            this.llbCheckForUpdates = new LinkLabelHand();
+            this.llbCheckForUpdates = new aphrodite.LinkLabelHand();
             this.lbHeader = new System.Windows.Forms.Label();
             this.lbBody = new System.Windows.Forms.Label();
             this.pbIcon = new System.Windows.Forms.PictureBox();
             this.tipWoof = new System.Windows.Forms.ToolTip(this.components);
-            this.lnkLicense = new LinkLabelHand();
+            this.lnkLicense = new aphrodite.LinkLabelHand();
             ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).BeginInit();
             this.SuspendLayout();
             // 
@@ -41,7 +41,7 @@
             this.lbVersion.AutoSize = true;
             this.lbVersion.Location = new System.Drawing.Point(178, 15);
             this.lbVersion.Name = "lbVersion";
-            this.lbVersion.Size = new System.Drawing.Size(28, 13);
+            this.lbVersion.Size = new System.Drawing.Size(27, 13);
             this.lbVersion.TabIndex = 2;
             this.lbVersion.Text = "v0.0";
             // 
@@ -51,7 +51,7 @@
             this.llbCheckForUpdates.LinkColor = System.Drawing.Color.Blue;
             this.llbCheckForUpdates.Location = new System.Drawing.Point(85, 120);
             this.llbCheckForUpdates.Name = "llbCheckForUpdates";
-            this.llbCheckForUpdates.Size = new System.Drawing.Size(94, 13);
+            this.llbCheckForUpdates.Size = new System.Drawing.Size(101, 13);
             this.llbCheckForUpdates.TabIndex = 0;
             this.llbCheckForUpdates.TabStop = true;
             this.llbCheckForUpdates.Text = "Check for updates";
@@ -96,7 +96,7 @@
             this.lnkLicense.AutoSize = true;
             this.lnkLicense.Location = new System.Drawing.Point(12, 120);
             this.lnkLicense.Name = "lnkLicense";
-            this.lnkLicense.Size = new System.Drawing.Size(45, 13);
+            this.lnkLicense.Size = new System.Drawing.Size(47, 13);
             this.lnkLicense.TabIndex = 5;
             this.lnkLicense.TabStop = true;
             this.lnkLicense.Text = "licenses";
@@ -107,14 +107,15 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(264, 141);
+            this.ClientSize = new System.Drawing.Size(262, 143);
             this.Controls.Add(this.lnkLicense);
             this.Controls.Add(this.lbVersion);
             this.Controls.Add(this.pbIcon);
             this.Controls.Add(this.lbBody);
             this.Controls.Add(this.lbHeader);
             this.Controls.Add(this.llbCheckForUpdates);
-            this.Icon = Properties.Resources.Brad;
+            this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Icon = global::aphrodite.Properties.Resources.Brad;
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(280, 180);
             this.MinimumSize = new System.Drawing.Size(280, 180);

@@ -44,7 +44,7 @@
             this.tcMain.Location = new System.Drawing.Point(0, 0);
             this.tcMain.Name = "tcMain";
             this.tcMain.SelectedIndex = 0;
-            this.tcMain.Size = new System.Drawing.Size(284, 210);
+            this.tcMain.Size = new System.Drawing.Size(292, 205);
             this.tcMain.TabIndex = 0;
             // 
             // tbTags
@@ -53,17 +53,18 @@
             this.tbTags.Location = new System.Drawing.Point(4, 22);
             this.tbTags.Name = "tbTags";
             this.tbTags.Padding = new System.Windows.Forms.Padding(3);
-            this.tbTags.Size = new System.Drawing.Size(276, 184);
+            this.tbTags.Size = new System.Drawing.Size(283, 184);
             this.tbTags.TabIndex = 0;
             this.tbTags.Text = "Tags";
             this.tbTags.UseVisualStyleBackColor = true;
             // 
             // lbTags
             // 
+            this.lbTags.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lbTags.FormattingEnabled = true;
-            this.lbTags.Location = new System.Drawing.Point(8, 6);
+            this.lbTags.Location = new System.Drawing.Point(3, 3);
             this.lbTags.Name = "lbTags";
-            this.lbTags.Size = new System.Drawing.Size(270, 173);
+            this.lbTags.Size = new System.Drawing.Size(277, 178);
             this.lbTags.TabIndex = 0;
             this.lbTags.SelectedIndexChanged += new System.EventHandler(this.lbTags_SelectedIndexChanged);
             this.lbTags.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.lbTags_MouseDoubleClick);
@@ -74,17 +75,18 @@
             this.tbPools.Location = new System.Drawing.Point(4, 22);
             this.tbPools.Name = "tbPools";
             this.tbPools.Padding = new System.Windows.Forms.Padding(3);
-            this.tbPools.Size = new System.Drawing.Size(284, 184);
+            this.tbPools.Size = new System.Drawing.Size(284, 179);
             this.tbPools.TabIndex = 1;
             this.tbPools.Text = "Pools";
             this.tbPools.UseVisualStyleBackColor = true;
             // 
             // lbPools
             // 
+            this.lbPools.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lbPools.FormattingEnabled = true;
-            this.lbPools.Location = new System.Drawing.Point(8, 6);
+            this.lbPools.Location = new System.Drawing.Point(3, 3);
             this.lbPools.Name = "lbPools";
-            this.lbPools.Size = new System.Drawing.Size(268, 173);
+            this.lbPools.Size = new System.Drawing.Size(278, 173);
             this.lbPools.TabIndex = 0;
             this.lbPools.SelectedIndexChanged += new System.EventHandler(this.lbPools_SelectedIndexChanged);
             this.lbPools.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.lbPools_MouseDoubleClick);
@@ -92,9 +94,9 @@
             // btnRedownload
             // 
             this.btnRedownload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRedownload.Location = new System.Drawing.Point(159, 243);
+            this.btnRedownload.Location = new System.Drawing.Point(152, 239);
             this.btnRedownload.Name = "btnRedownload";
-            this.btnRedownload.Size = new System.Drawing.Size(129, 23);
+            this.btnRedownload.Size = new System.Drawing.Size(130, 23);
             this.btnRedownload.TabIndex = 1;
             this.btnRedownload.Text = "Redownload selected";
             this.btnRedownload.UseVisualStyleBackColor = true;
@@ -103,9 +105,9 @@
             // btnRenumerate
             // 
             this.btnRenumerate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnRenumerate.Location = new System.Drawing.Point(4, 243);
+            this.btnRenumerate.Location = new System.Drawing.Point(10, 239);
             this.btnRenumerate.Name = "btnRenumerate";
-            this.btnRenumerate.Size = new System.Drawing.Size(76, 23);
+            this.btnRenumerate.Size = new System.Drawing.Size(80, 23);
             this.btnRenumerate.TabIndex = 2;
             this.btnRenumerate.Text = "Renumerate";
             this.btnRenumerate.UseVisualStyleBackColor = true;
@@ -115,25 +117,26 @@
             // 
             this.lbDownloadedOn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lbDownloadedOn.AutoSize = true;
-            this.lbDownloadedOn.Location = new System.Drawing.Point(12, 213);
+            this.lbDownloadedOn.Location = new System.Drawing.Point(12, 208);
             this.lbDownloadedOn.Name = "lbDownloadedOn";
-            this.lbDownloadedOn.Size = new System.Drawing.Size(0, 13);
+            this.lbDownloadedOn.Size = new System.Drawing.Size(47, 26);
             this.lbDownloadedOn.TabIndex = 3;
+            this.lbDownloadedOn.Text = "????????\r\n????????";
             // 
             // frmRedownloader
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(284, 261);
+            this.ClientSize = new System.Drawing.Size(292, 269);
             this.Controls.Add(this.lbDownloadedOn);
             this.Controls.Add(this.btnRenumerate);
             this.Controls.Add(this.btnRedownload);
             this.Controls.Add(this.tcMain);
-            this.Icon = Properties.Resources.Brad;
+            this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Icon = global::aphrodite.Properties.Resources.Brad;
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(300, 300);
-            this.MinimumSize = new System.Drawing.Size(300, 300);
+            this.MinimumSize = new System.Drawing.Size(310, 306);
             this.Name = "frmRedownloader";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

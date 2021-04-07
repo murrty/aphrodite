@@ -154,5 +154,17 @@ namespace aphrodite.Settings {
                 this["saveTagMetadata"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool openAfter {
+            get {
+                return ((bool)(this["openAfter"]));
+            }
+            set {
+                this["openAfter"] = value;
+            }
+        }
     }
 }

@@ -87,7 +87,7 @@
             this.txtTags.Location = new System.Drawing.Point(12, 20);
             this.txtTags.Name = "txtTags";
             this.txtTags.ReadOnly = true;
-            this.txtTags.Size = new System.Drawing.Size(288, 20);
+            this.txtTags.Size = new System.Drawing.Size(288, 22);
             this.txtTags.TabIndex = 1;
             this.txtTags.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
@@ -111,9 +111,9 @@
             // 
             this.lbRemoved.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.lbRemoved.AutoSize = true;
-            this.lbRemoved.Location = new System.Drawing.Point(89, 273);
+            this.lbRemoved.Location = new System.Drawing.Point(86, 273);
             this.lbRemoved.Name = "lbRemoved";
-            this.lbRemoved.Size = new System.Drawing.Size(134, 13);
+            this.lbRemoved.Size = new System.Drawing.Size(141, 13);
             this.lbRemoved.TabIndex = 11;
             this.lbRemoved.Text = "Removed images detected";
             this.lbRemoved.Visible = false;
@@ -182,6 +182,7 @@
             this.Controls.Add(this.lbBlacklist);
             this.Controls.Add(this.lbLimits);
             this.Controls.Add(this.pbDownloadStatus);
+            this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = global::aphrodite.Properties.Resources.Brad;
             this.MaximizeBox = false;
             this.MinimizeBox = false;

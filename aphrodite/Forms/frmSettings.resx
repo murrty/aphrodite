@@ -120,9 +120,6 @@
   <metadata name="JustTheTips.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
-  <metadata name="JustTheTips.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
   <data name="chkSaveInfoFiles.ToolTip" xml:space="preserve">
     <value>Saves each image information, such as tags, description, md5, etc. into files in the same directory.
 Tags would be saved as tags.nfo &amp; tags.blacklisted.nfo
@@ -130,9 +127,11 @@ Pools would be saved as pools.nfo &amp; pools.blacklisted.nfo
 Images would be saved as images.nfo &amp; images.blacklisted.nfo</value>
   </data>
   <data name="lbProtocols.Text" xml:space="preserve">
-    <value>A protocol is used by browsers to run applications, usually with arguments from
-websites. Using a protocol with this program is useful if you want to download
-while browsing e621. They're all optional, but require a userscript.
+    <value>A protocol is used by browsers to run applications, usually with
+arguments from websites. Using a protocol with this program is
+useful if you want to download while browsing e621.
+They're all optional, but require a userscript.
+
 the 'images:' protocol uses a separate userscript for... various reasons.</value>
   </data>
   <data name="lbPortable.Text" xml:space="preserve">
@@ -147,27 +146,21 @@ Click the button below to export your settings to "aphrodite.ini" in the same di
 %id%          =  The ID of the post
 %rating%      =  The rating of the post
 %rating2%     =  The single letter of the rating
-%artist%      =  The first artist in the array of
-                 the image
+%artist%      =  The first artist in the array of the image
 %ext%         =  The extension of the file
 %fav_count%   =  The favorite count of the post
 %score%       =  The user score of the post
-%scoreup%     =  The amount of upvotes on the
-                 post
-%scoredown%   =  The amount of downvotes on the
-                 post
-%author%      =  The id of who submitted it to
-                 e621
+%scoreup%     =  The amount of upvotes on the post
+%scoredown%   =  The amount of downvotes on the post
+%author%      =  The id of who submitted it to e621
 
 (Pools only)
 %poolname%    =  The name of the pool
 %poolid%      =  The ID of the pool
-%page%        =  The page number of the post in
-                 the pool
+%page%        =  The page number of the post in the pool
 
 (Illegal characters)
-The following characters won't be allowed to be
-used:
+The following characters won't be allowed to be used:
 \    /    :    *    ?    "    &lt;    &gt;    |</value>
   </data>
   <data name="txtImageSchema.ToolTip" xml:space="preserve">

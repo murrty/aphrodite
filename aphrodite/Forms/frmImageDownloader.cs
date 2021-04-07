@@ -55,6 +55,9 @@ namespace aphrodite {
             imageDownload.Start();
         }
         private void AfterDownload() {
+            if (DownloadInfo.OpenAfter) {
+                Process.Start(DownloadInfo.DownloadPath);
+            }
             if (DownloadInfo.IgnoreFinish) {
                 if (DownloadHasFinished) {
                     this.DialogResult = DialogResult.Yes;
@@ -105,10 +108,9 @@ namespace aphrodite {
         }
         public void downloadImage() {
             try {
-                string SaveTo = DownloadInfo.DownloadPath;
             // Set the SaveTo to \\Images.
-                if (!SaveTo.EndsWith("\\Images"))
-                    SaveTo += "\\Images";
+                if (!DownloadInfo.DownloadPath.EndsWith("\\Images"))
+                    DownloadInfo.DownloadPath += "\\Images";
 
             // Check the start URL to add the extra forward-slash for the split.
                 if (DownloadInfo.ImageUrl.StartsWith("http://")) {
@@ -182,64 +184,144 @@ namespace aphrodite {
                     }
                 }
 
-                List<string> foundTags = new List<string>();
+                List<string> PostTags = new List<string>();
                 string ReadTags = string.Empty;
 
-                ReadTags += "          General: [";
-                for (int x = 0; x < xmlTagsGeneral[0].ChildNodes.Count; x++) {
-                    foundTags.Add(xmlTagsGeneral[0].ChildNodes[x].InnerText);
-                    ReadTags += xmlTagsGeneral[0].ChildNodes[x].InnerText + ", ";
+                ReadTags += "          General: [ ";
+                switch (xmlTagsGeneral[0].ChildNodes.Count > 0) {
+                    case true:
+                        for (int x = 0; x < xmlTagsGeneral[0].ChildNodes.Count; x++) {
+                            PostTags.Add(xmlTagsGeneral[0].ChildNodes[x].InnerText);
+                            ReadTags += xmlTagsGeneral[0].ChildNodes[x].InnerText + ", ";
+                        }
+                        ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                        break;
+
+                    case false:
+                        ReadTags += "none";
+                        break;
                 }
-                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                ReadTags += "]\n          Species: [";
-                for (int x = 0; x < xmlTagsSpecies[0].ChildNodes.Count; x++) {
-                    foundTags.Add(xmlTagsSpecies[0].ChildNodes[x].InnerText);
-                    ReadTags += xmlTagsSpecies[0].ChildNodes[x].InnerText + ", ";
+
+                ReadTags += " ]\r\n          Species: [ ";
+                switch (xmlTagsSpecies[0].ChildNodes.Count > 0) {
+                    case true:
+                        for (int x = 0; x < xmlTagsSpecies[0].ChildNodes.Count; x++) {
+                            PostTags.Add(xmlTagsSpecies[0].ChildNodes[x].InnerText);
+                            ReadTags += xmlTagsSpecies[0].ChildNodes[x].InnerText + ", ";
+                        }
+                        ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                        break;
+
+                    case false:
+                        ReadTags += "none";
+                        break;
                 }
-                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                ReadTags += "]\n          Character: [";
-                for (int x = 0; x < xmlTagsCharacter[0].ChildNodes.Count; x++) {
-                    foundTags.Add(xmlTagsCharacter[0].ChildNodes[x].InnerText);
-                    ReadTags += xmlTagsCharacter[0].ChildNodes[x].InnerText + ", ";
+
+                ReadTags += " ]\r\n          Character(s): [ ";
+                switch (xmlTagsCharacter[0].ChildNodes.Count > 0) {
+                    case true:
+                        for (int x = 0; x < xmlTagsCharacter[0].ChildNodes.Count; x++) {
+                            PostTags.Add(xmlTagsCharacter[0].ChildNodes[x].InnerText);
+                            ReadTags += xmlTagsCharacter[0].ChildNodes[x].InnerText + ", ";
+                        }
+                        ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                        break;
+
+                    case false:
+                        ReadTags += "none";
+                        break;
                 }
-                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                ReadTags += "]\n          Copyright: [";
-                for (int x = 0; x < xmlTagsCopyright[0].ChildNodes.Count; x++) {
-                    foundTags.Add(xmlTagsCopyright[0].ChildNodes[x].InnerText);
-                    ReadTags += xmlTagsCopyright[0].ChildNodes[x].InnerText + ", ";
+
+                ReadTags += " ]\r\n          Copyright: [ ";
+                switch (xmlTagsCopyright[0].ChildNodes.Count > 0) {
+                    case true:
+                        for (int x = 0; x < xmlTagsCopyright[0].ChildNodes.Count; x++) {
+                            PostTags.Add(xmlTagsCopyright[0].ChildNodes[x].InnerText);
+                            ReadTags += xmlTagsCopyright[0].ChildNodes[x].InnerText + ", ";
+                        }
+                        ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                        break;
+
+                    case false:
+                        ReadTags += "none";
+                        break;
                 }
-                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                ReadTags += "]\n          Artist: [";
-                for (int x = 0; x < xmlTagsArtist[0].ChildNodes.Count; x++) {
-                    foundTags.Add(xmlTagsArtist[0].ChildNodes[x].InnerText);
-                    ReadTags += xmlTagsArtist[0].ChildNodes[x].InnerText + ", ";
+
+                ReadTags += " ]\r\n          Artist: [ ";
+                switch (xmlTagsArtist[0].ChildNodes.Count > 0) {
+                    case true:
+                        for (int x = 0; x < xmlTagsArtist[0].ChildNodes.Count; x++) {
+                            PostTags.Add(xmlTagsArtist[0].ChildNodes[x].InnerText);
+                            ReadTags += xmlTagsArtist[0].ChildNodes[x].InnerText + ", ";
+                        }
+                        ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                        break;
+
+                    case false:
+                        ReadTags += "none";
+                        break;
                 }
-                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                ReadTags += "]\n          Invalid: [";
-                for (int x = 0; x < xmlTagsInvalid[0].ChildNodes.Count; x++) {
-                    foundTags.Add(xmlTagsInvalid[0].ChildNodes[x].InnerText);
-                    ReadTags += xmlTagsInvalid[0].ChildNodes[x].InnerText + ", ";
+
+                ReadTags += " ]\r\n          Lore: [ ";
+                switch (xmlTagsLore[0].ChildNodes.Count > 0) {
+                    case true:
+                        for (int x = 0; x < xmlTagsLore[0].ChildNodes.Count; x++) {
+                            PostTags.Add(xmlTagsLore[0].ChildNodes[x].InnerText);
+                            ReadTags += xmlTagsLore[0].ChildNodes[x].InnerText + ", ";
+                        }
+                        ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                        break;
+
+                    case false:
+                        ReadTags += "none";
+                        break;
                 }
-                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                ReadTags += "]\n          Lore: [";
-                for (int x = 0; x < xmlTagsLore[0].ChildNodes.Count; x++) {
-                    foundTags.Add(xmlTagsLore[0].ChildNodes[x].InnerText);
-                    ReadTags += xmlTagsLore[0].ChildNodes[x].InnerText + ", ";
+
+                ReadTags += " ]\r\n          Meta: [ ";
+                switch (xmlTagsMeta[0].ChildNodes.Count > 0) {
+                    case true:
+                        for (int x = 0; x < xmlTagsMeta[0].ChildNodes.Count; x++) {
+                            PostTags.Add(xmlTagsMeta[0].ChildNodes[x].InnerText);
+                            ReadTags += xmlTagsMeta[0].ChildNodes[x].InnerText + ", ";
+                        }
+                        ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                        break;
+
+                    case false:
+                        ReadTags += "none";
+                        break;
                 }
-                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                ReadTags += "]\n          Meta: [";
-                for (int x = 0; x < xmlTagsMeta[0].ChildNodes.Count; x++) {
-                    foundTags.Add(xmlTagsMeta[0].ChildNodes[x].InnerText);
-                    ReadTags += xmlTagsMeta[0].ChildNodes[x].InnerText + ", ";
+
+                ReadTags += " ]\r\n          Locked tags: [ ";
+                switch (xmlTagsLocked[0].ChildNodes.Count > 0) {
+                    case true:
+                        for (int x = 0; x < xmlTagsLocked[0].ChildNodes.Count; x++) {
+                            PostTags.Add(xmlTagsLocked[0].ChildNodes[x].InnerText);
+                            ReadTags += xmlTagsLocked[0].ChildNodes[x].InnerText + ", ";
+                        }
+                        ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',') + " ]";
+                        break;
+
+                    case false:
+                        ReadTags += "none";
+                        break;
                 }
-                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                ReadTags += "]\n          Locked tags: [";
-                for (int x = 0; x < xmlTagsLocked[0].ChildNodes.Count; x++) {
-                    foundTags.Add(xmlTagsLocked[0].ChildNodes[x].InnerText);
-                    ReadTags += xmlTagsLocked[0].ChildNodes[x].InnerText + ", ";
+
+                ReadTags += " ]\r\n          Invalid: [ ";
+                switch (xmlTagsInvalid[0].ChildNodes.Count > 0) {
+                    case true:
+                        for (int x = 0; x < xmlTagsInvalid[0].ChildNodes.Count; x++) {
+                            PostTags.Add(xmlTagsInvalid[0].ChildNodes[x].InnerText);
+                            ReadTags += xmlTagsInvalid[0].ChildNodes[x].InnerText + ", ";
+                        }
+                        ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                        break;
+
+                    case false:
+                        ReadTags += "none";
+                        break;
                 }
-                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                ReadTags += "]\n";
+                ReadTags += " ]";
 
             // Get the rating.
                 string rating = xmlRating[0].InnerText;
@@ -278,11 +360,11 @@ namespace aphrodite {
                 bool isGraylisted = false;
                 bool isBlacklisted = false;
                 string offendingTags = string.Empty;
-                for (int i = 0; i < foundTags.Count; i++) {
+                for (int i = 0; i < PostTags.Count; i++) {
                     if (DownloadInfo.Graylist.Length > 0) {
                         for (int j = 0; j < DownloadInfo.Graylist.Length; j++) {
-                            if (foundTags[i] == DownloadInfo.Graylist[j]) {
-                                offendingTags += foundTags[i];
+                            if (PostTags[i] == DownloadInfo.Graylist[j]) {
+                                offendingTags += PostTags[i];
                                 isGraylisted = true;
                             }
                         }
@@ -292,8 +374,8 @@ namespace aphrodite {
                 // Worst-case, just delete it after downloading.
                     if (DownloadInfo.Blacklist.Length > 0) {
                         for (int j = 0; j < DownloadInfo.Blacklist.Length; j++) {
-                            if (foundTags[i] == DownloadInfo.Blacklist[j]) {
-                                offendingTags += foundTags[i];
+                            if (PostTags[i] == DownloadInfo.Blacklist[j]) {
+                                offendingTags += PostTags[i];
                                 isGraylisted = true;
                                 isBlacklisted = true;
                             }
@@ -370,62 +452,65 @@ namespace aphrodite {
                     }
                 }
 
-                string fileName = DownloadInfo.FileNameSchema.Replace("%md5%", xmlMD5[0].InnerText)
-                                                             .Replace("%id%", xmlID[0].InnerText)
-                                                             .Replace("%rating%", rating.ToLower())
-                                                             .Replace("%rating2%", xmlRating[0].InnerText)
-                                                             .Replace("%artist%", fileNameArtist)
-                                                             .Replace("%ext%", xmlExt[0].InnerText)
-                                                             .Replace("%fav_count%", xmlFavCount[0].InnerText)
-                                                             .Replace("%score%", xmlScoreTotal[0].InnerText)
-                                                             .Replace("%scoreup%", xmlScoreUp[0].InnerText)
-                                                             .Replace("%scoredown%", xmlScoreDown[0].InnerText)
-                                                             .Replace("%author%", xmlAuthor[0].InnerText) + "." + xmlExt[0].InnerText;
+                DownloadInfo.FileName = DownloadInfo.FileNameSchema.Replace("%md5%", xmlMD5[0].InnerText)
+                                .Replace("%id%", xmlID[0].InnerText)
+                                .Replace("%rating%", rating.ToLower())
+                                .Replace("%rating2%", xmlRating[0].InnerText)
+                                .Replace("%artist%", fileNameArtist)
+                                .Replace("%ext%", xmlExt[0].InnerText)
+                                .Replace("%fav_count%", xmlFavCount[0].InnerText)
+                                .Replace("%score%", xmlScoreTotal[0].InnerText)
+                                .Replace("%scoreup%", xmlScoreUp[0].InnerText)
+                                .Replace("%scoredown%", xmlScoreDown[0].InnerText)
+                                .Replace("%author%", xmlAuthor[0].InnerText) + "." + xmlExt[0].InnerText;
 
             // Start working on the SaveTo string.
                 if (DownloadInfo.SeparateRatings) {
                     switch (xmlRating[0].InnerText.ToLower()) {
                         case "e": case "explicit":
-                            SaveTo += "\\explicit";
+                            DownloadInfo.DownloadPath += "\\explicit";
                             break;
                         case "q": case "questionable":
-                            SaveTo += "\\questionable";
+                            DownloadInfo.DownloadPath += "\\questionable";
                             break;
                         case "s": case "safe":
-                            SaveTo += "\\safe";
+                            DownloadInfo.DownloadPath += "\\safe";
                             break;
                     }
                 }
 
                 if (isGraylisted || isBlacklisted && DownloadInfo.SeparateBlacklisted)
-                    SaveTo += "\\blacklisted";
+                    DownloadInfo.DownloadPath += "\\blacklisted";
                 if (DownloadInfo.SeparateArtists) {
-                    SaveTo += "\\" + fileNameArtist;
+                    DownloadInfo.DownloadPath += "\\" + fileNameArtist;
                 }
 
                 switch (DownloadInfo.SeparateNonImages) {
                     case true:
-                        if (fileName.EndsWith("gif")) {
-                            SaveTo += "\\gif";
-                        }
-                        else if (fileName.EndsWith("apng")) {
-                            SaveTo += "\\apng";
-                        }
-                        else if (fileName.EndsWith("webm")) {
-                            SaveTo += "\\webm";
-                        }
-                        else if (fileName.EndsWith("swf")) {
-                            SaveTo += "\\swf";
+                        switch (xmlExt[0].InnerText) {
+                            case "gif":
+                                DownloadInfo.DownloadPath += "\\gif";
+                                break;
+                            case "apng":
+                                DownloadInfo.DownloadPath += "\\apng";
+                                break;
+                            case "webm":
+                                DownloadInfo.DownloadPath += "\\webm";
+                                break;
+                            case "swf":
+                                DownloadInfo.DownloadPath += "\\swf";
+                                break;
                         }
                         break;
                 }
 
             // Create output directory.
-                if (!Directory.Exists(SaveTo))
-                    Directory.CreateDirectory(SaveTo);
+                if (!Directory.Exists(DownloadInfo.DownloadPath)) {
+                    Directory.CreateDirectory(DownloadInfo.DownloadPath);
+                }
 
             // Check file before continuing.
-                if (File.Exists(SaveTo + "\\" + fileName)) {
+                if (File.Exists(DownloadInfo.DownloadPath + "\\" + DownloadInfo.FileName)) {
                     DownloadHasFinished = true;
                     goto Finished;
                 }
@@ -491,7 +576,7 @@ namespace aphrodite {
                     wc.Method = "GET";
                     apiTools.SendDebugMessage("Beginning download of file " + DownloadUrl);
 
-                    wc.DownloadFile(DownloadUrl, SaveTo + "\\" + fileName);
+                    wc.DownloadFile(DownloadUrl, DownloadInfo.DownloadPath + "\\" + DownloadInfo.FileName);
                 }
 
                 DownloadHasFinished = true;
@@ -544,16 +629,21 @@ Finished:
                 Info.FileNameSchema = "%artist%_%md5%";
             }
             DownloadInfo = Info;
-            DownloadImage();
+            switch (DownloadImage()) {
+                case true:
+                    if (DownloadInfo.OpenAfter) {
+                        Process.Start("explorer.exe", "/select, \"" + DownloadInfo.FileName + "\"");
+                    }
+                    break;
+            }
         }
 
         #region Downloader
         public bool DownloadImage() {
             try {
-                string SaveTo = DownloadInfo.DownloadPath;
                 // Set the saveto to \\Images.
-                if (!SaveTo.EndsWith("\\Images"))
-                    SaveTo += "\\Images";
+                if (!DownloadInfo.DownloadPath.EndsWith("\\Images"))
+                    DownloadInfo.DownloadPath += "\\Images";
 
                 // Check the start URL to add the extra forward-slash for the split.
                 if (!string.IsNullOrEmpty(DownloadInfo.ImageUrl)) {
@@ -619,64 +709,144 @@ Finished:
                     }
                 }
 
-                List<string> foundTags = new List<string>();
+                List<string> PostTags = new List<string>();
                 string ReadTags = string.Empty;
 
-                ReadTags += "          General: [";
-                for (int x = 0; x < xmlTagsGeneral[0].ChildNodes.Count; x++) {
-                    foundTags.Add(xmlTagsGeneral[0].ChildNodes[x].InnerText);
-                    ReadTags += xmlTagsGeneral[0].ChildNodes[x].InnerText + ", ";
+                ReadTags += "          General: [ ";
+                switch (xmlTagsGeneral[0].ChildNodes.Count > 0) {
+                    case true:
+                        for (int x = 0; x < xmlTagsGeneral[0].ChildNodes.Count; x++) {
+                            PostTags.Add(xmlTagsGeneral[0].ChildNodes[x].InnerText);
+                            ReadTags += xmlTagsGeneral[0].ChildNodes[x].InnerText + ", ";
+                        }
+                        ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                        break;
+
+                    case false:
+                        ReadTags += "none";
+                        break;
                 }
-                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                ReadTags += "]\n          Species: [";
-                for (int x = 0; x < xmlTagsSpecies[0].ChildNodes.Count; x++) {
-                    foundTags.Add(xmlTagsSpecies[0].ChildNodes[x].InnerText);
-                    ReadTags += xmlTagsSpecies[0].ChildNodes[x].InnerText + ", ";
+
+                ReadTags += " ]\r\n          Species: [ ";
+                switch (xmlTagsSpecies[0].ChildNodes.Count > 0) {
+                    case true:
+                        for (int x = 0; x < xmlTagsSpecies[0].ChildNodes.Count; x++) {
+                            PostTags.Add(xmlTagsSpecies[0].ChildNodes[x].InnerText);
+                            ReadTags += xmlTagsSpecies[0].ChildNodes[x].InnerText + ", ";
+                        }
+                        ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                        break;
+
+                    case false:
+                        ReadTags += "none";
+                        break;
                 }
-                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                ReadTags += "]\n          Character: [";
-                for (int x = 0; x < xmlTagsCharacter[0].ChildNodes.Count; x++) {
-                    foundTags.Add(xmlTagsCharacter[0].ChildNodes[x].InnerText);
-                    ReadTags += xmlTagsCharacter[0].ChildNodes[x].InnerText + ", ";
+
+                ReadTags += " ]\r\n          Character(s): [ ";
+                switch (xmlTagsCharacter[0].ChildNodes.Count > 0) {
+                    case true:
+                        for (int x = 0; x < xmlTagsCharacter[0].ChildNodes.Count; x++) {
+                            PostTags.Add(xmlTagsCharacter[0].ChildNodes[x].InnerText);
+                            ReadTags += xmlTagsCharacter[0].ChildNodes[x].InnerText + ", ";
+                        }
+                        ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                        break;
+
+                    case false:
+                        ReadTags += "none";
+                        break;
                 }
-                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                ReadTags += "]\n          Copyright: [";
-                for (int x = 0; x < xmlTagsCopyright[0].ChildNodes.Count; x++) {
-                    foundTags.Add(xmlTagsCopyright[0].ChildNodes[x].InnerText);
-                    ReadTags += xmlTagsCopyright[0].ChildNodes[x].InnerText + ", ";
+
+                ReadTags += " ]\r\n          Copyright: [ ";
+                switch (xmlTagsCopyright[0].ChildNodes.Count > 0) {
+                    case true:
+                        for (int x = 0; x < xmlTagsCopyright[0].ChildNodes.Count; x++) {
+                            PostTags.Add(xmlTagsCopyright[0].ChildNodes[x].InnerText);
+                            ReadTags += xmlTagsCopyright[0].ChildNodes[x].InnerText + ", ";
+                        }
+                        ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                        break;
+
+                    case false:
+                        ReadTags += "none";
+                        break;
                 }
-                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                ReadTags += "]\n          Artist: [";
-                for (int x = 0; x < xmlTagsArtist[0].ChildNodes.Count; x++) {
-                    foundTags.Add(xmlTagsArtist[0].ChildNodes[x].InnerText);
-                    ReadTags += xmlTagsArtist[0].ChildNodes[x].InnerText + ", ";
+
+                ReadTags += " ]\r\n          Artist: [ ";
+                switch (xmlTagsArtist[0].ChildNodes.Count > 0) {
+                    case true:
+                        for (int x = 0; x < xmlTagsArtist[0].ChildNodes.Count; x++) {
+                            PostTags.Add(xmlTagsArtist[0].ChildNodes[x].InnerText);
+                            ReadTags += xmlTagsArtist[0].ChildNodes[x].InnerText + ", ";
+                        }
+                        ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                        break;
+
+                    case false:
+                        ReadTags += "none";
+                        break;
                 }
-                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                ReadTags += "]\n          Invalid: [";
-                for (int x = 0; x < xmlTagsInvalid[0].ChildNodes.Count; x++) {
-                    foundTags.Add(xmlTagsInvalid[0].ChildNodes[x].InnerText);
-                    ReadTags += xmlTagsInvalid[0].ChildNodes[x].InnerText + ", ";
+
+                ReadTags += " ]\r\n          Lore: [ ";
+                switch (xmlTagsLore[0].ChildNodes.Count > 0) {
+                    case true:
+                        for (int x = 0; x < xmlTagsLore[0].ChildNodes.Count; x++) {
+                            PostTags.Add(xmlTagsLore[0].ChildNodes[x].InnerText);
+                            ReadTags += xmlTagsLore[0].ChildNodes[x].InnerText + ", ";
+                        }
+                        ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                        break;
+
+                    case false:
+                        ReadTags += "none";
+                        break;
                 }
-                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                ReadTags += "]\n          Lore: [";
-                for (int x = 0; x < xmlTagsLore[0].ChildNodes.Count; x++) {
-                    foundTags.Add(xmlTagsLore[0].ChildNodes[x].InnerText);
-                    ReadTags += xmlTagsLore[0].ChildNodes[x].InnerText + ", ";
+
+                ReadTags += " ]\r\n          Meta: [ ";
+                switch (xmlTagsMeta[0].ChildNodes.Count > 0) {
+                    case true:
+                        for (int x = 0; x < xmlTagsMeta[0].ChildNodes.Count; x++) {
+                            PostTags.Add(xmlTagsMeta[0].ChildNodes[x].InnerText);
+                            ReadTags += xmlTagsMeta[0].ChildNodes[x].InnerText + ", ";
+                        }
+                        ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                        break;
+
+                    case false:
+                        ReadTags += "none";
+                        break;
                 }
-                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                ReadTags += "]\n          Meta: [";
-                for (int x = 0; x < xmlTagsMeta[0].ChildNodes.Count; x++) {
-                    foundTags.Add(xmlTagsMeta[0].ChildNodes[x].InnerText);
-                    ReadTags += xmlTagsMeta[0].ChildNodes[x].InnerText + ", ";
+
+                ReadTags += " ]\r\n          Locked tags: [ ";
+                switch (xmlTagsLocked[0].ChildNodes.Count > 0) {
+                    case true:
+                        for (int x = 0; x < xmlTagsLocked[0].ChildNodes.Count; x++) {
+                            PostTags.Add(xmlTagsLocked[0].ChildNodes[x].InnerText);
+                            ReadTags += xmlTagsLocked[0].ChildNodes[x].InnerText + ", ";
+                        }
+                        ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',') + " ]";
+                        break;
+
+                    case false:
+                        ReadTags += "none";
+                        break;
                 }
-                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                ReadTags += "]\n          Locked tags: [";
-                for (int x = 0; x < xmlTagsLocked[0].ChildNodes.Count; x++) {
-                    foundTags.Add(xmlTagsLocked[0].ChildNodes[x].InnerText);
-                    ReadTags += xmlTagsLocked[0].ChildNodes[x].InnerText + ", ";
+
+                ReadTags += " ]\r\n          Invalid: [ ";
+                switch (xmlTagsInvalid[0].ChildNodes.Count > 0) {
+                    case true:
+                        for (int x = 0; x < xmlTagsInvalid[0].ChildNodes.Count; x++) {
+                            PostTags.Add(xmlTagsInvalid[0].ChildNodes[x].InnerText);
+                            ReadTags += xmlTagsInvalid[0].ChildNodes[x].InnerText + ", ";
+                        }
+                        ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                        break;
+
+                    case false:
+                        ReadTags += "none";
+                        break;
                 }
-                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                ReadTags += "]\n";
+                ReadTags += " ]";
 
                 // Get the rating.
                 string rating = xmlRating[0].InnerText;
@@ -718,11 +888,11 @@ Finished:
                 bool isGraylisted = false;
                 bool isBlacklisted = false;
                 string offendingTags = string.Empty;
-                for (int i = 0; i < foundTags.Count; i++) {
+                for (int i = 0; i < PostTags.Count; i++) {
                     if (DownloadInfo.Graylist.Length > 0) {
                         for (int j = 0; j < DownloadInfo.Graylist.Length; j++) {
-                            if (foundTags[i] == DownloadInfo.Graylist[j]) {
-                                offendingTags += foundTags[i];
+                            if (PostTags[i] == DownloadInfo.Graylist[j]) {
+                                offendingTags += PostTags[i];
                                 isGraylisted = true;
                             }
                         }
@@ -732,8 +902,8 @@ Finished:
                     // Worst-case, just delete it after downloading.
                     if (DownloadInfo.Blacklist.Length > 0) {
                         for (int j = 0; j < DownloadInfo.Blacklist.Length; j++) {
-                            if (foundTags[i] == DownloadInfo.Graylist[j]) {
-                                offendingTags += foundTags[i];
+                            if (PostTags[i] == DownloadInfo.Graylist[j]) {
+                                offendingTags += PostTags[i];
                                 isGraylisted = true;
                                 isBlacklisted = true;
                             }
@@ -809,66 +979,70 @@ Finished:
                     }
                 }
 
-                string fileName = DownloadInfo.FileNameSchema.Replace("%md5%", xmlMD5[0].InnerText)
-                                                             .Replace("%id%", xmlID[0].InnerText)
-                                                             .Replace("%rating%", rating.ToLower())
-                                                             .Replace("%rating2%", xmlRating[0].InnerText)
-                                                             .Replace("%artist%", fileNameArtist)
-                                                             .Replace("%ext%", xmlExt[0].InnerText)
-                                                             .Replace("%fav_count%", xmlFavCount[0].InnerText)
-                                                             .Replace("%score%", xmlScoreTotal[0].InnerText)
-                                                             .Replace("%scoreup%", xmlScoreUp[0].InnerText)
-                                                             .Replace("%scoredown%", xmlScoreDown[0].InnerText)
-                                                             .Replace("%author%", xmlAuthor[0].InnerText) + "." + xmlExt[0].InnerText;
+                DownloadInfo.FileName = DownloadInfo.FileNameSchema.Replace("%md5%", xmlMD5[0].InnerText)
+                                .Replace("%id%", xmlID[0].InnerText)
+                                .Replace("%rating%", rating.ToLower())
+                                .Replace("%rating2%", xmlRating[0].InnerText)
+                                .Replace("%artist%", fileNameArtist)
+                                .Replace("%ext%", xmlExt[0].InnerText)
+                                .Replace("%fav_count%", xmlFavCount[0].InnerText)
+                                .Replace("%score%", xmlScoreTotal[0].InnerText)
+                                .Replace("%scoreup%", xmlScoreUp[0].InnerText)
+                                .Replace("%scoredown%", xmlScoreDown[0].InnerText)
+                                .Replace("%author%", xmlAuthor[0].InnerText) + "." + xmlExt[0].InnerText;
 
                 // Start working on the saveTo string.
                 if (DownloadInfo.SeparateRatings) {
                     switch (xmlRating[0].InnerText.ToLower()) {
                         case "e":
                         case "explicit":
-                            SaveTo += "\\explicit";
+                            DownloadInfo.DownloadPath += "\\explicit";
                             break;
                         case "q":
                         case "questionable":
-                            SaveTo += "\\questionable";
+                            DownloadInfo.DownloadPath += "\\questionable";
                             break;
                         case "s":
                         case "safe":
-                            SaveTo += "\\safe";
+                            DownloadInfo.DownloadPath += "\\safe";
                             break;
                     }
                 }
 
                 if (isGraylisted || isBlacklisted && DownloadInfo.SeparateBlacklisted)
-                    SaveTo += "\\blacklisted";
+                    DownloadInfo.DownloadPath += "\\blacklisted";
                 if (DownloadInfo.SeparateArtists) {
-                    SaveTo += "\\" + fileNameArtist;
+                    DownloadInfo.DownloadPath += "\\" + fileNameArtist;
                 }
 
                 switch (DownloadInfo.SeparateNonImages) {
                     case true:
-                        if (fileName.EndsWith("gif")) {
-                            SaveTo += "\\gif";
-                        }
-                        else if (fileName.EndsWith("apng")) {
-                            SaveTo += "\\apng";
-                        }
-                        else if (fileName.EndsWith("webm")) {
-                            SaveTo += "\\webm";
-                        }
-                        else if (fileName.EndsWith("swf")) {
-                            SaveTo += "\\swf";
+                        switch (xmlExt[0].InnerText) {
+                            case "gif":
+                                DownloadInfo.DownloadPath += "\\gif";
+                                break;
+                            case "apng":
+                                DownloadInfo.DownloadPath += "\\apng";
+                                break;
+                            case "webm":
+                                DownloadInfo.DownloadPath += "\\webm";
+                                break;
+                            case "swf":
+                                DownloadInfo.DownloadPath += "\\swf";
+                                break;
                         }
                         break;
                 }
 
                 // Create output directory.
-                if (!Directory.Exists(SaveTo))
-                    Directory.CreateDirectory(SaveTo);
+                if (!Directory.Exists(DownloadInfo.DownloadPath)) {
+                    Directory.CreateDirectory(DownloadInfo.DownloadPath);
+                }
 
                 // Check file before continuing.
-                if (File.Exists(SaveTo + "\\" + fileName))
+                if (File.Exists(DownloadInfo.DownloadPath + "\\" + DownloadInfo.FileName)) {
                     return true;
+                }
 
                 // Save image.nfo.
                 if (DownloadInfo.SaveInfo) {
@@ -900,7 +1074,7 @@ Finished:
 
                 // Download file.
                 DownloadInfo.ImageUrl = DownloadUrl;
-                apiTools.DownloadImage(DownloadUrl, SaveTo + "\\" + fileName);
+                apiTools.DownloadImage(DownloadUrl, DownloadInfo.DownloadPath + "\\" + DownloadInfo.FileName);
                 return true;
             }
             catch (ThreadAbortException) {

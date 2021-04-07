@@ -30,6 +30,7 @@ namespace aphrodite {
         public bool SaveBlacklistedFiles;
         public bool IgnoreFinish;
         public bool SaveInfo;
+        public bool OpenAfter;
 
         public bool UseMinimumScore;
         public bool MinimumScoreAsTag;
@@ -71,6 +72,7 @@ namespace aphrodite {
             SaveBlacklistedFiles = Config.Settings.General.saveBlacklisted;
             IgnoreFinish = Config.Settings.General.ignoreFinish;
             SaveInfo = Config.Settings.General.saveInfo;
+            OpenAfter = Config.Settings.General.openAfter;
 
             UseMinimumScore = aphrodite.Config.Settings.Tags.enableScoreMin;
             if (UseMinimumScore) {
@@ -141,6 +143,7 @@ namespace aphrodite {
             SaveBlacklistedFiles = Config.Settings.General.saveBlacklisted;
             IgnoreFinish = Config.Settings.General.ignoreFinish;
             SaveInfo = Config.Settings.General.saveInfo;
+            OpenAfter = Config.Settings.General.openAfter;
 
             UseMinimumScore = aphrodite.Config.Settings.Tags.enableScoreMin;
             if (UseMinimumScore) {
@@ -178,9 +181,9 @@ namespace aphrodite {
         public bool SaveInfo;
         public bool IgnoreFinish;
         public bool SaveBlacklistedFiles;
+        public bool OpenAfter;
 
         public bool MergeBlacklisted;
-        public bool OpenAfter;
         public string FileNameSchema;
 
         public PoolDownloadInfo(string RequestedPool) {
@@ -203,9 +206,9 @@ namespace aphrodite {
             SaveInfo = Config.Settings.General.saveInfo;
             IgnoreFinish = Config.Settings.General.ignoreFinish;
             SaveBlacklistedFiles = Config.Settings.General.saveBlacklisted;
+            OpenAfter = Config.Settings.General.openAfter;
 
             MergeBlacklisted = Config.Settings.Pools.mergeBlacklisted;
-            OpenAfter = Config.Settings.Pools.openAfter;
             FileNameSchema = apiTools.ReplaceIllegalCharacters(Config.Settings.Pools.fileNameSchema);
         }
     }
@@ -215,6 +218,7 @@ namespace aphrodite {
 
         public string ImageUrl;
         public string PostId;
+        public string FileName;
 
         public string[] Graylist;
         public string[] Blacklist;
@@ -223,6 +227,7 @@ namespace aphrodite {
         public string DownloadPath;
         public bool SaveInfo;
         public bool IgnoreFinish;
+        public bool OpenAfter;
 
         public bool SeparateRatings;
         public bool SeparateBlacklisted;
@@ -248,6 +253,7 @@ namespace aphrodite {
 
             SaveInfo = Config.Settings.General.saveInfo;
             IgnoreFinish = Config.Settings.General.ignoreFinish;
+            OpenAfter = Config.Settings.General.openAfter;
 
             FileNameSchema = apiTools.ReplaceIllegalCharacters(Config.Settings.Images.fileNameSchema);
             SeparateRatings = Config.Settings.Images.separateRatings;

@@ -33,9 +33,9 @@
             // 
             // status
             // 
-            this.status.Location = new System.Drawing.Point(0, 69);
+            this.status.Location = new System.Drawing.Point(0, 71);
             this.status.Name = "status";
-            this.status.Size = new System.Drawing.Size(276, 22);
+            this.status.Size = new System.Drawing.Size(274, 22);
             this.status.SizingGrip = false;
             this.status.TabIndex = 0;
             this.status.Text = "Waiting for initial start";
@@ -79,12 +79,13 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(276, 91);
+            this.ClientSize = new System.Drawing.Size(274, 93);
             this.Controls.Add(this.lbInfo);
             this.Controls.Add(this.lbPercentage);
             this.Controls.Add(this.status);
             this.Controls.Add(this.pbDownloadStatus);
-            this.Icon = Properties.Resources.Brad;
+            this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Icon = global::aphrodite.Properties.Resources.Brad;
             this.MaximumSize = new System.Drawing.Size(292, 130);
             this.MinimumSize = new System.Drawing.Size(292, 130);
             this.Name = "frmImageDownloader";

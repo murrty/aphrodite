@@ -39,7 +39,7 @@
             this.txtUpdateAvailableName.Location = new System.Drawing.Point(12, 107);
             this.txtUpdateAvailableName.Name = "txtUpdateAvailableName";
             this.txtUpdateAvailableName.ReadOnly = true;
-            this.txtUpdateAvailableName.Size = new System.Drawing.Size(298, 20);
+            this.txtUpdateAvailableName.Size = new System.Drawing.Size(298, 22);
             this.txtUpdateAvailableName.TabIndex = 13;
             // 
             // btnUpdateAvailableSkip
@@ -132,11 +132,12 @@
             this.Controls.Add(this.lbUpdateAvailableCurrentVersion);
             this.Controls.Add(this.lbUpdateAvailableUpdateVersion);
             this.Controls.Add(this.lbUpdateAvailableHeader);
-            this.Icon = Properties.Resources.Brad;
+            this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Icon = global::aphrodite.Properties.Resources.Brad;
             this.MaximizeBox = false;
             this.Name = "frmUpdateAvailable";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "frmUpdateAvailable";
+            this.Text = "Update available";
             this.Load += new System.EventHandler(this.frmUpdateAvailable_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

@@ -25,5 +25,8 @@ namespace aphrodite {
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr SetCursor(IntPtr hCursor);
         public static readonly Cursor SystemHandCursor = new Cursor(LoadCursor(IntPtr.Zero, 32649));
+
+        [DllImport("uxtheme", CharSet = CharSet.Unicode)]
+        public static extern Int32 SetWindowTheme(IntPtr hWnd, String textSubAppName, String textSubIdList);
     }
 }
