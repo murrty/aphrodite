@@ -11,41 +11,17 @@ namespace aphrodite {
             lbTags.Items.Clear();
             lbPools.Items.Clear();
 
-            if (Program.UseIni) {
-                string[] Tags = Directory.GetDirectories(Environment.CurrentDirectory + "\\Tags");
-                string[] Pools = Directory.GetDirectories(Environment.CurrentDirectory + "\\Pools");
+            string[] Tags = Directory.GetDirectories(Config.Settings.General.saveLocation + "\\Tags");
+            string[] Pools = Directory.GetDirectories(Config.Settings.General.saveLocation + "\\Pools");
 
-                if (Tags.Length > 0) {
-                    for (int i = 0; i < Tags.Length; i++) {
-                        lbTags.Items.Add(Tags[i].Replace(Environment.CurrentDirectory + "\\Tags\\", string.Empty));
-                    }
-                }
-                if (Pools.Length > 0) {
-                    for (int i = 0; i < Pools.Length; i++) {
-                        lbPools.Items.Add(Pools[i].Replace(Environment.CurrentDirectory + "\\Pools\\", string.Empty));
-                    }
+            if (Tags.Length > 0) {
+                for (int i = 0; i < Tags.Length; i++) {
+                    lbTags.Items.Add(Tags[i].Replace(Config.Settings.General.saveLocation + "\\Tags\\", string.Empty));
                 }
             }
-            else {
-                string[] Tags = new string[0];
-                string[] Pools = new string[0];
-
-                if (Directory.Exists(General.Default.saveLocation + "\\Tags")) {
-                    Tags = Directory.GetDirectories(General.Default.saveLocation + "\\Tags");
-                }
-                if (Directory.Exists(General.Default.saveLocation + "\\Pools")) {
-                    Pools = Directory.GetDirectories(General.Default.saveLocation + "\\Pools");
-                }
-
-                if (Tags.Length > 0) {
-                    for (int i = 0; i < Tags.Length; i++) {
-                        lbTags.Items.Add(Tags[i].Replace(General.Default.saveLocation + "\\Tags\\", string.Empty));
-                    }
-                }
-                if (Pools.Length > 0) {
-                    for (int i = 0; i < Pools.Length; i++) {
-                        lbPools.Items.Add(Pools[i].Replace(General.Default.saveLocation + "\\Pools\\", string.Empty));
-                    }
+            if (Pools.Length > 0) {
+                for (int i = 0; i < Pools.Length; i++) {
+                    lbPools.Items.Add(Pools[i].Replace(Config.Settings.General.saveLocation + "\\Pools\\", string.Empty));
                 }
             }
         }
@@ -175,8 +151,6 @@ namespace aphrodite {
         
         private void frmTagRedownloader_Load(object sender, EventArgs e) {
             loadDownloads();
-            if (!Program.UseIni)
-                saveLocation = General.Default.saveLocation;
         }
 
         private void btnRedownload_Click(object sender, EventArgs e) {

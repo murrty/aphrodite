@@ -85,6 +85,9 @@
     <Compile Include="Controls\LinkLabelHand.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\TransparentLabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Forms\frmException.cs">
       <SubType>Form</SubType>
     </Compile>

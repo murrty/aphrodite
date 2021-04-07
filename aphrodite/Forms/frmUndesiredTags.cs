@@ -9,7 +9,7 @@ namespace aphrodite {
         }
 
         private void frmUndesiredTags_Load(object sender, EventArgs e) {
-            if (string.IsNullOrEmpty(General.Default.undesiredTags)) {
+            if (string.IsNullOrEmpty(Config.Settings.General.undesiredTags)) {
                 listTags.Items.AddRange(UndesiredTags.HardcodedUndesiredTags);
             }
         }
@@ -20,13 +20,8 @@ namespace aphrodite {
                 undesiredBuffer += listTags.GetItemText(listTags.Items[i]) + " ";
             }
 
-            if (Program.UseIni) {
-                Program.Ini.WriteString("UndesiredTags", undesiredBuffer.Trim(' '), "Global");
-            }
-            else {
-                General.Default.undesiredTags = undesiredBuffer.Trim(' ');
-                General.Default.Save();
-            }
+            Config.Settings.General.undesiredTags = undesiredBuffer.Trim(' ');
+            Config.Settings.General.Save();
             this.Dispose();
         }
 
@@ -43,7 +38,7 @@ namespace aphrodite {
         }
 
         private void btnReset_Click(object sender, EventArgs e) {
-            if (string.IsNullOrEmpty(General.Default.undesiredTags)) {
+            if (string.IsNullOrEmpty(Config.Settings.General.undesiredTags)) {
                 listTags.Items.AddRange(UndesiredTags.HardcodedUndesiredTags);
             }
         }
@@ -79,13 +74,8 @@ namespace aphrodite {
             }
 
             List<string> undesiredTags = new List<string>();
-            if (Program.UseIni) {
-                if (Program.Ini.KeyExists("UndesiredTags", "Global")) {
-                    undesiredTags.AddRange(Program.Ini.ReadString("UndesiredTags", "Global").Split(' '));
-                }
-            }
-            else {
-                undesiredTags.AddRange(General.Default.undesiredTags.Split(' '));
+            if (Config.Settings.General.undesiredTags.Length > 0) {
+                undesiredTags.AddRange(Config.Settings.General.undesiredTags.Split(' '));
             }
 
             if (undesiredTags.Count > 0) {

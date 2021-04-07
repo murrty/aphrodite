@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace aphrodite {
+namespace aphrodite.Settings {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

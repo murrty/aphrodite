@@ -60,144 +60,39 @@ namespace aphrodite {
 
             DownloadPath = Environment.CurrentDirectory;
 
-            switch (Program.UseIni) {
-                case true:
-                    if (File.Exists(File.ReadAllText(Environment.CurrentDirectory + "\\graylist.cfg"))) {
-                        Graylist = File.ReadAllLines(Environment.CurrentDirectory + "\\graylist.cfg");
-                    }
-                    else {
-                        Graylist = new string[] { };
-                    }
-                    if (File.Exists(Environment.CurrentDirectory + "\\blacklist.cfg")) {
-                        Blacklist = File.ReadAllLines(Environment.CurrentDirectory + "\\blacklist.cfg");
-                    }
-                    else {
-                        Blacklist = new string[] { };
-                    }
-                    if (Program.Ini.KeyExists("UndesiredTags", "Global")) {
-                        UndesiredTags = Program.Ini.ReadString("UndesiredTags", "Global");
-                    }
-                    else {
-                        UndesiredTags = string.Empty;
-                    }
-
-                    if (Program.Ini.KeyExists("saveBlacklisted", "Global")) {
-                        SaveBlacklistedFiles = Program.Ini.ReadBool("saveBlacklisted", "Global");
-                    }
-                    else {
-                        SaveBlacklistedFiles = true;
-                    }
-                    if (Program.Ini.KeyExists("saveInfo", "Global")) {
-                        SaveInfo = Program.Ini.ReadBool("saveInfo", "Global");
-                    }
-                    else {
-                        SaveInfo = true;
-                    }
-                    if (Program.Ini.KeyExists("ignoreFinish", "Global")) {
-                        IgnoreFinish = Program.Ini.ReadBool("ignoreFinish", "Global");
-                    }
-                    else {
-                        IgnoreFinish = false;
-                    }
-
-
-                    if (Program.Ini.KeyExists("useMinimumScore", "Tags")) {
-                        UseMinimumScore = Program.Ini.ReadBool("useMinimumScore", "Tags");
-                    }
-                    else {
-                        UseMinimumScore = false;
-                    }
-                    if (UseMinimumScore) {
-                        MinimumScoreAsTag = Program.Ini.ReadBool("scoreAsTag", "Tags");
-                        MinimumScore = Program.Ini.ReadInt("scoreMin", "Tags");
-                    }
-                    if (Program.Ini.KeyExists("imageLimit", "Tags")) {
-                        if (Program.Ini.ReadInt("imageLimit", "Tags") > 0) {
-                            ImageLimit = Program.Ini.ReadInt("imageLimit", "Tags");
-                        }
-                        else {
-                            ImageLimit = 0;
-                        }
-                    }
-                    if (Program.Ini.KeyExists("pageLimit", "Tags")) {
-                        if (Program.Ini.ReadInt("pageLimit", "Tags") > 0) {
-                            PageLimit = Program.Ini.ReadInt("pageLimit", "Tags");
-                        }
-                    }
-                    if (Program.Ini.KeyExists("separateRatings", "Tags")) {
-                        SeparateRatings = Program.Ini.ReadBool("separateRatings", "Tags");
-                    }
-                    else {
-                        SeparateRatings = true;
-                    }
-                    if (Program.Ini.KeyExists("separateNonImages", "Tags")) {
-                        SeparateNonImages = Program.Ini.ReadBool("separateNonImages", "Tags");
-                    }
-                    else {
-                        SeparateNonImages = true;
-                    }
-                    if (Program.Ini.KeyExists("Explicit", "Tags")) {
-                        SaveExplicit = Program.Ini.ReadBool("Explicit", "Tags");
-                    }
-                    else {
-                        SaveExplicit = true;
-                    }
-                    if (Program.Ini.KeyExists("Questionable", "Tags")) {
-                        SaveQuestionable = Program.Ini.ReadBool("Questionable", "Tags");
-                    }
-                    else {
-                        SaveQuestionable = true;
-                    }
-                    if (Program.Ini.KeyExists("Safe", "Tags")) {
-                        SaveSafe = Program.Ini.ReadBool("Safe", "Tags");
-                    }
-                    else {
-                        SaveSafe = true;
-                    }
-                    if (Program.Ini.KeyExists("fileNameSchema", "Tags")) {
-                        FileNameSchema = apiTools.ReplaceIllegalCharacters(Program.Ini.ReadString("fileNameSchema", "Tags").ToLower());
-                    }
-                    else {
-                        FileNameSchema = "%md5%";
-                    }
-                    break;
-
-                default:
-                    if (General.Default.saveLocation != string.Empty) {
-                        DownloadPath = General.Default.saveLocation;
-                    }
-
-                    Graylist = General.Default.blacklist.Split(' ');
-                    Blacklist = General.Default.zeroToleranceBlacklist.Split(' ');
-                    UndesiredTags = General.Default.undesiredTags;
-
-                    SaveBlacklistedFiles = General.Default.saveBlacklisted;
-                    IgnoreFinish = General.Default.ignoreFinish;
-                    SaveInfo = General.Default.saveInfo;
-
-                    UseMinimumScore = aphrodite.Tags.Default.enableScoreMin;
-                    if (UseMinimumScore) {
-                        MinimumScoreAsTag = aphrodite.Tags.Default.scoreAsTag;
-                        MinimumScore = aphrodite.Tags.Default.scoreMin;
-                    }
-
-                    if (aphrodite.Tags.Default.imageLimit > 0) {
-                        ImageLimit = aphrodite.Tags.Default.imageLimit;
-                    }
-
-                    if (PageLimit > 0) {
-                        PageLimit = aphrodite.Tags.Default.pageLimit;
-                    }
-
-                    SeparateRatings = aphrodite.Tags.Default.separateRatings;
-                    SeparateNonImages = aphrodite.Tags.Default.separateNonImages;
-                    SaveExplicit = aphrodite.Tags.Default.Explicit;
-                    SaveQuestionable = aphrodite.Tags.Default.Questionable;
-                    SaveSafe = aphrodite.Tags.Default.Safe;
-
-                    FileNameSchema = apiTools.ReplaceIllegalCharacters(aphrodite.Tags.Default.fileNameSchema.ToLower());
-                    break;
+            if (Config.Settings.General.saveLocation != string.Empty) {
+                DownloadPath = Config.Settings.General.saveLocation;
             }
+
+            Graylist = Config.Settings.General.blacklist.Split(' ');
+            Blacklist = Config.Settings.General.zeroToleranceBlacklist.Split(' ');
+            UndesiredTags = Config.Settings.General.undesiredTags;
+
+            SaveBlacklistedFiles = Config.Settings.General.saveBlacklisted;
+            IgnoreFinish = Config.Settings.General.ignoreFinish;
+            SaveInfo = Config.Settings.General.saveInfo;
+
+            UseMinimumScore = aphrodite.Config.Settings.Tags.enableScoreMin;
+            if (UseMinimumScore) {
+                MinimumScoreAsTag = aphrodite.Config.Settings.Tags.scoreAsTag;
+                MinimumScore = aphrodite.Config.Settings.Tags.scoreMin;
+            }
+
+            if (aphrodite.Config.Settings.Tags.imageLimit > 0) {
+                ImageLimit = aphrodite.Config.Settings.Tags.imageLimit;
+            }
+
+            if (PageLimit > 0) {
+                PageLimit = aphrodite.Config.Settings.Tags.pageLimit;
+            }
+
+            SeparateRatings = aphrodite.Config.Settings.Tags.separateRatings;
+            SeparateNonImages = aphrodite.Config.Settings.Tags.separateNonImages;
+            SaveExplicit = aphrodite.Config.Settings.Tags.Explicit;
+            SaveQuestionable = aphrodite.Config.Settings.Tags.Questionable;
+            SaveSafe = aphrodite.Config.Settings.Tags.Safe;
+
+            FileNameSchema = apiTools.ReplaceIllegalCharacters(aphrodite.Config.Settings.Tags.fileNameSchema.ToLower());
         }
         /// <summary>
         /// Initializes new TagDownloadInfo for downloading a page.
@@ -235,143 +130,39 @@ namespace aphrodite {
 
             DownloadPath = Environment.CurrentDirectory;
 
-            switch (Program.UseIni) {
-                case true:
-                    if (File.Exists(File.ReadAllText(Environment.CurrentDirectory + "\\graylist.cfg"))) {
-                        Graylist = File.ReadAllLines(Environment.CurrentDirectory + "\\graylist.cfg");
-                    }
-                    else {
-                        Graylist = new string[] { };
-                    }
-                    if (File.Exists(Environment.CurrentDirectory + "\\blacklist.cfg")) {
-                        Blacklist = File.ReadAllLines(Environment.CurrentDirectory + "\\blacklist.cfg");
-                    }
-                    else {
-                        Blacklist = new string[] { };
-                    }
-                    if (Program.Ini.KeyExists("UndesiredTags", "Global")) {
-                        UndesiredTags = Program.Ini.ReadString("UndesiredTags", "Global");
-                    }
-                    else {
-                        UndesiredTags = string.Empty;
-                    }
-
-                    if (Program.Ini.KeyExists("saveBlacklisted", "Global")) {
-                        SaveBlacklistedFiles = Program.Ini.ReadBool("saveBlacklisted", "Global");
-                    }
-                    else {
-                        SaveBlacklistedFiles = true;
-                    }
-                    if (Program.Ini.KeyExists("saveInfo", "Global")) {
-                        SaveInfo = Program.Ini.ReadBool("saveInfo", "Global");
-                    }
-                    else {
-                        SaveInfo = true;
-                    }
-                    if (Program.Ini.KeyExists("ignoreFinish", "Global")) {
-                        IgnoreFinish = Program.Ini.ReadBool("ignoreFinish", "Global");
-                    }
-                    else {
-                        IgnoreFinish = false;
-                    }
-
-                    if (Program.Ini.KeyExists("useMinimumScore", "Tags")) {
-                        UseMinimumScore = Program.Ini.ReadBool("useMinimumScore", "Tags");
-                    }
-                    else {
-                        UseMinimumScore = false;
-                    }
-                    if (UseMinimumScore) {
-                        MinimumScoreAsTag = Program.Ini.ReadBool("scoreAsTag", "Tags");
-                        MinimumScore = Program.Ini.ReadInt("scoreMin", "Tags");
-                    }
-                    if (Program.Ini.KeyExists("imageLimit", "Tags")) {
-                        if (Program.Ini.ReadInt("imageLimit", "Tags") > 0) {
-                            ImageLimit = Program.Ini.ReadInt("imageLimit", "Tags");
-                        }
-                        else {
-                            ImageLimit = 0;
-                        }
-                    }
-                    if (Program.Ini.KeyExists("pageLimit", "Tags")) {
-                        if (Program.Ini.ReadInt("pageLimit", "Tags") > 0) {
-                            PageLimit = Program.Ini.ReadInt("pageLimit", "Tags");
-                        }
-                    }
-                    if (Program.Ini.KeyExists("separateRatings", "Tags")) {
-                        SeparateRatings = Program.Ini.ReadBool("separateRatings", "Tags");
-                    }
-                    else {
-                        SeparateRatings = true;
-                    }
-                    if (Program.Ini.KeyExists("separateNonImages", "Tags")) {
-                        SeparateNonImages = Program.Ini.ReadBool("separateNonImages", "Tags");
-                    }
-                    else {
-                        SeparateNonImages = true;
-                    }
-                    if (Program.Ini.KeyExists("Explicit", "Tags")) {
-                        SaveExplicit = Program.Ini.ReadBool("Explicit", "Tags");
-                    }
-                    else {
-                        SaveExplicit = true;
-                    }
-                    if (Program.Ini.KeyExists("Questionable", "Tags")) {
-                        SaveQuestionable = Program.Ini.ReadBool("Questionable", "Tags");
-                    }
-                    else {
-                        SaveQuestionable = true;
-                    }
-                    if (Program.Ini.KeyExists("Safe", "Tags")) {
-                        SaveSafe = Program.Ini.ReadBool("Safe", "Tags");
-                    }
-                    else {
-                        SaveSafe = true;
-                    }
-                    if (Program.Ini.KeyExists("fileNameSchema", "Tags")) {
-                        FileNameSchema = apiTools.ReplaceIllegalCharacters(Program.Ini.ReadString("fileNameSchema", "Tags").ToLower());
-                    }
-                    else {
-                        FileNameSchema = "%md5%";
-                    }
-                    break;
-
-                default:
-                    if (General.Default.saveLocation != string.Empty) {
-                        DownloadPath = General.Default.saveLocation;
-                    }
-
-                    Graylist = General.Default.blacklist.Split(' ');
-                    Blacklist = General.Default.zeroToleranceBlacklist.Split(' ');
-                    UndesiredTags = General.Default.undesiredTags;
-
-                    SaveBlacklistedFiles = General.Default.saveBlacklisted;
-                    IgnoreFinish = General.Default.ignoreFinish;
-                    SaveInfo = General.Default.saveInfo;
-
-                    UseMinimumScore = aphrodite.Tags.Default.enableScoreMin;
-                    if (UseMinimumScore) {
-                        MinimumScoreAsTag = aphrodite.Tags.Default.scoreAsTag;
-                        MinimumScore = aphrodite.Tags.Default.scoreMin;
-                    }
-
-                    if (aphrodite.Tags.Default.imageLimit > 0) {
-                        ImageLimit = aphrodite.Tags.Default.imageLimit;
-                    }
-
-                    if (PageLimit > 0) {
-                        PageLimit = aphrodite.Tags.Default.pageLimit;
-                    }
-
-                    SeparateRatings = aphrodite.Tags.Default.separateRatings;
-                    SeparateNonImages = aphrodite.Tags.Default.separateNonImages;
-                    SaveExplicit = aphrodite.Tags.Default.Explicit;
-                    SaveQuestionable = aphrodite.Tags.Default.Questionable;
-                    SaveSafe = aphrodite.Tags.Default.Safe;
-
-                    FileNameSchema = apiTools.ReplaceIllegalCharacters(aphrodite.Tags.Default.fileNameSchema.ToLower());
-                    break;
+            if (Config.Settings.General.saveLocation != string.Empty) {
+                DownloadPath = Config.Settings.General.saveLocation;
             }
+
+            Graylist = Config.Settings.General.blacklist.Split(' ');
+            Blacklist = Config.Settings.General.zeroToleranceBlacklist.Split(' ');
+            UndesiredTags = Config.Settings.General.undesiredTags;
+
+            SaveBlacklistedFiles = Config.Settings.General.saveBlacklisted;
+            IgnoreFinish = Config.Settings.General.ignoreFinish;
+            SaveInfo = Config.Settings.General.saveInfo;
+
+            UseMinimumScore = aphrodite.Config.Settings.Tags.enableScoreMin;
+            if (UseMinimumScore) {
+                MinimumScoreAsTag = aphrodite.Config.Settings.Tags.scoreAsTag;
+                MinimumScore = aphrodite.Config.Settings.Tags.scoreMin;
+            }
+
+            if (aphrodite.Config.Settings.Tags.imageLimit > 0) {
+                ImageLimit = aphrodite.Config.Settings.Tags.imageLimit;
+            }
+
+            if (PageLimit > 0) {
+                PageLimit = aphrodite.Config.Settings.Tags.pageLimit;
+            }
+
+            SeparateRatings = aphrodite.Config.Settings.Tags.separateRatings;
+            SeparateNonImages = aphrodite.Config.Settings.Tags.separateNonImages;
+            SaveExplicit = aphrodite.Config.Settings.Tags.Explicit;
+            SaveQuestionable = aphrodite.Config.Settings.Tags.Questionable;
+            SaveSafe = aphrodite.Config.Settings.Tags.Safe;
+
+            FileNameSchema = apiTools.ReplaceIllegalCharacters(aphrodite.Config.Settings.Tags.fileNameSchema.ToLower());
         }
     }
     public class PoolDownloadInfo {
@@ -401,84 +192,21 @@ namespace aphrodite {
             PoolId = RequestedPool;
             DownloadPath = Environment.CurrentDirectory;
 
-            switch (Program.UseIni) {
-                case true:
-                    if (File.Exists(File.ReadAllText(Environment.CurrentDirectory + "\\graylist.cfg"))) {
-                        Graylist = File.ReadAllLines(Environment.CurrentDirectory + "\\graylist.cfg");
-                    }
-                    else {
-                        Graylist = new string[] { };
-                    }
-                    if (File.Exists(Environment.CurrentDirectory + "\\blacklist.cfg")) {
-                        Blacklist = File.ReadAllLines(Environment.CurrentDirectory + "\\blacklist.cfg");
-                    }
-                    else {
-                        Blacklist = new string[] { };
-                    }
-                    if (Program.Ini.KeyExists("UndesiredTags", "Global")) {
-                        UndesiredTags = Program.Ini.ReadString("UndesiredTags", "Global");
-                    }
-                    else {
-                        UndesiredTags = string.Empty;
-                    }
-
-                    if (Program.Ini.KeyExists("saveInfo", "Global")) {
-                        SaveInfo = Program.Ini.ReadBool("saveInfo", "Global");
-                    }
-                    else {
-                        SaveInfo = true;
-                    }
-                    if (Program.Ini.KeyExists("ignoreFinish", "Global")) {
-                        IgnoreFinish = Program.Ini.ReadBool("ignoreFinish", "Global");
-                    }
-                    else {
-                        IgnoreFinish = false;
-                    }
-                    if (Program.Ini.KeyExists("saveBlacklisted", "Global")) {
-                        SaveBlacklistedFiles = Program.Ini.ReadBool("saveBlacklisted", "Global");
-                    }
-                    else {
-                        SaveBlacklistedFiles = true;
-                    }
-
-                    if (Program.Ini.KeyExists("mergeBlacklisted", "Pools")) {
-                        MergeBlacklisted = Program.Ini.ReadBool("mergeBlacklisted", "Pools");
-                    }
-                    else {
-                        MergeBlacklisted = true;
-                    }
-                    if (Program.Ini.KeyExists("openAfter", "Pools")) {
-                        OpenAfter = Program.Ini.ReadBool("openAfter", "Pools");
-                    }
-                    else {
-                        OpenAfter = false;
-                    }
-                    if (Program.Ini.KeyExists("fileNameSchema", "Pools")) {
-                        FileNameSchema = apiTools.ReplaceIllegalCharacters(Program.Ini.ReadString("fileNameSchema", "Pools").ToLower());
-                    }
-                    else {
-                        FileNameSchema = Properties.Settings.Default.Properties["fileNameSchema"].DefaultValue as string;
-                    }
-                    break;
-
-                default:
-                    if (General.Default.saveLocation != string.Empty) {
-                        DownloadPath = General.Default.saveLocation;
-                    }
-
-                    Graylist = General.Default.blacklist.Split(' ');
-                    Blacklist = General.Default.zeroToleranceBlacklist.Split(' ');
-                    UndesiredTags = General.Default.undesiredTags;
-
-                    SaveInfo = General.Default.saveInfo;
-                    IgnoreFinish = General.Default.ignoreFinish;
-                    SaveBlacklistedFiles = General.Default.saveBlacklisted;
-
-                    MergeBlacklisted = Pools.Default.mergeBlacklisted;
-                    OpenAfter = Pools.Default.openAfter;
-                    FileNameSchema = apiTools.ReplaceIllegalCharacters(Pools.Default.fileNameSchema);
-                    break;
+            if (Config.Settings.General.saveLocation != string.Empty) {
+                DownloadPath = Config.Settings.General.saveLocation;
             }
+
+            Graylist = Config.Settings.General.blacklist.Split(' ');
+            Blacklist = Config.Settings.General.zeroToleranceBlacklist.Split(' ');
+            UndesiredTags = Config.Settings.General.undesiredTags;
+
+            SaveInfo = Config.Settings.General.saveInfo;
+            IgnoreFinish = Config.Settings.General.ignoreFinish;
+            SaveBlacklistedFiles = Config.Settings.General.saveBlacklisted;
+
+            MergeBlacklisted = Config.Settings.Pools.mergeBlacklisted;
+            OpenAfter = Config.Settings.Pools.openAfter;
+            FileNameSchema = apiTools.ReplaceIllegalCharacters(Config.Settings.Pools.fileNameSchema);
         }
     }
     public class ImageDownloadInfo {
@@ -510,107 +238,24 @@ namespace aphrodite {
 
             DownloadPath = Environment.CurrentDirectory;
 
-            switch (Program.UseIni) {
-                case true:
-                    if (File.Exists(File.ReadAllText(Environment.CurrentDirectory + "\\graylist.cfg"))) {
-                        Graylist = File.ReadAllLines(Environment.CurrentDirectory + "\\graylist.cfg");
-                    }
-                    else {
-                        Graylist = new string[] { };
-                    }
-
-                    if (File.Exists(Environment.CurrentDirectory + "\\blacklist.cfg")) {
-                        Blacklist = File.ReadAllLines(Environment.CurrentDirectory + "\\blacklist.cfg");
-                    }
-                    else {
-                        Blacklist = new string[] { };
-                    }
-                    if (Program.Ini.KeyExists("UndesiredTags", "Global")) {
-                        UndesiredTags = Program.Ini.ReadString("UndesiredTags", "Global");
-                    }
-                    else {
-                        UndesiredTags = string.Empty;
-                    }
-
-
-                    if (Program.Ini.KeyExists("saveInfo", "Global")) {
-                        SaveInfo = Program.Ini.ReadBool("saveInfo", "Global");
-                    }
-                    else {
-                        SaveInfo = true;
-                    }
-
-                    if (Program.Ini.KeyExists("ignoreFinish", "Global")) {
-                        IgnoreFinish = Program.Ini.ReadBool("ignoreFinish", "Global");
-                    }
-                    else {
-                        IgnoreFinish = false;
-                    }
-
-
-                    if (Program.Ini.KeyExists("fileNameSchema", "Images")) {
-                        FileNameSchema = apiTools.ReplaceIllegalCharacters(Program.Ini.ReadString("fileNameSchema", "Images").ToLower());
-                    }
-                    else {
-                        FileNameSchema = "%artist%_%md5%";
-                    }
-
-                    if (Program.Ini.KeyExists("separateRatings", "Images")) {
-                        SeparateRatings = Program.Ini.ReadBool("separateRatings", "Images");
-                    }
-                    else {
-                        SeparateRatings = true;
-                    }
-
-                    if (Program.Ini.KeyExists("separateBlacklisted", "Images")) {
-                        SeparateBlacklisted = Program.Ini.ReadBool("separateBlacklisted", "Images");
-                    }
-                    else {
-                        SeparateBlacklisted = true;
-                    }
-
-                    if (Program.Ini.KeyExists("separateNonImages", "Images")) {
-                        SeparateNonImages = Program.Ini.ReadBool("separateNonImages", "Images");
-                    }
-                    else {
-                        SeparateNonImages = false;
-                    }
-
-                    if (Program.Ini.KeyExists("separateArtists", "Images")) {
-                        SeparateArtists = Program.Ini.ReadBool("separateArtists", "Images");
-                    }
-                    else {
-                        SeparateArtists = false;
-                    }
-
-                    if (Program.Ini.KeyExists("useForm", "Images")) {
-                        if (Program.Ini.ReadBool("useForm", "Images")) {
-                            UseForm = true;
-                        }
-                    }
-                    break;
-
-                default:
-                    if (General.Default.saveLocation != string.Empty) {
-                        DownloadPath = General.Default.saveLocation;
-                    }
-
-                    Graylist = General.Default.blacklist.Split(' ');
-                    Blacklist = General.Default.zeroToleranceBlacklist.Split(' ');
-                    UndesiredTags = General.Default.undesiredTags;
-
-                    SaveInfo = General.Default.saveInfo;
-                    IgnoreFinish = General.Default.ignoreFinish;
-
-                    FileNameSchema = apiTools.ReplaceIllegalCharacters(Images.Default.fileNameSchema);
-                    SeparateRatings = Images.Default.separateRatings;
-                    SeparateBlacklisted = Images.Default.separateBlacklisted;
-                    SeparateNonImages = Images.Default.separateNonImages;
-                    SeparateArtists = Images.Default.separateArtists;
-
-                    UseForm = Images.Default.useForm;
-                    break;
+            if (Config.Settings.General.saveLocation != string.Empty) {
+                DownloadPath = Config.Settings.General.saveLocation;
             }
+
+            Graylist = Config.Settings.General.blacklist.Split(' ');
+            Blacklist = Config.Settings.General.zeroToleranceBlacklist.Split(' ');
+            UndesiredTags = Config.Settings.General.undesiredTags;
+
+            SaveInfo = Config.Settings.General.saveInfo;
+            IgnoreFinish = Config.Settings.General.ignoreFinish;
+
+            FileNameSchema = apiTools.ReplaceIllegalCharacters(Config.Settings.Images.fileNameSchema);
+            SeparateRatings = Config.Settings.Images.separateRatings;
+            SeparateBlacklisted = Config.Settings.Images.separateBlacklisted;
+            SeparateNonImages = Config.Settings.Images.separateNonImages;
+            SeparateArtists = Config.Settings.Images.separateArtists;
+
+            UseForm = Config.Settings.Images.useForm;
         }
     }
 
@@ -665,9 +310,7 @@ namespace aphrodite {
                     imageDL.Dispose();
                 }
                 else {
-                    ImageDownloader imageDL = new ImageDownloader();
-                    imageDL.DownloadInfo = NewInfo;
-                    imageDL.downloadImage();
+                    ImageDownloader imageDL = new ImageDownloader(NewInfo);
                 }
                 return true;
             }

@@ -275,6 +275,7 @@
             // chkTagsUseScoreAsTag
             // 
             this.chkTagsUseScoreAsTag.AutoSize = true;
+            this.chkTagsUseScoreAsTag.Enabled = false;
             this.chkTagsUseScoreAsTag.Location = new System.Drawing.Point(70, 18);
             this.chkTagsUseScoreAsTag.Name = "chkTagsUseScoreAsTag";
             this.chkTagsUseScoreAsTag.Size = new System.Drawing.Size(55, 17);
@@ -591,6 +592,7 @@
             this.Menu = this.toolMenu;
             this.MinimumSize = new System.Drawing.Size(290, 274);
             this.Name = "frmMain";
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "aphrodite";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmMain_FormClosing);

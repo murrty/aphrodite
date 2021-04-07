@@ -48,62 +48,17 @@ namespace aphrodite {
             NativeMethods.SendMessage(txtImageUrl.Handle, 0x1501, (IntPtr)1, "Image ID / URL...");
         }
         private void frmMain_Load(object sender, EventArgs e) {
-            if (string.IsNullOrWhiteSpace(General.Default.saveLocation)) {
-                General.Default.saveLocation = Environment.CurrentDirectory;
+            if (string.IsNullOrWhiteSpace(Config.Settings.General.saveLocation)) {
+                Config.Settings.General.saveLocation = Environment.CurrentDirectory;
             }
 
             if (Program.UseIni) {
                 mProtocol.Visible = false;
                 mProtocol.Enabled = false;
                 lbIni.Visible = true;
-
-                chkTagsDownloadExplicit.Checked = Program.Ini.ReadBool("Explicit", "Tags");
-                chkTagsDownloadQuestionable.Checked = Program.Ini.ReadBool("Questionable", "Tags");
-                chkTagsDownloadSafe.Checked = Program.Ini.ReadBool("Safe", "Tags");
-                chkTagsSeparateRatings.Checked = Program.Ini.ReadBool("separateRatings", "Tags");
-                chkTagsUseMinimumScore.Checked = Program.Ini.ReadBool("useMinimumScore", "Tags");
-                chkTagsUseScoreAsTag.Checked = Program.Ini.ReadBool("scoreAsTag", "Tags");
-                numTagsMinimumScore.Value = Convert.ToDecimal(Program.Ini.ReadInt("scoreMin", "Tags"));
-                numTagsImageLimit.Value = Convert.ToDecimal(Program.Ini.ReadInt("imageLimit", "Tags"));
-                numTagsPageLimit.Value = Convert.ToDecimal(Program.Ini.ReadInt("pageLimit", "Tags"));
-
-                chkPoolsMergeBlacklisted.Checked = Program.Ini.ReadBool("mergeBlacklisted", "Pools");
-                chkPoolsOpenAfter.Checked = Program.Ini.ReadBool("openAfter", "Pools");
-
-                chkImageSeparateRatings.Checked = Program.Ini.ReadBool("separateRatings", "Images");
-                chkImageSeparateBlacklisted.Checked = Program.Ini.ReadBool("separateBlacklisted", "Images");
-                chkImageUseForm.Checked = Program.Ini.ReadBool("useForm", "Images");
-
-                if (Program.Ini.KeyExists("frmMainLocation", "FormSettings")) {
-                    Point p = Program.Ini.ReadPoint("frmMainLocation", "FormSettings");
-                    if (p.X == -32000 || p.Y == -32000) {
-                        this.StartPosition = FormStartPosition.CenterScreen;
-                    }
-                    else {
-                        this.Location = p;
-                    }
-                }
             }
             else {
-                chkTagsDownloadExplicit.Checked = Tags.Default.Explicit;
-                chkTagsDownloadQuestionable.Checked = Tags.Default.Questionable;
-                chkTagsDownloadSafe.Checked = Tags.Default.Safe;
-                chkTagsSeparateRatings.Checked = Tags.Default.separateRatings;
-                chkTagsUseMinimumScore.Checked = Tags.Default.enableScoreMin;
-                chkTagsUseScoreAsTag.Checked = Tags.Default.scoreAsTag;
-                numTagsMinimumScore.Value = Convert.ToDecimal(Tags.Default.scoreMin);
-                numTagsImageLimit.Value = Convert.ToDecimal(Tags.Default.imageLimit);
-                numTagsPageLimit.Value = Convert.ToDecimal(Tags.Default.pageLimit);
-
-                chkPoolsMergeBlacklisted.Checked = Pools.Default.mergeBlacklisted;
-                chkPoolsOpenAfter.Checked = Pools.Default.openAfter;
-
-                chkImageSeparateRatings.Checked = Images.Default.separateRatings;
-                chkImageSeparateBlacklisted.Checked = Images.Default.separateBlacklisted;
-                chkImageUseForm.Checked = Images.Default.useForm;
-
                 tbMain.TabPages.Remove(tbIni);
-
                 RegistryKey keyPools = Registry.ClassesRoot.OpenSubKey("pools\\shell\\open\\command", false);
                 RegistryKey keyPoolWl = Registry.ClassesRoot.OpenSubKey("poolwl\\shell\\open\\command", false);
                 RegistryKey keyTags = Registry.ClassesRoot.OpenSubKey("tags\\shell\\open\\command", false);
@@ -113,13 +68,25 @@ namespace aphrodite {
                 }
             }
 
-            if (FormSettings.Default.frmMainLocation.X != -32000 && FormSettings.Default.frmMainLocation.Y != -32000) {
-                if (Program.UseIni) {
-                    this.Location = new Point(Program.Ini.ReadInt("frmMainX", "Forms"), Program.Ini.ReadInt("frmMainY", "Forms"));
-                }
-                else {
-                    this.Location = FormSettings.Default.frmMainLocation;
-                }
+            chkTagsDownloadExplicit.Checked = Config.Settings.Tags.Explicit;
+            chkTagsDownloadQuestionable.Checked = Config.Settings.Tags.Questionable;
+            chkTagsDownloadSafe.Checked = Config.Settings.Tags.Safe;
+            chkTagsSeparateRatings.Checked = Config.Settings.Tags.separateRatings;
+            chkTagsUseMinimumScore.Checked = Config.Settings.Tags.enableScoreMin;
+            chkTagsUseScoreAsTag.Checked = Config.Settings.Tags.scoreAsTag;
+            numTagsMinimumScore.Value = Convert.ToDecimal(Config.Settings.Tags.scoreMin);
+            numTagsImageLimit.Value = Convert.ToDecimal(Config.Settings.Tags.imageLimit);
+            numTagsPageLimit.Value = Convert.ToDecimal(Config.Settings.Tags.pageLimit);
+
+            chkPoolsMergeBlacklisted.Checked = Config.Settings.Pools.mergeBlacklisted;
+            chkPoolsOpenAfter.Checked = Config.Settings.Pools.openAfter;
+
+            chkImageSeparateRatings.Checked = Config.Settings.Images.separateRatings;
+            chkImageSeparateBlacklisted.Checked = Config.Settings.Images.separateBlacklisted;
+            chkImageUseForm.Checked = Config.Settings.Images.useForm;
+
+            if (Config.Settings.FormSettings.frmMainLocation.X != -32000 && Config.Settings.FormSettings.frmMainLocation.Y != -32000) {
+                this.Location = Config.Settings.FormSettings.frmMainLocation;
             }
         }
         private void frmMain_Shown(object sender, EventArgs e) {
@@ -132,13 +99,8 @@ namespace aphrodite {
                 this.WindowState = FormWindowState.Normal;
             }
 
-            if (Program.UseIni) {
-                Program.Ini.WritePoint("frmMainLocation", this.Location, "FormSettings");
-            }
-            else {
-                FormSettings.Default.frmMainLocation = this.Location;
-                FormSettings.Default.Save();
-            }
+            Config.Settings.FormSettings.frmMainLocation = this.Location;
+            Config.Settings.Save();
         }
         private void tbMain_SelectedIndexChanged(object sender, EventArgs e) {
             if (tbMain.SelectedTab == tbTags) {
@@ -158,36 +120,6 @@ namespace aphrodite {
         private void mSettings_Click(object sender, EventArgs e) {
             frmSettings settings = new frmSettings();
             settings.ShowDialog();
-
-            if (Program.UseIni) {
-                chkTagsDownloadExplicit.Checked = Program.Ini.ReadBool("Explicit", "Tags");
-                chkTagsDownloadQuestionable.Checked = Program.Ini.ReadBool("Questionable", "Tags");
-                chkTagsDownloadSafe.Checked = Program.Ini.ReadBool("Safe", "Tags");
-                chkTagsSeparateRatings.Checked = Program.Ini.ReadBool("separateRatings", "Tags");
-                chkTagsUseMinimumScore.Checked = Program.Ini.ReadBool("useMinimumScore", "Tags");
-                chkTagsUseScoreAsTag.Checked = Program.Ini.ReadBool("scoreAsTag", "Tags");
-                numTagsMinimumScore.Value = Convert.ToDecimal(Program.Ini.ReadInt("scoreMin", "Tags"));
-                numTagsImageLimit.Value = Convert.ToDecimal(Program.Ini.ReadInt("imageLimit", "Tags"));
-                numTagsPageLimit.Value = Convert.ToDecimal(Program.Ini.ReadInt("pageLimit", "Tags"));
-
-                chkPoolsOpenAfter.Checked = Program.Ini.ReadBool("openAfter", "Pools");
-                chkPoolsMergeBlacklisted.Checked = Program.Ini.ReadBool("mergeBlacklisted", "Pools");
-            }
-            else {
-                chkTagsDownloadExplicit.Checked = Tags.Default.Explicit;
-                chkTagsDownloadQuestionable.Checked = Tags.Default.Questionable;
-                chkTagsDownloadSafe.Checked = Tags.Default.Safe;
-                chkTagsSeparateRatings.Checked = Tags.Default.separateRatings;
-                chkTagsUseMinimumScore.Checked = Tags.Default.enableScoreMin;
-                chkTagsUseScoreAsTag.Checked = Tags.Default.scoreAsTag;
-                numTagsMinimumScore.Value = Convert.ToDecimal(Tags.Default.scoreMin);
-                numTagsImageLimit.Value = Convert.ToDecimal(Tags.Default.imageLimit);
-                numTagsPageLimit.Value = Convert.ToDecimal(Tags.Default.pageLimit);
-
-                chkPoolsOpenAfter.Checked = Pools.Default.openAfter;
-                chkPoolsMergeBlacklisted.Checked = Pools.Default.mergeBlacklisted;
-            }
-
         }
         private void mBlacklist_Click(object sender, EventArgs e) {
             frmBlacklist blackList = new frmBlacklist();
@@ -198,7 +130,6 @@ namespace aphrodite {
             Process.Start("https://e621.net/iqdb_queries");
         }
         private void mWishlist_Click(object sender, EventArgs e) {
-            Pools.Default.Reload();
             frmPoolWishlist wl = new frmPoolWishlist();
             wl.ShowDialog();
             wl.Dispose();
@@ -344,9 +275,7 @@ namespace aphrodite {
             NewInfo.UseForm = chkImageUseForm.Checked;
 
             if (NewInfo.UseForm) {
-                ImageDownloader Downloader = new ImageDownloader();
-                Downloader.DownloadInfo = NewInfo;
-                Downloader.downloadImage();
+                ImageDownloader Downloader = new ImageDownloader(NewInfo);
             }
             else {
                 frmImageDownloader Downloader = new frmImageDownloader();

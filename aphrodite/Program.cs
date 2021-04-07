@@ -1,12 +1,15 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Reflection;
 using System.Security.Principal;
 using System.Windows.Forms;
 
 namespace aphrodite {
     static class Program {
         public static readonly string UserAgent = "aphrodite/" + (Properties.Settings.Default.currentVersion) + " (Contact: https://github.com/murrty/aphrodite ... open an issue)";
+        public static readonly string ApplicationPath = Assembly.GetExecutingAssembly().Location;
+        public static readonly string ApplicationName = Assembly.GetExecutingAssembly().GetName().Name;
         public static volatile bool IsDebug = false;
         public static volatile bool IsAdmin = false;
         public static volatile IniFile Ini = new IniFile();
@@ -19,8 +22,7 @@ namespace aphrodite {
         static void Main() {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            System.Diagnostics.Debug.Print(apiTools.GetBlacklistedImageUrl("61c39c449a92d44d56c754a7f6ae51e6", "png"));
-            MessageBox.Show(apiTools.GetBlacklistedImageUrl("61c39c449a92d44d56c754a7f6ae51e6", "png"));
+
             SetDebug();
 
             if (!TaskbarProgress.Windows7OrGreater) {
@@ -30,13 +32,15 @@ namespace aphrodite {
             else {
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
-                if (File.Exists(Environment.CurrentDirectory + "\\aphrodite.ini")) {
+                if (File.Exists(Assembly.GetExecutingAssembly().Location + "\\aphrodite.ini")) {
                     if (Ini.KeyExists("useIni")) {
                         if (Ini.ReadBool("useIni")) {
                             UseIni = true;
                         }
                     }
                 }
+
+                Config.Settings = new Config();
 
                 if ((new WindowsPrincipal(WindowsIdentity.GetCurrent())).IsInRole(WindowsBuiltInRole.Administrator)){
                     IsAdmin = true;
@@ -45,15 +49,15 @@ namespace aphrodite {
                     IsAdmin = false;
                 }
 
-                if (General.Default.firstTime) {
+                if (Config.Settings.General.firstTime) {
                     MessageBox.Show(
                         "This is your first time running aphrodite, so read this before continuing:\n\n" +
                         "This program is \"advertised\" as a porn downloader. You don't have to download any 18+ material using it, but it's emphasised on porn.\n" +
                         "As soon as you get access into the program, change the settings and set your prefered file name schema. I don't want to be responsible for any excess files being downloaded.\n\n" +
                         "Just so you know."
                     );
-                    General.Default.firstTime = false;
-                    General.Default.Save();
+                    Config.Settings.General.firstTime = false;
+                    Config.Settings.General.Save();
                 }
                 if (!HasArgumentsThatSkipMainForm()) {
                     Application.Run(new frmMain(arg, type));
@@ -161,21 +165,8 @@ namespace aphrodite {
                                 .Replace("%22", "\"")
                                 .Trim(' ');
 
-                            if (Pools.Default.addWishlistSilent) {
-                                if (UseIni) {
-                                    if (Pools.Default.wishlist.Contains(url)) {
+                            Config.Config_Pools.AppendToWishlist(title, url);
 
-                                    }
-                                    else {
-                                        return true;
-                                    }
-                                }
-                                WishlistManager.WriteWishlist(url, title);
-                            }
-                            else {
-                                frmPoolWishlist WishList = new frmPoolWishlist(true, url, title);
-                                WishList.ShowDialog();
-                            }
                         }
                     }
                     return true;

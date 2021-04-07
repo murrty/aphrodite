@@ -29,6 +29,9 @@ namespace aphrodite {
             InitializeComponent();
         }
         private void frmImageDownloader_Load(object sender, EventArgs e) {
+            if (string.IsNullOrWhiteSpace(DownloadInfo.FileNameSchema)) {
+                DownloadInfo.FileNameSchema = "%artist%_%md5%";
+            }
             startDownload();
         }
 
@@ -343,8 +346,10 @@ namespace aphrodite {
             // Work on the filename
                 string fileNameArtist = "(none)";
                 bool useHardcodedFilter = false;
-                if (string.IsNullOrEmpty(General.Default.undesiredTags))
+                if (string.IsNullOrEmpty(Config.Settings.General.undesiredTags)) {
+
                     useHardcodedFilter = true;
+                }
 
                 if (xmlTagsArtist.Count > 0) {
                     if (!string.IsNullOrEmpty(xmlTagsArtist[0].InnerText)) {
@@ -534,8 +539,16 @@ Finished:
         public ImageDownloadInfo DownloadInfo;
         #endregion
 
+        public ImageDownloader(ImageDownloadInfo Info) {
+            if (string.IsNullOrWhiteSpace(Info.FileNameSchema)) {
+                Info.FileNameSchema = "%artist%_%md5%";
+            }
+            DownloadInfo = Info;
+            DownloadImage();
+        }
+
         #region Downloader
-        public bool downloadImage() {
+        public bool DownloadImage() {
             try {
                 string SaveTo = DownloadInfo.DownloadPath;
                 // Set the saveto to \\Images.
@@ -773,8 +786,9 @@ Finished:
                 // Work on the filename
                 string fileNameArtist = "unknown";
                 bool useHardcodedFilter = false;
-                if (string.IsNullOrEmpty(General.Default.undesiredTags))
+                if (string.IsNullOrEmpty(Config.Settings.General.undesiredTags)) {
                     useHardcodedFilter = true;
+                }
 
                 if (xmlTagsArtist.Count > 0) {
                     if (!string.IsNullOrEmpty(xmlTagsArtist[0].InnerText)) {

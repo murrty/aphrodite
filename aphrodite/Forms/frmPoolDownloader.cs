@@ -34,6 +34,10 @@ namespace aphrodite {
 
         private void frmDownload_Load(object sender, EventArgs e) {
             lbID.Text = "Pool ID " + DownloadInfo.PoolId;
+
+            if (string.IsNullOrWhiteSpace(DownloadInfo.FileNameSchema)) {
+                DownloadInfo.FileNameSchema = "%poolname%_%page%";
+            }
         }
         private void frmDownload_Shown(object sender, EventArgs e) {
             startDownload();
@@ -348,8 +352,9 @@ namespace aphrodite {
                   // File name artist for the schema
                     string fileNameArtist = "(none)";
                     bool useHardcodedFilter = false;
-                    if (string.IsNullOrEmpty(General.Default.undesiredTags))
+                    if (string.IsNullOrEmpty(Config.Settings.General.undesiredTags)) {
                         useHardcodedFilter = true;
+                    }
 
                     if (xmlTagsArtist[i].ChildNodes.Count > 0) {
                         for (int j = 0; j < xmlTagsArtist[i].ChildNodes.Count; j++) {
@@ -600,8 +605,9 @@ namespace aphrodite {
 
                             string fileNameArtist = "(none)";
                             bool useHardcodedFilter = false;
-                            if (string.IsNullOrEmpty(General.Default.undesiredTags))
+                            if (string.IsNullOrEmpty(Config.Settings.General.undesiredTags)) {
                                 useHardcodedFilter = true;
+                            }
 
                             if (xmlTagsArtist[j].ChildNodes.Count > 0) {
                                 for (int k = 0; k < xmlTagsArtist[j].ChildNodes.Count; k++) {

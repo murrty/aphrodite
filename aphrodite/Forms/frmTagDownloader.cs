@@ -14,9 +14,8 @@ namespace aphrodite {
 
         #region Public Variables
         public TagDownloadInfo DownloadInfo;
-        public static readonly string tagJson = "https://e621.net/posts.json?tags=";        // API url.
-        public static readonly string limitJson = "&limit=320";                             // Maximum limit suffix
-        public static readonly string pageJson = "&page=";                                  // Page suffix.
+        public static readonly string TagURL = "https://e621.net/posts.json?tags={0}&limit=320";
+        public static readonly string PageURL = "https://e621.net/posts.json?tags={0}&limit=320&page={1}";
 
         //       \ = %5C
         //       / = %2F
@@ -70,64 +69,81 @@ namespace aphrodite {
         }
         private void frmDownload_Load(object sender, EventArgs e) {
             if (DownloadInfo.ImageLimit == 0 && DownloadInfo.PageLimit == 0) {
-                if (MessageBox.Show("Downloading won't be limited. This may take a long while or even blacklist you. Continue anyway?", "aphrodite", MessageBoxButtons.YesNo) == DialogResult.No) {
+                if (!DownloadInfo.SaveExplicit && !DownloadInfo.SaveQuestionable && !DownloadInfo.SaveSafe) {
+                    MessageBox.Show("No ratings were selected!", "aphrodite", MessageBoxButtons.OK);
                     this.Opacity = 0;
                     DownloadHasAborted = true;
                     this.DialogResult = DialogResult.No;
+                    return;
                 }
-                else {
-                    tmrTitle.Start();
-                    txtTags.Text = DownloadInfo.Tags.Replace("%25-2F", "/");
-
-                    lbBlacklist.Text = "No file counts.\nWaiting for first json parse.";
-
-                    string minScore = "Minimum score: disabled";
-                    string imgLim = "Image limit: disabled";
-                    string pageLim = "Page limit: disabled";
-
-                    int tagCount = DownloadInfo.Tags.Split(' ').Length;
-
-                    if (tagCount == 6 && DownloadInfo.MinimumScoreAsTag)
-                        DownloadInfo.MinimumScoreAsTag = false;
-
-                    if (DownloadInfo.UseMinimumScore)
-                        minScore = "Minimum score: " + DownloadInfo.MinimumScore.ToString();
-
-                    if (DownloadInfo.MinimumScoreAsTag)
-                        minScore += " (as tag)";
-
-                    if (DownloadInfo.ImageLimit > 0)
-                        imgLim = "Image limit: " + DownloadInfo.ImageLimit.ToString() + "images";
-
-                    if (DownloadInfo.PageLimit > 0)
-                        pageLim = "Page limit: " + DownloadInfo.PageLimit.ToString() + " pages";
-
-                    string ratingBuffer = "\nRatings: ";
-                    if (DownloadInfo.SaveExplicit)
-                        ratingBuffer += "e";
-                    if (DownloadInfo.SaveQuestionable) {
-                        if (ratingBuffer.EndsWith("e"))
-                            ratingBuffer += ", ";
-
-                        ratingBuffer += "q";
-                    }
-                    if (DownloadInfo.SaveSafe) {
-                        if (ratingBuffer.EndsWith("e") || ratingBuffer.EndsWith("q"))
-                            ratingBuffer += ", ";
-
-                        ratingBuffer += "s";
-                    }
-
-                    if (DownloadInfo.SeparateRatings)
-                        ratingBuffer += " (separating)";
-                    else
-                        ratingBuffer = string.Empty;
-
-                    lbLimits.Text = minScore + "\r\n" + imgLim + "\r\n" + pageLim + ratingBuffer;
-                    StartDownload();
-                    this.CenterToScreen();
+                else if (MessageBox.Show("Downloading won't be limited. This may take a long while or even blacklist you. Continue anyway?", "aphrodite", MessageBoxButtons.YesNo) == DialogResult.No) {
+                    this.Opacity = 0;
+                    DownloadHasAborted = true;
+                    this.DialogResult = DialogResult.No;
+                    return;
                 }
             }
+
+            if (string.IsNullOrWhiteSpace(DownloadInfo.FileNameSchema)) {
+                DownloadInfo.FileNameSchema = "%md5%";
+            }
+
+            tmrTitle.Start();
+            txtTags.Text = DownloadInfo.Tags.Replace("%25-2F", "/");
+
+            lbBlacklist.Text = "No file counts.\nWaiting for first json parse.";
+
+            string minScore = "Minimum score: disabled";
+            string imgLim = "Image limit: disabled";
+            string pageLim = "Page limit: disabled";
+
+            int tagCount = DownloadInfo.Tags.Split(' ').Length;
+
+            if (tagCount == 6 && DownloadInfo.MinimumScoreAsTag) {
+                DownloadInfo.MinimumScoreAsTag = false;
+            }
+
+            if (DownloadInfo.UseMinimumScore) {
+                minScore = "Minimum score: " + DownloadInfo.MinimumScore.ToString();
+            }
+
+            if (DownloadInfo.MinimumScoreAsTag) {
+                minScore += " (as tag)";
+            }
+
+            if (DownloadInfo.ImageLimit > 0) {
+                imgLim = "Image limit: " + DownloadInfo.ImageLimit.ToString() + "images";
+            }
+
+            if (DownloadInfo.PageLimit > 0) {
+                pageLim = "Page limit: " + DownloadInfo.PageLimit.ToString() + " pages";
+            }
+
+            string ratingBuffer = "\nRatings: ";
+            if (DownloadInfo.SaveExplicit) {
+                ratingBuffer += "e";
+            }
+            if (DownloadInfo.SaveQuestionable) {
+                if (ratingBuffer.EndsWith("e")) {
+                    ratingBuffer += ", ";
+                }
+                ratingBuffer += "q";
+            }
+            if (DownloadInfo.SaveSafe) {
+                if (ratingBuffer.EndsWith("e") || ratingBuffer.EndsWith("q")) {
+                    ratingBuffer += ", ";
+                }
+
+                ratingBuffer += "s";
+            }
+
+            if (DownloadInfo.SeparateRatings) {
+                ratingBuffer += " (separating)";
+            }
+
+            lbLimits.Text = minScore + "\r\n" + imgLim + "\r\n" + pageLim + ratingBuffer;
+            StartDownload();
+            this.CenterToScreen();
         }
         private void frmDownload_FormClosing(object sender, FormClosingEventArgs e) {
             if (!DownloadHasFinished && !DownloadHasErrored && !DownloadHasAborted) {
@@ -323,14 +339,11 @@ namespace aphrodite {
                 }
 
                 if (DownloadInfo.FromUrl) {
-                    if (!DownloadInfo.DownloadPath.EndsWith("\\Pages\\" + newTagName + " (page " + DownloadInfo.PageNumber + ")")) {
-                        DownloadInfo.DownloadPath += "\\Pages\\" + newTagName + " (page " + DownloadInfo.PageNumber + ")";
-                    }
+                    DownloadInfo.DownloadPath += "\\Pages\\" + newTagName + " (page " + DownloadInfo.PageNumber + ")";
                 }
                 else {
-                    if (!DownloadInfo.DownloadPath.EndsWith("\\Tags\\" + newTagName)) { // Set the output folder.
-                        DownloadInfo.DownloadPath += "\\Tags\\" + newTagName;
-                    }
+                    // Set the output folder.
+                    DownloadInfo.DownloadPath += "\\Tags\\" + newTagName;
                 }
 
             // Start the buffer for the .nfo files.
@@ -368,7 +381,12 @@ namespace aphrodite {
             #region first page of the download
             // Get XML of page.
                 ChangeTask("Downloading tag information for page 1...");
-                CurrentUrl = DownloadInfo.PageUrl.Replace("e621.net/posts", "e621.net/posts.json");
+                if (DownloadInfo.FromUrl) {
+                    CurrentUrl = DownloadInfo.PageUrl.Replace("e621.net/posts", "e621.net/posts.json");
+                }
+                else {
+                    CurrentUrl = string.Format(TagURL, DownloadInfo.Tags);
+                }
                 CuurentXml = apiTools.GetJsonToXml(CurrentUrl);
                 if (apiTools.IsXmlDead(CuurentXml)) {
                     throw new ApiReturnedNullOrEmptyException(ApiReturnedNullOrEmptyException.ReportedEmpty);
@@ -483,14 +501,20 @@ namespace aphrodite {
                     ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',') + "]";
 
                   // Set the rating for the .nfo file.
-                    if (rating == "e")
-                        rating = "Explicit";
-                    else if (rating == "q")
-                        rating = "Questionable";
-                    else if (rating == "s")
-                        rating = "Safe";
-                    else
-                        rating = "Unknown";
+                    switch (xmlRating[i].InnerText.ToLower()) {
+                        case "e": case "explicit":
+                            rating = "Explicit";
+                            break;
+                        case "q": case "questionable":
+                            rating = "Questionable";
+                            break;
+                        case "s": case "safe":
+                            rating = "Safe";
+                            break;
+                        default:
+                            rating = "Unknown";
+                            break;
+                    }
 
                   // Set the description
                     string ImageDescription = " No description";
@@ -519,12 +543,6 @@ namespace aphrodite {
                                     break;
                                 }
                             }
-                        }
-                    }
-
-                    if (xmlTagsArtist[i].ChildNodes.Count > 0) {
-                        if (!string.IsNullOrEmpty(xmlTagsArtist[i].ChildNodes[0].InnerText)) {
-                            fileNameArtist = xmlTagsArtist[i].ChildNodes[0].InnerText;
                         }
                     }
 
@@ -624,7 +642,7 @@ namespace aphrodite {
 
 
                         switch (xmlRating[i].InnerText.ToLower()) {
-                            case "e":
+                            case "e": case "explicit":
                                 if (alreadyExists) {
                                     graylistExplicitExistCount++;
                                 }
@@ -648,7 +666,7 @@ namespace aphrodite {
                                     graylistExplicitCount++;
                                 }
                                 break;
-                            case "q":
+                            case "q": case "questionable":
                                 if (alreadyExists) {
                                     graylistQuestionableExistCount++;
                                 }
@@ -672,7 +690,7 @@ namespace aphrodite {
                                     graylistQuestionableCount++;
                                 }
                                 break;
-                            case "s":
+                            case "s": case "safe":
                                 if (alreadyExists) {
                                     graylistSafeExistCount++;
                                 }
@@ -765,7 +783,7 @@ namespace aphrodite {
                         }
 
                         switch (xmlRating[i].InnerText.ToLower()) {
-                            case "e":
+                            case "e": case "explicit":
                                 if (alreadyExists) {
                                     cleanExplicitExistCount++;
                                 }
@@ -789,7 +807,7 @@ namespace aphrodite {
                                     cleanExplicitCount++;
                                 }
                                 break;
-                            case "q":
+                            case "q": case "questionable":
                                 if (alreadyExists) {
                                     cleanQuestionableExistCount++;
                                 }
@@ -813,7 +831,7 @@ namespace aphrodite {
                                     cleanQuestionableCount++;
                                 }
                                 break;
-                            case "s":
+                            case "s": case "safe":
                                 if (alreadyExists) {
                                     cleanSafeExistCount++;
                                 }
@@ -1042,7 +1060,7 @@ namespace aphrodite {
                     while (!PageIsDead) {
                         ChangeTask("Downloading tag information for page " + (CurrentPage) + "...");
                         //CurrentUrl = tagJson + DownloadInfo.Tags + limitJson + pageJson + CurrentPage;
-                        CurrentUrl = DownloadInfo.PageUrl.Replace("e621.net/posts", "e621.net/posts.json");
+                        CurrentUrl = string.Format(PageURL, DownloadInfo.Tags, CurrentPage);
                         CuurentXml = apiTools.GetJsonToXml(CurrentUrl);
 
                         if (DownloadInfo.PageLimit > 0 && CurrentPage > DownloadInfo.PageLimit)
