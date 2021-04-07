@@ -121,6 +121,9 @@ namespace aphrodite {
             frmRedownloader rd = new frmRedownloader();
             rd.Show();
         }
+        private void mLog_Click(object sender, EventArgs e) {
+            Program.Log(LogAction.ShowLog);
+        }
 
         private void mAbout_Click(object sender, EventArgs e) {
             frmAbout frAbout = new frmAbout();

@@ -36,8 +36,16 @@ namespace aphrodite {
 
         public Config() {
 
-            if (Program.UseIni) {
-                Debug.Print("Using ini file at " + Program.ApplicationPath + "\\aphrodite.ini");
+            Program.Log(LogAction.WriteToLog, "Initializing Config");
+
+            switch (Program.UseIni) {
+                case true:
+                    Program.Log(LogAction.WriteToLog, "UseIni is enabled, skipping internal settings");
+                    break;
+
+                case false:
+                    Program.Log(LogAction.WriteToLog, "UseIni is disabled, using internal settings");
+                    break;
             }
 
             Initialization = new Config_Initialization();
@@ -114,12 +122,15 @@ namespace aphrodite {
 
         public class Config_Initialization {
             public Config_Initialization() {
+                Program.Log(LogAction.WriteToLog, "Initializing Config_Initialization (ironic)");
                 Load();
             }
 
             public bool firstTime = true;
 
             public void Save() {
+                Program.Log(LogAction.WriteToLog, "Saving Config_Initialization settings");
+
                 switch (Program.UseIni) {
                     case true:
                         Program.Ini.WriteBool("firstTime", firstTime, "General");
@@ -137,6 +148,7 @@ namespace aphrodite {
 
                             switch (Save) {
                                 case true:
+                                    Program.Log(LogAction.WriteToLog, "Saving Initialization");
                                     aphrodite.Settings.General.Default.Save();
                                     break;
                             }
@@ -145,10 +157,17 @@ namespace aphrodite {
                 }
             }
             public void Load() {
+                Program.Log(LogAction.WriteToLog, "Loading Config_Initialization settings");
+
                 switch (Program.UseIni) {
                     case true:
-                        if (Program.Ini.KeyExists("firstTime", "General")) {
-                            firstTime = Program.Ini.ReadBool("firstTime", "General");
+                        switch (Program.Ini.KeyExists("firstTime", "General")) {
+                            case true:
+                                firstTime = Program.Ini.ReadBool("firstTime", "General");
+                                break;
+
+                            case false:
+                                break;
                         }
                         break;
 
@@ -161,12 +180,13 @@ namespace aphrodite {
 
         public class Config_FormSettings {
             public Config_FormSettings(bool SkipLoad = false) {
+                Program.Log(LogAction.WriteToLog, "Initializing Config_FormSettings");
                 if (!SkipLoad) {
                     Load();
                 }
             }
 
-            #region
+            #region Variables
             public Point frmMain_Location = new Point(-32000, -32000);
             //public decimal frmMain_numTagsPageLimit = 0;
             //public decimal frmMain_numTagsImageLimit = 0;
@@ -211,10 +231,13 @@ namespace aphrodite {
             #endregion
 
             public void Save() {
+                Program.Log(LogAction.WriteToLog, "Saving Config_FormSettings settings");
+
                 switch (Program.UseIni) {
                     case true:
                         switch (frmMain_Location != frmMain_Location_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "FormSettings -> frmMain_Location changed!");
                                 Program.Ini.WritePoint("frmMain_Location", frmMain_Location, "FormSettings");
                                 frmMain_Location_First = frmMain_Location;
                                 break;
@@ -226,6 +249,7 @@ namespace aphrodite {
 
                             switch (aphrodite.Settings.FormSettings.Default.frmMain_Location != frmMain_Location) {
                                 case true:
+                                    Program.Log(LogAction.WriteToLog, "FormSettings -> frmMain_Location changed!");
                                     aphrodite.Settings.FormSettings.Default.frmMain_Location = frmMain_Location;
                                     Save = true;
                                     break;
@@ -233,6 +257,7 @@ namespace aphrodite {
 
                             switch (Save) {
                                 case true:
+                                    Program.Log(LogAction.WriteToLog, "Saving FormSettings");
                                     aphrodite.Settings.FormSettings.Default.Save();
                                     break;
                             }
@@ -241,6 +266,8 @@ namespace aphrodite {
                 }
             }
             public void Load() {
+                Program.Log(LogAction.WriteToLog, "Loading Config_FormSettings settings");
+
                 switch (Program.UseIni) {
                     case true:
                         if (Program.Ini.KeyExists("frmMain_Location", "FormSettings")) {
@@ -258,6 +285,7 @@ namespace aphrodite {
 
         public class Config_General {
             public Config_General(bool SkipLoad = false) {
+                Program.Log(LogAction.WriteToLog, "Initializing Config_General");
                 if (!SkipLoad) {
                     Load();
                 }
@@ -284,18 +312,25 @@ namespace aphrodite {
             #endregion
 
             public void Save() {
+                Program.Log(LogAction.WriteToLog, "Saving Config_General settings");
+
                 switch (Program.UseIni) {
                     case true:
                         switch (saveLocation != saveLocation_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "General -> saveLocation changed!");
                                 Program.Ini.WriteString("saveLocation", saveLocation, "General");
                                 saveLocation_First = saveLocation;
                                 break;
                         }
                         switch (blacklist != blacklist_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "General -> blacklist changed!");
                                 if (blacklist.Length > 0) {
-                                    File.WriteAllText(Program.ApplicationPath + "\\graylist.cfg", blacklist.Replace(" ", "_").Replace("\r\n", " "));
+                                    File.WriteAllText(
+                                        Program.ApplicationPath + "\\graylist.cfg",
+                                        blacklist.Replace(" ", "_").Replace("\r\n", " ")
+                                    );
                                 }
                                 else {
                                     File.Delete(Program.ApplicationPath + "\\graylist.cfg");
@@ -304,26 +339,33 @@ namespace aphrodite {
                         }
                         switch (saveBlacklisted != saveBlacklisted_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "General -> saveBlacklisted changed!");
                                 Program.Ini.WriteBool("saveBlacklisted", saveBlacklisted, "General");
                                 saveBlacklisted_First = saveBlacklisted;
                                 break;
                         }
                         switch (saveInfo != saveInfo_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "General -> saveInfo changed!");
                                 Program.Ini.WriteBool("saveInfo", saveInfo, "General");
                                 saveInfo_First = saveInfo;
                                 break;
                         }
                         switch (ignoreFinish != ignoreFinish_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "General -> ignoreFinish changed!");
                                 Program.Ini.WriteBool("ignoreFinish", ignoreFinish, "General");
                                 ignoreFinish_First = ignoreFinish;
                                 break;
                         }
                         switch (zeroToleranceBlacklist != zeroToleranceBlacklist_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "General -> zeroToleranceBlacklist changed!");
                                 if (blacklist.Length > 0) {
-                                    File.WriteAllText(Program.ApplicationPath + "\\blacklist.cfg", zeroToleranceBlacklist.Replace(" ", "_").Replace("\r\n", " "));
+                                    File.WriteAllText(
+                                        Program.ApplicationPath + "\\blacklist.cfg",
+                                        zeroToleranceBlacklist.Replace(" ", "_").Replace("\r\n", " ")
+                                    );
                                 }
                                 else {
                                     File.Delete(Program.ApplicationPath + "\\blacklist.cfg");
@@ -332,12 +374,14 @@ namespace aphrodite {
                         }
                         switch (undesiredTags != undesiredTags_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "General -> undesiredTags changed!");
                                 Program.Ini.WriteString("undesiredTags", undesiredTags, "General");
                                 undesiredTags_First = undesiredTags;
                                 break;
                         }
                         switch (openAfter != openAfter_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "General -> openAfter changed!");
                                 Program.Ini.WriteBool("openAfter", openAfter, "General");
                                 openAfter_First = openAfter;
                                 break;
@@ -347,50 +391,58 @@ namespace aphrodite {
                     case false:
                         bool Save = false;
 
-                        switch (aphrodite.Settings.General.Default.saveLocation != saveLocation_First) {
+                        switch (aphrodite.Settings.General.Default.saveLocation != saveLocation) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "General -> saveLocation changed!");
                                 aphrodite.Settings.General.Default.saveLocation = saveLocation;
                                 Save = true;
                                 break;
                         }
                         switch (aphrodite.Settings.General.Default.blacklist != blacklist) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "General -> blacklist changed!");
                                 aphrodite.Settings.General.Default.blacklist = blacklist;
                                 Save = true;
                                 break;
                         }
                         switch (aphrodite.Settings.General.Default.saveBlacklisted != saveBlacklisted) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "General -> saveBlacklisted changed!");
                                 aphrodite.Settings.General.Default.saveBlacklisted = saveBlacklisted;
                                 Save = true;
                                 break;
                         }
                         switch (aphrodite.Settings.General.Default.saveInfo != saveInfo) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "General -> saveInfo changed!");
                                 aphrodite.Settings.General.Default.saveInfo = saveInfo;
                                 Save = true;
                                 break;
                         }
                         switch (aphrodite.Settings.General.Default.ignoreFinish != ignoreFinish) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "General -> ignoreFinish changed!");
                                 aphrodite.Settings.General.Default.ignoreFinish = ignoreFinish;
                                 Save = true;
                                 break;
                         }
                         switch (aphrodite.Settings.General.Default.zeroToleranceBlacklist != zeroToleranceBlacklist) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "General -> zeroToleranceBlacklist changed!");
                                 aphrodite.Settings.General.Default.zeroToleranceBlacklist = zeroToleranceBlacklist;
                                 Save = true;
                                 break;
                         }
                         switch (aphrodite.Settings.General.Default.undesiredTags != undesiredTags) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "General -> undesiredTags changed!");
                                 aphrodite.Settings.General.Default.undesiredTags = undesiredTags;
                                 Save = true;
                                 break;
                         }
                         switch (aphrodite.Settings.General.Default.openAfter != openAfter) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "General -> openAfter changed!");
                                 aphrodite.Settings.General.Default.openAfter = openAfter;
                                 Save = true;
                                 break;
@@ -398,6 +450,7 @@ namespace aphrodite {
 
                         switch (Save) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Saving General");
                                 aphrodite.Settings.General.Default.Save();
                                 break;
                         }
@@ -405,6 +458,8 @@ namespace aphrodite {
                 }
             }
             public void Load() {
+                Program.Log(LogAction.WriteToLog, "Loading Config_General settings");
+
                 switch (Program.UseIni) {
                     case true:
                         switch (Program.Ini.KeyExists("saveLocation", "General")) {
@@ -473,6 +528,7 @@ namespace aphrodite {
 
         public class Config_Tags {
             public Config_Tags(bool SkipLoad = false) {
+                Program.Log(LogAction.WriteToLog, "Initializing Config_Tags");
                 if (!SkipLoad) {
                     Load();
                 }
@@ -505,70 +561,83 @@ namespace aphrodite {
             #endregion
 
             public void Save() {
+                Program.Log(LogAction.WriteToLog, "Saving Config_Tags settings");
+
                 switch (Program.UseIni) {
                     case true:
                         switch (Safe != Safe_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> Safe changed!");
                                 Program.Ini.WriteBool("Safe", Safe, "Tags");
                                 Safe_First = Safe;
                                 break;
                         }
                         switch (Questionable != Questionable_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> Questionable changed!");
                                 Program.Ini.WriteBool("Questionable", Questionable, "Tags");
                                 Questionable_First = Questionable;
                                 break;
                         }
                         switch (Explicit != Explicit_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> Explicit changed!");
                                 Program.Ini.WriteBool("Explicit", Explicit, "Tags");
                                 Explicit_First = Explicit;
                                 break;
                         }
                         switch (separateRatings != separateRatings_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> separateRatings changed!");
                                 Program.Ini.WriteBool("separateRatings", separateRatings, "Tags");
                                 separateRatings_First = separateRatings;
                                 break;
                         }
                         switch (separateNonImages != separateNonImages_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> separateNonImages changed!");
                                 Program.Ini.WriteBool("separateNonImages", separateNonImages, "Tags");
                                 separateNonImages_First = separateNonImages;
                                 break;
                         }
                         switch (enableScoreMin != enableScoreMin_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> enableScoreMin changed!");
                                 Program.Ini.WriteBool("enableScoreMin", enableScoreMin, "Tags");
                                 enableScoreMin_First = enableScoreMin;
                                 break;
                         }
                         switch (scoreAsTag != scoreAsTag_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> scoreAsTag changed!");
                                 Program.Ini.WriteBool("scoreAsTag", scoreAsTag, "Tags");
                                 scoreAsTag_First = scoreAsTag;
                                 break;
                         }
                         switch (scoreMin != scoreMin_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> scoreMin changed!");
                                 Program.Ini.WriteInt("scoreMin", scoreMin, "Tags");
                                 scoreMin_First = scoreMin;
                                 break;
                         }
                         switch (imageLimit != imageLimit_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> imageLimit changed!");
                                 Program.Ini.WriteInt("imageLimit", imageLimit, "Tags");
                                 imageLimit_First = imageLimit;
                                 break;
                         }
                         switch (pageLimit != pageLimit_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> pageLimit changed!");
                                 Program.Ini.WriteInt("pageLimit", pageLimit, "Tags");
                                 pageLimit_First = pageLimit;
                                 break;
                         }
                         switch (fileNameSchema != fileNameSchema_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> fileNameSchema changed!");
                                 Program.Ini.WriteString("fileNameSchema", fileNameSchema, "Tags");
                                 fileNameSchema_First = fileNameSchema;
                                 break;
@@ -580,66 +649,77 @@ namespace aphrodite {
 
                         switch (aphrodite.Settings.Tags.Default.Safe != Safe) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> Safe changed!");
                                 aphrodite.Settings.Tags.Default.Safe = Safe;
                                 Save = true;
                                 break;
                         }
                         switch (aphrodite.Settings.Tags.Default.Questionable != Questionable) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> Questionable changed!");
                                 aphrodite.Settings.Tags.Default.Questionable = Questionable;
                                 Save = true;
                                 break;
                         }
                         switch (aphrodite.Settings.Tags.Default.Explicit != Explicit) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> Explicit changed!");
                                 aphrodite.Settings.Tags.Default.Explicit = Explicit;
                                 Save = true;
                                 break;
                         }
                         switch (aphrodite.Settings.Tags.Default.separateRatings != separateRatings) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> separateRatings changed!");
                                 aphrodite.Settings.Tags.Default.separateRatings = separateRatings;
                                 Save = true;
                                 break;
                         }
                         switch (aphrodite.Settings.Tags.Default.separateNonImages != separateNonImages) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> separateNonImages changed!");
                                 aphrodite.Settings.Tags.Default.separateNonImages = separateNonImages;
                                 Save = true;
                                 break;
                         }
                         switch (aphrodite.Settings.Tags.Default.enableScoreMin != enableScoreMin) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> enableScoreMin changed!");
                                 aphrodite.Settings.Tags.Default.enableScoreMin = enableScoreMin;
                                 Save = true;
                                 break;
                         }
                         switch (aphrodite.Settings.Tags.Default.scoreAsTag != scoreAsTag) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> scoreAsTag changed!");
                                 aphrodite.Settings.Tags.Default.scoreAsTag = scoreAsTag;
                                 Save = true;
                                 break;
                         }
                         switch (aphrodite.Settings.Tags.Default.scoreMin != scoreMin) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> scoreMin changed!");
                                 aphrodite.Settings.Tags.Default.scoreMin = scoreMin;
                                 Save = true;
                                 break;
                         }
                         switch (aphrodite.Settings.Tags.Default.imageLimit != imageLimit) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> imageLimit changed!");
                                 aphrodite.Settings.Tags.Default.imageLimit = imageLimit;
                                 Save = true;
                                 break;
                         }
                         switch (aphrodite.Settings.Tags.Default.pageLimit != pageLimit) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> pageLimit changed!");
                                 aphrodite.Settings.Tags.Default.pageLimit = pageLimit;
                                 Save = true;
                                 break;
                         }
                         switch (aphrodite.Settings.Tags.Default.fileNameSchema != fileNameSchema) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> fileNameSchema changed!");
                                 aphrodite.Settings.Tags.Default.fileNameSchema = fileNameSchema;
                                 Save = true;
                                 break;
@@ -647,6 +727,7 @@ namespace aphrodite {
 
                         switch (Save) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Saving Tags");
                                 aphrodite.Settings.Tags.Default.Save();
                                 break;
                         }
@@ -654,6 +735,8 @@ namespace aphrodite {
                 }
             }
             public void Load() {
+                Program.Log(LogAction.WriteToLog, "Loading Config_Tags settings");
+
                 switch (Program.UseIni) {
                     case true:
                         if (Program.Ini.KeyExists("Safe", "Tags")) {
@@ -723,10 +806,13 @@ namespace aphrodite {
             public static readonly string WishlistFile = Program.ApplicationPath + "\\PoolWishlist.cfg";
 
             public Config_Pools() {
+                Program.Log(LogAction.WriteToLog, "Initializing Config_Pools");
                 Load();
             }
 
             public static void AppendToWishlist(string Name, string URL) {
+                Program.Log(LogAction.WriteToLog, "Appending new Wishlist pool");
+
                 if (Program.UseIni) {
                     if (Program.Ini.KeyExists("addWishlistSilent", "Pools") && Program.Ini.ReadBool("addWishlistSilent", "Pools")) {
                         if (File.Exists(WishlistFile)) {
@@ -764,6 +850,8 @@ namespace aphrodite {
                 }
             }
             public static void SaveWishlist(List<string> Names, List<string> URLs) {
+                Program.Log(LogAction.WriteToLog, "Saving pool wishlist");
+
                 switch (URLs.Count > 0 && Names.Count > 0 && URLs.Count == Names.Count) {
                     case true:
                         switch (Program.UseIni) {
@@ -799,22 +887,27 @@ namespace aphrodite {
             #endregion
 
             public void Save() {
+                Program.Log(LogAction.WriteToLog, "Saving Config_Pools settings");
+
                 switch (Program.UseIni) {
                     case true:
                         switch (mergeBlacklisted != mergeBlacklisted_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Pools -> mergeBlacklisted changed!");
                                 Program.Ini.WriteBool("mergeBlacklisted", mergeBlacklisted, "Pools");
                                 mergeBlacklisted_First = mergeBlacklisted;
                                 break;
                         }
                         switch (addWishlistSilent != addWishlistSilent_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Pools -> addWishlistSilent changed!");
                                 Program.Ini.WriteBool("addWishlistSilent", addWishlistSilent, "Pools");
                                 addWishlistSilent_First = addWishlistSilent;
                                 break;
                         }
                         switch (fileNameSchema != fileNameSchema_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Pools -> fileNameSchema changed!");
                                 Program.Ini.WriteString("fileNameSchema", fileNameSchema, "Pools");
                                 fileNameSchema_First = fileNameSchema;
                                 break;
@@ -826,18 +919,21 @@ namespace aphrodite {
 
                         switch (aphrodite.Settings.Pools.Default.mergeBlacklisted != mergeBlacklisted) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Pools -> mergeBlacklisted changed!");
                                 aphrodite.Settings.Pools.Default.mergeBlacklisted = mergeBlacklisted;
                                 Save = true;
                                 break;
                         }
                         switch (aphrodite.Settings.Pools.Default.addWishlistSilent != addWishlistSilent) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Pools -> addWishlistSilent changed!");
                                 aphrodite.Settings.Pools.Default.addWishlistSilent = addWishlistSilent;
                                 Save = true;
                                 break;
                         }
                         switch (aphrodite.Settings.Pools.Default.fileNameSchema != fileNameSchema) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Pools -> fileNameSchema changed!");
                                 aphrodite.Settings.Pools.Default.fileNameSchema = fileNameSchema;
                                 Save = true;
                                 break;
@@ -845,6 +941,7 @@ namespace aphrodite {
 
                         switch (Save) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Saving Pools");
                                 aphrodite.Settings.Pools.Default.Save();
                                 break;
                         }
@@ -852,6 +949,8 @@ namespace aphrodite {
                 }
             }
             public void Load() {
+                Program.Log(LogAction.WriteToLog, "Loading Config_Pools settings");
+
                 switch (Program.UseIni) {
                     case true:
                         switch (Program.Ini.KeyExists("mergeBlacklisted", "Pools")) {
@@ -904,6 +1003,7 @@ namespace aphrodite {
 
         public class Config_Images {
             public Config_Images() {
+                Program.Log(LogAction.WriteToLog, "Initializing Config_Images");
                 Load();
             }
 
@@ -924,40 +1024,48 @@ namespace aphrodite {
             #endregion
 
             public void Save() {
+                Program.Log(LogAction.WriteToLog, "Saving Config_Images settings");
+
                 switch (Program.UseIni) {
                     case true:
                         switch (separateRatings != separateRatings_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Images -> separateRatings changed!");
                                 Program.Ini.WriteBool("separateRatings", separateRatings, "Images");
                                 separateRatings_First = separateRatings;
                                 break;
                         }
                         switch (separateBlacklisted != separateBlacklisted_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Images -> separateBlacklisted changed!");
                                 Program.Ini.WriteBool("separateBlacklisted", separateBlacklisted, "Images");
                                 separateBlacklisted_First = separateBlacklisted;
                                 break;
                         }
                         switch (useForm != useForm_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Images -> useForm changed!");
                                 Program.Ini.WriteBool("useForm", useForm, "Images");
                                 useForm_First = useForm;
                                 break;
                         }
                         switch (separateArtists != separateArtists_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Images -> separateArtists changed!");
                                 Program.Ini.WriteBool("separateArtists", separateArtists, "Images");
                                 separateArtists_First = separateArtists;
                                 break;
                         }
                         switch (fileNameSchema != fileNameSchema_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Images -> fileNameSchema changed!");
                                 Program.Ini.WriteString("fileNameSchema", fileNameSchema, "Images");
                                 fileNameSchema_First = fileNameSchema;
                                 break;
                         }
                         switch (separateNonImages != separateNonImages_First) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Images -> separateNonImages changed!");
                                 Program.Ini.WriteBool("separateNonImages", separateNonImages, "Images");
                                 separateNonImages_First = separateNonImages;
                                 break;
@@ -969,36 +1077,42 @@ namespace aphrodite {
 
                         switch (aphrodite.Settings.Images.Default.separateRatings != separateRatings) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Images -> separateRatings changed!");
                                 aphrodite.Settings.Images.Default.separateRatings = separateRatings;
                                 Save = true;
                                 break;
                         }
                         switch (aphrodite.Settings.Images.Default.separateBlacklisted != separateBlacklisted) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Images -> separateBlacklisted changed!");
                                 aphrodite.Settings.Images.Default.separateBlacklisted = separateBlacklisted;
                                 Save = true;
                                 break;
                         }
                         switch (aphrodite.Settings.Images.Default.useForm != useForm) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Images -> useForm changed!");
                                 aphrodite.Settings.Images.Default.useForm = useForm;
                                 Save = true;
                                 break;
                         }
                         switch (aphrodite.Settings.Images.Default.separateArtists != separateArtists) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Images -> separateArtists changed!");
                                 aphrodite.Settings.Images.Default.separateArtists = separateArtists;
                                 Save = true;
                                 break;
                         }
                         switch (aphrodite.Settings.Images.Default.fileNameSchema != fileNameSchema) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Images -> fileNameSchema changed!");
                                 aphrodite.Settings.Images.Default.fileNameSchema = fileNameSchema;
                                 Save = true;
                                 break;
                         }
                         switch (aphrodite.Settings.Images.Default.separateNonImages != separateNonImages) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Images -> separateNonImages changed!");
                                 aphrodite.Settings.Images.Default.separateNonImages = separateNonImages;
                                 Save = true;
                                 break;
@@ -1006,6 +1120,7 @@ namespace aphrodite {
 
                         switch (Save) {
                             case true:
+                                Program.Log(LogAction.WriteToLog, "Saving Images");
                                 aphrodite.Settings.Images.Default.Save();
                                 break;
                         }
@@ -1013,6 +1128,8 @@ namespace aphrodite {
                 }
             }
             public void Load() {
+                Program.Log(LogAction.WriteToLog, "Loading Config_Images settings");
+
                 switch (Program.UseIni) {
                     case true:
                         switch (Program.Ini.KeyExists("separateRatings", "Images")) {

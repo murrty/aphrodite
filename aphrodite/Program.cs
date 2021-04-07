@@ -16,6 +16,8 @@ namespace aphrodite {
 
         private static volatile DownloadType type = DownloadType.None;
         private static volatile string arg = null;
+        private static volatile frmLog Logger;
+        private static volatile bool LogEnabled = false;
 
         [STAThread]
         static void Main() {
@@ -39,16 +41,23 @@ namespace aphrodite {
                     }
                 }
 
+                Log(LogAction.EnableLog);
                 Config.Settings = new Config();
 
-                if ((new WindowsPrincipal(WindowsIdentity.GetCurrent())).IsInRole(WindowsBuiltInRole.Administrator)){
-                    IsAdmin = true;
-                }
-                else {
-                    IsAdmin = false;
+                switch ((new WindowsPrincipal(WindowsIdentity.GetCurrent())).IsInRole(WindowsBuiltInRole.Administrator)) {
+                    case true:
+                        Log(LogAction.WriteToLog, "Running as administrator. I hope you know what you're doing");
+                        IsAdmin = true;
+                        break;
+
+                    case false:
+                        Log(LogAction.WriteToLog, "Not running as administrator (bad for protocols, good for everything else)");
+                        IsAdmin = false;
+                        break;
                 }
 
                 if (Config.Settings.Initialization.firstTime) {
+                    Log(LogAction.WriteToLog, "First time running! Look at my notice");
                     MessageBox.Show(
                         "This is your first time running aphrodite, so read this before continuing:\n\n" +
                         "This program is \"advertised\" as a porn downloader. You don't have to download any 18+ material using it, but it's emphasised on porn.\n" +
@@ -59,6 +68,7 @@ namespace aphrodite {
                     Config.Settings.Save(ConfigType.Initialization);
                 }
                 if (!HasArgumentsThatSkipMainForm()) {
+                    Log(LogAction.WriteToLog, "No arguments were passed that didn't require the main form");
                     Config.Settings.Load(ConfigType.All);
                     Application.Run(new frmMain(arg, type));
                 }
@@ -66,6 +76,7 @@ namespace aphrodite {
         }
 
         static bool HasArgumentsThatSkipMainForm() {
+            Log(LogAction.WriteToLog, "Checking arguments");
             string CurrentArg;
 
             for (int ArgIndex = 1; ArgIndex < Environment.GetCommandLineArgs().Length; ArgIndex++) {
@@ -125,13 +136,13 @@ namespace aphrodite {
                     CurrentArg = CurrentArg.Substring(5).Replace("|", " ");
 
                     if (apiTools.IsValidPageLink(CurrentArg)) {
-
                         Config.Settings.Load(ConfigType.General);
                         Config.Settings.Load(ConfigType.Tags);
                         Downloader.Arguments.DownloadPage(CurrentArg);
                         return true;
                     }
                     else {
+                        Log(LogAction.WriteToLog, "Some tags were passed to the program");
                         type = DownloadType.Tags;
                         arg = CurrentArg.Replace("%20", " ");
                         return false;
@@ -198,6 +209,7 @@ namespace aphrodite {
                         return true;
                     }
                     else {
+                        Log(LogAction.WriteToLog, "A pool id was passed to the program");
                         arg = CurrentArg;
                         type = DownloadType.Pools;
                         return false;
@@ -217,6 +229,7 @@ namespace aphrodite {
                         return true;
                     }
                     else {
+                        Log(LogAction.WriteToLog, "An image id was passed to the program");
                         arg = CurrentArg;
                         type = DownloadType.Images;
                         return false;
@@ -250,6 +263,109 @@ namespace aphrodite {
         [System.Diagnostics.Conditional("DEBUG")]
         static void SetDebug() {
             IsDebug = true;
+        }
+
+        public static bool Log(LogAction Action, string LogMessage = "") {
+            switch (Action) {
+                default:
+                    return false;
+
+                case LogAction.EnableLog:
+                    if (LogEnabled) {
+                        Logger.Append("The log is already enabled");
+                        return false;
+                    }
+                    else {
+                        Logger = new frmLog();
+                        Logger.Append("Log has been enabled", true);
+                        LogEnabled = true;
+                        return true;
+                    }
+
+                case LogAction.DisableLog:
+                    if (LogEnabled) {
+                        System.Diagnostics.Debug.Print("Disabling log");
+
+                        if (Logger.WindowState == FormWindowState.Minimized) {
+                            Logger.Opacity = 0;
+                            Logger.WindowState = FormWindowState.Normal;
+                        }
+                        //if (Config.Default.LogFormLocation != Logger.Location) {
+                        //    Config.Default.LogFormLocation = Logger.Location;
+                        //    Properties.Settings.Default.ConfigChanged = true;
+                        //}
+
+                        //if (Config.Default.LogFormSize != Logger.Size) {
+                        //    Config.Default.LogFormSize = Logger.Size;
+                        //    Properties.Settings.Default.ConfigChanged = true;
+                        //}
+
+                        Logger.Dispose();
+                        LogEnabled = false;
+                        return true;
+                    }
+                    return false;
+
+                case LogAction.WriteToLog:
+                    switch (LogEnabled) {
+                        case true:
+                            if (Logger != null) {
+                                Logger.Append(LogMessage);
+                                return true;
+                            }
+                            else {
+                                System.Diagnostics.Debug.Print(LogMessage);
+                            }
+                            break;
+                        case false:
+                            System.Diagnostics.Debug.Print(LogMessage);
+                            break;
+                    }
+                    return false;
+
+                case LogAction.InitialWriteToLog:
+                    switch (LogEnabled) {
+                        case true:
+                            switch (Logger == null) {
+                                case false:
+                                    Logger.Append(LogMessage, true);
+                                    return true;
+                                case true:
+                                    System.Diagnostics.Debug.Print(LogMessage);
+                                    break;
+                            }
+                            break;
+                        case false:
+                            System.Diagnostics.Debug.Print(LogMessage);
+                            break;
+                    }
+                    return false;
+
+                case LogAction.ShowLog:
+                    if (LogEnabled && Logger != null) {
+                        if (Logger.IsShown) {
+                            Logger.Append("The log was already shown dingus, activating log");
+                            Logger.Activate();
+                            return true;
+                        }
+                        else {
+                            Logger.Append("Showing log");
+                            Logger.IsShown = true;
+                            Logger.Show();
+                            return true;
+                        }
+                    }
+                    return false;
+            }
+        }
+        public static bool QuickLog(string LogMessage) {
+            if (LogEnabled && Logger != null) {
+                Logger.Append(LogMessage);
+            }
+            else {
+                System.Diagnostics.Debug.Print(LogMessage);
+            }
+            return true;
         }
     }
 }

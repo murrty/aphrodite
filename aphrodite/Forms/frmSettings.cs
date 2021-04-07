@@ -21,7 +21,6 @@ namespace aphrodite {
         public bool PoolsProtocol = false;          // is the pools protocol installed?
         public bool PoolsWishlistProtocol = false;  // is the poolwl protocol installed?
         public bool ImagesProtocol = false;         // is the images protocol installed?
-        private bool changedSaveTo = false;         // Determines if the txtSaveTo was changed.
         #endregion
 
         [DllImport("user32.dll")]
@@ -106,9 +105,7 @@ namespace aphrodite {
 
         private void saveSettings() {
           // General
-            if (changedSaveTo) {
-                Config.Settings.General.saveLocation = txtSaveTo.Text;
-            }
+            Config.Settings.General.saveLocation = txtSaveTo.Text;
             Config.Settings.General.saveInfo = chkSaveInfoFiles.Checked;
             Config.Settings.General.saveBlacklisted = chkSaveBlacklistedImages.Checked;
             Config.Settings.General.ignoreFinish = chkIgnoreFinish.Checked;
@@ -300,7 +297,6 @@ namespace aphrodite {
 
                 if (fbd.ShowDialog() == DialogResult.OK) {
                     txtSaveTo.Text = fbd.SelectedPath;
-                    changedSaveTo = true;
                 }
             }
         }

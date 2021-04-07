@@ -65,8 +65,10 @@ namespace aphrodite {
         }
 
         private void btnSave_Click(object sender, EventArgs e) {
-            Config.Settings.General.blacklist = rtbBlacklist.Text.Replace(" ", "_").Replace("\r\n", " ");
-            Config.Settings.General.zeroToleranceBlacklist = rtbZTB.Text.Replace(" ", "_").Replace("\r\n", " ");
+            Config.Settings.General.blacklist =
+                rtbBlacklist.Text.Replace(" ", "_").Replace("\r\n", " ").Replace('\n', ' ').Trim(' ');
+            Config.Settings.General.zeroToleranceBlacklist =
+                rtbZTB.Text.Replace(" ", "_").Replace("\r\n", " ").Replace('\n', ' ').Trim(' ');
             Config.Settings.General.Save();
             this.DialogResult = DialogResult.OK;
         }

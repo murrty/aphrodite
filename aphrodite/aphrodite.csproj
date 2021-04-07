@@ -103,6 +103,12 @@
     <Compile Include="Forms\frmLicensing.Designer.cs">
       <DependentUpon>frmLicensing.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\frmLog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmLog.Designer.cs">
+      <DependentUpon>frmLog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\frmUpdateAvailable.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -219,6 +225,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmLicensing.resx">
       <DependentUpon>frmLicensing.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmLog.resx">
+      <DependentUpon>frmLog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmPoolDownloader.resx">
       <DependentUpon>frmPoolDownloader.cs</DependentUpon>

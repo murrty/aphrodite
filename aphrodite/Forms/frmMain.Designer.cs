@@ -69,6 +69,8 @@
             this.mReverseSearch = new System.Windows.Forms.MenuItem();
             this.mAbout = new System.Windows.Forms.MenuItem();
             this.TouchingTips = new System.Windows.Forms.ToolTip(this.components);
+            this.mToolsSeparator = new System.Windows.Forms.MenuItem();
+            this.mLog = new System.Windows.Forms.MenuItem();
             this.tbMain.SuspendLayout();
             this.tbTags.SuspendLayout();
             this.gbtPageLimit.SuspendLayout();
@@ -576,7 +578,9 @@
             this.mTools.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.mWishlist,
             this.mRedownloader,
-            this.mReverseSearch});
+            this.mReverseSearch,
+            this.mToolsSeparator,
+            this.mLog});
             this.mTools.Text = "tools";
             // 
             // mWishlist
@@ -602,6 +606,17 @@
             this.mAbout.Index = 3;
             this.mAbout.Text = "about";
             this.mAbout.Click += new System.EventHandler(this.mAbout_Click);
+            // 
+            // mToolsSeparator
+            // 
+            this.mToolsSeparator.Index = 3;
+            this.mToolsSeparator.Text = "-";
+            // 
+            // mLog
+            // 
+            this.mLog.Index = 4;
+            this.mLog.Text = "aphrodite log";
+            this.mLog.Click += new System.EventHandler(this.mLog_Click);
             // 
             // frmMain
             // 
@@ -691,6 +706,8 @@
         private System.Windows.Forms.CheckBox chkTagSeparateNonImages;
         private System.Windows.Forms.CheckBox chkTagsOpenAfterDownload;
         private System.Windows.Forms.CheckBox chkImageOpenAfter;
+        private System.Windows.Forms.MenuItem mToolsSeparator;
+        private System.Windows.Forms.MenuItem mLog;
     }
 }
 
