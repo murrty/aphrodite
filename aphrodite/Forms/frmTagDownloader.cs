@@ -158,7 +158,7 @@ namespace aphrodite {
                 }
                 else {
                     lbFile.Text = "Download canceled";
-                    pbDownloadStatus.State = ProgressBarState.Error;
+                    pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
                     lbPercentage.Text = "Canceled";
                     tmrTitle.Stop();
                     this.Text = "Download canceled";
@@ -181,6 +181,8 @@ namespace aphrodite {
         #region Downloader
         private void StartDownload() {
             try {
+                ///////////////////////////////
+                Program.Log(LogAction.WriteToLog, "Starting Tag download for \"" + DownloadInfo.Tags + "\"");
                 tagDownload = new Thread(() => {
                     Thread.CurrentThread.IsBackground = true;
 
@@ -210,6 +212,7 @@ namespace aphrodite {
         }
 
         private void AfterDownload(int ErrorType = 0) {
+            tmrTitle.Stop();
             if (DownloadInfo.OpenAfter) {
                 Process.Start(DownloadInfo.DownloadPath);
             }
@@ -228,48 +231,45 @@ namespace aphrodite {
                     this.DialogResult = DialogResult.Ignore;
                 }
             }
-            if (DownloadHasFinished) {
-                lbFile.Text = "All " + (PresentFiles) + " file(s) downloaded. (" + (TotalFiles) + " total files downloaded)";
-                pbDownloadStatus.Value = pbDownloadStatus.Maximum;
-                lbPercentage.Text = "Done";
-                tmrTitle.Stop();
-                this.Text = "Finished downloading tags " + DownloadInfo.Tags;
-                status.Text = "Finished downloading tags";
-            }
-            else if (DownloadHasErrored) {
-                if (ErrorType == 0) {
-                    lbFile.Text = "Downloading has encountered an error";
-                    pbDownloadStatus.State = ProgressBarState.Error;
-                    lbPercentage.Text = "Error";
-                    tmrTitle.Stop();
-                    this.Text = "Download error";
-                    status.Text = "Downloading has resulted in an error";
-                }
-                else if (ErrorType == 1) {
-                    lbFile.Text = "API parsing has resulted in an error";
-                    pbDownloadStatus.State = ProgressBarState.Error;
-                    lbPercentage.Text = "Error";
-                    tmrTitle.Stop();
-                    this.Text = "API parsing error";
-                    status.Text = "API parsing has resulted in an error";
-                }
-            }
-            else if (DownloadHasAborted) {
-                lbFile.Text = "Download canceled";
-                pbDownloadStatus.State = ProgressBarState.Error;
-                lbPercentage.Text = "Canceled";
-                tmrTitle.Stop();
-                this.Text = "Download canceled";
-                status.Text = "Download has canceled";
-            }
             else {
-                // assume it completed
-                lbFile.Text = "Download assumed to be completed...";
-                pbDownloadStatus.Value = pbDownloadStatus.Maximum;
-                lbPercentage.Text = "Done?";
-                tmrTitle.Stop();
-                this.Text = "Tags download completed";
-                status.Text = "Download status booleans not set, assuming the download completed";
+                if (DownloadHasFinished) {
+                    lbFile.Text = "All " + (PresentFiles) + " file(s) downloaded. (" + (TotalFiles) + " total files downloaded)";
+                    pbDownloadStatus.Value = pbDownloadStatus.Maximum;
+                    lbPercentage.Text = "Done";
+                    this.Text = "Finished downloading tags " + DownloadInfo.Tags;
+                    status.Text = "Finished downloading tags";
+                }
+                else if (DownloadHasErrored) {
+                    if (ErrorType == 0) {
+                        lbFile.Text = "Downloading has encountered an error";
+                        pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
+                        lbPercentage.Text = "Error";
+                        this.Text = "Download error";
+                        status.Text = "Downloading has resulted in an error";
+                    }
+                    else if (ErrorType == 1) {
+                        lbFile.Text = "API parsing has resulted in an error";
+                        pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
+                        lbPercentage.Text = "Error";
+                        this.Text = "API parsing error";
+                        status.Text = "API parsing has resulted in an error";
+                    }
+                }
+                else if (DownloadHasAborted) {
+                    lbFile.Text = "Download canceled";
+                    pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
+                    lbPercentage.Text = "Canceled";
+                    this.Text = "Download canceled";
+                    status.Text = "Download has canceled";
+                }
+                else {
+                    // assume it completed
+                    lbFile.Text = "Download assumed to be completed...";
+                    pbDownloadStatus.Value = pbDownloadStatus.Maximum;
+                    lbPercentage.Text = "Done?";
+                    this.Text = "Tags download completed";
+                    status.Text = "Download status booleans not set, assuming the download completed";
+                }
             }
         }
 
@@ -406,7 +406,7 @@ namespace aphrodite {
                 XmlNodeList xmlExt;
                 XmlNodeList xmlDeleted;
 
-                for (int Page = 0; Page < CurrentPage; Page++) {
+                for (int ApiPage = 0; ApiPage < CurrentPage; ApiPage++) {
                     if (DownloadInfo.PageLimit > 0 && CurrentPage > DownloadInfo.PageLimit) {
                         break;
                     }
@@ -672,7 +672,7 @@ namespace aphrodite {
                                     totalCount++;
                                     continue;
                             }
-                            switch (PostIsGraylisted && !DownloadInfo.SaveBlacklistedFiles) {
+                            switch (PostIsGraylisted && !DownloadInfo.SaveGraylistedFiles) {
                                 case true:
                                     graylistTotalCount++;
                                     totalCount++;
@@ -1036,7 +1036,7 @@ namespace aphrodite {
 
                             // Graylist check & options check
                             if (PostIsGraylisted) {
-                                if (DownloadInfo.SaveBlacklistedFiles) {
+                                if (DownloadInfo.SaveGraylistedFiles) {
                                     if (DownloadInfo.UseMinimumScore && Int32.Parse(xmlScore[i].InnerText) < DownloadInfo.MinimumScore)
                                         continue;
                                 }
@@ -1068,7 +1068,7 @@ namespace aphrodite {
                             }
 
                             // Start adding to the nfo buffer and URL lists
-                            if (PostIsGraylisted && DownloadInfo.SaveBlacklistedFiles) {
+                            if (PostIsGraylisted && DownloadInfo.SaveGraylistedFiles) {
                                 if (DownloadInfo.SeparateRatings) {
                                     if (xmlRating[i].InnerText == "e") {
                                         //GraylistedExplicitURLs.Add(xmlURL[i].InnerText);
@@ -1273,7 +1273,7 @@ namespace aphrodite {
                         }
                     }
 
-                    if (DownloadInfo.SaveBlacklistedFiles) {
+                    if (DownloadInfo.SaveGraylistedFiles) {
                         if (GraylistedExplicitURLs.Count > 0) {
                             Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\blacklisted");
                             if (DownloadInfo.SeparateNonImages) {
@@ -1344,7 +1344,7 @@ namespace aphrodite {
                         }
                     }
 
-                    if (DownloadInfo.SaveBlacklistedFiles && GraylistedURLs.Count > 0) {
+                    if (DownloadInfo.SaveGraylistedFiles && GraylistedURLs.Count > 0) {
                         Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\blacklisted");
                         if (DownloadInfo.SeparateNonImages) {
                             if (GraylistedFileNonImages[0]) {
@@ -1376,7 +1376,7 @@ namespace aphrodite {
                     TagInfoBuffer.TrimEnd('\r').TrimEnd('\n');
                     File.WriteAllText(DownloadInfo.DownloadPath + "\\tags.nfo", TagInfoBuffer, Encoding.UTF8);
 
-                    if (DownloadInfo.SaveBlacklistedFiles && graylistTotalCount > 0) {
+                    if (DownloadInfo.SaveGraylistedFiles && graylistTotalCount > 0) {
                         BlacklistInfoBuffer.TrimEnd('\r').TrimEnd('\n');
                         if (DownloadInfo.SeparateRatings)
                             File.WriteAllText(DownloadInfo.DownloadPath + "\\tags.blacklisted.nfo", BlacklistInfoBuffer, Encoding.UTF8);
@@ -1436,7 +1436,7 @@ namespace aphrodite {
                     }
                     lbBlacklist.Text = labelBuffer;
 
-                    if (DownloadInfo.SaveBlacklistedFiles)
+                    if (DownloadInfo.SaveGraylistedFiles)
                         pbTotalStatus.Maximum = cleanTotalCount + graylistTotalCount;
                     else
                         pbTotalStatus.Maximum = cleanTotalCount;
@@ -1447,7 +1447,7 @@ namespace aphrodite {
 
             #region download
             // Start the download
-                using (ExWebClient wc = new ExWebClient()) {
+                using (Controls.ExtendedWebClient wc = new Controls.ExtendedWebClient()) {
                     wc.DownloadProgressChanged += (s, e) => {
                         if (!this.IsDisposed) {
                             //if (!sizeRecieved) {
@@ -1455,7 +1455,7 @@ namespace aphrodite {
                             //    if (!lbFile.Text.Contains(("(" + e.TotalBytesToReceive / 1024) + "kb)"))
                             //        this.Invoke((MethodInvoker)(() => lbFile.Text += " (" + (e.TotalBytesToReceive / 1024) + "kb)"));
                             //    sizeRecieved = true;
-                            //    apiTools.SendDebugMessage((e.TotalBytesToReceive / 1024).ToString());
+                            //    Program.Log(LogAction.WriteToLog, (e.TotalBytesToReceive / 1024).ToString());
                             //}
                             this.BeginInvoke(new MethodInvoker(() => {
                                 pbDownloadStatus.Value = e.ProgressPercentage;
@@ -1606,7 +1606,7 @@ namespace aphrodite {
                             }
                         }
 
-                        if (DownloadInfo.SaveBlacklistedFiles) {
+                        if (DownloadInfo.SaveGraylistedFiles) {
                             if (GraylistedExplicitURLs.Count > 0) {
                                 for (int y = 0; y < GraylistedExplicitURLs.Count; y++) {
                                     if (string.IsNullOrEmpty(GraylistedExplicitURLs[y])) { continue; }
@@ -1761,7 +1761,7 @@ namespace aphrodite {
                             }
                         }
 
-                        if (DownloadInfo.SaveBlacklistedFiles && GraylistedURLs.Count > 0) {
+                        if (DownloadInfo.SaveGraylistedFiles && GraylistedURLs.Count > 0) {
                             for (int y = 0; y < GraylistedURLs.Count; y++) {
                                 if (string.IsNullOrEmpty(GraylistedURLs[y])) { continue; }
                                 CurrentUrl = GraylistedURLs[y];
@@ -1806,7 +1806,7 @@ namespace aphrodite {
                 if (DownloadInfo.SeparateRatings) {
                     TotalFiles += (ExplicitURLs.Count + QuestionableURLs.Count + SafeURLs.Count);
                     PresentFiles += cleanTotalCount;
-                    if (DownloadInfo.SaveBlacklistedFiles) {
+                    if (DownloadInfo.SaveGraylistedFiles) {
                         TotalFiles += (GraylistedExplicitURLs.Count + GraylistedQuestionableURLs.Count + GraylistedSafeURLs.Count);
                         PresentFiles += graylistTotalCount;
                     }
@@ -1814,7 +1814,7 @@ namespace aphrodite {
                 else {
                     TotalFiles += URLs.Count;
                     PresentFiles += cleanTotalCount;
-                    if (DownloadInfo.SaveBlacklistedFiles) {
+                    if (DownloadInfo.SaveGraylistedFiles) {
                         TotalFiles += GraylistedURLs.Count;
                         PresentFiles += graylistTotalCount;
                     }
@@ -1827,33 +1827,33 @@ namespace aphrodite {
 
             #region Downloader catch-statements
             catch (ThreadAbortException) {
-                apiTools.SendDebugMessage("Thread was requested to be, and has been, aborted. (frmTagDownloader.cs)");
+                Program.Log(LogAction.WriteToLog, "Thread was requested to be, and has been, aborted. (frmTagDownloader.cs)");
                 DownloadHasAborted = true;
             }
             catch (ObjectDisposedException) {
-                apiTools.SendDebugMessage("Seems like the object got disposed. (frmTagDownloader.cs)");
+                Program.Log(LogAction.WriteToLog, "Seems like the object got disposed. (frmTagDownloader.cs)");
                 DownloadHasErrored = true;
             }
             catch (ApiReturnedNullOrEmptyException) {
-                apiTools.SendDebugMessage("Api returned null or empty. (frmTagDownloader.cs)");
+                Program.Log(LogAction.WriteToLog, "Api returned null or empty. (frmTagDownloader.cs)");
                 DownloadHasErrored = true;
             }
             catch (WebException WebE) {
-                apiTools.SendDebugMessage("A WebException has occured. (frmTagDownloader.cs)");
+                Program.Log(LogAction.WriteToLog, "A WebException has occured. (frmTagDownloader.cs)");
                 this.BeginInvoke(new MethodInvoker(() => {
                     status.Text = "A WebException has occured";
-                    pbDownloadStatus.State = ProgressBarState.Error;
-                    pbTotalStatus.State = ProgressBarState.Error;
+                    pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
+                    pbTotalStatus.State = aphrodite.Controls.ProgressBarState.Error;
                 }));
                 DownloadHasErrored = true;
                 ErrorLog.ReportWebException(WebE,CurrentUrl, "frmTagDownloader.cs");
             }
             catch (Exception ex) {
-                apiTools.SendDebugMessage("A general exception has occured. (frmTagDownloader.cs)");
+                Program.Log(LogAction.WriteToLog, "A general exception has occured. (frmTagDownloader.cs)");
                 this.BeginInvoke(new MethodInvoker(() => {
                     status.Text = "A Exception has occured";
-                    pbDownloadStatus.State = ProgressBarState.Error;
-                    pbTotalStatus.State = ProgressBarState.Error;
+                    pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
+                    pbTotalStatus.State = aphrodite.Controls.ProgressBarState.Error;
                 }));
                 DownloadHasErrored = true;
                 ErrorLog.ReportException(ex, "frmTagDownloader.cs");

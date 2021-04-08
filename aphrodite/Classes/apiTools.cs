@@ -16,10 +16,7 @@ namespace aphrodite {
         public static readonly string[] ReplacementChars = new string[] { "%5C", "%2F", "%3A", "%2A", "%3F", "%22", "%3C", "%3E", "%7C" };
 
         public static string GetJsonToXml(string JsonURL) {
-            apiTools.SendDebugMessage("getJson starting");
-
             try {
-                apiTools.SendDebugMessage("Downloading JSON at " + JsonURL);
                 string JSONOutput = null;
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                 HttpWebRequest Request = (HttpWebRequest)WebRequest.Create(JsonURL);
@@ -50,11 +47,10 @@ namespace aphrodite {
         }
         public static bool DownloadImage(string ImageURL, string SavePath) {
             try {
-                using (ExWebClient WC = new ExWebClient()) {
+                using (Controls.ExtendedWebClient WC = new Controls.ExtendedWebClient()) {
                     WC.Proxy = WebRequest.GetSystemWebProxy();
                     WC.Method = "GET";
                     WC.Headers.Add("User-Agent: " + Program.UserAgent);
-                    apiTools.SendDebugMessage("Downloading file " + ImageURL);
                     WC.DownloadFile(ImageURL, SavePath);
                 }
                 return true;
@@ -74,10 +70,6 @@ namespace aphrodite {
                 return true;
             else
                 return false;
-        }
-
-        public static void SendDebugMessage(string message) {
-            Debug.Print(message);
         }
 
         public static string ReplaceIllegalCharacters(string input, bool WithCodes = true) {

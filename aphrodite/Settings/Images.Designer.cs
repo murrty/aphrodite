@@ -38,12 +38,12 @@ namespace aphrodite.Settings {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool separateBlacklisted {
+        public bool separateGraylisted {
             get {
-                return ((bool)(this["separateBlacklisted"]));
+                return ((bool)(this["separateGraylisted"]));
             }
             set {
-                this["separateBlacklisted"] = value;
+                this["separateGraylisted"] = value;
             }
         }
         
@@ -92,6 +92,18 @@ namespace aphrodite.Settings {
             }
             set {
                 this["separateNonImages"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool separateBlacklisted {
+            get {
+                return ((bool)(this["separateBlacklisted"]));
+            }
+            set {
+                this["separateBlacklisted"] = value;
             }
         }
     }

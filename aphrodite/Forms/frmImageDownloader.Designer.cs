@@ -28,7 +28,7 @@
             this.tmrTitle = new System.Windows.Forms.Timer(this.components);
             this.lbPercentage = new System.Windows.Forms.Label();
             this.lbInfo = new System.Windows.Forms.Label();
-            this.pbDownloadStatus = new aphrodite.ExProgressBar();
+            this.pbDownloadStatus = new Controls.ExtendedProgressBar();
             this.SuspendLayout();
             // 
             // status
@@ -102,6 +102,6 @@
         private System.Windows.Forms.Timer tmrTitle;
         private System.Windows.Forms.Label lbPercentage;
         private System.Windows.Forms.Label lbInfo;
-        private ExProgressBar pbDownloadStatus;
+        private Controls.ExtendedProgressBar pbDownloadStatus;
     }
 }

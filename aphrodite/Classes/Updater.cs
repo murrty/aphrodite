@@ -19,7 +19,7 @@ namespace aphrodite {
                 return decimal.Parse(xmlTag[0].InnerText.Replace(".", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), NumberStyles.Any, CultureInfo.InvariantCulture);
             }
             catch (Exception ex) {
-                apiTools.SendDebugMessage(ex.ToString());
+                Program.Log(LogAction.WriteToLog, ex.ToString());
                 return -1;
             }
         }
@@ -36,7 +36,7 @@ namespace aphrodite {
                     return false;
             }
             catch (Exception ex) {
-                apiTools.SendDebugMessage(ex.ToString());
+                Program.Log(LogAction.WriteToLog, ex.ToString());
                 return false;
             }
         }

@@ -35,14 +35,26 @@ namespace aphrodite {
         }
 
         public void Append(string LogEntry, bool InitialMessage = false) {
-            string Now = DateTime.Now.Year.ToString("0000.##") + "/" + DateTime.Now.Month.ToString("00.##") + "/" + DateTime.Now.Day.ToString("00.##") + " " + DateTime.Now.Hour.ToString("00.##") + ":" + DateTime.Now.Minute.ToString("00.##") + ":" + DateTime.Now.Second.ToString("00.##") + "." + DateTime.Now.Millisecond.ToString("000.##");
+            //string Now = DateTime.Now.Year.ToString("0000.##") + "/" + DateTime.Now.Month.ToString("00.##") + "/" + DateTime.Now.Day.ToString("00.##") + " " + DateTime.Now.Hour.ToString("00.##") + ":" + DateTime.Now.Minute.ToString("00.##") + ":" + DateTime.Now.Second.ToString("00.##") + "." + DateTime.Now.Millisecond.ToString("000.##");
+            string Now = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
             System.Diagnostics.Debug.Print(LogEntry);
+
+            string Message = string.Format("[{0}] {1}", Now, LogEntry);
             switch (InitialMessage) {
                 case false:
-                    rtbLog.AppendText(string.Format("\r\n[{0}] {1}", Now, LogEntry));
+                    Message = Message = "\r\n" + Message;
                     break;
+            }
+
+            switch (InvokeRequired) {
                 case true:
-                    rtbLog.AppendText(string.Format("[{0}] {1}", Now, LogEntry));
+                    this.BeginInvoke((MethodInvoker)delegate() {
+                        rtbLog.AppendText(Message);
+                    });
+                    break;
+
+                case false:
+                    rtbLog.AppendText(Message);
                     break;
             }
         }

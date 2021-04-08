@@ -31,16 +31,16 @@
             this.status = new System.Windows.Forms.StatusBar();
             this.lbTotal = new System.Windows.Forms.Label();
             this.tmrTitle = new System.Windows.Forms.Timer(this.components);
-            this.pbTotalStatus = new aphrodite.ExProgressBar();
-            this.pbDownloadStatus = new aphrodite.ExProgressBar();
             this.lbRemoved = new System.Windows.Forms.Label();
             this.lbBytes = new System.Windows.Forms.Label();
+            this.pbTotalStatus = new aphrodite.Controls.ExtendedProgressBar();
+            this.pbDownloadStatus = new aphrodite.Controls.ExtendedProgressBar();
             this.SuspendLayout();
             // 
             // lbID
             // 
             this.lbID.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.lbID.Location = new System.Drawing.Point(84, 5);
+            this.lbID.Location = new System.Drawing.Point(90, 5);
             this.lbID.Name = "lbID";
             this.lbID.Size = new System.Drawing.Size(100, 14);
             this.lbID.TabIndex = 0;
@@ -50,9 +50,9 @@
             // lbName
             // 
             this.lbName.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.lbName.Location = new System.Drawing.Point(12, 19);
+            this.lbName.Location = new System.Drawing.Point(18, 19);
             this.lbName.Name = "lbName";
-            this.lbName.Size = new System.Drawing.Size(244, 14);
+            this.lbName.Size = new System.Drawing.Size(244, 16);
             this.lbName.TabIndex = 1;
             this.lbName.Text = "unknown pool name";
             this.lbName.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -61,9 +61,9 @@
             // 
             this.lbFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbFile.Location = new System.Drawing.Point(12, 89);
+            this.lbFile.Location = new System.Drawing.Point(10, 98);
             this.lbFile.Name = "lbFile";
-            this.lbFile.Size = new System.Drawing.Size(244, 14);
+            this.lbFile.Size = new System.Drawing.Size(252, 16);
             this.lbFile.TabIndex = 2;
             this.lbFile.Text = "File ? of ?";
             this.lbFile.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -72,7 +72,7 @@
             // 
             this.lbPercentage.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.lbPercentage.BackColor = System.Drawing.Color.Transparent;
-            this.lbPercentage.Location = new System.Drawing.Point(110, 127);
+            this.lbPercentage.Location = new System.Drawing.Point(116, 139);
             this.lbPercentage.Name = "lbPercentage";
             this.lbPercentage.Size = new System.Drawing.Size(41, 14);
             this.lbPercentage.TabIndex = 4;
@@ -81,9 +81,9 @@
             // 
             // status
             // 
-            this.status.Location = new System.Drawing.Point(0, 163);
+            this.status.Location = new System.Drawing.Point(0, 191);
             this.status.Name = "status";
-            this.status.Size = new System.Drawing.Size(260, 22);
+            this.status.Size = new System.Drawing.Size(272, 22);
             this.status.SizingGrip = false;
             this.status.TabIndex = 5;
             this.status.Text = "Waiting for initial start";
@@ -91,11 +91,11 @@
             // lbTotal
             // 
             this.lbTotal.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.lbTotal.Location = new System.Drawing.Point(12, 43);
+            this.lbTotal.Location = new System.Drawing.Point(10, 39);
             this.lbTotal.Name = "lbTotal";
-            this.lbTotal.Size = new System.Drawing.Size(244, 38);
+            this.lbTotal.Size = new System.Drawing.Size(252, 56);
             this.lbTotal.TabIndex = 6;
-            this.lbTotal.Text = "? clean pages\r\n? blacklisted pages\r\n? total pages";
+            this.lbTotal.Text = "? clean pages\r\n? graylisted pages\r\n? blacklisted pages\r\n? total pages";
             this.lbTotal.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // tmrTitle
@@ -103,33 +103,11 @@
             this.tmrTitle.Interval = 1000;
             this.tmrTitle.Tick += new System.EventHandler(this.tmrTitle_Tick);
             // 
-            // pbTotalStatus
-            // 
-            this.pbTotalStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.pbTotalStatus.ContainerControl = this;
-            this.pbTotalStatus.Location = new System.Drawing.Point(12, 148);
-            this.pbTotalStatus.Name = "pbTotalStatus";
-            this.pbTotalStatus.ShowInTaskbar = true;
-            this.pbTotalStatus.Size = new System.Drawing.Size(244, 18);
-            this.pbTotalStatus.TabIndex = 7;
-            // 
-            // pbDownloadStatus
-            // 
-            this.pbDownloadStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.pbDownloadStatus.ContainerControl = this;
-            this.pbDownloadStatus.Location = new System.Drawing.Point(12, 125);
-            this.pbDownloadStatus.Name = "pbDownloadStatus";
-            this.pbDownloadStatus.Size = new System.Drawing.Size(244, 18);
-            this.pbDownloadStatus.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
-            this.pbDownloadStatus.TabIndex = 8;
-            // 
             // lbRemoved
             // 
             this.lbRemoved.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.lbRemoved.AutoSize = true;
-            this.lbRemoved.Location = new System.Drawing.Point(60, 150);
+            this.lbRemoved.Location = new System.Drawing.Point(66, 162);
             this.lbRemoved.Name = "lbRemoved";
             this.lbRemoved.Size = new System.Drawing.Size(141, 13);
             this.lbRemoved.TabIndex = 12;
@@ -140,19 +118,41 @@
             // 
             this.lbBytes.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbBytes.Location = new System.Drawing.Point(12, 105);
+            this.lbBytes.Location = new System.Drawing.Point(10, 117);
             this.lbBytes.Name = "lbBytes";
-            this.lbBytes.Size = new System.Drawing.Size(244, 18);
+            this.lbBytes.Size = new System.Drawing.Size(252, 18);
             this.lbBytes.TabIndex = 13;
             this.lbBytes.Text = "0kb / 0kb";
             this.lbBytes.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // pbTotalStatus
+            // 
+            this.pbTotalStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.pbTotalStatus.ContainerControl = this;
+            this.pbTotalStatus.Location = new System.Drawing.Point(10, 160);
+            this.pbTotalStatus.Name = "pbTotalStatus";
+            this.pbTotalStatus.ShowInTaskbar = true;
+            this.pbTotalStatus.Size = new System.Drawing.Size(252, 18);
+            this.pbTotalStatus.TabIndex = 7;
+            // 
+            // pbDownloadStatus
+            // 
+            this.pbDownloadStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.pbDownloadStatus.ContainerControl = this;
+            this.pbDownloadStatus.Location = new System.Drawing.Point(10, 137);
+            this.pbDownloadStatus.Name = "pbDownloadStatus";
+            this.pbDownloadStatus.Size = new System.Drawing.Size(252, 18);
+            this.pbDownloadStatus.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
+            this.pbDownloadStatus.TabIndex = 8;
             // 
             // frmPoolDownloader
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(260, 185);
+            this.ClientSize = new System.Drawing.Size(272, 213);
             this.Controls.Add(this.lbRemoved);
             this.Controls.Add(this.pbTotalStatus);
             this.Controls.Add(this.status);
@@ -188,8 +188,8 @@
         private System.Windows.Forms.StatusBar status;
         private System.Windows.Forms.Label lbTotal;
         private System.Windows.Forms.Timer tmrTitle;
-        private ExProgressBar pbTotalStatus;
-        private ExProgressBar pbDownloadStatus;
+        private Controls.ExtendedProgressBar pbTotalStatus;
+        private Controls.ExtendedProgressBar pbDownloadStatus;
         private System.Windows.Forms.Label lbRemoved;
         private System.Windows.Forms.Label lbBytes;
     }

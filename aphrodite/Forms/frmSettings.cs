@@ -23,16 +23,9 @@ namespace aphrodite {
         public bool ImagesProtocol = false;         // is the images protocol installed?
         #endregion
 
-        [DllImport("user32.dll")]
-        public static extern int SendMessage(IntPtr hWnd, uint Msg, int wParam, int lParam);
-        public static void UACShield(Button btn) {
-            const Int32 BCM_SETSHIELD = 0x160C;
-            btn.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            SendMessage(btn.Handle, BCM_SETSHIELD, 0, 1);
-        }
-
         public frmSettings() {
             InitializeComponent();
+            txtSaveTo.TextHint = Environment.CurrentDirectory;
         }
         private void frmSettings_Load(object sender, EventArgs e) {
             loadSettings();
@@ -73,29 +66,32 @@ namespace aphrodite {
 
             if (TagsProtocol == true) {
                 btnProtocolInstallTags.Enabled = false;
-                btnProtocolInstallTags.Text = "'tags:' protocol installed";
+                btnProtocolInstallTags.Text = "tags protocol installed";
             }
             else {
-                if (!Program.IsAdmin)
-                    UACShield(btnProtocolInstallTags);
+                if (!Program.IsAdmin) {
+                    btnProtocolInstallTags.ShowUACShield = true;
+                }
             }
 
             if (PoolsProtocol == true && PoolsWishlistProtocol == true) {
                 btnProtocolInstallPools.Enabled = false;
-                btnProtocolInstallPools.Text = "pool protocols installed";
+                btnProtocolInstallPools.Text = "pools protocols installed";
             }
             else {
-                if (!Program.IsAdmin)
-                    UACShield(btnProtocolInstallPools);
+                if (!Program.IsAdmin) {
+                    btnProtocolInstallPools.ShowUACShield = true;
+                }
             }
 
             if (ImagesProtocol == true) {
                 btnProtocolInstallImages.Enabled = false;
-                btnProtocolInstallImages.Text = "'images:' protocol installed";
+                btnProtocolInstallImages.Text = "images protocol installed";
             }
             else {
-                if (!Program.IsAdmin)
-                    UACShield(btnProtocolInstallImages);
+                if (!Program.IsAdmin) {
+                    btnProtocolInstallImages.ShowUACShield = true;
+                }
             }
 
             if (InstallProtocol) {
@@ -105,9 +101,17 @@ namespace aphrodite {
 
         private void saveSettings() {
           // General
-            Config.Settings.General.saveLocation = txtSaveTo.Text;
+            switch (string.IsNullOrWhiteSpace(txtSaveTo.Text)) {
+                case true:
+                    Config.Settings.General.saveLocation = txtSaveTo.Text;
+                    break;
+                    
+                case false:
+                    Config.Settings.General.saveLocation = Environment.CurrentDirectory;
+                    break;
+            }
             Config.Settings.General.saveInfo = chkSaveInfoFiles.Checked;
-            Config.Settings.General.saveBlacklisted = chkSaveBlacklistedImages.Checked;
+            Config.Settings.General.saveGraylisted = chkSaveGraylistedImages.Checked;
             Config.Settings.General.ignoreFinish = chkIgnoreFinish.Checked;
             Config.Settings.General.openAfter = chkOpenAfterDownload.Checked;
             //Config.Settings.General.saveMetadata = chkSaveMetadata.Checked;
@@ -115,7 +119,15 @@ namespace aphrodite {
             //Config.Settings.General.saveTagMetadata = chkSaveTagMetadata.Checked;
 
           // Tags
-            Config.Settings.Tags.fileNameSchema = apiTools.ReplaceIllegalCharacters(txtTagSchema.Text.ToLower());
+            switch (string.IsNullOrWhiteSpace(txtTagSchema.Text)) {
+                case true:
+                    Config.Settings.Tags.fileNameSchema = "%md5%";
+                    break;
+
+                case false:
+                    Config.Settings.Tags.fileNameSchema = apiTools.ReplaceIllegalCharacters(txtTagSchema.Text.ToLower());
+                    break;
+            }
             Config.Settings.Tags.Explicit = chkTagsExplicit.Checked;
             Config.Settings.Tags.Questionable = chkTagsQuestionable.Checked;
             Config.Settings.Tags.Safe = chkTagsSafe.Checked;
@@ -128,16 +140,35 @@ namespace aphrodite {
             Config.Settings.Tags.separateNonImages = chkTagsSeparateNonImages.Checked;
 
           // Pools
-            Config.Settings.Pools.fileNameSchema = apiTools.ReplaceIllegalCharacters(txtPoolSchema.Text.ToLower());
-            Config.Settings.Pools.mergeBlacklisted = chkPoolsMergeBlacklistedImages.Checked;
+            switch (string.IsNullOrWhiteSpace(txtPoolSchema.Text)) {
+                case true:
+                    Config.Settings.Pools.fileNameSchema = "%poolname%_%page%";
+                    break;
+
+                case false:
+                    Config.Settings.Pools.fileNameSchema = apiTools.ReplaceIllegalCharacters(txtPoolSchema.Text.ToLower());
+                    break;
+            }
+            Config.Settings.Pools.mergeGraylisted = chkPoolsMergeGraylistedImages.Checked;
             Config.Settings.Pools.addWishlistSilent = chkPoolsAddToWishlistSilently.Checked;
+            Config.Settings.Pools.downloadBlacklisted = chkPoolsDownloadBlacklistedImages.Checked;
+            Config.Settings.Pools.mergeBlacklisted = chkPoolsMergeBlacklistedImages.Checked;
 
           // Images
-            Config.Settings.Images.fileNameSchema = apiTools.ReplaceIllegalCharacters(txtImageSchema.Text.ToLower());
+            switch (string.IsNullOrWhiteSpace(txtImageSchema.Text)) {
+                case true:
+                    Config.Settings.Images.fileNameSchema = "%artist%_%md5%";
+                    break;
+
+                case false:
+                    Config.Settings.Images.fileNameSchema = apiTools.ReplaceIllegalCharacters(txtImageSchema.Text.ToLower());
+                    break;
+            }
             Config.Settings.Images.separateRatings = chkImagesSeparateRatings.Checked;
-            Config.Settings.Images.separateBlacklisted = chkImagesSeparateBlacklisted.Checked;
+            Config.Settings.Images.separateGraylisted = chkImagesSeparateGraylisted.Checked;
             Config.Settings.Images.separateArtists = chkImagesSeparateArtists.Checked;
             Config.Settings.Images.useForm = chkImagesUseForm.Checked;
+            Config.Settings.Images.separateBlacklisted = chkImagesSeparateBlacklisted.Checked;
 
           // Save all
             Config.Settings.Save(ConfigType.All);
@@ -151,7 +182,7 @@ namespace aphrodite {
                 txtSaveTo.Text = Config.Settings.General.saveLocation;
             }
             chkSaveInfoFiles.Checked = Config.Settings.General.saveInfo;
-            chkSaveBlacklistedImages.Checked = Config.Settings.General.saveBlacklisted;
+            chkSaveGraylistedImages.Checked = Config.Settings.General.saveGraylisted;
             chkIgnoreFinish.Checked = Config.Settings.General.ignoreFinish;
             chkOpenAfterDownload.Checked = Config.Settings.General.openAfter;
             //chkSaveMetadata.Checked = Config.Settings.General.saveMetadata;
@@ -173,15 +204,18 @@ namespace aphrodite {
 
             // Pools
             txtPoolSchema.Text = apiTools.ReplaceIllegalCharacters(Config.Settings.Pools.fileNameSchema.ToLower());
-            chkPoolsMergeBlacklistedImages.Checked = Config.Settings.Pools.mergeBlacklisted;
+            chkPoolsMergeGraylistedImages.Checked = Config.Settings.Pools.mergeGraylisted;
             chkPoolsAddToWishlistSilently.Checked = Config.Settings.Pools.addWishlistSilent;
+            chkPoolsDownloadBlacklistedImages.Checked = Config.Settings.Pools.downloadBlacklisted;
+            chkPoolsMergeBlacklistedImages.Checked = Config.Settings.Pools.mergeBlacklisted;
 
             // Images
             txtImageSchema.Text = apiTools.ReplaceIllegalCharacters(Config.Settings.Images.fileNameSchema.ToLower());
             chkImagesSeparateRatings.Checked = Config.Settings.Images.separateRatings;
-            chkImagesSeparateBlacklisted.Checked = Config.Settings.Images.separateBlacklisted;
+            chkImagesSeparateGraylisted.Checked = Config.Settings.Images.separateGraylisted;
             chkImagesSeparateArtists.Checked = Config.Settings.Images.separateArtists;
             chkImagesUseForm.Checked = Config.Settings.Images.useForm;
+            chkImagesSeparateBlacklisted.Checked = Config.Settings.Images.separateBlacklisted;
 
         }
         private void checkAdmin() {
@@ -271,17 +305,6 @@ namespace aphrodite {
                         File.Copy(Program.ApplicationPath + "\\" + filename, directory + "\\aphrodite.exe");
                     }
 
-                    // Create directories
-                    if (!Directory.Exists(directory + "\\Tags")) {
-                        Directory.CreateDirectory(directory + "\\Tags");
-                    }
-                    if (!Directory.Exists(directory + "\\Pools")) {
-                        Directory.CreateDirectory(directory + "\\Pools");
-                    }
-                    if (!Directory.Exists(directory + "\\Images")) {
-                        Directory.CreateDirectory(directory + "\\Images");
-                    }
-
                     // Return selected directory
                     return directory;
             }
@@ -363,7 +386,7 @@ namespace aphrodite {
             }
 
             btnProtocolInstallTags.Enabled = false;
-            btnProtocolInstallTags.Text = "'tags:' protocol installed";
+            btnProtocolInstallTags.Text = "tags protocol installed";
 
             TagsProtocol = true;
             NoProtocols = false;
@@ -428,7 +451,7 @@ namespace aphrodite {
             }
 
             btnProtocolInstallPools.Enabled = false;
-            btnProtocolInstallPools.Text = "pool protocols installed";
+            btnProtocolInstallPools.Text = "pools protocols installed";
 
             PoolsProtocol = true;
             PoolsWishlistProtocol = true;
@@ -477,7 +500,7 @@ namespace aphrodite {
             }
 
             btnProtocolInstallImages.Enabled = false;
-            btnProtocolInstallImages.Text = "'images:' protocol installed";
+            btnProtocolInstallImages.Text = "images protocol installed";
 
             ImagesProtocol = true;
             NoProtocols = false;
@@ -493,13 +516,14 @@ namespace aphrodite {
         private void btnExportIni_Click(object sender, EventArgs e) {
             MessageBox.Show("You can use the system-based settings for aphrodite by changing \"useIni\" to \"False\".\nAlso, graylist & blacklist have spaces between tags and are separate files, so... keep that in mind.");
             string bufferINI = "[aphrodite]\nuseIni=True";
-            File.WriteAllText(Program.ApplicationPath + "\\graylist.cfg", Config.Settings.General.blacklist);
-            File.WriteAllText(Program.ApplicationPath + "\\blacklist.cfg", Config.Settings.General.zeroToleranceBlacklist);
+            File.WriteAllText(Program.ApplicationPath + "\\graylist.cfg", Config.Settings.General.Graylist);
+            File.WriteAllText(Program.ApplicationPath + "\\blacklist.cfg", Config.Settings.General.Blacklist);
 
             bufferINI += "\n\n[Global]";
             bufferINI += "\nsaveInfo=" + Config.Settings.General.saveInfo;
-            bufferINI += "\nsaveBlacklisted=" + Config.Settings.General.saveBlacklisted;
+            bufferINI += "\nsaveBlacklisted=" + Config.Settings.General.saveGraylisted;
             bufferINI += "\nignoreFinish=" + Config.Settings.General.ignoreFinish;
+            bufferINI += "\nopenAfter=" + Config.Settings.General.openAfter;
             //bufferINI += "\nsaveMetadata=" + Config.Settings.General.saveMetadata;
             //bufferINI += "\nsaveArtistMetadata=" + Config.Settings.General.saveArtistMetadata;
             //bufferINI += "\nsaveTagMetadata=" + Config.Settings.General.saveTagMetadata;
@@ -519,12 +543,12 @@ namespace aphrodite {
 
             bufferINI += "\n\n[Pools]";
             bufferINI += "\nfileNameSchema=" + apiTools.ReplaceIllegalCharacters(Config.Settings.Pools.fileNameSchema);
-            bufferINI += "\nmergeBlacklisted=" + Config.Settings.Pools.mergeBlacklisted;
+            bufferINI += "\nmergeBlacklisted=" + Config.Settings.Pools.mergeGraylisted;
 
             bufferINI += "\n\n[Images]";
             bufferINI += "\nfileNameSchema=" + apiTools.ReplaceIllegalCharacters(Config.Settings.Images.fileNameSchema);
             bufferINI += "\nseparateRatings=" + Config.Settings.Images.separateRatings;
-            bufferINI += "\nseparateBlacklisted=" + Config.Settings.Images.separateBlacklisted;
+            bufferINI += "\nseparateBlacklisted=" + Config.Settings.Images.separateGraylisted;
             bufferINI += "\nseparateNonImages=" + Config.Settings.Images.separateNonImages;
             bufferINI += "\nuseForm=" + Config.Settings.Images.useForm;
 
@@ -532,6 +556,8 @@ namespace aphrodite {
             bufferINI += "\nfrmMainLocation=" + Config.Settings.FormSettings.frmMain_Location.X + ", " + Config.Settings.FormSettings.frmMain_Location.Y;
 
             File.WriteAllText(Program.ApplicationPath + "\\aphrodite.ini", bufferINI);
+
+            Program.UseIni = true;
         }
 
         private void btnSchemaUndesiredTags_Click(object sender, EventArgs e) {
@@ -586,6 +612,60 @@ namespace aphrodite {
                 case (char)124: // |
                     e.Handled = true;
                     System.Media.SystemSounds.Beep.Play();
+                    break;
+            }
+        }
+
+        private void txtTagSchema_KeyDown(object sender, KeyEventArgs e) {
+            switch (e.Modifiers == Keys.Control) {
+                case true:
+                    switch (e.KeyCode == Keys.V) {
+                        case true:
+                            switch (Clipboard.ContainsText()) {
+                                case true:
+                                    Clipboard.SetText(Clipboard.GetText().Replace("\\", "").Replace("/", "")
+                                        .Replace (":", "").Replace("*", "").Replace("?", "").Replace("\"", "")
+                                        .Replace("<", "").Replace(">", "").Replace("|", ""));
+                                    break;
+                            }
+                            break;
+                    }
+                    break;
+            }
+        }
+
+        private void txtPoolSchema_KeyDown(object sender, KeyEventArgs e) {
+            switch (e.Modifiers == Keys.Control) {
+                case true:
+                    switch (e.KeyCode == Keys.V) {
+                        case true:
+                            switch (Clipboard.ContainsText()) {
+                                case true:
+                                    Clipboard.SetText(Clipboard.GetText().Replace("\\", "").Replace("/", "")
+                                        .Replace(":", "").Replace("*", "").Replace("?", "").Replace("\"", "")
+                                        .Replace("<", "").Replace(">", "").Replace("|", ""));
+                                    break;
+                            }
+                            break;
+                    }
+                    break;
+            }
+        }
+
+        private void txtImageSchema_KeyDown(object sender, KeyEventArgs e) {
+            switch (e.Modifiers == Keys.Control) {
+                case true:
+                    switch (e.KeyCode == Keys.V) {
+                        case true:
+                            switch (Clipboard.ContainsText()) {
+                                case true:
+                                    Clipboard.SetText(Clipboard.GetText().Replace("\\", "").Replace("/", "")
+                                        .Replace(":", "").Replace("*", "").Replace("?", "").Replace("\"", "")
+                                        .Replace("<", "").Replace(">", "").Replace("|", ""));
+                                    break;
+                            }
+                            break;
+                    }
                     break;
             }
         }

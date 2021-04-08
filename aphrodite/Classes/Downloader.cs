@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 
 namespace aphrodite {
 
@@ -27,7 +26,7 @@ namespace aphrodite {
         public string UndesiredTags;
 
         public string DownloadPath;
-        public bool SaveBlacklistedFiles;
+        public bool SaveGraylistedFiles;
         public bool IgnoreFinish;
         public bool SaveInfo;
         public bool OpenAfter;
@@ -65,11 +64,11 @@ namespace aphrodite {
                 DownloadPath = Config.Settings.General.saveLocation;
             }
 
-            Graylist = Config.Settings.General.blacklist.Split(' ');
-            Blacklist = Config.Settings.General.zeroToleranceBlacklist.Split(' ');
+            Graylist = Config.Settings.General.Graylist.Split(' ');
+            Blacklist = Config.Settings.General.Blacklist.Split(' ');
             UndesiredTags = Config.Settings.General.undesiredTags;
 
-            SaveBlacklistedFiles = Config.Settings.General.saveBlacklisted;
+            SaveGraylistedFiles = Config.Settings.General.saveGraylisted;
             IgnoreFinish = Config.Settings.General.ignoreFinish;
             SaveInfo = Config.Settings.General.saveInfo;
             OpenAfter = Config.Settings.General.openAfter;
@@ -136,11 +135,11 @@ namespace aphrodite {
                 DownloadPath = Config.Settings.General.saveLocation;
             }
 
-            Graylist = Config.Settings.General.blacklist.Split(' ');
-            Blacklist = Config.Settings.General.zeroToleranceBlacklist.Split(' ');
+            Graylist = Config.Settings.General.Graylist.Split(' ');
+            Blacklist = Config.Settings.General.Blacklist.Split(' ');
             UndesiredTags = Config.Settings.General.undesiredTags;
 
-            SaveBlacklistedFiles = Config.Settings.General.saveBlacklisted;
+            SaveGraylistedFiles = Config.Settings.General.saveGraylisted;
             IgnoreFinish = Config.Settings.General.ignoreFinish;
             SaveInfo = Config.Settings.General.saveInfo;
             OpenAfter = Config.Settings.General.openAfter;
@@ -180,11 +179,13 @@ namespace aphrodite {
         public string DownloadPath;
         public bool SaveInfo;
         public bool IgnoreFinish;
-        public bool SaveBlacklistedFiles;
+        public bool DownloadGraylistedPages;
         public bool OpenAfter;
 
-        public bool MergeBlacklisted;
+        public bool MergeGraylistedPages;
         public string FileNameSchema;
+        public bool DownloadBlacklistedPages;
+        public bool MergeBlacklistedPages;
 
         public PoolDownloadInfo(string RequestedPool) {
             if (RequestedPool == null) {
@@ -199,23 +200,24 @@ namespace aphrodite {
                 DownloadPath = Config.Settings.General.saveLocation;
             }
 
-            Graylist = Config.Settings.General.blacklist.Split(' ');
-            Blacklist = Config.Settings.General.zeroToleranceBlacklist.Split(' ');
+            Graylist = Config.Settings.General.Graylist.Split(' ');
+            Blacklist = Config.Settings.General.Blacklist.Split(' ');
             UndesiredTags = Config.Settings.General.undesiredTags;
 
             SaveInfo = Config.Settings.General.saveInfo;
             IgnoreFinish = Config.Settings.General.ignoreFinish;
-            SaveBlacklistedFiles = Config.Settings.General.saveBlacklisted;
+            DownloadGraylistedPages = Config.Settings.General.saveGraylisted;
             OpenAfter = Config.Settings.General.openAfter;
 
-            MergeBlacklisted = Config.Settings.Pools.mergeBlacklisted;
+            MergeGraylistedPages = Config.Settings.Pools.mergeGraylisted;
             FileNameSchema = apiTools.ReplaceIllegalCharacters(Config.Settings.Pools.fileNameSchema);
+            DownloadBlacklistedPages = Config.Settings.Pools.downloadBlacklisted;
+            MergeBlacklistedPages = Config.Settings.Pools.mergeBlacklisted;
         }
     }
     public class ImageDownloadInfo {
         public bool Valid;
         public bool UseForm;
-        public bool IsUrl;
 
         public string ImageUrl;
         public string PostId;
@@ -231,10 +233,11 @@ namespace aphrodite {
         public bool OpenAfter;
 
         public bool SeparateRatings;
-        public bool SeparateBlacklisted;
+        public bool SeparateGraylisted;
         public bool SeparateNonImages;
         public bool SeparateArtists;
         public string FileNameSchema;
+        public bool SeparateBlacklisted;
 
         public ImageDownloadInfo(string Image) {
             if (Image == null) {
@@ -243,11 +246,10 @@ namespace aphrodite {
             }
 
             if (apiTools.IsValidImageLink(Image)) {
-                IsUrl = true;
                 ImageUrl = Image;
+                PostId = Image.Substring(Image.IndexOf("e621.net")).Split('/')[2].Split('?')[0];
             }
             else {
-                IsUrl = false;
                 PostId = Image;
             }
 
@@ -257,8 +259,8 @@ namespace aphrodite {
                 DownloadPath = Config.Settings.General.saveLocation;
             }
 
-            Graylist = Config.Settings.General.blacklist.Split(' ');
-            Blacklist = Config.Settings.General.zeroToleranceBlacklist.Split(' ');
+            Graylist = Config.Settings.General.Graylist.Split(' ');
+            Blacklist = Config.Settings.General.Blacklist.Split(' ');
             UndesiredTags = Config.Settings.General.undesiredTags;
 
             SaveInfo = Config.Settings.General.saveInfo;
@@ -267,13 +269,15 @@ namespace aphrodite {
 
             FileNameSchema = apiTools.ReplaceIllegalCharacters(Config.Settings.Images.fileNameSchema);
             SeparateRatings = Config.Settings.Images.separateRatings;
-            SeparateBlacklisted = Config.Settings.Images.separateBlacklisted;
+            SeparateGraylisted = Config.Settings.Images.separateGraylisted;
             SeparateNonImages = Config.Settings.Images.separateNonImages;
             SeparateArtists = Config.Settings.Images.separateArtists;
+            SeparateBlacklisted = Config.Settings.Images.separateBlacklisted;
 
             UseForm = Config.Settings.Images.useForm;
         }
     }
+
 
     class Downloader {
         /// <summary>

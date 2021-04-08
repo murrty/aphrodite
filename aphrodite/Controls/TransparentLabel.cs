@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using System.Windows.Forms;
 
-namespace aphrodite {
+namespace aphrodite.Controls {
     internal class TransparentLabel : Control {
         /// <summary>
         /// Creates a new <see cref="TransparentLabel"/> instance.

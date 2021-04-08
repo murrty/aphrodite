@@ -11,8 +11,8 @@ namespace aphrodite {
         }
 
         private void frmBlacklist_Load(object sender, EventArgs e) {
-            rtbBlacklist.Text = Config.Settings.General.blacklist.Replace(" ", "\r\n");
-            rtbZTB.Text = Config.Settings.General.zeroToleranceBlacklist.Replace(" ", "\r\n");
+            rtbBlacklist.Text = Config.Settings.General.Graylist.Replace(" ", "\r\n");
+            rtbZTB.Text = Config.Settings.General.Blacklist.Replace(" ", "\r\n");
 
             if (Program.UseIni) {
                 lbIni.Visible = true;
@@ -65,9 +65,9 @@ namespace aphrodite {
         }
 
         private void btnSave_Click(object sender, EventArgs e) {
-            Config.Settings.General.blacklist =
+            Config.Settings.General.Graylist =
                 rtbBlacklist.Text.Replace(" ", "_").Replace("\r\n", " ").Replace('\n', ' ').Trim(' ');
-            Config.Settings.General.zeroToleranceBlacklist =
+            Config.Settings.General.Blacklist =
                 rtbZTB.Text.Replace(" ", "_").Replace("\r\n", " ").Replace('\n', ' ').Trim(' ');
             Config.Settings.General.Save();
             this.DialogResult = DialogResult.OK;

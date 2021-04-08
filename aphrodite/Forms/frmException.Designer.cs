@@ -23,9 +23,9 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            this.btnExceptionGithub = new System.Windows.Forms.Button();
+            this.btnExceptionGithub = new Controls.ExtendedButton();
             this.lbVersion = new System.Windows.Forms.Label();
-            this.btnExceptionOk = new System.Windows.Forms.Button();
+            this.btnExceptionOk = new Controls.ExtendedButton();
             this.rtbExceptionDetails = new System.Windows.Forms.RichTextBox();
             this.lbExceptionDescription = new System.Windows.Forms.Label();
             this.lbExceptionHeader = new System.Windows.Forms.Label();
@@ -137,9 +137,9 @@
 
         #endregion
 
-        private System.Windows.Forms.Button btnExceptionGithub;
+        private Controls.ExtendedButton btnExceptionGithub;
         private System.Windows.Forms.Label lbVersion;
-        private System.Windows.Forms.Button btnExceptionOk;
+        private Controls.ExtendedButton btnExceptionOk;
         private System.Windows.Forms.RichTextBox rtbExceptionDetails;
         private System.Windows.Forms.Label lbExceptionDescription;
         private System.Windows.Forms.Label lbExceptionHeader;

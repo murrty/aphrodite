@@ -34,8 +34,8 @@
             this.lbRemoved = new System.Windows.Forms.Label();
             this.lbBlacklist = new System.Windows.Forms.Label();
             this.lbBytes = new System.Windows.Forms.Label();
-            this.pbTotalStatus = new aphrodite.ExProgressBar();
-            this.pbDownloadStatus = new aphrodite.ExProgressBar();
+            this.pbTotalStatus = new Controls.ExtendedProgressBar();
+            this.pbDownloadStatus = new Controls.ExtendedProgressBar();
             this.SuspendLayout();
             // 
             // lbID
@@ -206,8 +206,8 @@
         private System.Windows.Forms.TextBox txtTags;
         private System.Windows.Forms.Timer tmrTitle;
         private System.Windows.Forms.Label lbLimits;
-        private ExProgressBar pbTotalStatus;
-        private ExProgressBar pbDownloadStatus;
+        private Controls.ExtendedProgressBar pbTotalStatus;
+        private Controls.ExtendedProgressBar pbDownloadStatus;
         private System.Windows.Forms.Label lbRemoved;
         private System.Windows.Forms.Label lbBlacklist;
         private System.Windows.Forms.Label lbBytes;

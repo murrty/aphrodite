@@ -25,8 +25,8 @@
         private void InitializeComponent() {
             this.rtbLog = new System.Windows.Forms.RichTextBox();
             this.panelControls = new System.Windows.Forms.Panel();
-            this.btnClear = new System.Windows.Forms.Button();
-            this.btnClose = new System.Windows.Forms.Button();
+            this.btnClear = new Controls.ExtendedButton();
+            this.btnClose = new Controls.ExtendedButton();
             this.panelControls.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -94,8 +94,8 @@
 
         public System.Windows.Forms.RichTextBox rtbLog;
         private System.Windows.Forms.Panel panelControls;
-        private System.Windows.Forms.Button btnClear;
-        private System.Windows.Forms.Button btnClose;
+        private Controls.ExtendedButton btnClear;
+        private Controls.ExtendedButton btnClose;
 
     }
 }

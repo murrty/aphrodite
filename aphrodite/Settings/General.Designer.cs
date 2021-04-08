@@ -38,24 +38,24 @@ namespace aphrodite.Settings {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string blacklist {
+        public string Graylist {
             get {
-                return ((string)(this["blacklist"]));
+                return ((string)(this["Graylist"]));
             }
             set {
-                this["blacklist"] = value;
+                this["Graylist"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool saveBlacklisted {
+        public bool saveGraylisted {
             get {
-                return ((bool)(this["saveBlacklisted"]));
+                return ((bool)(this["saveGraylisted"]));
             }
             set {
-                this["saveBlacklisted"] = value;
+                this["saveGraylisted"] = value;
             }
         }
         
@@ -86,12 +86,12 @@ namespace aphrodite.Settings {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string zeroToleranceBlacklist {
+        public string Blacklist {
             get {
-                return ((string)(this["zeroToleranceBlacklist"]));
+                return ((string)(this["Blacklist"]));
             }
             set {
-                this["zeroToleranceBlacklist"] = value;
+                this["Blacklist"] = value;
             }
         }
         

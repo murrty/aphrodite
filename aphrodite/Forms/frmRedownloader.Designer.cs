@@ -25,11 +25,11 @@
         private void InitializeComponent() {
             this.tcMain = new System.Windows.Forms.TabControl();
             this.tbTags = new System.Windows.Forms.TabPage();
-            this.lbTags = new AeroListBox();
+            this.lbTags = new aphrodite.Controls.AeroListBox();
             this.tbPools = new System.Windows.Forms.TabPage();
-            this.lbPools = new AeroListBox();
-            this.btnRedownload = new System.Windows.Forms.Button();
-            this.btnRenumerate = new System.Windows.Forms.Button();
+            this.lbPools = new aphrodite.Controls.AeroListBox();
+            this.btnRedownload = new aphrodite.Controls.ExtendedButton();
+            this.btnRenumerate = new aphrodite.Controls.ExtendedButton();
             this.lbDownloadedOn = new System.Windows.Forms.Label();
             this.tcMain.SuspendLayout();
             this.tbTags.SuspendLayout();
@@ -53,7 +53,7 @@
             this.tbTags.Location = new System.Drawing.Point(4, 22);
             this.tbTags.Name = "tbTags";
             this.tbTags.Padding = new System.Windows.Forms.Padding(3);
-            this.tbTags.Size = new System.Drawing.Size(283, 184);
+            this.tbTags.Size = new System.Drawing.Size(284, 179);
             this.tbTags.TabIndex = 0;
             this.tbTags.Text = "Tags";
             this.tbTags.UseVisualStyleBackColor = true;
@@ -64,7 +64,7 @@
             this.lbTags.FormattingEnabled = true;
             this.lbTags.Location = new System.Drawing.Point(3, 3);
             this.lbTags.Name = "lbTags";
-            this.lbTags.Size = new System.Drawing.Size(277, 178);
+            this.lbTags.Size = new System.Drawing.Size(278, 173);
             this.lbTags.TabIndex = 0;
             this.lbTags.SelectedIndexChanged += new System.EventHandler(this.lbTags_SelectedIndexChanged);
             this.lbTags.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.lbTags_MouseDoubleClick);
@@ -96,6 +96,7 @@
             this.btnRedownload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnRedownload.Location = new System.Drawing.Point(152, 239);
             this.btnRedownload.Name = "btnRedownload";
+            this.btnRedownload.ShowUACShield = false;
             this.btnRedownload.Size = new System.Drawing.Size(130, 23);
             this.btnRedownload.TabIndex = 1;
             this.btnRedownload.Text = "Redownload selected";
@@ -107,6 +108,7 @@
             this.btnRenumerate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnRenumerate.Location = new System.Drawing.Point(10, 239);
             this.btnRenumerate.Name = "btnRenumerate";
+            this.btnRenumerate.ShowUACShield = false;
             this.btnRenumerate.Size = new System.Drawing.Size(80, 23);
             this.btnRenumerate.TabIndex = 2;
             this.btnRenumerate.Text = "Renumerate";
@@ -119,9 +121,10 @@
             this.lbDownloadedOn.AutoSize = true;
             this.lbDownloadedOn.Location = new System.Drawing.Point(12, 208);
             this.lbDownloadedOn.Name = "lbDownloadedOn";
-            this.lbDownloadedOn.Size = new System.Drawing.Size(47, 26);
+            this.lbDownloadedOn.Size = new System.Drawing.Size(233, 26);
             this.lbDownloadedOn.TabIndex = 3;
-            this.lbDownloadedOn.Text = "????????\r\n????????";
+            this.lbDownloadedOn.Text = "The name of the tags/pool will appear here.\r\nThe date downloaded will appear here" +
+    ".";
             // 
             // frmRedownloader
             // 
@@ -155,10 +158,10 @@
         private System.Windows.Forms.TabControl tcMain;
         private System.Windows.Forms.TabPage tbTags;
         private System.Windows.Forms.TabPage tbPools;
-        private AeroListBox lbTags;
-        private System.Windows.Forms.Button btnRedownload;
-        private System.Windows.Forms.Button btnRenumerate;
-        private AeroListBox lbPools;
+        private Controls.AeroListBox lbTags;
+        private Controls.ExtendedButton btnRedownload;
+        private Controls.ExtendedButton btnRenumerate;
+        private Controls.AeroListBox lbPools;
         private System.Windows.Forms.Label lbDownloadedOn;
     }
 }

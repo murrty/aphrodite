@@ -24,13 +24,13 @@
         /// </summary>
         private void InitializeComponent() {
             this.lbHeader = new System.Windows.Forms.Label();
-            this.btnReset = new System.Windows.Forms.Button();
-            this.btnSave = new System.Windows.Forms.Button();
-            this.btnCancel = new System.Windows.Forms.Button();
+            this.btnReset = new Controls.ExtendedButton();
+            this.btnSave = new Controls.ExtendedButton();
+            this.btnCancel = new Controls.ExtendedButton();
             this.txtUndesired = new System.Windows.Forms.TextBox();
-            this.btnAdd = new System.Windows.Forms.Button();
-            this.btnRemove = new System.Windows.Forms.Button();
-            this.listTags = new aphrodite.AeroListBox();
+            this.btnAdd = new Controls.ExtendedButton();
+            this.btnRemove = new Controls.ExtendedButton();
+            this.listTags = new Controls.AeroListBox();
             this.SuspendLayout();
             // 
             // lbHeader
@@ -145,12 +145,12 @@
         #endregion
 
         private System.Windows.Forms.Label lbHeader;
-        private System.Windows.Forms.Button btnReset;
-        private System.Windows.Forms.Button btnSave;
-        private System.Windows.Forms.Button btnCancel;
-        private AeroListBox listTags;
+        private Controls.ExtendedButton btnReset;
+        private Controls.ExtendedButton btnSave;
+        private Controls.ExtendedButton btnCancel;
+        private Controls.AeroListBox listTags;
         private System.Windows.Forms.TextBox txtUndesired;
-        private System.Windows.Forms.Button btnAdd;
-        private System.Windows.Forms.Button btnRemove;
+        private Controls.ExtendedButton btnAdd;
+        private Controls.ExtendedButton btnRemove;
     }
 }

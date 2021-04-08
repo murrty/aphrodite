@@ -11,9 +11,6 @@ namespace aphrodite {
 
         public frmPoolWishlist(bool AddToWishlist = false, string AddUrl = null, string AddTitle = null) {
             InitializeComponent();
-            NativeMethods.SendMessage(txtName.Handle, 0x1501, (IntPtr)1, "Pool name...");
-            NativeMethods.SendMessage(txtURL.Handle, 0x1501, (IntPtr)1, "Pool url...");
-
             if (AddToWishlist) {
                 txtName.Text = AddTitle.Replace('|', '_');
                 txtURL.Text = AddUrl;

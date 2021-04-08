@@ -25,16 +25,12 @@
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmSettings));
-            this.btnCancel = new System.Windows.Forms.Button();
-            this.btnSave = new System.Windows.Forms.Button();
             this.tbMain = new System.Windows.Forms.TabControl();
             this.tabGeneral = new System.Windows.Forms.TabPage();
             this.chkIgnoreFinish = new System.Windows.Forms.CheckBox();
-            this.chkSaveBlacklistedImages = new System.Windows.Forms.CheckBox();
+            this.chkSaveGraylistedImages = new System.Windows.Forms.CheckBox();
             this.chkOpenAfterDownload = new System.Windows.Forms.CheckBox();
             this.chkSaveInfoFiles = new System.Windows.Forms.CheckBox();
-            this.btnBrowseForSaveTo = new System.Windows.Forms.Button();
-            this.txtSaveTo = new System.Windows.Forms.TextBox();
             this.lbSaveTo = new System.Windows.Forms.Label();
             this.gbMetadata = new System.Windows.Forms.GroupBox();
             this.chkSaveTagMetadata = new System.Windows.Forms.CheckBox();
@@ -56,29 +52,22 @@
             this.gbTagsPageLimit = new System.Windows.Forms.GroupBox();
             this.numTagsPageLimit = new System.Windows.Forms.NumericUpDown();
             this.tabPools = new System.Windows.Forms.TabPage();
-            this.chkPoolsMergeBlacklistedImages = new System.Windows.Forms.CheckBox();
+            this.chkPoolsMergeGraylistedImages = new System.Windows.Forms.CheckBox();
             this.chkPoolsAddToWishlistSilently = new System.Windows.Forms.CheckBox();
             this.tabImages = new System.Windows.Forms.TabPage();
             this.chkImagesSeparateNonImages = new System.Windows.Forms.CheckBox();
             this.chkImagesUseForm = new System.Windows.Forms.CheckBox();
             this.chkImagesSeparateArtists = new System.Windows.Forms.CheckBox();
-            this.chkImagesSeparateBlacklisted = new System.Windows.Forms.CheckBox();
+            this.chkImagesSeparateGraylisted = new System.Windows.Forms.CheckBox();
             this.chkImagesSeparateRatings = new System.Windows.Forms.CheckBox();
             this.lbImagesSeparator = new System.Windows.Forms.Label();
             this.lbImagesHeader = new System.Windows.Forms.Label();
             this.tabProtocol = new System.Windows.Forms.TabPage();
             this.lbProtocolsSeparator = new System.Windows.Forms.Label();
-            this.btnProtocolImagesUserscript = new System.Windows.Forms.Button();
-            this.btnProtocolUserscript = new System.Windows.Forms.Button();
             this.lbProtocols = new System.Windows.Forms.Label();
-            this.btnProtocolInstallTags = new System.Windows.Forms.Button();
-            this.btnProtocolInstallPools = new System.Windows.Forms.Button();
-            this.btnProtocolInstallImages = new System.Windows.Forms.Button();
             this.tabPortable = new System.Windows.Forms.TabPage();
-            this.btnPortableExportIni = new System.Windows.Forms.Button();
             this.lbPortable = new System.Windows.Forms.Label();
             this.tabSchemas = new System.Windows.Forms.TabPage();
-            this.btnSchemaUndesiredTags = new System.Windows.Forms.Button();
             this.lbImageExt = new System.Windows.Forms.Label();
             this.lbPoolExt = new System.Windows.Forms.Label();
             this.lbTagExt = new System.Windows.Forms.Label();
@@ -86,12 +75,27 @@
             this.lbSchemaParam = new System.Windows.Forms.Label();
             this.lblTagSchema = new System.Windows.Forms.Label();
             this.lbPoolSchema = new System.Windows.Forms.Label();
-            this.txtImageSchema = new System.Windows.Forms.TextBox();
-            this.txtTagSchema = new System.Windows.Forms.TextBox();
             this.lbImageSchema = new System.Windows.Forms.Label();
-            this.txtPoolSchema = new System.Windows.Forms.TextBox();
-            this.btnBlacklist = new System.Windows.Forms.Button();
             this.JustTheTips = new System.Windows.Forms.ToolTip(this.components);
+            this.btnBlacklist = new aphrodite.Controls.ExtendedButton();
+            this.btnSave = new aphrodite.Controls.ExtendedButton();
+            this.btnCancel = new aphrodite.Controls.ExtendedButton();
+            this.btnBrowseForSaveTo = new aphrodite.Controls.ExtendedButton();
+            this.txtSaveTo = new aphrodite.Controls.ExtendedTextBox();
+            this.btnProtocolImagesUserscript = new aphrodite.Controls.ExtendedButton();
+            this.btnProtocolUserscript = new aphrodite.Controls.ExtendedButton();
+            this.btnProtocolInstallTags = new aphrodite.Controls.ExtendedButton();
+            this.btnProtocolInstallPools = new aphrodite.Controls.ExtendedButton();
+            this.btnProtocolInstallImages = new aphrodite.Controls.ExtendedButton();
+            this.btnPortableExportIni = new aphrodite.Controls.ExtendedButton();
+            this.btnSchemaUndesiredTags = new aphrodite.Controls.ExtendedButton();
+            this.txtImageSchema = new aphrodite.Controls.ExtendedTextBox();
+            this.txtTagSchema = new aphrodite.Controls.ExtendedTextBox();
+            this.txtPoolSchema = new aphrodite.Controls.ExtendedTextBox();
+            this.chkPoolsDownloadBlacklistedImages = new System.Windows.Forms.CheckBox();
+            this.chkPoolsMergeBlacklistedImages = new System.Windows.Forms.CheckBox();
+            this.chkImagesSeparateBlacklisted = new System.Windows.Forms.CheckBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.tbMain.SuspendLayout();
             this.tabGeneral.SuspendLayout();
             this.gbMetadata.SuspendLayout();
@@ -109,26 +113,6 @@
             this.tabPortable.SuspendLayout();
             this.tabSchemas.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // btnCancel
-            // 
-            this.btnCancel.Location = new System.Drawing.Point(238, 230);
-            this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(75, 23);
-            this.btnCancel.TabIndex = 9;
-            this.btnCancel.Text = "Cancel";
-            this.btnCancel.UseVisualStyleBackColor = true;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
-            // 
-            // btnSave
-            // 
-            this.btnSave.Location = new System.Drawing.Point(319, 230);
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(75, 23);
-            this.btnSave.TabIndex = 8;
-            this.btnSave.Text = "Save";
-            this.btnSave.UseVisualStyleBackColor = true;
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // tbMain
             // 
@@ -149,7 +133,7 @@
             // tabGeneral
             // 
             this.tabGeneral.Controls.Add(this.chkIgnoreFinish);
-            this.tabGeneral.Controls.Add(this.chkSaveBlacklistedImages);
+            this.tabGeneral.Controls.Add(this.chkSaveGraylistedImages);
             this.tabGeneral.Controls.Add(this.chkOpenAfterDownload);
             this.tabGeneral.Controls.Add(this.chkSaveInfoFiles);
             this.tabGeneral.Controls.Add(this.btnBrowseForSaveTo);
@@ -176,19 +160,19 @@
         " requested\r\nPlugin downloads quit when finished");
             this.chkIgnoreFinish.UseVisualStyleBackColor = true;
             // 
-            // chkSaveBlacklistedImages
+            // chkSaveGraylistedImages
             // 
-            this.chkSaveBlacklistedImages.AutoSize = true;
-            this.chkSaveBlacklistedImages.Checked = true;
-            this.chkSaveBlacklistedImages.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkSaveBlacklistedImages.Location = new System.Drawing.Point(24, 110);
-            this.chkSaveBlacklistedImages.Name = "chkSaveBlacklistedImages";
-            this.chkSaveBlacklistedImages.Size = new System.Drawing.Size(145, 17);
-            this.chkSaveBlacklistedImages.TabIndex = 3;
-            this.chkSaveBlacklistedImages.Text = "Save blacklisted images";
-            this.JustTheTips.SetToolTip(this.chkSaveBlacklistedImages, "Saves blacklisted images into a separate folder.\r\nImages downloaded with the \'ima" +
+            this.chkSaveGraylistedImages.AutoSize = true;
+            this.chkSaveGraylistedImages.Checked = true;
+            this.chkSaveGraylistedImages.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkSaveGraylistedImages.Location = new System.Drawing.Point(24, 110);
+            this.chkSaveGraylistedImages.Name = "chkSaveGraylistedImages";
+            this.chkSaveGraylistedImages.Size = new System.Drawing.Size(140, 17);
+            this.chkSaveGraylistedImages.TabIndex = 3;
+            this.chkSaveGraylistedImages.Text = "Save graylisted images";
+            this.JustTheTips.SetToolTip(this.chkSaveGraylistedImages, "Saves blacklisted images into a separate folder.\r\nImages downloaded with the \'ima" +
         "ges\' protocol are also saved + separated.");
-            this.chkSaveBlacklistedImages.UseVisualStyleBackColor = true;
+            this.chkSaveGraylistedImages.UseVisualStyleBackColor = true;
             // 
             // chkOpenAfterDownload
             // 
@@ -213,25 +197,6 @@
             this.chkSaveInfoFiles.Text = "Save info files";
             this.JustTheTips.SetToolTip(this.chkSaveInfoFiles, resources.GetString("chkSaveInfoFiles.ToolTip"));
             this.chkSaveInfoFiles.UseVisualStyleBackColor = true;
-            // 
-            // btnBrowseForSaveTo
-            // 
-            this.btnBrowseForSaveTo.Location = new System.Drawing.Point(353, 36);
-            this.btnBrowseForSaveTo.Name = "btnBrowseForSaveTo";
-            this.btnBrowseForSaveTo.Size = new System.Drawing.Size(24, 23);
-            this.btnBrowseForSaveTo.TabIndex = 1;
-            this.btnBrowseForSaveTo.Text = "...";
-            this.btnBrowseForSaveTo.UseVisualStyleBackColor = true;
-            this.btnBrowseForSaveTo.Click += new System.EventHandler(this.btnBrws_Click);
-            // 
-            // txtSaveTo
-            // 
-            this.txtSaveTo.Location = new System.Drawing.Point(24, 39);
-            this.txtSaveTo.Name = "txtSaveTo";
-            this.txtSaveTo.ReadOnly = true;
-            this.txtSaveTo.Size = new System.Drawing.Size(323, 22);
-            this.txtSaveTo.TabIndex = 0;
-            this.JustTheTips.SetToolTip(this.txtSaveTo, "The location where pools, tags, and images will be saved to.");
             // 
             // lbSaveTo
             // 
@@ -496,6 +461,8 @@
             // tabPools
             // 
             this.tabPools.Controls.Add(this.chkPoolsMergeBlacklistedImages);
+            this.tabPools.Controls.Add(this.chkPoolsDownloadBlacklistedImages);
+            this.tabPools.Controls.Add(this.chkPoolsMergeGraylistedImages);
             this.tabPools.Controls.Add(this.chkPoolsAddToWishlistSilently);
             this.tabPools.Location = new System.Drawing.Point(4, 22);
             this.tabPools.Name = "tabPools";
@@ -505,24 +472,24 @@
             this.tabPools.Text = "Pools";
             this.tabPools.UseVisualStyleBackColor = true;
             // 
-            // chkPoolsMergeBlacklistedImages
+            // chkPoolsMergeGraylistedImages
             // 
-            this.chkPoolsMergeBlacklistedImages.AutoSize = true;
-            this.chkPoolsMergeBlacklistedImages.Checked = true;
-            this.chkPoolsMergeBlacklistedImages.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkPoolsMergeBlacklistedImages.Location = new System.Drawing.Point(67, 54);
-            this.chkPoolsMergeBlacklistedImages.Name = "chkPoolsMergeBlacklistedImages";
-            this.chkPoolsMergeBlacklistedImages.Size = new System.Drawing.Size(302, 17);
-            this.chkPoolsMergeBlacklistedImages.TabIndex = 2;
-            this.chkPoolsMergeBlacklistedImages.Text = "Merge blacklisted images with non blacklisted images";
-            this.JustTheTips.SetToolTip(this.chkPoolsMergeBlacklistedImages, "Merge blacklisted images with the rest of the pool\r\npool.blacklisted.nfo is not s" +
-        "aved, instead, blacklisted info is saved in pool.nfo under \"BLACKLISTED PAGE\"");
-            this.chkPoolsMergeBlacklistedImages.UseVisualStyleBackColor = true;
+            this.chkPoolsMergeGraylistedImages.AutoSize = true;
+            this.chkPoolsMergeGraylistedImages.Checked = true;
+            this.chkPoolsMergeGraylistedImages.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkPoolsMergeGraylistedImages.Location = new System.Drawing.Point(54, 37);
+            this.chkPoolsMergeGraylistedImages.Name = "chkPoolsMergeGraylistedImages";
+            this.chkPoolsMergeGraylistedImages.Size = new System.Drawing.Size(292, 17);
+            this.chkPoolsMergeGraylistedImages.TabIndex = 2;
+            this.chkPoolsMergeGraylistedImages.Text = "Merge graylisted images with non graylisted images";
+            this.JustTheTips.SetToolTip(this.chkPoolsMergeGraylistedImages, "Merge graylisted images with the rest of the pool\r\npool.graylisted.nfo is not sav" +
+        "ed, instead, graylisted info is saved in pool.nfo under \"GRAYLISTED PAGE\"");
+            this.chkPoolsMergeGraylistedImages.UseVisualStyleBackColor = true;
             // 
             // chkPoolsAddToWishlistSilently
             // 
             this.chkPoolsAddToWishlistSilently.AutoSize = true;
-            this.chkPoolsAddToWishlistSilently.Location = new System.Drawing.Point(114, 126);
+            this.chkPoolsAddToWishlistSilently.Location = new System.Drawing.Point(114, 142);
             this.chkPoolsAddToWishlistSilently.Name = "chkPoolsAddToWishlistSilently";
             this.chkPoolsAddToWishlistSilently.Size = new System.Drawing.Size(173, 17);
             this.chkPoolsAddToWishlistSilently.TabIndex = 4;
@@ -532,10 +499,12 @@
             // 
             // tabImages
             // 
+            this.tabImages.Controls.Add(this.label1);
+            this.tabImages.Controls.Add(this.chkImagesSeparateBlacklisted);
             this.tabImages.Controls.Add(this.chkImagesSeparateNonImages);
             this.tabImages.Controls.Add(this.chkImagesUseForm);
             this.tabImages.Controls.Add(this.chkImagesSeparateArtists);
-            this.tabImages.Controls.Add(this.chkImagesSeparateBlacklisted);
+            this.tabImages.Controls.Add(this.chkImagesSeparateGraylisted);
             this.tabImages.Controls.Add(this.chkImagesSeparateRatings);
             this.tabImages.Controls.Add(this.lbImagesSeparator);
             this.tabImages.Controls.Add(this.lbImagesHeader);
@@ -552,7 +521,7 @@
             this.chkImagesSeparateNonImages.AutoSize = true;
             this.chkImagesSeparateNonImages.Checked = true;
             this.chkImagesSeparateNonImages.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkImagesSeparateNonImages.Location = new System.Drawing.Point(185, 110);
+            this.chkImagesSeparateNonImages.Location = new System.Drawing.Point(243, 117);
             this.chkImagesSeparateNonImages.Name = "chkImagesSeparateNonImages";
             this.chkImagesSeparateNonImages.Size = new System.Drawing.Size(134, 17);
             this.chkImagesSeparateNonImages.TabIndex = 9;
@@ -563,7 +532,7 @@
             // chkImagesUseForm
             // 
             this.chkImagesUseForm.AutoSize = true;
-            this.chkImagesUseForm.Location = new System.Drawing.Point(84, 133);
+            this.chkImagesUseForm.Location = new System.Drawing.Point(76, 140);
             this.chkImagesUseForm.Name = "chkImagesUseForm";
             this.chkImagesUseForm.Size = new System.Drawing.Size(249, 17);
             this.chkImagesUseForm.TabIndex = 4;
@@ -574,32 +543,32 @@
             // chkImagesSeparateArtists
             // 
             this.chkImagesSeparateArtists.AutoSize = true;
-            this.chkImagesSeparateArtists.Location = new System.Drawing.Point(81, 110);
+            this.chkImagesSeparateArtists.Location = new System.Drawing.Point(139, 117);
             this.chkImagesSeparateArtists.Name = "chkImagesSeparateArtists";
             this.chkImagesSeparateArtists.Size = new System.Drawing.Size(104, 17);
             this.chkImagesSeparateArtists.TabIndex = 3;
             this.chkImagesSeparateArtists.Text = "Separate artists";
             this.chkImagesSeparateArtists.UseVisualStyleBackColor = true;
             // 
-            // chkImagesSeparateBlacklisted
+            // chkImagesSeparateGraylisted
             // 
-            this.chkImagesSeparateBlacklisted.AutoSize = true;
-            this.chkImagesSeparateBlacklisted.Checked = true;
-            this.chkImagesSeparateBlacklisted.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkImagesSeparateBlacklisted.Location = new System.Drawing.Point(176, 87);
-            this.chkImagesSeparateBlacklisted.Name = "chkImagesSeparateBlacklisted";
-            this.chkImagesSeparateBlacklisted.Size = new System.Drawing.Size(167, 17);
-            this.chkImagesSeparateBlacklisted.TabIndex = 2;
-            this.chkImagesSeparateBlacklisted.Text = "Separate blacklisted images";
-            this.JustTheTips.SetToolTip(this.chkImagesSeparateBlacklisted, "Separates blacklisted images into separate folder.");
-            this.chkImagesSeparateBlacklisted.UseVisualStyleBackColor = true;
+            this.chkImagesSeparateGraylisted.AutoSize = true;
+            this.chkImagesSeparateGraylisted.Checked = true;
+            this.chkImagesSeparateGraylisted.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkImagesSeparateGraylisted.Location = new System.Drawing.Point(33, 94);
+            this.chkImagesSeparateGraylisted.Name = "chkImagesSeparateGraylisted";
+            this.chkImagesSeparateGraylisted.Size = new System.Drawing.Size(162, 17);
+            this.chkImagesSeparateGraylisted.TabIndex = 2;
+            this.chkImagesSeparateGraylisted.Text = "Separate graylisted images";
+            this.JustTheTips.SetToolTip(this.chkImagesSeparateGraylisted, "Separates graylisted images into separate folder.");
+            this.chkImagesSeparateGraylisted.UseVisualStyleBackColor = true;
             // 
             // chkImagesSeparateRatings
             // 
             this.chkImagesSeparateRatings.AutoSize = true;
             this.chkImagesSeparateRatings.Checked = true;
             this.chkImagesSeparateRatings.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkImagesSeparateRatings.Location = new System.Drawing.Point(57, 87);
+            this.chkImagesSeparateRatings.Location = new System.Drawing.Point(24, 117);
             this.chkImagesSeparateRatings.Name = "chkImagesSeparateRatings";
             this.chkImagesSeparateRatings.Size = new System.Drawing.Size(109, 17);
             this.chkImagesSeparateRatings.TabIndex = 1;
@@ -651,26 +620,6 @@
             this.lbProtocolsSeparator.TabIndex = 6;
             this.lbProtocolsSeparator.Text = "bark";
             // 
-            // btnProtocolImagesUserscript
-            // 
-            this.btnProtocolImagesUserscript.Location = new System.Drawing.Point(246, 161);
-            this.btnProtocolImagesUserscript.Name = "btnProtocolImagesUserscript";
-            this.btnProtocolImagesUserscript.Size = new System.Drawing.Size(75, 23);
-            this.btnProtocolImagesUserscript.TabIndex = 5;
-            this.btnProtocolImagesUserscript.Text = "Userscript";
-            this.btnProtocolImagesUserscript.UseVisualStyleBackColor = true;
-            this.btnProtocolImagesUserscript.Click += new System.EventHandler(this.btnImagesUserscript_Click);
-            // 
-            // btnProtocolUserscript
-            // 
-            this.btnProtocolUserscript.Location = new System.Drawing.Point(246, 108);
-            this.btnProtocolUserscript.Name = "btnProtocolUserscript";
-            this.btnProtocolUserscript.Size = new System.Drawing.Size(75, 23);
-            this.btnProtocolUserscript.TabIndex = 3;
-            this.btnProtocolUserscript.Text = "Userscript";
-            this.btnProtocolUserscript.UseVisualStyleBackColor = true;
-            this.btnProtocolUserscript.Click += new System.EventHandler(this.btnUserscript_Click);
-            // 
             // lbProtocols
             // 
             this.lbProtocols.Location = new System.Drawing.Point(6, 7);
@@ -679,36 +628,6 @@
             this.lbProtocols.TabIndex = 3;
             this.lbProtocols.Text = resources.GetString("lbProtocols.Text");
             this.lbProtocols.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            // 
-            // btnProtocolInstallTags
-            // 
-            this.btnProtocolInstallTags.Location = new System.Drawing.Point(89, 96);
-            this.btnProtocolInstallTags.Name = "btnProtocolInstallTags";
-            this.btnProtocolInstallTags.Size = new System.Drawing.Size(151, 23);
-            this.btnProtocolInstallTags.TabIndex = 1;
-            this.btnProtocolInstallTags.Text = "Install \'tags:\' protocol";
-            this.btnProtocolInstallTags.UseVisualStyleBackColor = true;
-            this.btnProtocolInstallTags.Click += new System.EventHandler(this.btnTagsProtocol_Click);
-            // 
-            // btnProtocolInstallPools
-            // 
-            this.btnProtocolInstallPools.Location = new System.Drawing.Point(89, 121);
-            this.btnProtocolInstallPools.Name = "btnProtocolInstallPools";
-            this.btnProtocolInstallPools.Size = new System.Drawing.Size(151, 23);
-            this.btnProtocolInstallPools.TabIndex = 2;
-            this.btnProtocolInstallPools.Text = "Install pool protocols";
-            this.btnProtocolInstallPools.UseVisualStyleBackColor = true;
-            this.btnProtocolInstallPools.Click += new System.EventHandler(this.btnPoolsProtocol_Click);
-            // 
-            // btnProtocolInstallImages
-            // 
-            this.btnProtocolInstallImages.Location = new System.Drawing.Point(89, 161);
-            this.btnProtocolInstallImages.Name = "btnProtocolInstallImages";
-            this.btnProtocolInstallImages.Size = new System.Drawing.Size(151, 23);
-            this.btnProtocolInstallImages.TabIndex = 4;
-            this.btnProtocolInstallImages.Text = "Install \'image:\' protocol";
-            this.btnProtocolInstallImages.UseVisualStyleBackColor = true;
-            this.btnProtocolInstallImages.Click += new System.EventHandler(this.btnImagesProtocol_Click);
             // 
             // tabPortable
             // 
@@ -721,16 +640,6 @@
             this.tabPortable.TabIndex = 5;
             this.tabPortable.Text = "Portable";
             this.tabPortable.UseVisualStyleBackColor = true;
-            // 
-            // btnPortableExportIni
-            // 
-            this.btnPortableExportIni.Location = new System.Drawing.Point(162, 159);
-            this.btnPortableExportIni.Name = "btnPortableExportIni";
-            this.btnPortableExportIni.Size = new System.Drawing.Size(86, 24);
-            this.btnPortableExportIni.TabIndex = 1;
-            this.btnPortableExportIni.Text = "Export";
-            this.btnPortableExportIni.UseVisualStyleBackColor = true;
-            this.btnPortableExportIni.Click += new System.EventHandler(this.btnExportIni_Click);
             // 
             // lbPortable
             // 
@@ -762,16 +671,6 @@
             this.tabSchemas.TabIndex = 6;
             this.tabSchemas.Text = "Schemas";
             this.tabSchemas.UseVisualStyleBackColor = true;
-            // 
-            // btnSchemaUndesiredTags
-            // 
-            this.btnSchemaUndesiredTags.Location = new System.Drawing.Point(272, 81);
-            this.btnSchemaUndesiredTags.Name = "btnSchemaUndesiredTags";
-            this.btnSchemaUndesiredTags.Size = new System.Drawing.Size(104, 23);
-            this.btnSchemaUndesiredTags.TabIndex = 4;
-            this.btnSchemaUndesiredTags.Text = "undesired tags...";
-            this.btnSchemaUndesiredTags.UseVisualStyleBackColor = true;
-            this.btnSchemaUndesiredTags.Click += new System.EventHandler(this.btnSchemaUndesiredTags_Click);
             // 
             // lbImageExt
             // 
@@ -837,26 +736,6 @@
             this.lbPoolSchema.TabIndex = 22;
             this.lbPoolSchema.Text = "Pools name schema";
             // 
-            // txtImageSchema
-            // 
-            this.txtImageSchema.Location = new System.Drawing.Point(135, 55);
-            this.txtImageSchema.Name = "txtImageSchema";
-            this.txtImageSchema.Size = new System.Drawing.Size(197, 22);
-            this.txtImageSchema.TabIndex = 3;
-            this.txtImageSchema.Text = "%artist%_%md5%";
-            this.JustTheTips.SetToolTip(this.txtImageSchema, resources.GetString("txtImageSchema.ToolTip"));
-            this.txtImageSchema.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtImageSchema_KeyPress);
-            // 
-            // txtTagSchema
-            // 
-            this.txtTagSchema.Location = new System.Drawing.Point(135, 7);
-            this.txtTagSchema.Name = "txtTagSchema";
-            this.txtTagSchema.Size = new System.Drawing.Size(197, 22);
-            this.txtTagSchema.TabIndex = 1;
-            this.txtTagSchema.Text = "%md5%";
-            this.JustTheTips.SetToolTip(this.txtTagSchema, resources.GetString("txtTagSchema.ToolTip"));
-            this.txtTagSchema.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtTagSchema_KeyPress);
-            // 
             // lbImageSchema
             // 
             this.lbImageSchema.AutoSize = true;
@@ -866,26 +745,269 @@
             this.lbImageSchema.TabIndex = 13;
             this.lbImageSchema.Text = "Image name schema";
             // 
-            // txtPoolSchema
-            // 
-            this.txtPoolSchema.Location = new System.Drawing.Point(135, 31);
-            this.txtPoolSchema.Name = "txtPoolSchema";
-            this.txtPoolSchema.Size = new System.Drawing.Size(197, 22);
-            this.txtPoolSchema.TabIndex = 2;
-            this.txtPoolSchema.Text = "%poolname%_%page%";
-            this.JustTheTips.SetToolTip(this.txtPoolSchema, resources.GetString("txtPoolSchema.ToolTip"));
-            this.txtPoolSchema.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtPoolSchema_KeyPress);
-            // 
             // btnBlacklist
             // 
             this.btnBlacklist.Location = new System.Drawing.Point(16, 230);
             this.btnBlacklist.Name = "btnBlacklist";
+            this.btnBlacklist.ShowUACShield = false;
             this.btnBlacklist.Size = new System.Drawing.Size(102, 23);
             this.btnBlacklist.TabIndex = 7;
             this.btnBlacklist.Text = "Manage blacklist";
             this.JustTheTips.SetToolTip(this.btnBlacklist, "Manage your blacklist");
             this.btnBlacklist.UseVisualStyleBackColor = true;
             this.btnBlacklist.Click += new System.EventHandler(this.btnBlacklist_Click);
+            // 
+            // btnSave
+            // 
+            this.btnSave.Location = new System.Drawing.Point(319, 230);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.ShowUACShield = false;
+            this.btnSave.Size = new System.Drawing.Size(75, 23);
+            this.btnSave.TabIndex = 8;
+            this.btnSave.Text = "Save";
+            this.btnSave.UseVisualStyleBackColor = true;
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            // 
+            // btnCancel
+            // 
+            this.btnCancel.Location = new System.Drawing.Point(238, 230);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.ShowUACShield = false;
+            this.btnCancel.Size = new System.Drawing.Size(75, 23);
+            this.btnCancel.TabIndex = 9;
+            this.btnCancel.Text = "Cancel";
+            this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            // 
+            // btnBrowseForSaveTo
+            // 
+            this.btnBrowseForSaveTo.Location = new System.Drawing.Point(353, 36);
+            this.btnBrowseForSaveTo.Name = "btnBrowseForSaveTo";
+            this.btnBrowseForSaveTo.ShowUACShield = false;
+            this.btnBrowseForSaveTo.Size = new System.Drawing.Size(24, 23);
+            this.btnBrowseForSaveTo.TabIndex = 1;
+            this.btnBrowseForSaveTo.Text = "...";
+            this.btnBrowseForSaveTo.UseVisualStyleBackColor = true;
+            this.btnBrowseForSaveTo.Click += new System.EventHandler(this.btnBrws_Click);
+            // 
+            // txtSaveTo
+            // 
+            this.txtSaveTo.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
+            this.txtSaveTo.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
+            this.txtSaveTo.ButtonEnabled = false;
+            this.txtSaveTo.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtSaveTo.ButtonImage = null;
+            this.txtSaveTo.ButtonImageAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.txtSaveTo.ButtonImageIndex = -1;
+            this.txtSaveTo.ButtonImageKey = "";
+            this.txtSaveTo.ButtonImageList = null;
+            this.txtSaveTo.ButtonSize = new System.Drawing.Size(22, 21);
+            this.txtSaveTo.ButtonText = "";
+            this.txtSaveTo.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.txtSaveTo.Location = new System.Drawing.Point(24, 39);
+            this.txtSaveTo.Name = "txtSaveTo";
+            this.txtSaveTo.ReadOnly = true;
+            this.txtSaveTo.Size = new System.Drawing.Size(323, 22);
+            this.txtSaveTo.TabIndex = 0;
+            this.txtSaveTo.TextHint = "";
+            this.txtSaveTo.TextType = aphrodite.Controls.AllowedTextTypes.All;
+            this.JustTheTips.SetToolTip(this.txtSaveTo, "The location where pools, tags, and images will be saved to.");
+            // 
+            // btnProtocolImagesUserscript
+            // 
+            this.btnProtocolImagesUserscript.Location = new System.Drawing.Point(246, 161);
+            this.btnProtocolImagesUserscript.Name = "btnProtocolImagesUserscript";
+            this.btnProtocolImagesUserscript.ShowUACShield = false;
+            this.btnProtocolImagesUserscript.Size = new System.Drawing.Size(75, 23);
+            this.btnProtocolImagesUserscript.TabIndex = 5;
+            this.btnProtocolImagesUserscript.Text = "Userscript";
+            this.btnProtocolImagesUserscript.UseVisualStyleBackColor = true;
+            this.btnProtocolImagesUserscript.Click += new System.EventHandler(this.btnImagesUserscript_Click);
+            // 
+            // btnProtocolUserscript
+            // 
+            this.btnProtocolUserscript.Location = new System.Drawing.Point(246, 108);
+            this.btnProtocolUserscript.Name = "btnProtocolUserscript";
+            this.btnProtocolUserscript.ShowUACShield = false;
+            this.btnProtocolUserscript.Size = new System.Drawing.Size(75, 23);
+            this.btnProtocolUserscript.TabIndex = 3;
+            this.btnProtocolUserscript.Text = "Userscript";
+            this.btnProtocolUserscript.UseVisualStyleBackColor = true;
+            this.btnProtocolUserscript.Click += new System.EventHandler(this.btnUserscript_Click);
+            // 
+            // btnProtocolInstallTags
+            // 
+            this.btnProtocolInstallTags.Location = new System.Drawing.Point(89, 96);
+            this.btnProtocolInstallTags.Name = "btnProtocolInstallTags";
+            this.btnProtocolInstallTags.ShowUACShield = false;
+            this.btnProtocolInstallTags.Size = new System.Drawing.Size(151, 23);
+            this.btnProtocolInstallTags.TabIndex = 1;
+            this.btnProtocolInstallTags.Text = "Install \'tags:\' protocol";
+            this.btnProtocolInstallTags.UseVisualStyleBackColor = true;
+            this.btnProtocolInstallTags.Click += new System.EventHandler(this.btnTagsProtocol_Click);
+            // 
+            // btnProtocolInstallPools
+            // 
+            this.btnProtocolInstallPools.Location = new System.Drawing.Point(89, 121);
+            this.btnProtocolInstallPools.Name = "btnProtocolInstallPools";
+            this.btnProtocolInstallPools.ShowUACShield = false;
+            this.btnProtocolInstallPools.Size = new System.Drawing.Size(151, 23);
+            this.btnProtocolInstallPools.TabIndex = 2;
+            this.btnProtocolInstallPools.Text = "Install pool protocols";
+            this.btnProtocolInstallPools.UseVisualStyleBackColor = true;
+            this.btnProtocolInstallPools.Click += new System.EventHandler(this.btnPoolsProtocol_Click);
+            // 
+            // btnProtocolInstallImages
+            // 
+            this.btnProtocolInstallImages.Location = new System.Drawing.Point(89, 161);
+            this.btnProtocolInstallImages.Name = "btnProtocolInstallImages";
+            this.btnProtocolInstallImages.ShowUACShield = false;
+            this.btnProtocolInstallImages.Size = new System.Drawing.Size(151, 23);
+            this.btnProtocolInstallImages.TabIndex = 4;
+            this.btnProtocolInstallImages.Text = "Install \'image:\' protocol";
+            this.btnProtocolInstallImages.UseVisualStyleBackColor = true;
+            this.btnProtocolInstallImages.Click += new System.EventHandler(this.btnImagesProtocol_Click);
+            // 
+            // btnPortableExportIni
+            // 
+            this.btnPortableExportIni.Location = new System.Drawing.Point(162, 159);
+            this.btnPortableExportIni.Name = "btnPortableExportIni";
+            this.btnPortableExportIni.ShowUACShield = false;
+            this.btnPortableExportIni.Size = new System.Drawing.Size(86, 24);
+            this.btnPortableExportIni.TabIndex = 1;
+            this.btnPortableExportIni.Text = "Export";
+            this.btnPortableExportIni.UseVisualStyleBackColor = true;
+            this.btnPortableExportIni.Click += new System.EventHandler(this.btnExportIni_Click);
+            // 
+            // btnSchemaUndesiredTags
+            // 
+            this.btnSchemaUndesiredTags.Location = new System.Drawing.Point(272, 81);
+            this.btnSchemaUndesiredTags.Name = "btnSchemaUndesiredTags";
+            this.btnSchemaUndesiredTags.ShowUACShield = false;
+            this.btnSchemaUndesiredTags.Size = new System.Drawing.Size(104, 23);
+            this.btnSchemaUndesiredTags.TabIndex = 4;
+            this.btnSchemaUndesiredTags.Text = "undesired tags...";
+            this.btnSchemaUndesiredTags.UseVisualStyleBackColor = true;
+            this.btnSchemaUndesiredTags.Click += new System.EventHandler(this.btnSchemaUndesiredTags_Click);
+            // 
+            // txtImageSchema
+            // 
+            this.txtImageSchema.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
+            this.txtImageSchema.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
+            this.txtImageSchema.ButtonEnabled = false;
+            this.txtImageSchema.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtImageSchema.ButtonImage = null;
+            this.txtImageSchema.ButtonImageAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.txtImageSchema.ButtonImageIndex = -1;
+            this.txtImageSchema.ButtonImageKey = "";
+            this.txtImageSchema.ButtonImageList = null;
+            this.txtImageSchema.ButtonSize = new System.Drawing.Size(22, 21);
+            this.txtImageSchema.ButtonText = "";
+            this.txtImageSchema.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.txtImageSchema.Location = new System.Drawing.Point(135, 55);
+            this.txtImageSchema.Name = "txtImageSchema";
+            this.txtImageSchema.Size = new System.Drawing.Size(197, 22);
+            this.txtImageSchema.TabIndex = 3;
+            this.txtImageSchema.TextHint = "%artist%_%md5%";
+            this.txtImageSchema.TextType = aphrodite.Controls.AllowedTextTypes.All;
+            this.JustTheTips.SetToolTip(this.txtImageSchema, resources.GetString("txtImageSchema.ToolTip"));
+            this.txtImageSchema.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtImageSchema_KeyDown);
+            this.txtImageSchema.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtImageSchema_KeyPress);
+            // 
+            // txtTagSchema
+            // 
+            this.txtTagSchema.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
+            this.txtTagSchema.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
+            this.txtTagSchema.ButtonEnabled = false;
+            this.txtTagSchema.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtTagSchema.ButtonImage = null;
+            this.txtTagSchema.ButtonImageAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.txtTagSchema.ButtonImageIndex = -1;
+            this.txtTagSchema.ButtonImageKey = "";
+            this.txtTagSchema.ButtonImageList = null;
+            this.txtTagSchema.ButtonSize = new System.Drawing.Size(22, 21);
+            this.txtTagSchema.ButtonText = "";
+            this.txtTagSchema.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.txtTagSchema.Location = new System.Drawing.Point(135, 7);
+            this.txtTagSchema.Name = "txtTagSchema";
+            this.txtTagSchema.Size = new System.Drawing.Size(197, 22);
+            this.txtTagSchema.TabIndex = 1;
+            this.txtTagSchema.TextHint = "%md5%";
+            this.txtTagSchema.TextType = aphrodite.Controls.AllowedTextTypes.All;
+            this.JustTheTips.SetToolTip(this.txtTagSchema, resources.GetString("txtTagSchema.ToolTip"));
+            this.txtTagSchema.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtTagSchema_KeyDown);
+            this.txtTagSchema.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtTagSchema_KeyPress);
+            // 
+            // txtPoolSchema
+            // 
+            this.txtPoolSchema.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
+            this.txtPoolSchema.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
+            this.txtPoolSchema.ButtonEnabled = false;
+            this.txtPoolSchema.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtPoolSchema.ButtonImage = null;
+            this.txtPoolSchema.ButtonImageAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.txtPoolSchema.ButtonImageIndex = -1;
+            this.txtPoolSchema.ButtonImageKey = "";
+            this.txtPoolSchema.ButtonImageList = null;
+            this.txtPoolSchema.ButtonSize = new System.Drawing.Size(22, 21);
+            this.txtPoolSchema.ButtonText = "";
+            this.txtPoolSchema.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.txtPoolSchema.Location = new System.Drawing.Point(135, 31);
+            this.txtPoolSchema.Name = "txtPoolSchema";
+            this.txtPoolSchema.Size = new System.Drawing.Size(197, 22);
+            this.txtPoolSchema.TabIndex = 2;
+            this.txtPoolSchema.TextHint = "%poolname%_%page%";
+            this.txtPoolSchema.TextType = aphrodite.Controls.AllowedTextTypes.All;
+            this.JustTheTips.SetToolTip(this.txtPoolSchema, resources.GetString("txtPoolSchema.ToolTip"));
+            this.txtPoolSchema.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtPoolSchema_KeyDown);
+            this.txtPoolSchema.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtPoolSchema_KeyPress);
+            // 
+            // chkPoolsDownloadBlacklistedImages
+            // 
+            this.chkPoolsDownloadBlacklistedImages.AutoSize = true;
+            this.chkPoolsDownloadBlacklistedImages.Checked = true;
+            this.chkPoolsDownloadBlacklistedImages.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkPoolsDownloadBlacklistedImages.Location = new System.Drawing.Point(112, 60);
+            this.chkPoolsDownloadBlacklistedImages.Name = "chkPoolsDownloadBlacklistedImages";
+            this.chkPoolsDownloadBlacklistedImages.Size = new System.Drawing.Size(176, 17);
+            this.chkPoolsDownloadBlacklistedImages.TabIndex = 5;
+            this.chkPoolsDownloadBlacklistedImages.Text = "Download blacklisted images";
+            this.JustTheTips.SetToolTip(this.chkPoolsDownloadBlacklistedImages, "Downloads any blacklisted pages in the pool");
+            this.chkPoolsDownloadBlacklistedImages.UseVisualStyleBackColor = true;
+            // 
+            // chkPoolsMergeBlacklistedImages
+            // 
+            this.chkPoolsMergeBlacklistedImages.AutoSize = true;
+            this.chkPoolsMergeBlacklistedImages.Location = new System.Drawing.Point(49, 83);
+            this.chkPoolsMergeBlacklistedImages.Name = "chkPoolsMergeBlacklistedImages";
+            this.chkPoolsMergeBlacklistedImages.Size = new System.Drawing.Size(302, 17);
+            this.chkPoolsMergeBlacklistedImages.TabIndex = 6;
+            this.chkPoolsMergeBlacklistedImages.Text = "Merge blacklisted images with non blacklisted images";
+            this.JustTheTips.SetToolTip(this.chkPoolsMergeBlacklistedImages, "Merge blacklisted images with the rest of the pool\r\npool.blacklisted.nfo is not s" +
+        "aved, instead, blacklisted info is saved in pool.nfo under \"BLACKLISTED PAGE\"");
+            this.chkPoolsMergeBlacklistedImages.UseVisualStyleBackColor = true;
+            // 
+            // chkImagesSeparateBlacklisted
+            // 
+            this.chkImagesSeparateBlacklisted.AutoSize = true;
+            this.chkImagesSeparateBlacklisted.Checked = true;
+            this.chkImagesSeparateBlacklisted.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkImagesSeparateBlacklisted.Location = new System.Drawing.Point(201, 94);
+            this.chkImagesSeparateBlacklisted.Name = "chkImagesSeparateBlacklisted";
+            this.chkImagesSeparateBlacklisted.Size = new System.Drawing.Size(167, 17);
+            this.chkImagesSeparateBlacklisted.TabIndex = 10;
+            this.chkImagesSeparateBlacklisted.Text = "Separate blacklisted images";
+            this.JustTheTips.SetToolTip(this.chkImagesSeparateBlacklisted, "Separates blacklisted images into separate folder.");
+            this.chkImagesSeparateBlacklisted.UseVisualStyleBackColor = true;
+            // 
+            // label1
+            // 
+            this.label1.Location = new System.Drawing.Point(6, 40);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(388, 19);
+            this.label1.TabIndex = 11;
+            this.label1.Text = "Graylisted && Blacklisted images are downloaded regardless of options";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // frmSettings
             // 
@@ -937,18 +1059,18 @@
 
         #endregion
 
-        private System.Windows.Forms.Button btnCancel;
-        private System.Windows.Forms.Button btnSave;
+        private Controls.ExtendedButton btnCancel;
+        private Controls.ExtendedButton btnSave;
         private System.Windows.Forms.TabControl tbMain;
         private System.Windows.Forms.TabPage tabGeneral;
         private System.Windows.Forms.TabPage tabTags;
         private System.Windows.Forms.TabPage tabPools;
-        private System.Windows.Forms.Button btnBrowseForSaveTo;
-        private System.Windows.Forms.TextBox txtSaveTo;
+        private Controls.ExtendedButton btnBrowseForSaveTo;
+        private Controls.ExtendedTextBox txtSaveTo;
         private System.Windows.Forms.Label lbSaveTo;
         private System.Windows.Forms.CheckBox chkSaveInfoFiles;
-        private System.Windows.Forms.Button btnBlacklist;
-        private System.Windows.Forms.CheckBox chkSaveBlacklistedImages;
+        private Controls.ExtendedButton btnBlacklist;
+        private System.Windows.Forms.CheckBox chkSaveGraylistedImages;
         private System.Windows.Forms.CheckBox chkTagsSeparateRatings;
         private System.Windows.Forms.CheckBox chkTagsSafe;
         private System.Windows.Forms.CheckBox chkTagsQuestionable;
@@ -956,15 +1078,15 @@
         private System.Windows.Forms.CheckBox chkTagsEnableScoreLimit;
         private System.Windows.Forms.NumericUpDown numTagsScoreLimit;
         private System.Windows.Forms.NumericUpDown numTagsDownloadLimit;
-        private System.Windows.Forms.CheckBox chkPoolsMergeBlacklistedImages;
+        private System.Windows.Forms.CheckBox chkPoolsMergeGraylistedImages;
         private System.Windows.Forms.CheckBox chkOpenAfterDownload;
         private System.Windows.Forms.TabPage tabProtocol;
-        private System.Windows.Forms.Button btnProtocolInstallTags;
-        private System.Windows.Forms.Button btnProtocolInstallPools;
-        private System.Windows.Forms.Button btnProtocolInstallImages;
+        private Controls.ExtendedButton btnProtocolInstallTags;
+        private Controls.ExtendedButton btnProtocolInstallPools;
+        private Controls.ExtendedButton btnProtocolInstallImages;
         private System.Windows.Forms.Label lbProtocolsSeparator;
-        private System.Windows.Forms.Button btnProtocolImagesUserscript;
-        private System.Windows.Forms.Button btnProtocolUserscript;
+        private Controls.ExtendedButton btnProtocolImagesUserscript;
+        private Controls.ExtendedButton btnProtocolUserscript;
         private System.Windows.Forms.Label lbProtocols;
         private System.Windows.Forms.TabPage tabImages;
         private System.Windows.Forms.ToolTip JustTheTips;
@@ -972,7 +1094,7 @@
         private System.Windows.Forms.Label lbImagesHeader;
         private System.Windows.Forms.CheckBox chkIgnoreFinish;
         private System.Windows.Forms.CheckBox chkImagesSeparateRatings;
-        private System.Windows.Forms.CheckBox chkImagesSeparateBlacklisted;
+        private System.Windows.Forms.CheckBox chkImagesSeparateGraylisted;
         private System.Windows.Forms.CheckBox chkImagesUseForm;
         private System.Windows.Forms.CheckBox chkPoolsAddToWishlistSilently;
         private System.Windows.Forms.NumericUpDown numTagsPageLimit;
@@ -982,28 +1104,32 @@
         private System.Windows.Forms.GroupBox gbTagsRatings;
         private System.Windows.Forms.CheckBox chkTagsIncludeScoreAsTag;
         private System.Windows.Forms.TabPage tabPortable;
-        private System.Windows.Forms.Button btnPortableExportIni;
+        private Controls.ExtendedButton btnPortableExportIni;
         private System.Windows.Forms.Label lbPortable;
         private System.Windows.Forms.Label lbImageSchema;
-        private System.Windows.Forms.TextBox txtImageSchema;
+        private Controls.ExtendedTextBox txtImageSchema;
         private System.Windows.Forms.CheckBox chkImagesSeparateArtists;
         private System.Windows.Forms.Label lblTagSchema;
-        private System.Windows.Forms.TextBox txtTagSchema;
+        private Controls.ExtendedTextBox txtTagSchema;
         private System.Windows.Forms.Label lbPoolSchema;
-        private System.Windows.Forms.TextBox txtPoolSchema;
+        private Controls.ExtendedTextBox txtPoolSchema;
         private System.Windows.Forms.TabPage tabSchemas;
         private System.Windows.Forms.Label lbSchemaParam;
         private System.Windows.Forms.RichTextBox rtbParams;
         private System.Windows.Forms.Label lbTagExt;
         private System.Windows.Forms.Label lbImageExt;
         private System.Windows.Forms.Label lbPoolExt;
-        private System.Windows.Forms.Button btnSchemaUndesiredTags;
+        private Controls.ExtendedButton btnSchemaUndesiredTags;
         private System.Windows.Forms.GroupBox gbMetadata;
         private System.Windows.Forms.CheckBox chkSaveTagMetadata;
         private System.Windows.Forms.CheckBox chkSaveArtistMetadata;
         private System.Windows.Forms.CheckBox chkSaveMetadata;
         private System.Windows.Forms.CheckBox chkTagsSeparateNonImages;
         private System.Windows.Forms.CheckBox chkImagesSeparateNonImages;
+        private System.Windows.Forms.CheckBox chkPoolsMergeBlacklistedImages;
+        private System.Windows.Forms.CheckBox chkPoolsDownloadBlacklistedImages;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.CheckBox chkImagesSeparateBlacklisted;
 
     }
 }

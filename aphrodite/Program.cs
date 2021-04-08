@@ -26,7 +26,7 @@ namespace aphrodite {
 
             SetDebug();
 
-            if (!TaskbarProgress.Windows7OrGreater) {
+            if (!Controls.TaskbarProgress.Windows7OrGreater) {
                 MessageBox.Show("Windows 7 or higher is required to run this application.");
                 Environment.Exit(0);
             }
@@ -79,11 +79,16 @@ namespace aphrodite {
             Log(LogAction.WriteToLog, "Checking arguments");
             string CurrentArg;
 
+            switch (Environment.GetCommandLineArgs().Length < 1) {
+                case true:
+                    return false;
+            }
+
             for (int ArgIndex = 1; ArgIndex < Environment.GetCommandLineArgs().Length; ArgIndex++) {
                 CurrentArg = Environment.GetCommandLineArgs()[ArgIndex];
 
-                #region "installProtocol"
-                if (CurrentArg.StartsWith("installProtocol")) { // if the argument is installProtocol
+                #region "-installprotocol"
+                if (CurrentArg.ToLower().StartsWith("-installprotocol")) { // if the argument is installProtocol
                     Config.Settings.Load(ConfigType.All);
                     frmSettings Settings = new frmSettings();
                     Settings.InstallProtocol = true;
@@ -93,8 +98,29 @@ namespace aphrodite {
                 }
                 #endregion
 
+                #region "-updateprotocol"
+                else if (CurrentArg.ToLower().StartsWith("-updateprotocol")) {
+                    if (CurrentArg.ToLower().StartsWith("-updateprotocol:tags")) {
+                        string NewPath = CurrentArg.Split('|')[1];
+
+                    }
+                    else if (CurrentArg.ToLower().StartsWith("-updateprotocol:pools")) {
+                        string NewPath = CurrentArg.Split('|')[1];
+
+                    }
+                    else if (CurrentArg.ToLower().StartsWith("-updateprotocol:images")) {
+                        string NewPath = CurrentArg.Split('|')[1];
+
+                    }
+                    else {
+                        return false;
+                    }
+                    return true;
+                }
+                #endregion
+
                 #region "-settings", "*:configuresettings", "protocol", "-portable", "-schema", "configuresettings"
-                else if (CurrentArg.StartsWith("-settings") || CurrentArg.StartsWith("tags:configuresettings") || CurrentArg.StartsWith("pools:configuresettings") || CurrentArg.StartsWith("images:configuresettings") || CurrentArg.StartsWith("-protocol") || CurrentArg.StartsWith("-portable") || CurrentArg.StartsWith("-schema") || CurrentArg.StartsWith("configuresettings")) {
+                else if (CurrentArg.ToLower().StartsWith("-settings") || CurrentArg.StartsWith("tags:configuresettings") || CurrentArg.StartsWith("pools:configuresettings") || CurrentArg.StartsWith("images:configuresettings") || CurrentArg.StartsWith("-protocol") || CurrentArg.StartsWith("-portable") || CurrentArg.StartsWith("-schema") || CurrentArg.StartsWith("configuresettings")) {
                     Config.Settings.Load(ConfigType.All);
 
                     frmSettings Settings = new frmSettings();
@@ -141,6 +167,10 @@ namespace aphrodite {
                         Downloader.Arguments.DownloadPage(CurrentArg);
                         return true;
                     }
+                    else if (CurrentArg == "start") {
+                        Log(LogAction.WriteToLog, "Using tags: protocol to start aphrodite");
+                        return false;
+                    }
                     else {
                         Log(LogAction.WriteToLog, "Some tags were passed to the program");
                         type = DownloadType.Tags;
@@ -156,6 +186,10 @@ namespace aphrodite {
                     if (CurrentArg == "poolwl:showwl") {
                         frmPoolWishlist WishList = new frmPoolWishlist();
                         WishList.ShowDialog();
+                    }
+                    else if (CurrentArg == "start") {
+                        Log(LogAction.WriteToLog, "Using poolwl: protocol to start aphrodite");
+                        return false;
                     }
                     else {
                         CurrentArg = CurrentArg.Substring(7);
@@ -208,6 +242,10 @@ namespace aphrodite {
                         Downloader.Arguments.DownloadPool(CurrentArg);
                         return true;
                     }
+                    else if (CurrentArg == "start") {
+                        Log(LogAction.WriteToLog, "Using pools: protocol to start aphrodite");
+                        return false;
+                    }
                     else {
                         Log(LogAction.WriteToLog, "A pool id was passed to the program");
                         arg = CurrentArg;
@@ -228,6 +266,10 @@ namespace aphrodite {
                         Downloader.Arguments.DownloadImage(CurrentArg);
                         return true;
                     }
+                    else if (CurrentArg == "start") {
+                        Log(LogAction.WriteToLog, "Using images: protocol to start aphrodite");
+                        return false;
+                    }
                     else {
                         Log(LogAction.WriteToLog, "An image id was passed to the program");
                         arg = CurrentArg;
@@ -238,7 +280,7 @@ namespace aphrodite {
                 #endregion
 
                 #region "-redownloader"
-                else if (CurrentArg.StartsWith("-redownloader")) {
+                else if (CurrentArg.ToLower().StartsWith("-redownloader")) {
                     Config.Settings.Load(ConfigType.All);
                     frmRedownloader rDownloader = new frmRedownloader();
                     rDownloader.ShowDialog();
@@ -247,7 +289,7 @@ namespace aphrodite {
                 #endregion
 
                 #region "-blacklist"
-                else if (CurrentArg.StartsWith("-blacklist")) {
+                else if (CurrentArg.ToLower().StartsWith("-blacklist")) {
                     Config.Settings.Load(ConfigType.General);
                     frmBlacklist bList = new frmBlacklist();
                     bList.ShowDialog();

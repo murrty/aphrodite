@@ -26,21 +26,22 @@
         {
             this.components = new System.ComponentModel.Container();
             this.lbVersion = new System.Windows.Forms.Label();
-            this.llbCheckForUpdates = new aphrodite.LinkLabelHand();
+            this.llbCheckForUpdates = new aphrodite.Controls.LinkLabelHand();
             this.lbHeader = new System.Windows.Forms.Label();
             this.lbBody = new System.Windows.Forms.Label();
             this.pbIcon = new System.Windows.Forms.PictureBox();
             this.tipWoof = new System.Windows.Forms.ToolTip(this.components);
-            this.lnkLicense = new aphrodite.LinkLabelHand();
+            this.lnkLicense = new aphrodite.Controls.LinkLabelHand();
             ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).BeginInit();
             this.SuspendLayout();
             // 
             // lbVersion
             // 
             this.lbVersion.AutoSize = true;
-            this.lbVersion.Location = new System.Drawing.Point(178, 15);
+            this.lbVersion.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbVersion.Location = new System.Drawing.Point(170, 15);
             this.lbVersion.Name = "lbVersion";
-            this.lbVersion.Size = new System.Drawing.Size(27, 13);
+            this.lbVersion.Size = new System.Drawing.Size(35, 15);
             this.lbVersion.TabIndex = 2;
             this.lbVersion.Text = "v0.0";
             // 
@@ -60,7 +61,7 @@
             // 
             this.lbHeader.AutoSize = true;
             this.lbHeader.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbHeader.Location = new System.Drawing.Point(97, 8);
+            this.lbHeader.Location = new System.Drawing.Point(89, 8);
             this.lbHeader.Name = "lbHeader";
             this.lbHeader.Size = new System.Drawing.Size(85, 21);
             this.lbHeader.TabIndex = 1;
@@ -73,17 +74,17 @@
             this.lbBody.Name = "lbBody";
             this.lbBody.Size = new System.Drawing.Size(248, 79);
             this.lbBody.TabIndex = 3;
-            this.lbBody.Text = "aphrodite  by murrty\r\nicon is brad the bread.\r\ncredit to fuz for being fuz\r\ncoded" +
-    " in VisualStudio 2013";
+            this.lbBody.Text = "aphrodite by murrty\r\nicon is brad the bread.\r\ncredit to fuz for being fuz\r\ncoded " +
+    "in VisualStudio 2013";
             this.lbBody.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // pbIcon
             // 
             this.pbIcon.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pbIcon.ErrorImage = null;
-            this.pbIcon.Image = Properties.Resources.Icon32;
+            this.pbIcon.Image = global::aphrodite.Properties.Resources.Icon32;
             this.pbIcon.InitialImage = null;
-            this.pbIcon.Location = new System.Drawing.Point(64, 3);
+            this.pbIcon.Location = new System.Drawing.Point(56, 3);
             this.pbIcon.Name = "pbIcon";
             this.pbIcon.Size = new System.Drawing.Size(32, 32);
             this.pbIcon.TabIndex = 4;
@@ -134,11 +135,11 @@
         #endregion
 
         private System.Windows.Forms.Label lbVersion;
-        private LinkLabelHand llbCheckForUpdates;
+        private Controls.LinkLabelHand llbCheckForUpdates;
         private System.Windows.Forms.Label lbHeader;
         private System.Windows.Forms.Label lbBody;
         private System.Windows.Forms.PictureBox pbIcon;
         private System.Windows.Forms.ToolTip tipWoof;
-        private LinkLabelHand lnkLicense;
+        private Controls.LinkLabelHand lnkLicense;
     }
 }

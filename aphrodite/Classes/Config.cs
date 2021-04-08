@@ -129,7 +129,7 @@ namespace aphrodite {
             public bool firstTime = true;
 
             public void Save() {
-                Program.Log(LogAction.WriteToLog, "Saving Config_Initialization settings");
+                Program.Log(LogAction.WriteToLog, "Attempting to save Config_Initialization settings");
 
                 switch (Program.UseIni) {
                     case true:
@@ -231,7 +231,7 @@ namespace aphrodite {
             #endregion
 
             public void Save() {
-                Program.Log(LogAction.WriteToLog, "Saving Config_FormSettings settings");
+                Program.Log(LogAction.WriteToLog, "Attempting to save Config_FormSettings settings");
 
                 switch (Program.UseIni) {
                     case true:
@@ -293,26 +293,26 @@ namespace aphrodite {
 
             #region Variables
             public string saveLocation = string.Empty;
-            public string blacklist = string.Empty;
-            public bool saveBlacklisted = true;
+            public string Graylist = string.Empty;
+            public bool saveGraylisted = true;
             public bool saveInfo = true;
             public bool ignoreFinish = false;
-            public string zeroToleranceBlacklist = string.Empty;
+            public string Blacklist = string.Empty;
             public string undesiredTags = string.Empty;
             public bool openAfter = false;
 
             private string saveLocation_First = string.Empty;
-            private string blacklist_First = string.Empty;
-            private bool saveBlacklisted_First = true;
+            private string Graylist_First = string.Empty;
+            private bool saveGraylisted_First = true;
             private bool saveInfo_First = true;
             private bool ignoreFinish_First = false;
-            private string zeroToleranceBlacklist_First = string.Empty;
+            private string Blacklist_First = string.Empty;
             private string undesiredTags_First = string.Empty;
             private bool openAfter_First = false;
             #endregion
 
             public void Save() {
-                Program.Log(LogAction.WriteToLog, "Saving Config_General settings");
+                Program.Log(LogAction.WriteToLog, "Attempting to save Config_General settings");
 
                 switch (Program.UseIni) {
                     case true:
@@ -323,13 +323,13 @@ namespace aphrodite {
                                 saveLocation_First = saveLocation;
                                 break;
                         }
-                        switch (blacklist != blacklist_First) {
+                        switch (Graylist != Graylist_First) {
                             case true:
-                                Program.Log(LogAction.WriteToLog, "General -> blacklist changed!");
-                                if (blacklist.Length > 0) {
+                                Program.Log(LogAction.WriteToLog, "General -> Graylist changed!");
+                                if (Graylist.Length > 0) {
                                     File.WriteAllText(
                                         Program.ApplicationPath + "\\graylist.cfg",
-                                        blacklist.Replace(" ", "_").Replace("\r\n", " ")
+                                        Graylist.Replace(" ", "_").Replace("\r\n", " ")
                                     );
                                 }
                                 else {
@@ -337,11 +337,11 @@ namespace aphrodite {
                                 }
                                 break;
                         }
-                        switch (saveBlacklisted != saveBlacklisted_First) {
+                        switch (saveGraylisted != saveGraylisted_First) {
                             case true:
-                                Program.Log(LogAction.WriteToLog, "General -> saveBlacklisted changed!");
-                                Program.Ini.WriteBool("saveBlacklisted", saveBlacklisted, "General");
-                                saveBlacklisted_First = saveBlacklisted;
+                                Program.Log(LogAction.WriteToLog, "General -> saveGraylisted changed!");
+                                Program.Ini.WriteBool("saveGraylisted", saveGraylisted, "General");
+                                saveGraylisted_First = saveGraylisted;
                                 break;
                         }
                         switch (saveInfo != saveInfo_First) {
@@ -358,13 +358,13 @@ namespace aphrodite {
                                 ignoreFinish_First = ignoreFinish;
                                 break;
                         }
-                        switch (zeroToleranceBlacklist != zeroToleranceBlacklist_First) {
+                        switch (Blacklist != Blacklist_First) {
                             case true:
-                                Program.Log(LogAction.WriteToLog, "General -> zeroToleranceBlacklist changed!");
-                                if (blacklist.Length > 0) {
+                                Program.Log(LogAction.WriteToLog, "General -> Blacklist changed!");
+                                if (Graylist.Length > 0) {
                                     File.WriteAllText(
                                         Program.ApplicationPath + "\\blacklist.cfg",
-                                        zeroToleranceBlacklist.Replace(" ", "_").Replace("\r\n", " ")
+                                        Blacklist.Replace(" ", "_").Replace("\r\n", " ")
                                     );
                                 }
                                 else {
@@ -398,17 +398,17 @@ namespace aphrodite {
                                 Save = true;
                                 break;
                         }
-                        switch (aphrodite.Settings.General.Default.blacklist != blacklist) {
+                        switch (aphrodite.Settings.General.Default.Graylist != Graylist) {
                             case true:
-                                Program.Log(LogAction.WriteToLog, "General -> blacklist changed!");
-                                aphrodite.Settings.General.Default.blacklist = blacklist;
+                                Program.Log(LogAction.WriteToLog, "General -> Graylist changed!");
+                                aphrodite.Settings.General.Default.Graylist = Graylist;
                                 Save = true;
                                 break;
                         }
-                        switch (aphrodite.Settings.General.Default.saveBlacklisted != saveBlacklisted) {
+                        switch (aphrodite.Settings.General.Default.saveGraylisted != saveGraylisted) {
                             case true:
-                                Program.Log(LogAction.WriteToLog, "General -> saveBlacklisted changed!");
-                                aphrodite.Settings.General.Default.saveBlacklisted = saveBlacklisted;
+                                Program.Log(LogAction.WriteToLog, "General -> saveGraylisted changed!");
+                                aphrodite.Settings.General.Default.saveGraylisted = saveGraylisted;
                                 Save = true;
                                 break;
                         }
@@ -426,10 +426,10 @@ namespace aphrodite {
                                 Save = true;
                                 break;
                         }
-                        switch (aphrodite.Settings.General.Default.zeroToleranceBlacklist != zeroToleranceBlacklist) {
+                        switch (aphrodite.Settings.General.Default.Blacklist != Blacklist) {
                             case true:
-                                Program.Log(LogAction.WriteToLog, "General -> zeroToleranceBlacklist changed!");
-                                aphrodite.Settings.General.Default.zeroToleranceBlacklist = zeroToleranceBlacklist;
+                                Program.Log(LogAction.WriteToLog, "General -> Blacklist changed!");
+                                aphrodite.Settings.General.Default.Blacklist = Blacklist;
                                 Save = true;
                                 break;
                         }
@@ -470,14 +470,14 @@ namespace aphrodite {
                         }
                         switch (File.Exists(Program.ApplicationPath + "\\graylist.cfg")) {
                             case true:
-                                blacklist = string.Join(" ", File.ReadAllLines(Program.ApplicationPath + "\\graylist.cfg"));
-                                blacklist_First = blacklist;
+                                Graylist = string.Join(" ", File.ReadAllLines(Program.ApplicationPath + "\\graylist.cfg"));
+                                Graylist_First = Graylist;
                                 break;
                         }
                         switch (Program.Ini.KeyExists("saveBlacklisted", "General")) {
                             case true:
-                                saveBlacklisted = Program.Ini.ReadBool("saveBlacklisted", "General");
-                                saveBlacklisted_First = saveBlacklisted;
+                                saveGraylisted = Program.Ini.ReadBool("saveBlacklisted", "General");
+                                saveGraylisted_First = saveGraylisted;
                                 break;
                         }
                         switch (Program.Ini.KeyExists("saveInfo", "General")) {
@@ -494,8 +494,8 @@ namespace aphrodite {
                         }
                         switch (File.Exists(Program.ApplicationPath + "\\blacklist.cfg")) {
                             case true:
-                                zeroToleranceBlacklist = string.Join(" ", File.ReadAllLines(Program.ApplicationPath + "\\blacklist.cfg"));
-                                zeroToleranceBlacklist_First = zeroToleranceBlacklist;
+                                Blacklist = string.Join(" ", File.ReadAllLines(Program.ApplicationPath + "\\blacklist.cfg"));
+                                Blacklist_First = Blacklist;
                                 break;
                         }
                         switch (Program.Ini.KeyExists("undesiredTags", "General")) {
@@ -514,11 +514,11 @@ namespace aphrodite {
 
                     case false:
                         saveLocation = aphrodite.Settings.General.Default.saveLocation;
-                        blacklist = aphrodite.Settings.General.Default.blacklist;
-                        saveBlacklisted = aphrodite.Settings.General.Default.saveBlacklisted;
+                        Graylist = aphrodite.Settings.General.Default.Graylist;
+                        saveGraylisted = aphrodite.Settings.General.Default.saveGraylisted;
                         saveInfo = aphrodite.Settings.General.Default.saveInfo;
                         ignoreFinish = aphrodite.Settings.General.Default.ignoreFinish;
-                        zeroToleranceBlacklist = aphrodite.Settings.General.Default.zeroToleranceBlacklist;
+                        Blacklist = aphrodite.Settings.General.Default.Blacklist;
                         undesiredTags = aphrodite.Settings.General.Default.undesiredTags;
                         openAfter = aphrodite.Settings.General.Default.openAfter;
                         break;
@@ -561,7 +561,7 @@ namespace aphrodite {
             #endregion
 
             public void Save() {
-                Program.Log(LogAction.WriteToLog, "Saving Config_Tags settings");
+                Program.Log(LogAction.WriteToLog, "Attempting to save Config_Tags settings");
 
                 switch (Program.UseIni) {
                     case true:
@@ -873,29 +873,33 @@ namespace aphrodite {
             }
 
             #region Variables
-            public bool mergeBlacklisted = true;
+            public bool mergeGraylisted = true;
             public string wishlist = string.Empty;
             public string wishlistNames = string.Empty;
             public bool addWishlistSilent = false;
             public string fileNameSchema = "%poolname%_%page%";
+            public bool downloadBlacklisted = true;
+            public bool mergeBlacklisted = false;
 
-            private bool mergeBlacklisted_First = true;
+            private bool mergeGraylisted_First = true;
             public string wishlist_First = string.Empty;
             public string wishlistNames_First = string.Empty;
             private bool addWishlistSilent_First = false;
             private string fileNameSchema_First = "%poolname%_%page%";
+            private bool downloadBlacklisted_First = true;
+            private bool mergeBlacklisted_First = false;
             #endregion
 
             public void Save() {
-                Program.Log(LogAction.WriteToLog, "Saving Config_Pools settings");
+                Program.Log(LogAction.WriteToLog, "Attempting to save Config_Pools settings");
 
                 switch (Program.UseIni) {
                     case true:
-                        switch (mergeBlacklisted != mergeBlacklisted_First) {
+                        switch (mergeGraylisted != mergeGraylisted_First) {
                             case true:
-                                Program.Log(LogAction.WriteToLog, "Pools -> mergeBlacklisted changed!");
-                                Program.Ini.WriteBool("mergeBlacklisted", mergeBlacklisted, "Pools");
-                                mergeBlacklisted_First = mergeBlacklisted;
+                                Program.Log(LogAction.WriteToLog, "Pools -> mergeGraylisted changed!");
+                                Program.Ini.WriteBool("mergeBlacklisted", mergeGraylisted, "Pools");
+                                mergeGraylisted_First = mergeGraylisted;
                                 break;
                         }
                         switch (addWishlistSilent != addWishlistSilent_First) {
@@ -912,15 +916,29 @@ namespace aphrodite {
                                 fileNameSchema_First = fileNameSchema;
                                 break;
                         }
+                        switch (downloadBlacklisted != downloadBlacklisted_First) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "Pools -> downloadBlacklisted changed!");
+                                Program.Ini.WriteBool("downloadBlacklisted", downloadBlacklisted, "Pools");
+                                downloadBlacklisted_First = downloadBlacklisted;
+                                break;
+                        }
+                        switch (mergeBlacklisted != mergeBlacklisted_First) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "Pools -> mergeBlacklisted changed!");
+                                Program.Ini.WriteBool("mergeBlacklisted", mergeBlacklisted, "Pools");
+                                mergeBlacklisted_First = mergeBlacklisted;
+                                break;
+                        }
                         break;
 
                     case false:
                         bool Save = false;
 
-                        switch (aphrodite.Settings.Pools.Default.mergeBlacklisted != mergeBlacklisted) {
+                        switch (aphrodite.Settings.Pools.Default.mergeGraylisted != mergeGraylisted) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Pools -> mergeBlacklisted changed!");
-                                aphrodite.Settings.Pools.Default.mergeBlacklisted = mergeBlacklisted;
+                                aphrodite.Settings.Pools.Default.mergeGraylisted = mergeGraylisted;
                                 Save = true;
                                 break;
                         }
@@ -935,6 +953,20 @@ namespace aphrodite {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Pools -> fileNameSchema changed!");
                                 aphrodite.Settings.Pools.Default.fileNameSchema = fileNameSchema;
+                                Save = true;
+                                break;
+                        }
+                        switch (aphrodite.Settings.Pools.Default.downloadBlacklisted != downloadBlacklisted) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "Pools -> downloadBlacklisted changed!");
+                                aphrodite.Settings.Pools.Default.downloadBlacklisted = downloadBlacklisted;
+                                Save = true;
+                                break;
+                        }
+                        switch (aphrodite.Settings.Pools.Default.mergeBlacklisted != mergeBlacklisted) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "Pools -> mergeBlacklisted changed!");
+                                aphrodite.Settings.Pools.Default.mergeBlacklisted = mergeBlacklisted;
                                 Save = true;
                                 break;
                         }
@@ -955,8 +987,8 @@ namespace aphrodite {
                     case true:
                         switch (Program.Ini.KeyExists("mergeBlacklisted", "Pools")) {
                             case true:
-                                mergeBlacklisted = Program.Ini.ReadBool("mergeBlacklisted", "Pools");
-                                mergeBlacklisted_First = mergeBlacklisted;
+                                mergeGraylisted = Program.Ini.ReadBool("mergeBlacklisted", "Pools");
+                                mergeGraylisted_First = mergeGraylisted;
                                 break;
                         }
                         switch (Program.Ini.KeyExists("addWishlistSilent", "Pools")) {
@@ -969,6 +1001,18 @@ namespace aphrodite {
                             case true:
                                 fileNameSchema = Program.Ini.ReadString("fileNameSchema", "Pools");
                                 fileNameSchema_First = fileNameSchema;
+                                break;
+                        }
+                        switch (Program.Ini.KeyExists("downloadBlacklisted", "Pools")) {
+                            case true:
+                                downloadBlacklisted = Program.Ini.ReadBool("downloadBlacklisted", "Pools");
+                                downloadBlacklisted_First = downloadBlacklisted;
+                                break;
+                        }
+                        switch (Program.Ini.KeyExists("mergeBlacklisted", "Pools")) {
+                            case true:
+                                mergeBlacklisted = Program.Ini.ReadBool("mergeBlacklisted", "Pools");
+                                mergeBlacklisted_First = mergeBlacklisted;
                                 break;
                         }
 
@@ -991,11 +1035,13 @@ namespace aphrodite {
                         break;
 
                     case false:
-                        mergeBlacklisted = aphrodite.Settings.Pools.Default.mergeBlacklisted;
+                        mergeGraylisted = aphrodite.Settings.Pools.Default.mergeGraylisted;
                         wishlist = aphrodite.Settings.Pools.Default.wishlist;
                         wishlistNames = aphrodite.Settings.Pools.Default.wishlistNames;
                         addWishlistSilent = aphrodite.Settings.Pools.Default.addWishlistSilent;
                         fileNameSchema = aphrodite.Settings.Pools.Default.fileNameSchema;
+                        downloadBlacklisted = aphrodite.Settings.Pools.Default.downloadBlacklisted;
+                        mergeBlacklisted = aphrodite.Settings.Pools.Default.mergeBlacklisted;
                         break;
                 }
             }
@@ -1009,22 +1055,24 @@ namespace aphrodite {
 
             #region Variables
             public bool separateRatings = true;
-            public bool separateBlacklisted = true;
+            public bool separateGraylisted = true;
             public bool useForm = false;
             public bool separateArtists = false;
             public string fileNameSchema = "%artist%_%md5%";
             public bool separateNonImages = true;
+            public bool separateBlacklisted = true;
 
             private bool separateRatings_First = true;
-            private bool separateBlacklisted_First = true;
+            private bool separateGraylisted_First = true;
             private bool useForm_First = false;
             private bool separateArtists_First = false;
             private string fileNameSchema_First = "%artist%_%md5%";
             private bool separateNonImages_First = true;
+            private bool separateBlacklisted_First = true;
             #endregion
 
             public void Save() {
-                Program.Log(LogAction.WriteToLog, "Saving Config_Images settings");
+                Program.Log(LogAction.WriteToLog, "Attempting to save Config_Images settings");
 
                 switch (Program.UseIni) {
                     case true:
@@ -1035,11 +1083,11 @@ namespace aphrodite {
                                 separateRatings_First = separateRatings;
                                 break;
                         }
-                        switch (separateBlacklisted != separateBlacklisted_First) {
+                        switch (separateGraylisted != separateGraylisted_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Images -> separateBlacklisted changed!");
-                                Program.Ini.WriteBool("separateBlacklisted", separateBlacklisted, "Images");
-                                separateBlacklisted_First = separateBlacklisted;
+                                Program.Ini.WriteBool("separateBlacklisted", separateGraylisted, "Images");
+                                separateGraylisted_First = separateGraylisted;
                                 break;
                         }
                         switch (useForm != useForm_First) {
@@ -1070,6 +1118,13 @@ namespace aphrodite {
                                 separateNonImages_First = separateNonImages;
                                 break;
                         }
+                        switch (separateBlacklisted != separateBlacklisted_First) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "Images -> separateBlacklisted changed!");
+                                Program.Ini.WriteBool("separateBlacklisted", separateBlacklisted, "Images");
+                                separateBlacklisted_First = separateBlacklisted;
+                                break;
+                        }
                         break;
 
                     case false:
@@ -1082,10 +1137,10 @@ namespace aphrodite {
                                 Save = true;
                                 break;
                         }
-                        switch (aphrodite.Settings.Images.Default.separateBlacklisted != separateBlacklisted) {
+                        switch (aphrodite.Settings.Images.Default.separateGraylisted != separateGraylisted) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Images -> separateBlacklisted changed!");
-                                aphrodite.Settings.Images.Default.separateBlacklisted = separateBlacklisted;
+                                aphrodite.Settings.Images.Default.separateGraylisted = separateGraylisted;
                                 Save = true;
                                 break;
                         }
@@ -1117,6 +1172,13 @@ namespace aphrodite {
                                 Save = true;
                                 break;
                         }
+                        switch (aphrodite.Settings.Images.Default.separateBlacklisted != separateBlacklisted) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "Images -> separateBlacklisted changed!");
+                                aphrodite.Settings.Images.Default.separateBlacklisted = separateBlacklisted;
+                                Save = true;
+                                break;
+                        }
 
                         switch (Save) {
                             case true:
@@ -1140,8 +1202,8 @@ namespace aphrodite {
                         }
                         switch (Program.Ini.KeyExists("separateBlacklisted", "Images")) {
                             case true:
-                                separateBlacklisted = Program.Ini.ReadBool("separateBlacklisted", "Images");
-                                separateBlacklisted_First = separateBlacklisted;
+                                separateGraylisted = Program.Ini.ReadBool("separateBlacklisted", "Images");
+                                separateGraylisted_First = separateGraylisted;
                                 break;
                         }
                         switch (Program.Ini.KeyExists("useForm", "Images")) {
@@ -1168,15 +1230,22 @@ namespace aphrodite {
                                 separateNonImages_First = separateNonImages;
                                 break;
                         }
+                        switch (Program.Ini.KeyExists("separateBlacklisted", "Images")) {
+                            case true:
+                                separateBlacklisted = Program.Ini.ReadBool("separateBlacklisted", "Images");
+                                separateBlacklisted_First = separateBlacklisted;
+                                break;
+                        }
                         break;
 
                     case false:
                         separateRatings = aphrodite.Settings.Images.Default.separateRatings;
-                        separateBlacklisted = aphrodite.Settings.Images.Default.separateBlacklisted;
+                        separateGraylisted = aphrodite.Settings.Images.Default.separateGraylisted;
                         useForm = aphrodite.Settings.Images.Default.useForm;
                         separateArtists = aphrodite.Settings.Images.Default.separateArtists;
                         fileNameSchema = aphrodite.Settings.Images.Default.fileNameSchema;
                         separateNonImages = aphrodite.Settings.Images.Default.separateNonImages;
+                        separateBlacklisted = aphrodite.Settings.Images.Default.separateBlacklisted;
                         break;
                 }
             }

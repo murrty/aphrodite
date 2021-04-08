@@ -23,14 +23,14 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            this.listWishlistItems = new AeroListBox();
-            this.txtURL = new System.Windows.Forms.TextBox();
-            this.btnAddUpdate = new System.Windows.Forms.Button();
-            this.btnRemove = new System.Windows.Forms.Button();
-            this.btnDownload = new System.Windows.Forms.Button();
-            this.txtName = new System.Windows.Forms.TextBox();
+            this.listWishlistItems = new aphrodite.Controls.AeroListBox();
+            this.txtURL = new aphrodite.Controls.ExtendedTextBox();
+            this.btnAddUpdate = new aphrodite.Controls.ExtendedButton();
+            this.btnRemove = new aphrodite.Controls.ExtendedButton();
+            this.btnDownload = new aphrodite.Controls.ExtendedButton();
+            this.txtName = new aphrodite.Controls.ExtendedTextBox();
             this.chkUpdate = new System.Windows.Forms.CheckBox();
-            this.lPoolLink = new LinkLabelHand();
+            this.lPoolLink = new aphrodite.Controls.LinkLabelHand();
             this.SuspendLayout();
             // 
             // listWishlistItems
@@ -44,15 +44,30 @@
             // 
             // txtURL
             // 
+            this.txtURL.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
+            this.txtURL.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
+            this.txtURL.ButtonEnabled = false;
+            this.txtURL.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtURL.ButtonImage = null;
+            this.txtURL.ButtonImageAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.txtURL.ButtonImageIndex = -1;
+            this.txtURL.ButtonImageKey = "";
+            this.txtURL.ButtonImageList = null;
+            this.txtURL.ButtonSize = new System.Drawing.Size(22, 21);
+            this.txtURL.ButtonText = "";
+            this.txtURL.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.txtURL.Location = new System.Drawing.Point(12, 233);
             this.txtURL.Name = "txtURL";
             this.txtURL.Size = new System.Drawing.Size(212, 22);
             this.txtURL.TabIndex = 4;
+            this.txtURL.TextHint = "Pool URL...";
+            this.txtURL.TextType = aphrodite.Controls.AllowedTextTypes.All;
             // 
             // btnAddUpdate
             // 
             this.btnAddUpdate.Location = new System.Drawing.Point(230, 231);
             this.btnAddUpdate.Name = "btnAddUpdate";
+            this.btnAddUpdate.ShowUACShield = false;
             this.btnAddUpdate.Size = new System.Drawing.Size(68, 23);
             this.btnAddUpdate.TabIndex = 5;
             this.btnAddUpdate.Text = "Add";
@@ -63,6 +78,7 @@
             // 
             this.btnRemove.Location = new System.Drawing.Point(230, 258);
             this.btnRemove.Name = "btnRemove";
+            this.btnRemove.ShowUACShield = false;
             this.btnRemove.Size = new System.Drawing.Size(68, 23);
             this.btnRemove.TabIndex = 8;
             this.btnRemove.Text = "Remove selected";
@@ -73,6 +89,7 @@
             // 
             this.btnDownload.Location = new System.Drawing.Point(148, 258);
             this.btnDownload.Name = "btnDownload";
+            this.btnDownload.ShowUACShield = false;
             this.btnDownload.Size = new System.Drawing.Size(76, 23);
             this.btnDownload.TabIndex = 7;
             this.btnDownload.Text = "Download pool";
@@ -81,10 +98,24 @@
             // 
             // txtName
             // 
+            this.txtName.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
+            this.txtName.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
+            this.txtName.ButtonEnabled = false;
+            this.txtName.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtName.ButtonImage = null;
+            this.txtName.ButtonImageAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.txtName.ButtonImageIndex = -1;
+            this.txtName.ButtonImageKey = "";
+            this.txtName.ButtonImageList = null;
+            this.txtName.ButtonSize = new System.Drawing.Size(22, 21);
+            this.txtName.ButtonText = "";
+            this.txtName.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.txtName.Location = new System.Drawing.Point(12, 207);
             this.txtName.Name = "txtName";
             this.txtName.Size = new System.Drawing.Size(286, 22);
             this.txtName.TabIndex = 3;
+            this.txtName.TextHint = "Pool name...";
+            this.txtName.TextType = aphrodite.Controls.AllowedTextTypes.All;
             // 
             // chkUpdate
             // 
@@ -104,10 +135,10 @@
             this.lPoolLink.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
             this.lPoolLink.Location = new System.Drawing.Point(12, 188);
             this.lPoolLink.Name = "lPoolLink";
-            this.lPoolLink.Size = new System.Drawing.Size(85, 13);
+            this.lPoolLink.Size = new System.Drawing.Size(196, 13);
             this.lPoolLink.TabIndex = 2;
             this.lPoolLink.TabStop = true;
-            this.lPoolLink.Text = "DEBUG ACCESS";
+            this.lPoolLink.Text = "The URL of the pool will display here";
             this.lPoolLink.UseMnemonic = false;
             this.lPoolLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lPoolLink_LinkClicked);
             // 
@@ -142,13 +173,13 @@
 
         #endregion
 
-        private AeroListBox listWishlistItems;
-        private System.Windows.Forms.TextBox txtURL;
-        private System.Windows.Forms.Button btnAddUpdate;
-        private System.Windows.Forms.Button btnRemove;
-        private System.Windows.Forms.Button btnDownload;
-        private System.Windows.Forms.TextBox txtName;
+        private Controls.AeroListBox listWishlistItems;
+        private Controls.ExtendedTextBox txtURL;
+        private Controls.ExtendedButton btnAddUpdate;
+        private Controls.ExtendedButton btnRemove;
+        private Controls.ExtendedButton btnDownload;
+        private Controls.ExtendedTextBox txtName;
         private System.Windows.Forms.CheckBox chkUpdate;
-        private LinkLabelHand lPoolLink;
+        private Controls.LinkLabelHand lPoolLink;
     }
 }

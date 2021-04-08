@@ -26,16 +26,16 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.lbIni = new System.Windows.Forms.Label();
             this.lbMutual = new System.Windows.Forms.Label();
-            this.btnSave = new System.Windows.Forms.Button();
-            this.btnCancel = new System.Windows.Forms.Button();
-            this.btnSort = new System.Windows.Forms.Button();
+            this.btnSave = new Controls.ExtendedButton();
+            this.btnCancel = new Controls.ExtendedButton();
+            this.btnSort = new Controls.ExtendedButton();
             this.rtbBlacklist = new System.Windows.Forms.RichTextBox();
             this.rtbZTB = new System.Windows.Forms.RichTextBox();
-            this.btnSortZTB = new System.Windows.Forms.Button();
-            this.llGraylist = new aphrodite.LinkLabelHand();
-            this.llBlacklist = new aphrodite.LinkLabelHand();
-            this.lbBlacklist = new aphrodite.TransparentLabel();
-            this.lbGraylist = new aphrodite.TransparentLabel();
+            this.btnSortZTB = new Controls.ExtendedButton();
+            this.llGraylist = new Controls.LinkLabelHand();
+            this.llBlacklist = new Controls.LinkLabelHand();
+            this.lbBlacklist = new Controls.TransparentLabel();
+            this.lbGraylist = new Controls.TransparentLabel();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -217,17 +217,17 @@
         #endregion
 
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Button btnSave;
-        private System.Windows.Forms.Button btnCancel;
-        private System.Windows.Forms.Button btnSort;
+        private Controls.ExtendedButton btnSave;
+        private Controls.ExtendedButton btnCancel;
+        private Controls.ExtendedButton btnSort;
         private System.Windows.Forms.RichTextBox rtbBlacklist;
         private System.Windows.Forms.RichTextBox rtbZTB;
-        private System.Windows.Forms.Button btnSortZTB;
+        private Controls.ExtendedButton btnSortZTB;
         private System.Windows.Forms.Label lbMutual;
         private System.Windows.Forms.Label lbIni;
-        private LinkLabelHand llBlacklist;
-        private LinkLabelHand llGraylist;
-        private TransparentLabel lbGraylist;
-        private TransparentLabel lbBlacklist;
+        private Controls.LinkLabelHand llBlacklist;
+        private Controls.LinkLabelHand llGraylist;
+        private Controls.TransparentLabel lbGraylist;
+        private Controls.TransparentLabel lbBlacklist;
     }
 }

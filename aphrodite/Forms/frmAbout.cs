@@ -13,8 +13,8 @@ namespace aphrodite {
             pbIcon.Cursor = NativeMethods.SystemHandCursor;
             llbCheckForUpdates.Cursor = NativeMethods.SystemHandCursor;
             lnkLicense.Cursor = NativeMethods.SystemHandCursor;
+            lbBody.Text += "\r\n\r\n(last debug date " + Properties.Settings.Default.debugDate + ")";
             if (Program.IsDebug) {
-                lbVersion.Text += " (" + Properties.Settings.Default.debugDate + ")";
                 this.Text = "About aphrodite (debug)";
             }
             else {
@@ -61,4 +61,5 @@ namespace aphrodite {
         }
 
     }
+
 }

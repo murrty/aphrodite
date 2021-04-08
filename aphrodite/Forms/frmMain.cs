@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -36,9 +37,12 @@ namespace aphrodite {
                 this.Text += " (debug " + Properties.Settings.Default.debugDate + ")";
             }
 
-            NativeMethods.SendMessage(txtTags.Handle, 0x1501, (IntPtr)1, "Tags to download...");
-            NativeMethods.SendMessage(txtPoolId.Handle, 0x1501, (IntPtr)1, "Pool ID...");
-            NativeMethods.SendMessage(txtImageUrl.Handle, 0x1501, (IntPtr)1, "Image ID / URL...");
+            txtTags.ButtonCursor = NativeMethods.SystemHandCursor;
+            txtPoolId.ButtonCursor = NativeMethods.SystemHandCursor;
+            txtImageUrl.ButtonCursor = NativeMethods.SystemHandCursor;
+            txtTags.Refresh();
+            txtPoolId.Refresh();
+            txtImageUrl.Refresh();
         }
         private void frmMain_Load(object sender, EventArgs e) {
             if (string.IsNullOrWhiteSpace(Config.Settings.General.saveLocation)) {
@@ -62,10 +66,10 @@ namespace aphrodite {
             numTagsImageLimit.Value = Convert.ToDecimal(Config.Settings.Tags.imageLimit);
             numTagsPageLimit.Value = Convert.ToDecimal(Config.Settings.Tags.pageLimit);
 
-            chkPoolMergeBlacklisted.Checked = Config.Settings.Pools.mergeBlacklisted;
+            chkPoolMergeGraylisted.Checked = Config.Settings.Pools.mergeGraylisted;
 
             chkImageSeparateRatings.Checked = Config.Settings.Images.separateRatings;
-            chkImageSeparateBlacklisted.Checked = Config.Settings.Images.separateBlacklisted;
+            chkImageSeparateBlacklisted.Checked = Config.Settings.Images.separateGraylisted;
             chkImageUseForm.Checked = Config.Settings.Images.useForm;
 
             if (Config.Settings.FormSettings.frmMain_Location.X != -32000 && Config.Settings.FormSettings.frmMain_Location.Y != -32000) {
@@ -187,6 +191,9 @@ namespace aphrodite {
             }
 
         }
+        private void txtTags_ButtonClick(object sender, EventArgs e) {
+            txtTags.Clear();
+        }
 
         private void btnDownloadTags_Click(object sender, EventArgs e) {
             if (string.IsNullOrWhiteSpace(txtTags.Text)) {
@@ -234,24 +241,6 @@ namespace aphrodite {
         #endregion
 
         #region Pools
-        private void btnDownloadPool_Click(object sender, EventArgs e) {
-            if (string.IsNullOrWhiteSpace(txtPoolId.Text)) {
-                MessageBox.Show("Please specify pool ID to download.");
-                return;
-            }
-            string ID = txtPoolId.Text;
-            if (apiTools.IsValidPoolLink(ID)) {
-                ID = apiTools.GetPoolIdFromUrl(ID);
-            }
-
-            PoolDownloadInfo NewInfo = new PoolDownloadInfo(txtPoolId.Text);
-            NewInfo.OpenAfter = chkPoolOpenAfter.Checked;
-            NewInfo.MergeBlacklisted = chkPoolMergeBlacklisted.Checked;
-            frmPoolDownloader Downloader = new frmPoolDownloader();
-            Downloader.DownloadInfo = NewInfo;
-            Downloader.Show();
-        }
-
         private void txtPoolId_KeyPress(object sender, KeyPressEventArgs e) {
             switch (e.KeyChar) {
                 case '0': case (char)Keys.Back:
@@ -333,24 +322,50 @@ namespace aphrodite {
                     break;
             }
         }
+        private void txtPoolId_ButtonClick(object sender, EventArgs e) {
+            txtPoolId.Clear();
+        }
+
+        private void btnDownloadPool_Click(object sender, EventArgs e) {
+            if (string.IsNullOrWhiteSpace(txtPoolId.Text)) {
+                MessageBox.Show("Please specify pool ID to download.");
+                return;
+            }
+            string ID = txtPoolId.Text;
+            if (apiTools.IsValidPoolLink(ID)) {
+                ID = apiTools.GetPoolIdFromUrl(ID);
+            }
+
+            PoolDownloadInfo NewInfo = new PoolDownloadInfo(txtPoolId.Text);
+            NewInfo.OpenAfter = chkPoolOpenAfter.Checked;
+            NewInfo.MergeGraylistedPages = chkPoolMergeGraylisted.Checked;
+            NewInfo.DownloadBlacklistedPages = chkPoolDownloadBlacklistedImages.Checked;
+            NewInfo.MergeBlacklistedPages = chkPoolMergeBlacklisted.Checked;
+            frmPoolDownloader Downloader = new frmPoolDownloader();
+            Downloader.DownloadInfo = NewInfo;
+            Downloader.Show();
+        }
         #endregion
 
         #region Images
+        private void txtImageUrl_KeyDown(object sender, KeyEventArgs e) {
+            if (e.KeyCode == Keys.Enter) {
+                btnDownloadImage_Click(this, new EventArgs());
+            }
+        }
+        private void txtImageUrl_ButtonClick(object sender, EventArgs e) {
+            txtImageUrl.Clear();
+        }
+
         private void btnDownloadImage_Click(object sender, EventArgs e) {
             if (string.IsNullOrWhiteSpace(txtImageUrl.Text)) {
                 MessageBox.Show("Please enter a valid image url or id");
                 return;
             }
 
-            string Image = txtImageUrl.Text;
-
-            if (apiTools.IsValidImageLink(txtImageUrl.Text)) {
-                Image = apiTools.GetPostIdFromUrl(Image);
-            }
-
-            ImageDownloadInfo NewInfo = new ImageDownloadInfo(Image);
+            ImageDownloadInfo NewInfo = new ImageDownloadInfo(txtImageUrl.Text);
             NewInfo.SeparateRatings = chkImageSeparateRatings.Checked;
-            NewInfo.SeparateBlacklisted = chkImageSeparateBlacklisted.Checked;
+            NewInfo.SeparateGraylisted = chkImageSeparateBlacklisted.Checked;
             NewInfo.SeparateArtists = chkImageSeparateArtists.Checked;
             NewInfo.UseForm = chkImageUseForm.Checked;
             NewInfo.SeparateNonImages = chkImageSeparateNonImages.Checked;
@@ -363,11 +378,6 @@ namespace aphrodite {
             }
             else {
                 ImageDownloader Downloader = new ImageDownloader(NewInfo);
-            }
-        }
-        private void txtImageUrl_KeyDown(object sender, KeyEventArgs e) {
-            if (e.KeyCode == Keys.Enter) {
-                btnDownloadImage_Click(this, new EventArgs());
             }
         }
         #endregion

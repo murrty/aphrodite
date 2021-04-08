@@ -26,12 +26,12 @@ namespace aphrodite.Settings {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool mergeBlacklisted {
+        public bool mergeGraylisted {
             get {
-                return ((bool)(this["mergeBlacklisted"]));
+                return ((bool)(this["mergeGraylisted"]));
             }
             set {
-                this["mergeBlacklisted"] = value;
+                this["mergeGraylisted"] = value;
             }
         }
         
@@ -80,6 +80,30 @@ namespace aphrodite.Settings {
             }
             set {
                 this["fileNameSchema"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool downloadBlacklisted {
+            get {
+                return ((bool)(this["downloadBlacklisted"]));
+            }
+            set {
+                this["downloadBlacklisted"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool mergeBlacklisted {
+            get {
+                return ((bool)(this["mergeBlacklisted"]));
+            }
+            set {
+                this["mergeBlacklisted"] = value;
             }
         }
     }

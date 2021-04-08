@@ -5,10 +5,10 @@
     <Setting Name="saveLocation" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="blacklist" Type="System.String" Scope="User">
+    <Setting Name="Graylist" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="saveBlacklisted" Type="System.Boolean" Scope="User">
+    <Setting Name="saveGraylisted" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="saveInfo" Type="System.Boolean" Scope="User">
@@ -17,7 +17,7 @@
     <Setting Name="ignoreFinish" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="zeroToleranceBlacklist" Type="System.String" Scope="User">
+    <Setting Name="Blacklist" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="firstTime" Type="System.Boolean" Scope="User">

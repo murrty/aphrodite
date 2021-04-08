@@ -24,9 +24,9 @@
         /// </summary>
         private void InitializeComponent() {
             this.txtUpdateAvailableName = new System.Windows.Forms.TextBox();
-            this.btnUpdateAvailableSkip = new System.Windows.Forms.Button();
-            this.btnUpdateAvailableOk = new System.Windows.Forms.Button();
-            this.btnUpdateAvailableUpdate = new System.Windows.Forms.Button();
+            this.btnUpdateAvailableSkip = new Controls.ExtendedButton();
+            this.btnUpdateAvailableOk = new Controls.ExtendedButton();
+            this.btnUpdateAvailableUpdate = new Controls.ExtendedButton();
             this.lbUpdateAvailableChangelog = new System.Windows.Forms.Label();
             this.rtbUpdateAvailableChangelog = new System.Windows.Forms.RichTextBox();
             this.lbUpdateAvailableCurrentVersion = new System.Windows.Forms.Label();
@@ -147,9 +147,9 @@
         #endregion
 
         private System.Windows.Forms.TextBox txtUpdateAvailableName;
-        private System.Windows.Forms.Button btnUpdateAvailableSkip;
-        private System.Windows.Forms.Button btnUpdateAvailableOk;
-        private System.Windows.Forms.Button btnUpdateAvailableUpdate;
+        private Controls.ExtendedButton btnUpdateAvailableSkip;
+        private Controls.ExtendedButton btnUpdateAvailableOk;
+        private Controls.ExtendedButton btnUpdateAvailableUpdate;
         private System.Windows.Forms.Label lbUpdateAvailableChangelog;
         private System.Windows.Forms.RichTextBox rtbUpdateAvailableChangelog;
         private System.Windows.Forms.Label lbUpdateAvailableCurrentVersion;

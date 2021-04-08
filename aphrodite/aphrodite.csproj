@@ -75,10 +75,16 @@
     <Compile Include="Controls\AeroListBox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\ExProgressBar.cs">
+    <Compile Include="Controls\ExtendedButton.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\ExWebClient.cs">
+    <Compile Include="Controls\ExtendedTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ExtendedProgressBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ExtendedWebClient.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Classes\Config.cs" />
