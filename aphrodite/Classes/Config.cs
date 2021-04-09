@@ -7,23 +7,8 @@ using System.Reflection;
 using System.Text;
 
 namespace aphrodite {
-    public enum ConfigType : int {
-        None = -1,
 
-        All = 0,
 
-        Initialization = 1,
-
-        FormSettings = 2,
-
-        General = 3,
-
-        Tags = 4,
-
-        Pools = 5,
-
-        Images = 6
-    }
     class Config {
         public static volatile Config Settings;
 
@@ -546,6 +531,7 @@ namespace aphrodite {
             public int imageLimit = 0;
             public int pageLimit = 0;
             public string fileNameSchema = "%md5%";
+            public bool downloadBlacklisted = false;
 
             private bool Safe_First = true;
             private bool Questionable_First = true;
@@ -558,6 +544,7 @@ namespace aphrodite {
             private int imageLimit_First = 0;
             private int pageLimit_First = 0;
             private string fileNameSchema_First = "%md5%";
+            private bool downloadBlacklisted_First = false;
             #endregion
 
             public void Save() {
@@ -642,6 +629,13 @@ namespace aphrodite {
                                 fileNameSchema_First = fileNameSchema;
                                 break;
                         }
+                        switch (downloadBlacklisted != downloadBlacklisted_First) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> downloadBlacklisted changed!");
+                                Program.Ini.WriteBool("downloadBlacklisted", downloadBlacklisted, "Tags");
+                                downloadBlacklisted_First = downloadBlacklisted;
+                                break;
+                        }
                         break;
 
                     case false:
@@ -724,6 +718,13 @@ namespace aphrodite {
                                 Save = true;
                                 break;
                         }
+                        switch (aphrodite.Settings.Tags.Default.downloadBlacklisted != downloadBlacklisted) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> downloadBlacklisted changed!");
+                                aphrodite.Settings.Tags.Default.downloadBlacklisted = downloadBlacklisted;
+                                Save = true;
+                                break;
+                        }
 
                         switch (Save) {
                             case true:
@@ -783,6 +784,10 @@ namespace aphrodite {
                             fileNameSchema = Program.Ini.ReadString("fileNameSchema", "Tags");
                             fileNameSchema_First = fileNameSchema;
                         }
+                        if (Program.Ini.KeyExists("downloadBlacklisted", "Tags")) {
+                            downloadBlacklisted = Program.Ini.ReadBool("downloadBlacklisted", "Tags");
+                            downloadBlacklisted_First = downloadBlacklisted;
+                        }
                         break;
 
                     case false:
@@ -797,6 +802,7 @@ namespace aphrodite {
                         imageLimit = aphrodite.Settings.Tags.Default.imageLimit;
                         pageLimit = aphrodite.Settings.Tags.Default.pageLimit;
                         fileNameSchema = aphrodite.Settings.Tags.Default.fileNameSchema;
+                        downloadBlacklisted = aphrodite.Settings.Tags.Default.downloadBlacklisted;
                         break;
                 }
             }

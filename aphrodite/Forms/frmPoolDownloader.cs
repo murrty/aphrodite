@@ -19,9 +19,7 @@ namespace aphrodite {
         #endregion
 
         #region Private Variables
-        private bool DownloadHasFinished = false;
-        private bool DownloadHasErrored = false;
-        private bool DownloadHasAborted = false;
+        private DownloadStatus CurrentStatus = DownloadStatus.Waiting;
         private string CurrentURL;
 
         private Thread poolDownloader;
@@ -41,7 +39,7 @@ namespace aphrodite {
         }
         private void frmDownload_Shown(object sender, EventArgs e) {
             tmrTitle.Start();
-            startDownload();
+            StartDownload();
         }
         private void frmDownload_FormClosing(object sender, FormClosingEventArgs e) {
             if (poolDownloader != null && poolDownloader.IsAlive) {
@@ -66,69 +64,98 @@ namespace aphrodite {
         #endregion
 
         #region Downloader
-        private void startDownload() {
+        private void StartDownload() {
             poolDownloader = new Thread(() => {
                 Thread.CurrentThread.IsBackground = true;
-                downloadPool();
+                DownloadPool();
             });
             tmrTitle.Start();
             poolDownloader.Start();
         }
         private void AfterDownload() {
             tmrTitle.Stop();
-            if (DownloadInfo.OpenAfter && DownloadHasFinished) {
+            pbDownloadStatus.Style = ProgressBarStyle.Blocks;
+            if (DownloadInfo.OpenAfter && CurrentStatus == DownloadStatus.Finished) {
                 Process.Start(DownloadInfo.DownloadPath);
             }
 
             if (DownloadInfo.IgnoreFinish) {
-                if (DownloadHasFinished) {
-                    this.DialogResult = DialogResult.Yes;
-                }
-                else if (DownloadHasErrored) {
-                    this.DialogResult = DialogResult.No;
-                }
-                else if (DownloadHasAborted) {
-                    this.DialogResult = DialogResult.Abort;
-                }
-                else {
-                    this.DialogResult = DialogResult.Ignore;
+                switch (CurrentStatus) {
+                    case DownloadStatus.Finished:
+                        this.DialogResult = DialogResult.Yes;
+                        break;
+
+                    case DownloadStatus.Errored:
+                        this.DialogResult = DialogResult.No;
+                        break;
+
+                    case DownloadStatus.Aborted:
+                        this.DialogResult = DialogResult.Abort;
+                        break;
+
+                    default:
+                        this.DialogResult = DialogResult.Ignore;
+                        break;
                 }
             }
             else {
-                if (DownloadHasFinished) {
-                    lbFile.Text = "All " + CleanPageCount + " files downloaded";
-                    pbDownloadStatus.Value = pbDownloadStatus.Maximum;
-                    lbPercentage.Text = "Done";
-                    this.Text = "Pool " + DownloadInfo.PoolId + " finished downloading";
-                    status.Text = "Finished downloading pool";
-                }
-                else if (DownloadHasErrored) {
-                    lbFile.Text = "Downloading has encountered an error";
-                    pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
-                    lbPercentage.Text = "Error";
-                    this.Text = "Download error";
-                    status.Text = "Downloading has resulted in an error";
-                }
-                else if (DownloadHasAborted) {
-                    lbFile.Text = "Download canceled";
-                    pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
-                    lbPercentage.Text = "Canceled";
-                    this.Text = "Download canceled";
-                    status.Text = "Download has canceled";
-                }
-                else {
-                    // assume it completed
-                    lbFile.Text = "Download assumed to be completed...";
-                    pbDownloadStatus.Value = pbDownloadStatus.Maximum;
-                    lbPercentage.Text = "Done?";
-                    this.Text = "Pool " + DownloadInfo.PoolId + " finished downloading";
-                    status.Text = "Download status booleans not set, assuming the download completed";
+                switch (CurrentStatus) {
+                    case DownloadStatus.Finished:
+                        pbDownloadStatus.Value = pbDownloadStatus.Maximum;
+                        pbTotalStatus.Value = pbTotalStatus.Maximum;
+                        lbFile.Text = "All " + CleanPageCount + " files downloaded";
+                        lbPercentage.Text = "Done";
+                        status.Text = "Finished downloading pool";
+                        this.Text = "Pool " + DownloadInfo.PoolId + " finished downloading";
+                        break;
+
+                    case DownloadStatus.Errored:
+                        pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
+                        lbFile.Text = "Downloading has encountered an error";
+                        lbPercentage.Text = "Error";
+                        status.Text = "Downloading has resulted in an error";
+                        this.Text = "Pool " + DownloadInfo.PoolId + " download error";
+                        break;
+
+                    case DownloadStatus.Aborted:
+                        pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
+                        lbFile.Text = "Download cancelled";
+                        lbPercentage.Text = "cancelled";
+                        status.Text = "Download has cancelled";
+                        this.Text = "Pool " + DownloadInfo.PoolId + " download cancelled";
+                        break;
+
+                    case DownloadStatus.NothingToDownload:
+                        pbDownloadStatus.Value = pbDownloadStatus.Minimum;
+                        lbFile.Text = "No files to download";
+                        lbPercentage.Text = "-";
+                        status.Text = "No files to download";
+                        this.Text = "Pool " + DownloadInfo.PoolId + " No files to download";
+                        break;
+
+                    case DownloadStatus.PostOrPoolWasDeleted:
+                        pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
+                        pbDownloadStatus.Value = pbDownloadStatus.Minimum;
+                        lbFile.Text = "The pool was deleted";
+                        lbPercentage.Text = "-";
+                        status.Text = "The pool was deleted";
+                        this.Text = "Pool " + DownloadInfo.PoolId + " was deleted";
+                        break;
+
+                    case DownloadStatus.ApiReturnedNullOrEmpty:
+                        pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
+                        pbDownloadStatus.Value = pbDownloadStatus.Minimum;
+                        lbFile.Text = "Initial api returned null/empty";
+                        lbPercentage.Text = "-";
+                        status.Text = "Initial api returned null/empty";
+                        this.Text = "Pool " + DownloadInfo.PoolId + " initial api returned null/empty";
+                        break;
                 }
             }
         }
-        private void downloadPool() {
+        private void DownloadPool() {
             try {
-              // Set the saveTo to \\Pools.
+                // Set the saveTo to \\Pools.
                 if (!DownloadInfo.DownloadPath.EndsWith("\\Pools")) {
                     DownloadInfo.DownloadPath += "\\Pools";
                 }
@@ -167,21 +194,14 @@ namespace aphrodite {
 
                 // Check the XML.
                 writeToConsole("Checking XML...");
-                if (postXML == apiTools.EmptyXML || string.IsNullOrWhiteSpace(postXML)) {
-                    DownloadHasErrored = true;
-                    this.BeginInvoke(new MethodInvoker(() => {
-                        pbDownloadStatus.Style = ProgressBarStyle.Continuous;
-                        AfterDownload();
-                    }));
-                    AfterDownload();
-                    return;
+                if (apiTools.IsXmlDead(postXML)) {
+                    throw new ApiReturnedNullOrEmptyException("API is null or empty");
                 }
-                writeToConsole("XML is valid.");
                 xmlDoc.LoadXml(postXML);
                 #endregion
 
                 #region initial api parse for main pool info
-              // XmlNodeLists for pool information.
+                // XmlNodeLists for pool information.
                 XmlNodeList xmlName = xmlDoc.DocumentElement.SelectNodes("/root/name");
                 XmlNodeList xmlPoolDescription = xmlDoc.DocumentElement.SelectNodes("/root/description");
                 XmlNodeList xmlCount = xmlDoc.DocumentElement.SelectNodes("/root/post_count");
@@ -190,6 +210,7 @@ namespace aphrodite {
 
                 if (xmlPoolDeleted[0].InnerText.ToLower() == "true") {
                     // idk how to handle it because I haven't found a deleted pool yet
+                    throw new PoolOrPostWasDeletedException("Pool was deleted");
                 }
 
                 string poolDescription = "No description";
@@ -205,18 +226,21 @@ namespace aphrodite {
                             "    DESCRIPTION:\n    " + poolDescription +
                             "\n\n";
 
-              // Add the pages in their pool index
-              // (so that way the page is true to the pool)
+                // Add the pages in their pool index
+                // (so that way the page is true to the pool)
                 for (int i = 0; i < xmlPostIDs.Count; i++) {
                     PostIDs.Add(xmlPostIDs[i].InnerText);
                 }
 
-                this.Invoke((MethodInvoker)(() => lbName.Text = xmlName[0].InnerText));
+                this.BeginInvoke((MethodInvoker)delegate() {
+                    txtPoolName.TextAlign = HorizontalAlignment.Left;
+                    txtPoolName.Text = xmlName[0].InnerText;
+                });
 
-              // Count the image count and do math for pages.
+                // Count the image count and do math for pages.
                 int TotalPagesToParse = apiTools.CountPoolPages(Convert.ToDecimal(xmlCount[0].InnerText));
 
-              // Set the output folder name.
+                // Set the output folder name.
                 poolName = apiTools.ReplaceIllegalCharacters(xmlName[0].InnerText);
                 DownloadInfo.DownloadPath += "\\" + poolName;
                 writeToConsole("Updated saveTo to \\Pools\\" + poolName);
@@ -244,7 +268,7 @@ namespace aphrodite {
                 XmlNodeList xmlDescription;
                 XmlNodeList xmlExt;
                 XmlNodeList xmlDeleted;
-              // Begin ripping the rest of the pool Json.
+                // Begin ripping the rest of the pool Json.
                 for (int ApiPage = 1; ApiPage < TotalPagesToParse + 1; ApiPage++) {
                     CurrentURL = poolJsonPage;
                     postXML = apiTools.GetJsonToXml(poolJsonPage + "&page=" + ApiPage);
@@ -563,11 +587,11 @@ namespace aphrodite {
                             }
                         }
 
-                        FilePaths.Add(NewPath + "\\" + fileName); 
+                        FilePaths.Add(NewPath + "\\" + fileName);
 
-                        updateTotals();
+                        UpdateTotals();
 
-                        poolInfo += "    PAGE: " + fileNamePage + "\n" +
+                        string InfoBuffer = "PAGE: " + fileNamePage + "\n" +
                                         "        MD5: " + xmlMD5[CurrentPost].InnerText + "\n" +
                                         "        URL: https://e621.net/posts/" + xmlID[CurrentPost].InnerText + "\n" +
                                         "        TAGS: " + ReadTags + "\n" +
@@ -576,36 +600,30 @@ namespace aphrodite {
                                         "        DESCRIPITON:" + poolDescription;
 
                         if (isBlacklisted && DownloadInfo.DownloadBlacklistedPages) {
-                            poolInfo = "    BLACKLISTED PAGE " + poolInfo.Substring(8) +
+                            InfoBuffer = "BLACKLISTED " + InfoBuffer +
                                              "        OFFENDING TAGS: " + foundBlacklistedTags;
                         }
                         else if (isGraylisted && DownloadInfo.DownloadGraylistedPages) {
-                            poolInfo = "    GRAYLISTED PAGE " + poolInfo.Substring(8) +
+                            InfoBuffer = "GRAYLISTED " + InfoBuffer +
                                              "        OFFENDING TAGS: " + foundBlacklistedTags;
                         }
-                        poolInfo += "\r\n\r\n";
+
+                        poolInfo += "    " + InfoBuffer + "\r\n\r\n";
                     }
                 }
 
-                
+
                 #endregion
 
                 #region pre-download checks
-            // Check for files.
-                if (URLs.Count <= 0) {
-                    writeToConsole("No files were found while downloading.", true);
-                    this.BeginInvoke(new MethodInvoker(() => {
-                        status.Text = "URL count is empty. Empty pool?";
-                        pbDownloadStatus.Style = ProgressBarStyle.Blocks;
-                        tmrTitle.Stop();
-                    }));
-                    MessageBox.Show("No files are to be downloaded.");
-                    return;
+                // Check for files.
+                if (URLs.Count < 1) {
+                    throw new NoFilesToDownloadException("No files are available to download");
                 }
 
                 writeToConsole("There are " + URLs.Count + " files in total.", true);
 
-                // Create directories.
+            // Create directories.
                 if (!Directory.Exists(DownloadInfo.DownloadPath)) {
                     Directory.CreateDirectory(DownloadInfo.DownloadPath);
                 }
@@ -618,7 +636,7 @@ namespace aphrodite {
                 #endregion
 
                 #region Downloading
-                // Save .nfo files.
+            // Save .nfo files.
                 if (DownloadInfo.SaveInfo) {
                     poolInfo = poolInfo.TrimEnd('\n');
                     poolInfo = poolInfo.TrimEnd('\r').TrimEnd('\n').TrimEnd('\r').TrimEnd('\n');
@@ -632,11 +650,8 @@ namespace aphrodite {
                     lbFile.Text = "File 1 of " + (CleanPageCount + GraylistedPageCount + BlacklistedPageCount);
                 }));
 
-                int currentDownloadFile = 1;
-                // Download pool.
+            // Download pool.
                 writeToConsole("Starting pool download...", true);
-                string outputBar = string.Empty;
-                currentPage = 0;
                 using (Controls.ExtendedWebClient wc = new Controls.ExtendedWebClient()) {
                     wc.DownloadProgressChanged += (s, e) => {
                         this.BeginInvoke(new MethodInvoker(() => {
@@ -644,10 +659,10 @@ namespace aphrodite {
                                 pbDownloadStatus.Value = e.ProgressPercentage;
                             }
                             lbPercentage.Text = e.ProgressPercentage.ToString() + "%";
-
                             lbBytes.Text = (e.BytesReceived / 1024) + " kb / " + (e.TotalBytesToReceive / 1024) + " kb";
                         }));
                     };
+
                     wc.DownloadFileCompleted += (s, e) => {
                         lock (e.UserState) {
                             this.BeginInvoke(new MethodInvoker(() => {
@@ -657,7 +672,6 @@ namespace aphrodite {
                                 if (pbTotalStatus.Value != pbTotalStatus.Maximum)
                                     pbTotalStatus.Value++;
                             }));
-                            currentDownloadFile++;
                             Monitor.Pulse(e.UserState);
                         }
                     };
@@ -682,54 +696,57 @@ namespace aphrodite {
                 }
                 #endregion
 
-                // Finish the job.
-                this.BeginInvoke(new MethodInvoker(() => {
-                    pbDownloadStatus.Value = 100;
-                    pbTotalStatus.Value = pbTotalStatus.Maximum;
-                    lbPercentage.Text = "100%";
-                    lbFile.Text = "All files downloaded.";
-                }));
-
-                DownloadHasFinished = true;
+                CurrentStatus = DownloadStatus.Finished;
+            }
+            catch (PoolOrPostWasDeletedException) {
+                CurrentStatus = DownloadStatus.PostOrPoolWasDeleted;
+            }
+            catch (ApiReturnedNullOrEmptyException) {
+                CurrentStatus = DownloadStatus.ApiReturnedNullOrEmpty;
+            }
+            catch (NoFilesToDownloadException) {
+                CurrentStatus = DownloadStatus.NothingToDownload;
             }
             catch (ThreadAbortException) {
-                Program.Log(LogAction.WriteToLog, "Thread was requested to be, and has been, aborted. (frmPoolDownloader.cs)");
-                DownloadHasAborted = true;
+                //Program.Log(LogAction.WriteToLog, "Thread was requested to be, and has been, aborted. (frmPoolDownloader.cs)");
+                CurrentStatus = DownloadStatus.Aborted;
             }
             catch (ObjectDisposedException) {
-                Program.Log(LogAction.WriteToLog, "Seems like the object got disposed. (frmPoolDownloader.cs)");
-                DownloadHasErrored = true;
+                //Program.Log(LogAction.WriteToLog, "Seems like the object got disposed. (frmPoolDownloader.cs)");
+                CurrentStatus = DownloadStatus.Errored;
             }
             catch (WebException WebE) {
-                Program.Log(LogAction.WriteToLog, "A WebException has occured. (frmPoolDownloader.cs)");
+                //Program.Log(LogAction.WriteToLog, "A WebException has occured. (frmPoolDownloader.cs)");
                 this.BeginInvoke(new MethodInvoker(() => {
                     status.Text = "A WebException has occured";
                     pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
                     pbTotalStatus.State = aphrodite.Controls.ProgressBarState.Error;
                 }));
                 ErrorLog.ReportWebException(WebE, "frmPoolDownloader.cs", CurrentURL);
-                DownloadHasErrored = true;
+                CurrentStatus = DownloadStatus.Errored;
             }
             catch (Exception ex) {
-                Program.Log(LogAction.WriteToLog, "An exception has occured. (frmPoolDownloader.cs)");
+                //Program.Log(LogAction.WriteToLog, "An exception has occured. (frmPoolDownloader.cs)");
                 this.BeginInvoke(new MethodInvoker(() => {
                     status.Text = "A Exception has occured";
                     pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
                     pbTotalStatus.State = aphrodite.Controls.ProgressBarState.Error;
                 }));
                 ErrorLog.ReportException(ex, "frmPoolDownloader.cs", false);
-                DownloadHasErrored = true;
+                CurrentStatus = DownloadStatus.Errored;
             }
             finally {
-                this.BeginInvoke(new MethodInvoker(() => { AfterDownload(); }));
+                this.BeginInvoke(new MethodInvoker(() => {
+                    AfterDownload();
+                }));
             }
         }
 
-        public void updateTotals() {
+        public void UpdateTotals() {
             this.BeginInvoke(new MethodInvoker(() => {
-                lbTotal.Text = (CleanPageCount) + " clean pages\n" +
+                lbTotal.Text = (CleanPageCount) + " clean pages\r\n" +
                                (GraylistedPageCount) + " graylisted pages\r\n" +
-                               (BlacklistedPageCount) + " blacklisted pages\n" +
+                               (BlacklistedPageCount) + " blacklisted pages\r\n" +
                                (CleanPageCount + GraylistedPageCount + BlacklistedPageCount) + " total pages";
             }));
         }

@@ -25,7 +25,6 @@
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             this.lbID = new System.Windows.Forms.Label();
-            this.lbName = new System.Windows.Forms.Label();
             this.lbFile = new System.Windows.Forms.Label();
             this.lbPercentage = new System.Windows.Forms.Label();
             this.status = new System.Windows.Forms.StatusBar();
@@ -35,6 +34,7 @@
             this.lbBytes = new System.Windows.Forms.Label();
             this.pbTotalStatus = new aphrodite.Controls.ExtendedProgressBar();
             this.pbDownloadStatus = new aphrodite.Controls.ExtendedProgressBar();
+            this.txtPoolName = new aphrodite.Controls.ExtendedTextBox();
             this.SuspendLayout();
             // 
             // lbID
@@ -47,21 +47,11 @@
             this.lbID.Text = "Pool ID ???";
             this.lbID.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // lbName
-            // 
-            this.lbName.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.lbName.Location = new System.Drawing.Point(18, 19);
-            this.lbName.Name = "lbName";
-            this.lbName.Size = new System.Drawing.Size(244, 16);
-            this.lbName.TabIndex = 1;
-            this.lbName.Text = "unknown pool name";
-            this.lbName.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
             // lbFile
             // 
             this.lbFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbFile.Location = new System.Drawing.Point(10, 98);
+            this.lbFile.Location = new System.Drawing.Point(10, 122);
             this.lbFile.Name = "lbFile";
             this.lbFile.Size = new System.Drawing.Size(252, 16);
             this.lbFile.TabIndex = 2;
@@ -72,7 +62,7 @@
             // 
             this.lbPercentage.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.lbPercentage.BackColor = System.Drawing.Color.Transparent;
-            this.lbPercentage.Location = new System.Drawing.Point(116, 139);
+            this.lbPercentage.Location = new System.Drawing.Point(116, 163);
             this.lbPercentage.Name = "lbPercentage";
             this.lbPercentage.Size = new System.Drawing.Size(41, 14);
             this.lbPercentage.TabIndex = 4;
@@ -81,7 +71,7 @@
             // 
             // status
             // 
-            this.status.Location = new System.Drawing.Point(0, 191);
+            this.status.Location = new System.Drawing.Point(0, 207);
             this.status.Name = "status";
             this.status.Size = new System.Drawing.Size(272, 22);
             this.status.SizingGrip = false;
@@ -91,7 +81,7 @@
             // lbTotal
             // 
             this.lbTotal.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.lbTotal.Location = new System.Drawing.Point(10, 39);
+            this.lbTotal.Location = new System.Drawing.Point(10, 55);
             this.lbTotal.Name = "lbTotal";
             this.lbTotal.Size = new System.Drawing.Size(252, 56);
             this.lbTotal.TabIndex = 6;
@@ -107,7 +97,7 @@
             // 
             this.lbRemoved.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.lbRemoved.AutoSize = true;
-            this.lbRemoved.Location = new System.Drawing.Point(66, 162);
+            this.lbRemoved.Location = new System.Drawing.Point(66, 186);
             this.lbRemoved.Name = "lbRemoved";
             this.lbRemoved.Size = new System.Drawing.Size(141, 13);
             this.lbRemoved.TabIndex = 12;
@@ -118,7 +108,7 @@
             // 
             this.lbBytes.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbBytes.Location = new System.Drawing.Point(10, 117);
+            this.lbBytes.Location = new System.Drawing.Point(10, 141);
             this.lbBytes.Name = "lbBytes";
             this.lbBytes.Size = new System.Drawing.Size(252, 18);
             this.lbBytes.TabIndex = 13;
@@ -130,7 +120,7 @@
             this.pbTotalStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pbTotalStatus.ContainerControl = this;
-            this.pbTotalStatus.Location = new System.Drawing.Point(10, 160);
+            this.pbTotalStatus.Location = new System.Drawing.Point(10, 184);
             this.pbTotalStatus.Name = "pbTotalStatus";
             this.pbTotalStatus.ShowInTaskbar = true;
             this.pbTotalStatus.Size = new System.Drawing.Size(252, 18);
@@ -141,24 +131,48 @@
             this.pbDownloadStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pbDownloadStatus.ContainerControl = this;
-            this.pbDownloadStatus.Location = new System.Drawing.Point(10, 137);
+            this.pbDownloadStatus.Location = new System.Drawing.Point(10, 161);
             this.pbDownloadStatus.Name = "pbDownloadStatus";
             this.pbDownloadStatus.Size = new System.Drawing.Size(252, 18);
             this.pbDownloadStatus.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
             this.pbDownloadStatus.TabIndex = 8;
+            // 
+            // txtPoolName
+            // 
+            this.txtPoolName.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
+            this.txtPoolName.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
+            this.txtPoolName.ButtonEnabled = false;
+            this.txtPoolName.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtPoolName.ButtonImage = null;
+            this.txtPoolName.ButtonImageAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.txtPoolName.ButtonImageIndex = -1;
+            this.txtPoolName.ButtonImageKey = "";
+            this.txtPoolName.ButtonImageList = null;
+            this.txtPoolName.ButtonSize = new System.Drawing.Size(22, 21);
+            this.txtPoolName.ButtonText = "";
+            this.txtPoolName.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.txtPoolName.Location = new System.Drawing.Point(12, 27);
+            this.txtPoolName.Name = "txtPoolName";
+            this.txtPoolName.ReadOnly = true;
+            this.txtPoolName.Size = new System.Drawing.Size(248, 22);
+            this.txtPoolName.TabIndex = 14;
+            this.txtPoolName.Text = "not parsed yet";
+            this.txtPoolName.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.txtPoolName.TextHint = "";
+            this.txtPoolName.TextType = aphrodite.Controls.AllowedTextTypes.All;
             // 
             // frmPoolDownloader
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(272, 213);
+            this.ClientSize = new System.Drawing.Size(272, 229);
+            this.Controls.Add(this.txtPoolName);
             this.Controls.Add(this.lbRemoved);
             this.Controls.Add(this.pbTotalStatus);
             this.Controls.Add(this.status);
             this.Controls.Add(this.lbPercentage);
             this.Controls.Add(this.lbFile);
-            this.Controls.Add(this.lbName);
             this.Controls.Add(this.lbID);
             this.Controls.Add(this.lbTotal);
             this.Controls.Add(this.pbDownloadStatus);
@@ -182,7 +196,6 @@
         #endregion
 
         private System.Windows.Forms.Label lbID;
-        private System.Windows.Forms.Label lbName;
         private System.Windows.Forms.Label lbFile;
         private System.Windows.Forms.Label lbPercentage;
         private System.Windows.Forms.StatusBar status;
@@ -192,5 +205,6 @@
         private Controls.ExtendedProgressBar pbDownloadStatus;
         private System.Windows.Forms.Label lbRemoved;
         private System.Windows.Forms.Label lbBytes;
+        private Controls.ExtendedTextBox txtPoolName;
     }
 }

@@ -154,5 +154,17 @@ namespace aphrodite.Settings {
                 this["separateNonImages"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool downloadBlacklisted {
+            get {
+                return ((bool)(this["downloadBlacklisted"]));
+            }
+            set {
+                this["downloadBlacklisted"] = value;
+            }
+        }
     }
 }

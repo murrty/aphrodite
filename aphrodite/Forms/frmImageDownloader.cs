@@ -13,8 +13,7 @@ namespace aphrodite {
     public class ImageInfo {
         public string FileUrl;
         public string InfoBuffer;
-        public bool DownloadFinish = false;
-        public bool DownloadError = false;
+        public DownloadStatus Status;
         public string DownloadPath;
 
         public ImageInfo(ImageDownloadInfo Info) {
@@ -35,8 +34,7 @@ namespace aphrodite {
 
             // Check the XML.
                 if (postXML == apiTools.EmptyXML || string.IsNullOrWhiteSpace(postXML)) {
-                    DownloadError = true;
-                    return;
+                    throw new ApiReturnedNullOrEmptyException();
                 }
 
                 XmlDocument xmlDoc = new XmlDocument();
@@ -66,17 +64,14 @@ namespace aphrodite {
 
                 switch (xmlDeleted[0].InnerText.ToLower() == "true") {
                     case true:
-                        DownloadError = true;
-                        break;
+                        throw new PoolOrPostWasDeletedException("Image was deleted");
 
                     case false:
                         FileUrl = xmlURL[0].InnerText;
                         if (FileUrl == null) {
                             FileUrl = apiTools.GetBlacklistedImageUrl(xmlMD5[0].InnerText, xmlExt[0].InnerText);
                             if (FileUrl == null) {
-                                ErrorLog.ReportCustomException("DownloadUrl was still null after attempting to bypass blacklist with MD5", "ImageDownloader.cs");
-                                DownloadError = true;
-                                return;
+                                throw new ImageWasNullAfterBypassingException(Info.PostId + " was still null.");
                             }
                         }
 
@@ -380,7 +375,7 @@ namespace aphrodite {
 
                     // Check file before continuing.
                         if (File.Exists(DownloadPath)) {
-                            DownloadFinish = true;
+                            Status = DownloadStatus.Finished;
                             return;
                         }
 
@@ -459,11 +454,14 @@ namespace aphrodite {
 
                 ImageInfo Image = new ImageInfo(DownloadInfo);
 
-                if (Image.DownloadFinish) {
-                    return true;
-                }
-                if (Image.DownloadError) {
-                    return false;
+                switch (Image.Status) {
+                    case DownloadStatus.Finished:
+                        return true;
+
+                    case DownloadStatus.Errored: case DownloadStatus.ApiReturnedNullOrEmpty:
+                    case DownloadStatus.NothingToDownload:
+                    case DownloadStatus.FileWasNullAfterBypassingBlacklist:
+                        return false;
                 }
 
                 // Download file.
@@ -474,7 +472,25 @@ namespace aphrodite {
 
                     wc.DownloadFile(Image.FileUrl, Image.DownloadPath);
                 }
+
                 return true;
+
+            }
+            catch (PoolOrPostWasDeletedException) {
+                ErrorLog.ReportCustomException("The image was deleted.", "ImageDownloader.cs");
+                return false;
+            }
+            catch (ApiReturnedNullOrEmptyException) {
+                ErrorLog.ReportCustomException("The api returned null or empty.", "ImageDownloader.cs");
+                return false;
+            }
+            catch (NoFilesToDownloadException) {
+                ErrorLog.ReportCustomException("No image is available to download.", "ImageDownloader.cs");
+                return false;
+            }
+            catch (ImageWasNullAfterBypassingException) {
+                ErrorLog.ReportCustomException("The image was null after attempting to bypassing the e621 global blacklist.", "ImageDownloader.cs");
+                return false;
             }
             catch (ThreadAbortException) {
                 return false;
@@ -502,10 +518,7 @@ namespace aphrodite {
 
     #region PrivateVariables
         private Thread imageDownload;                   // The thread for the downloader.
-
-        private bool DownloadHasFinished = false;
-        private bool DownloadHasErrored = false;
-        private bool DownloadHasAborted = false;
+        private DownloadStatus CurrentStatus = DownloadStatus.Waiting;
     #endregion
 
     #region Form
@@ -516,7 +529,7 @@ namespace aphrodite {
             if (string.IsNullOrWhiteSpace(DownloadInfo.FileNameSchema)) {
                 DownloadInfo.FileNameSchema = "%artist%_%md5%";
             }
-            startDownload();
+            StartDownload();
         }
 
         private void tmrTitle_Tick(object sender, EventArgs e) {
@@ -530,66 +543,97 @@ namespace aphrodite {
     #endregion
 
     #region Downloader
-        private void startDownload() {
+        private void StartDownload() {
             imageDownload = new Thread(() => {
                 Thread.CurrentThread.IsBackground = true;
-                downloadImage();
+                DownloadImage();
             });
             tmrTitle.Start();
             imageDownload.Start();
         }
         private void AfterDownload() {
             tmrTitle.Stop();
-            if (DownloadInfo.OpenAfter) {
+            pbDownloadStatus.Style = ProgressBarStyle.Blocks;
+            if (DownloadInfo.OpenAfter && CurrentStatus == DownloadStatus.Finished) {
                 Process.Start("explorer.exe", "/select, \"" + DownloadInfo.DownloadPath + "\\" + DownloadInfo.FileName + "\"");
             }
+
             if (DownloadInfo.IgnoreFinish) {
-                if (DownloadHasFinished) {
-                    this.DialogResult = DialogResult.Yes;
-                }
-                else if (DownloadHasErrored) {
-                    this.DialogResult = DialogResult.No;
-                }
-                else if (DownloadHasAborted) {
-                    this.DialogResult = DialogResult.Abort;
-                }
-                else {
-                    this.DialogResult = DialogResult.Ignore;
+                switch (CurrentStatus) {
+                    case DownloadStatus.Finished:
+                        this.DialogResult = DialogResult.Yes;
+                        break;
+
+                    case DownloadStatus.Errored:
+                        this.DialogResult = DialogResult.No;
+                        break;
+
+                    case DownloadStatus.Aborted:
+                        this.DialogResult = DialogResult.Abort;
+                        break;
+
+                    default:
+                        this.DialogResult = DialogResult.Ignore;
+                        break;
                 }
             }
             else {
-                if (DownloadHasFinished) {
-                    lbInfo.Text = "The image has been downloaded";
-                    pbDownloadStatus.Value = pbDownloadStatus.Maximum;
-                    lbPercentage.Text = "Done";
-                    this.Text = "Image " + DownloadInfo.PostId + " finished downloading";
-                    status.Text = "Finished downloading pool";
-                }
-                else if (DownloadHasErrored) {
-                    lbInfo.Text = "Downloading has encountered an error";
-                    pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
-                    lbPercentage.Text = "Error";
-                    this.Text = "Download error";
-                    status.Text = "Downloading has resulted in an error";
-                }
-                else if (DownloadHasAborted) {
-                    lbInfo.Text = "Download canceled";
-                    pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
-                    lbPercentage.Text = "Canceled";
-                    this.Text = "Download canceled";
-                    status.Text = "Download has canceled";
-                }
-                else {
-                    // assume it completed
-                    lbInfo.Text = "Download assumed to be completed...";
-                    pbDownloadStatus.Value = pbDownloadStatus.Maximum;
-                    lbPercentage.Text = "Done?";
-                    this.Text = "Image " + DownloadInfo.PostId + " finished downloading";
-                    status.Text = "Download status booleans not set, assuming the download completed";
+                switch (CurrentStatus) {
+                    case DownloadStatus.Finished:
+                        pbDownloadStatus.Value = pbDownloadStatus.Maximum;
+                        lbPercentage.Text = "Done";
+                        status.Text = "Finished downloading image";
+                        this.Text = "Image " + DownloadInfo.PostId + " finished downloading";
+                        break;
+
+                    case DownloadStatus.Errored:
+                        pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
+                        lbPercentage.Text = "Error";
+                        status.Text = "Downloading has resulted in an error";
+                        this.Text = "Image " + DownloadInfo.PostId + " download error";
+                        break;
+
+                    case DownloadStatus.Aborted:
+                        pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
+                        lbPercentage.Text = "cancelled";
+                        status.Text = "Download has cancelled";
+                        this.Text = "Pool " + DownloadInfo.PostId + " download cancelled";
+                        break;
+
+                    case DownloadStatus.NothingToDownload:
+                        pbDownloadStatus.Value = pbDownloadStatus.Minimum;
+                        lbPercentage.Text = "-";
+                        status.Text = "No image to download";
+                        this.Text = "Image " + DownloadInfo.PostId + " No files to download";
+                        break;
+
+                    case DownloadStatus.PostOrPoolWasDeleted:
+                        pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
+                        pbDownloadStatus.Value = pbDownloadStatus.Minimum;
+                        lbPercentage.Text = "-";
+                        status.Text = "The image was deleted";
+                        this.Text = "Image " + DownloadInfo.PostId + " was deleted";
+                        break;
+
+                    case DownloadStatus.ApiReturnedNullOrEmpty:
+                        pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
+                        pbDownloadStatus.Value = pbDownloadStatus.Minimum;
+                        lbPercentage.Text = "-";
+                        status.Text = "Initial api returned null/empty";
+                        this.Text = "Image " + DownloadInfo.PostId + " initial api returned null/empty";
+                        break;
+
+                    case DownloadStatus.FileWasNullAfterBypassingBlacklist:
+                        pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
+                        pbDownloadStatus.Value = pbDownloadStatus.Minimum;
+                        lbPercentage.Text = "-";
+                        status.Text = "The image was null after bypassing blacklist";
+                        this.Text = "Image " + DownloadInfo.PostId + " was null after bypassing blacklist";
+                        break;
                 }
             }
         }
-        public void downloadImage() {
+        public void DownloadImage() {
             try {
                 this.BeginInvoke(new MethodInvoker(() => {
                     lbInfo.Text = "Downloading image id " + DownloadInfo.PostId;
@@ -597,11 +641,9 @@ namespace aphrodite {
                 }));
 
                 ImageInfo Image = new ImageInfo(DownloadInfo);
+                CurrentStatus = Image.Status;
 
-                if (Image.DownloadFinish) {
-                    DownloadHasFinished = true;
-                }
-                else {
+                if (Image.Status != DownloadStatus.Finished) {
                     this.BeginInvoke(new MethodInvoker(() => {
                         status.Text = "Downloading image...";
                         pbDownloadStatus.Value = 0;
@@ -634,25 +676,35 @@ namespace aphrodite {
                         wc.Method = "GET";
 
                         wc.DownloadFile(Image.FileUrl, Image.DownloadPath);
+                        CurrentStatus = DownloadStatus.Finished;
                     }
-
-                    DownloadHasFinished = true;
                 }
 
                 Debug.Print("Finished");
             }
+            catch (PoolOrPostWasDeletedException) {
+                CurrentStatus = DownloadStatus.PostOrPoolWasDeleted;
+            }
+            catch (ApiReturnedNullOrEmptyException) {
+                CurrentStatus = DownloadStatus.ApiReturnedNullOrEmpty;
+            }
+            catch (NoFilesToDownloadException) {
+                CurrentStatus = DownloadStatus.NothingToDownload;
+            }
+            catch (ImageWasNullAfterBypassingException) {
+                CurrentStatus = DownloadStatus.FileWasNullAfterBypassingBlacklist;
+            }
             catch (ThreadAbortException) {
-                DownloadHasAborted = true;
+                CurrentStatus = DownloadStatus.Aborted;
             }
-            catch (ObjectDisposedException) {
-            }
+            catch (ObjectDisposedException) { }
             catch (WebException WebE) {
                 this.BeginInvoke(new MethodInvoker(() => {
                     status.Text = "A WebException has occured";
                     pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
                 }));
                 ErrorLog.ReportWebException(WebE, DownloadInfo.ImageUrl, "frmImageDownloader.cs");
-                DownloadHasErrored = true;
+                CurrentStatus = DownloadStatus.Errored;
             }
             catch (Exception ex) {
                 this.BeginInvoke(new MethodInvoker(() => {
@@ -660,7 +712,7 @@ namespace aphrodite {
                     pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
                 }));
                 ErrorLog.ReportException(ex, "frmImageDownloader.cs");
-                DownloadHasErrored = true;
+                CurrentStatus = DownloadStatus.Errored;
             }
             finally {
                 this.BeginInvoke(new MethodInvoker(() => {

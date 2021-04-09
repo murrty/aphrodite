@@ -71,6 +71,7 @@
   <ItemGroup>
     <Compile Include="Classes\apiTools.cs" />
     <Compile Include="Classes\Downloader.cs" />
+    <Compile Include="Classes\Enums.cs" />
     <Compile Include="Classes\ErrorLog.cs" />
     <Compile Include="Controls\AeroListBox.cs">
       <SubType>Component</SubType>

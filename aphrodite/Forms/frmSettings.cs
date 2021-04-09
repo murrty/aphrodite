@@ -138,6 +138,7 @@ namespace aphrodite {
             Config.Settings.Tags.imageLimit = Convert.ToInt32(numTagsDownloadLimit.Value);
             Config.Settings.Tags.pageLimit = Convert.ToInt32(numTagsPageLimit.Value);
             Config.Settings.Tags.separateNonImages = chkTagsSeparateNonImages.Checked;
+            Config.Settings.Tags.downloadBlacklisted = chkTagsDownloadBlacklisted.Checked;
 
           // Pools
             switch (string.IsNullOrWhiteSpace(txtPoolSchema.Text)) {
@@ -201,6 +202,7 @@ namespace aphrodite {
             numTagsDownloadLimit.Value = Convert.ToDecimal(Config.Settings.Tags.imageLimit);
             numTagsPageLimit.Value = Convert.ToDecimal(Config.Settings.Tags.pageLimit);
             chkTagsSeparateNonImages.Checked = Config.Settings.Tags.separateNonImages;
+            chkTagsDownloadBlacklisted.Checked = Config.Settings.Tags.downloadBlacklisted;
 
             // Pools
             txtPoolSchema.Text = apiTools.ReplaceIllegalCharacters(Config.Settings.Pools.fileNameSchema.ToLower());

@@ -2,12 +2,6 @@
 
 namespace aphrodite {
 
-    public enum DownloadType : int {
-        None = -1,
-        Tags = 0,
-        Pools = 1,
-        Images = 2
-    }
 
     public static class JsonDownloadInfo {
         public static readonly string postJsonBase = "https://e621.net/posts/{0}.json";
@@ -43,6 +37,7 @@ namespace aphrodite {
         public bool SeparateNonImages;
         public bool SkipExistingFiles;
         public string FileNameSchema;
+        public bool SaveBlacklistedFiles;
 
         /// <summary>
         /// Initializes new TagDownloadInfo for downloading specified tags.
@@ -74,26 +69,17 @@ namespace aphrodite {
             OpenAfter = Config.Settings.General.openAfter;
 
             UseMinimumScore = aphrodite.Config.Settings.Tags.enableScoreMin;
-            if (UseMinimumScore) {
-                MinimumScoreAsTag = aphrodite.Config.Settings.Tags.scoreAsTag;
-                MinimumScore = aphrodite.Config.Settings.Tags.scoreMin;
-            }
-
-            if (aphrodite.Config.Settings.Tags.imageLimit > 0) {
-                ImageLimit = aphrodite.Config.Settings.Tags.imageLimit;
-            }
-
-            if (PageLimit > 0) {
-                PageLimit = aphrodite.Config.Settings.Tags.pageLimit;
-            }
-
+            MinimumScoreAsTag = aphrodite.Config.Settings.Tags.scoreAsTag;
+            MinimumScore = aphrodite.Config.Settings.Tags.scoreMin;
+            ImageLimit = aphrodite.Config.Settings.Tags.imageLimit;
+            PageLimit = aphrodite.Config.Settings.Tags.pageLimit;
             SeparateRatings = aphrodite.Config.Settings.Tags.separateRatings;
             SeparateNonImages = aphrodite.Config.Settings.Tags.separateNonImages;
             SaveExplicit = aphrodite.Config.Settings.Tags.Explicit;
             SaveQuestionable = aphrodite.Config.Settings.Tags.Questionable;
             SaveSafe = aphrodite.Config.Settings.Tags.Safe;
-
             FileNameSchema = apiTools.ReplaceIllegalCharacters(aphrodite.Config.Settings.Tags.fileNameSchema.ToLower());
+            SaveBlacklistedFiles = Config.Settings.Tags.downloadBlacklisted;
         }
         /// <summary>
         /// Initializes new TagDownloadInfo for downloading a page.
@@ -145,26 +131,17 @@ namespace aphrodite {
             OpenAfter = Config.Settings.General.openAfter;
 
             UseMinimumScore = aphrodite.Config.Settings.Tags.enableScoreMin;
-            if (UseMinimumScore) {
-                MinimumScoreAsTag = aphrodite.Config.Settings.Tags.scoreAsTag;
-                MinimumScore = aphrodite.Config.Settings.Tags.scoreMin;
-            }
-
-            if (aphrodite.Config.Settings.Tags.imageLimit > 0) {
-                ImageLimit = aphrodite.Config.Settings.Tags.imageLimit;
-            }
-
-            if (PageLimit > 0) {
-                PageLimit = aphrodite.Config.Settings.Tags.pageLimit;
-            }
-
+            MinimumScoreAsTag = aphrodite.Config.Settings.Tags.scoreAsTag;
+            MinimumScore = aphrodite.Config.Settings.Tags.scoreMin;
+            ImageLimit = aphrodite.Config.Settings.Tags.imageLimit;
+            PageLimit = aphrodite.Config.Settings.Tags.pageLimit;
             SeparateRatings = aphrodite.Config.Settings.Tags.separateRatings;
             SeparateNonImages = aphrodite.Config.Settings.Tags.separateNonImages;
             SaveExplicit = aphrodite.Config.Settings.Tags.Explicit;
             SaveQuestionable = aphrodite.Config.Settings.Tags.Questionable;
             SaveSafe = aphrodite.Config.Settings.Tags.Safe;
-
             FileNameSchema = apiTools.ReplaceIllegalCharacters(aphrodite.Config.Settings.Tags.fileNameSchema.ToLower());
+            SaveBlacklistedFiles = Config.Settings.Tags.downloadBlacklisted;
         }
     }
     public class PoolDownloadInfo {

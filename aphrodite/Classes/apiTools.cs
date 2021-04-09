@@ -248,11 +248,22 @@ namespace aphrodite {
         public ApiReturnedNullOrEmptyException(string message, Exception inner) : base (message, inner) { }
     }
     [Serializable]
-    public class ApiReturnedNullException : Exception {
-        public ApiReturnedNullException () { }
-        public ApiReturnedNullException(string message) : base(message) { }
-        public ApiReturnedNullException(string message, Exception inner) : base(message, inner) { }
+    public class PoolOrPostWasDeletedException : Exception {
+        public PoolOrPostWasDeletedException() { }
+        public PoolOrPostWasDeletedException(string message) : base(message) { }
+        public PoolOrPostWasDeletedException(string message, Exception inner) : base(message, inner) { }
     }
-
+    [Serializable]
+    public class NoFilesToDownloadException : Exception {
+        public NoFilesToDownloadException() { }
+        public NoFilesToDownloadException(string message) : base(message) { }
+        public NoFilesToDownloadException(string message, Exception inner) : base(message, inner) { }
+    }
+    [Serializable]
+    public class ImageWasNullAfterBypassingException : Exception {
+        public ImageWasNullAfterBypassingException() { }
+        public ImageWasNullAfterBypassingException(string message) : base(message) { }
+        public ImageWasNullAfterBypassingException(string message, Exception inner) : base(message, inner) { }
+    }
 
 }
