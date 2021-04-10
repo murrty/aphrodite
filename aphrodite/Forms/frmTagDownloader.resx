@@ -120,4 +120,15 @@
   <metadata name="tmrTitle.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
+  <data name="lbBlacklist.Text" xml:space="preserve">
+    <value>files: 0 ( 0 E | 0 Q | 0 S )
+graylisted: 0 ( 0 E | 0 Q | 0 S )
+blacklisted: 0 ( 0 E | 0 Q | 0 S )
+total parsed: 0
+
+files that exist: 0 E | 0 Q | 0 S
+graylisted that exist: 0 E | 0 Q | 0 S
+blacklisted that exist: 0 E | 0 Q | 0 S
+total exist: 0</value>
+  </data>
 </root>

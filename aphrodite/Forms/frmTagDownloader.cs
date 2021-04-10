@@ -29,36 +29,47 @@ namespace aphrodite {
         #endregion
 
         #region Private Variables
-        private Thread tagDownload;                     // New thread for the downloader.
+        private Thread TagDownloadThread;                     // New thread for the downloader.
 
-        private int cleanTotalCount = 0;                // Will be the count of how many files that are set for download.
-        private int cleanExplicitCount = 0;             // Will be the count of how many explicit files that are set for download.
-        private int cleanQuestionableCount = 0;         // Will be the count of how many questionable files that are set for download.
-        private int cleanSafeCount = 0;                 // Will be the count of how many safe files that are set for download.
+        private int CleanTotalCount = 0;                // Will be the count of how many files that are set for download.
+        private int CleanExplicitCount = 0;             // Will be the count of how many explicit files that are set for download.
+        private int CleanQuestionableCount = 0;         // Will be the count of how many questionable files that are set for download.
+        private int CleanSafeCount = 0;                 // Will be the count of how many safe files that are set for download.
+        private int CleanTotalExistCount = 0;           // Will be the count of how many files already exist in total.
+        private int CleanExplicitExistCount = 0;        // Will be the count of how many explicit files already exist.
+        private int CleanQuestionableExistCount = 0;    // Will be the count of how many questionable files already exist.
+        private int CleanSafeExistCount = 0;            // Will be the count of how many safe files already exist.
 
-        private int cleanTotalExistCount = 0;           // Will be the count of how many files already exist in total.
-        private int cleanExplicitExistCount = 0;        // Will be the count of how many explicit files already exist.
-        private int cleanQuestionableExistCount = 0;    // Will be the count of how many questionable files already exist.
-        private int cleanSafeExistCount = 0;            // Will be the count of how many safe files already exist.
+        private int GraylistTotalCount = 0;             // Will be the count of how many graylisted files that are set for download.
+        private int GraylistExplicitCount = 0;          // Will be the count of how many explicit graylisted files that are set for download.
+        private int GraylistQuestionableCount = 0;      // Will be the count of how many questionable graylisted files that are set for download.
+        private int GraylistSafeCount = 0;              // Will be the count of how many safe graylisted files that are set for download.
+        private int GraylistTotalExistCount = 0;        // Will be the count of how many gralisted files already exist in total.
+        private int GraylistExplicitExistCount = 0;     // Will be the count of how many explicit graylisted files already exist.
+        private int GraylistQuestionableExistCount = 0; // Will be the count of how many questionable graylisted files already exist.
+        private int GraylistSafeExistCount = 0;         // Will be the count of how many safe graylisted files already exist.
 
-        private int graylistTotalCount = 0;             // Will be the count of how many graylisted files that are set for download.
-        private int graylistExplicitCount = 0;          // Will be the count of how many explicit graylisted files that are set for download.
-        private int graylistQuestionableCount = 0;      // Will be the count of how many questionable graylisted files that are set for download.
-        private int graylistSafeCount = 0;              // Will be the count of how many safe graylisted files that are set for download.
+        private int BlacklistTotalCount = 0;             // Will be the count of how many blacklisted files that are set for download.
+        private int BlacklistExplicitCount = 0;          // Will be the count of how many explicit blacklisted files that are set for download.
+        private int BlacklistQuestionableCount = 0;      // Will be the count of how many questionable blacklisted files that are set for download.
+        private int BlacklistSafeCount = 0;              // Will be the count of how many safe blacklisted files that are set for download.
+        private int BlacklistTotalExistCount = 0;        // Will be the count of how many gralisted files already exist in total.
+        private int BlacklistExplicitExistCount = 0;     // Will be the count of how many explicit blacklisted files already exist.
+        private int BlacklistQuestionableExistCount = 0; // Will be the count of how many questionable blacklisted files already exist.
+        private int BlacklistSafeExistCount = 0;         // Will be the count of how many safe blacklisted files already exist.
 
-        private int graylistTotalExistCount = 0;        // Will be the count of how many gralisted files already exist in total.
-        private int graylistExplicitExistCount = 0;     // Will be the count of how many explicit graylisted files already exist.
-        private int graylistQuestionableExistCount = 0; // Will be the count of how many questionable graylisted files already exist.
-        private int graylistSafeExistCount = 0;         // Will be the count of how many safe graylisted files already exist.
-
-        private int blacklistCount = 0;                 // Will be the count of how many blacklisted files that will be skipped.
-        private int totalCount = 0;                     // Will be the count of how many files that were parsed.
+        private int TotalCount = 0;                     // Will be the count of how many files that were parsed.
+        private int CleanSkippedCount = 0;
+        private int GraylistSkippedCount = 0;                  // Will be the count of how many graylisted files that will be skipped.
+        private int BlacklistSkippedCount = 0;
 
         private int PresentFiles = 0;
         private int TotalFiles = 0;
 
         private DownloadStatus CurrentStatus = DownloadStatus.Waiting;
         #endregion
+
+        private bool UseNewDownloadLogic = true;
 
         #region Form
         public frmTagDownloader() {
@@ -149,8 +160,8 @@ namespace aphrodite {
                     break;
 
                 default:
-                    if (tagDownload != null && tagDownload.IsAlive) {
-                        tagDownload.Abort();
+                    if (TagDownloadThread != null && TagDownloadThread.IsAlive) {
+                        TagDownloadThread.Abort();
                     }
 
                     if (!DownloadInfo.IgnoreFinish) {
@@ -170,23 +181,18 @@ namespace aphrodite {
 
         #region Downloader
         private void StartDownload() {
-            try {
-                ///////////////////////////////
-                Program.Log(LogAction.WriteToLog, "Starting Tag download for \"" + DownloadInfo.Tags + "\"");
-                tagDownload = new Thread(() => {
-                    Thread.CurrentThread.IsBackground = true;
-                    DownloadPosts();
-                });
+            Program.Log(LogAction.WriteToLog, "Starting Tag download for \"" + DownloadInfo.Tags + "\"");
+            TagDownloadThread = new Thread(() => {
+                Thread.CurrentThread.IsBackground = true;
+                DownloadPosts();
+            });
 
-                tagDownload.Start();
-                tmrTitle.Start();
-            }
-            catch {
-                throw;
-            }
+            TagDownloadThread.Start();
+            tmrTitle.Start();
         }
 
         private void AfterDownload() {
+            Program.Log(LogAction.WriteToLog, "Tag download for \"" + DownloadInfo.Tags + "\" finished.");
             tmrTitle.Stop();
             if (DownloadInfo.OpenAfter) {
                 Process.Start(DownloadInfo.DownloadPath);
@@ -194,12 +200,18 @@ namespace aphrodite {
 
             if (DownloadInfo.IgnoreFinish) {
                 switch (CurrentStatus) {
-                    case DownloadStatus.Finished: case DownloadStatus.NothingToDownload:
+                    case DownloadStatus.Finished:
+                    case DownloadStatus.NothingToDownload:
                         this.DialogResult = DialogResult.Yes;
                         break;
 
                     case DownloadStatus.Errored:
-                        this.DialogResult = DialogResult.No;
+                        lbFile.Text = "Downloading has encountered an error";
+                        pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
+                        lbPercentage.Text = "Error";
+                        this.Text = "Download error";
+                        status.Text = "Downloading has resulted in an error";
+                        System.Media.SystemSounds.Hand.Play();
                         break;
 
                     case DownloadStatus.Aborted:
@@ -219,6 +231,7 @@ namespace aphrodite {
                         lbPercentage.Text = "Done";
                         this.Text = "Finished downloading tags " + DownloadInfo.Tags;
                         status.Text = "Finished downloading tags";
+                        System.Media.SystemSounds.Exclamation.Play();
                         break;
 
                     case DownloadStatus.Errored:
@@ -227,6 +240,7 @@ namespace aphrodite {
                         lbPercentage.Text = "Error";
                         this.Text = "Download error";
                         status.Text = "Downloading has resulted in an error";
+                        System.Media.SystemSounds.Hand.Play();
                         break;
 
                     case DownloadStatus.Aborted:
@@ -237,81 +251,100 @@ namespace aphrodite {
                         status.Text = "Download has canceled";
                         break;
 
-                    case DownloadStatus.ApiReturnedNullOrEmpty:
-                        lbFile.Text = "API parsing has resulted in an error";
-                        pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
-                        lbPercentage.Text = "Error";
-                        this.Text = "API parsing error";
-                        status.Text = "API parsing has resulted in an error";
-                        break;
-
                     case DownloadStatus.NothingToDownload:
                         lbFile.Text = "No files were available for download.";
                         pbDownloadStatus.Value = pbDownloadStatus.Minimum;
                         lbPercentage.Text = "-";
                         this.Text = "No downloads for tags " + DownloadInfo.Tags;
                         status.Text = "No downloads available";
+                        System.Media.SystemSounds.Asterisk.Play();
+                        break;
+
+                    case DownloadStatus.ApiReturnedNullOrEmpty:
+                        lbFile.Text = "API parsing has resulted in an error";
+                        pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
+                        lbPercentage.Text = "Error";
+                        this.Text = "API parsing error";
+                        status.Text = "API parsing has resulted in an error";
+                        System.Media.SystemSounds.Hand.Play();
                         break;
 
                     default:
                         // assume it completed
-                        lbFile.Text = "Download assumed to be completed...";
+                        lbFile.Text = "Download assumed to be completed";
                         pbDownloadStatus.Value = pbDownloadStatus.Maximum;
                         lbPercentage.Text = "Done?";
-                        this.Text = "Tags download completed";
-                        status.Text = "Download status booleans not set, assuming the download completed";
+                        this.Text = "Tags download completed?";
+                        status.Text = "Download status not set, assuming the download completed";
+                        System.Media.SystemSounds.Asterisk.Play();
                         break;
                 }
             }
         }
 
-        private void DownloadPosts() {
-
+        private async void DownloadPosts() {
             #region Download variables
             string CurrentUrl = string.Empty;               // The URL being accessed, changes per API call/File download.
-            string TagInfoBuffer = string.Empty;            // The buffer for the 'tag.nfo' file that will be created.
+            string CleanInfoBuffer = string.Empty;            // The buffer for the 'tag.nfo' file that will be created.
+            string GraylistInfoBuffer = string.Empty;
             string BlacklistInfoBuffer = string.Empty;      // The buffer for the 'tag.blacklisted.nfo' file that will be created.
 
             string CurrentXml = string.Empty;               // The XML string.
             int CurrentPage = 1;                            // Will be the count of the pages parsed.
-            bool MaximumReached = false;                    // Determines if the maximum files have been parsed.
+            bool ImageLimitReached = false;                    // Determines if the maximum files have been parsed.
 
-            List<string> URLs = new List<string>();             // The URLs that will be downloaded (if separateRatings = false).
-            List<string> FileNames = new List<string>();            // Contains the file names of the images
+            // SeparateRatings disabled \\
+            List<string> CleanedURLs = new List<string>();             // The URLs that will be downloaded (if separateRatings = false).
+            List<string> CleanedFileNames = new List<string>();            // Contains the file names of the images
+            List<string> CleanedFilePaths = new List<string>();
             List<string> GraylistedURLs = new List<string>();   // The Blacklisted URLs that will be downloaded (if separateRatings = false).
             List<string> GraylistedFileNames = new List<string>();  // Contains the file names of the graylisted images
+            List<string> GraylistedFilePaths = new List<string>();
             List<string> BlacklistedURLs = new List<string>();
             List<string> BlacklistedFileNames = new List<string>();
+            List<string> BlacklistedFilePaths = new List<string>();
+            //\\//\\//\\//\\//\\//\\//\\//\\
 
-            List<string> ExplicitURLs = new List<string>();         // The list of Explicit files.
-            List<string> ExplicitFileNames = new List<string>();    // The list of Explicit file names.
-            List<string> QuestionableURLs = new List<string>();         // The list of Questionable files.
-            List<string> QuestionableFileNames = new List<string>();    // The list of Questionable file names.
-            List<string> SafeURLs = new List<string>();                     // The list of Safe files.
-            List<string> SafeFileNames = new List<string>();                // The list of Safe file names.
+            // Separate ratings enabled \\
+            List<string> CleanedExplicitURLs = new List<string>();         // The list of Explicit files.
+            List<string> CleanedExplicitFileNames = new List<string>();    // The list of Explicit file names.
+            List<string> CleanedExplicitFilePaths = new List<string>();
+            List<string> CleanedQuestionableURLs = new List<string>();         // The list of Questionable files.
+            List<string> CleanedQuestionableFileNames = new List<string>();    // The list of Questionable file names.
+            List<string> CleanedQuestionableFilePaths = new List<string>();
+            List<string> CleanedSafeURLs = new List<string>();                     // The list of Safe files.
+            List<string> CleanedSafeFileNames = new List<string>();                // The list of Safe file names.
+            List<string> CleanedSafeFilePaths = new List<string>();
 
             List<string> GraylistedExplicitURLs = new List<string>();       // The list of Graylisted Explicit files.
             List<string> GraylistedExplicitFileNames = new List<string>();  // The list of Graylisted Explicit file names.
+            List<string> GraylistedExplicitFilePaths = new List<string>();
             List<string> GraylistedQuestionableURLs = new List<string>();       // The list of Graylisted Questionable files.
             List<string> GraylistedQuestionableFileNames = new List<string>();  // The list of Graylitsed Questionable file names.
+            List<string> GraylistedQuestionableFilePaths = new List<string>();
             List<string> GraylistedSafeURLs = new List<string>();           // The list of Graylisted Safe files.
             List<string> GraylistedSafeFileNames = new List<string>();      // The list of Graylisted Safe file names.
+            List<string> GraylistedSafeFilePaths = new List<string>();
 
             List<string> BlacklistedExplicitURLs = new List<string>();       // The list of Blacklisted Explicit files.
             List<string> BlacklistedExplicitFileNames = new List<string>();  // The list of Blacklisted Explicit file names.
+            List<string> BlacklistedExplicitFilePaths = new List<string>();
             List<string> BlacklistedQuestionableURLs = new List<string>();       // The list of Blacklisted Questionable files.
             List<string> BlacklistedQuestionableFileNames = new List<string>();  // The list of Blacklitsed Questionable file names.
+            List<string> BlacklistedQuestionableFilePaths = new List<string>();
             List<string> BlacklistedSafeURLs = new List<string>();           // The list of Blacklisted Safe files.
             List<string> BlacklistedSafeFileNames = new List<string>();      // The list of Blacklisted Safe file names.
+            List<string> BlacklistedSafeFilePaths = new List<string>();
+            //\\//\\//\\//\\//\\//\\//\\//\\
 
             // the Boolean lists of if non-images exist to create the save folder
             // 0 = gif, 1 = apng, 2 = webm, 3 = swf
-            List<bool> FileNonImages = new List<bool> { false, false, false, false };
+            List<bool> CleanedFileNonImages = new List<bool> { false, false, false, false };
             List<bool> GraylistedFileNonImages = new List<bool> { false, false, false, false };
-
-            List<bool> ExplicitNonImages = new List<bool> { false, false, false, false };
-            List<bool> QuestionableNonImages = new List<bool> { false, false, false, false };
-            List<bool> SafeNonImages = new List<bool> { false, false, false, false };
+            List<bool> BlacklistedFileNonImages = new List<bool> { false, false, false, false };
+            List<bool> CleanedExplicitNonImages = new List<bool> { false, false, false, false };
+            List<bool> CleanedQuestionableNonImages = new List<bool> { false, false, false, false };
+            List<bool> CleanedSafeNonImages = new List<bool> { false, false, false, false };
             List<bool> GraylistedExplicitNonImages = new List<bool> { false, false, false, false };
             List<bool> GraylistedQuestionableNonImages = new List<bool> { false, false, false, false };
             List<bool> GraylistedSafeNonImages = new List<bool> { false, false, false, false };
@@ -324,43 +357,45 @@ namespace aphrodite {
             try {
                 #region initialization
                 //Properties.Settings.Default.Log += "Tag downloader starting for tags " + tags + "\r\n";
-                string newTagName = apiTools.ReplaceIllegalCharacters(DownloadInfo.Tags);
+                string OutputFolderTags = apiTools.ReplaceIllegalCharacters(DownloadInfo.Tags);
                 if (DownloadInfo.UseMinimumScore) { // Add minimum score to folder name.
-                    newTagName += " (scores " + (DownloadInfo.MinimumScore) + "+)";
+                    OutputFolderTags += " (scores " + (DownloadInfo.MinimumScore) + "+)";
                 }
 
                 // Set the saveTo.
                 if (DownloadInfo.FromUrl) {
-                    DownloadInfo.DownloadPath += "\\Pages\\" + newTagName + " (page " + DownloadInfo.PageNumber + ")";
+                    DownloadInfo.DownloadPath += "\\Pages\\" + OutputFolderTags + " (page " + DownloadInfo.PageNumber + ")";
                 }
                 else {
-                    DownloadInfo.DownloadPath += "\\Tags\\" + newTagName;
+                    DownloadInfo.DownloadPath += "\\Tags\\" + OutputFolderTags;
                 }
 
                 // Start the buffer for the .nfo files.
-                if (DownloadInfo.UseMinimumScore) {
-                    TagInfoBuffer = "TAGS: " + DownloadInfo.Tags + "\r\n" +
-                              "MINIMUM SCORE: " + DownloadInfo.MinimumScore + "\r\n" +
-                              "DOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") +
-                              "\r\n\r\n";
+                if (DownloadInfo.SaveInfo) {
+                    if (DownloadInfo.UseMinimumScore) {
+                        CleanInfoBuffer = "TAGS: " + DownloadInfo.Tags + "\r\n" +
+                                  "MINIMUM SCORE: " + DownloadInfo.MinimumScore + "\r\n" +
+                                  "DOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") +
+                                  "\r\n\r\n";
 
-                    BlacklistInfoBuffer = "TAGS: " + DownloadInfo.Tags + "\r\n" +
-                                    "MINIMUM SCORE: " + DownloadInfo.MinimumScore + "\r\n" +
-                                    "DOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\r\n" +
-                                    "BLACKLISTED TAGS: " + string.Join(" ", DownloadInfo.Graylist) +
-                                    "\r\n\r\n";
-                }
-                else {
-                    TagInfoBuffer = "TAGS: " + DownloadInfo.Tags + "\r\n" +
-                              "MINIMUM SCORE: n/a\r\n" +
-                              "DOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") +
-                              "\r\n\r\n";
+                        BlacklistInfoBuffer = "TAGS: " + DownloadInfo.Tags + "\r\n" +
+                                        "MINIMUM SCORE: " + DownloadInfo.MinimumScore + "\r\n" +
+                                        "DOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\r\n" +
+                                        "BLACKLISTED TAGS: " + string.Join(" ", DownloadInfo.Graylist) +
+                                        "\r\n\r\n";
+                    }
+                    else {
+                        CleanInfoBuffer = "TAGS: " + DownloadInfo.Tags + "\r\n" +
+                                  "MINIMUM SCORE: n/a\r\n" +
+                                  "DOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") +
+                                  "\r\n\r\n";
 
-                    BlacklistInfoBuffer = "TAGS: " + DownloadInfo.Tags + "\r\n" +
-                                    "MINIMUM SCORE: n/a\r\n" +
-                                    "DOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\r\n" +
-                                    "BLACKLISTED TAGS: " + string.Join(" ", DownloadInfo.Graylist) +
-                                    "\r\n\r\n";
+                        BlacklistInfoBuffer = "TAGS: " + DownloadInfo.Tags + "\r\n" +
+                                        "MINIMUM SCORE: n/a\r\n" +
+                                        "DOWNLOADED ON: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm (tt)") + "\r\n" +
+                                        "BLACKLISTED TAGS: " + string.Join(" ", DownloadInfo.Graylist) +
+                                        "\r\n\r\n";
+                    }
                 }
 
                 // Add the minimum score to the search tags (if applicable).
@@ -371,7 +406,7 @@ namespace aphrodite {
                 }
                 #endregion
 
-                #region donwload pages & parse
+                #region download pages & parse
                 XmlDocument doc;
                 XmlNodeList xmlID;
                 XmlNodeList xmlMD5;
@@ -395,20 +430,18 @@ namespace aphrodite {
                 XmlNodeList xmlExt;
                 XmlNodeList xmlDeleted;
 
-
-
                 for (int ApiPage = 0; ApiPage < CurrentPage; ApiPage++) {
                     if (DownloadInfo.PageLimit > 0 && CurrentPage > DownloadInfo.PageLimit) {
-                        this.BeginInvoke((MethodInvoker)delegate() {
+                        this.BeginInvoke(new MethodInvoker(() => {
                             Program.Log(LogAction.WriteToLog, "PageLimit reached, breaking parse loop.");
-                        });
+                        }));
                         break;
                     }
 
-                    this.BeginInvoke((MethodInvoker)delegate() {
+                    this.BeginInvoke(new MethodInvoker(() => {
                         Program.Log(LogAction.WriteToLog, "Downloading tag api page " + CurrentPage);
                         status.Text = "Downloading api page " + CurrentPage;
-                    });
+                    }));
 
                     // Get XML of page.
                     if (DownloadInfo.FromUrl) {
@@ -419,7 +452,12 @@ namespace aphrodite {
                     }
                     CurrentXml = apiTools.GetJsonToXml(CurrentUrl);
                     if (apiTools.IsXmlDead(CurrentXml)) {
-                        throw new ApiReturnedNullOrEmptyException();
+                        if (ApiPage < 1) {
+                            throw new ApiReturnedNullOrEmptyException();
+                        }
+                        else {
+                            break;
+                        }
                     }
 
                     // Parse the XML file.
@@ -447,34 +485,26 @@ namespace aphrodite {
                     xmlExt = doc.DocumentElement.SelectNodes("/root/posts/item/file/ext");
                     xmlDeleted = doc.DocumentElement.SelectNodes("/root/posts/item/flags/deleted");
 
-                    // Determine the pages by counting the posts.
-                    switch (!DownloadInfo.FromUrl && xmlID.Count == 320) {
-                        case true:
-                            CurrentPage++;
-                            break;
-                    }
-
                     if (xmlID.Count > 0) {
-                        this.BeginInvoke((MethodInvoker)delegate() {
+                        this.BeginInvoke(new MethodInvoker(() => {
                             Program.Log(LogAction.WriteToLog, "Parsing tag api page " + CurrentPage);
                             status.Text = "Parsing api page " + CurrentPage;
-                        });
+                        }));
 
                         // Begin parsing the XML for tag information per item.
                         for (int i = 0; i < xmlID.Count; i++) {
 
-                            if (DownloadInfo.ImageLimit > 0 && DownloadInfo.ImageLimit == totalCount) {
-                                MaximumReached = true;
-                                this.BeginInvoke((MethodInvoker)delegate() {
+                            if (DownloadInfo.ImageLimit > 0 && DownloadInfo.ImageLimit == TotalCount) {
+                                ImageLimitReached = true;
+                                this.BeginInvoke(new MethodInvoker(() => {
                                     Program.Log(LogAction.WriteToLog, "ImageLimit reached, breaking parse loop.");
-                                });
+                                }));
                                 break;
                             }
 
                             string rating = xmlRating[i].InnerText;         // Get the rating of the current file.
                             bool PostIsGraylisted = false;                  // Will determine if the file is graylisted.
                             bool PostIsBlacklisted = false;                 // Will determine if the file is blacklisted.
-                            bool PostAlreadyExists = false;                 // Will determine if the file exists.
                             List<string> PostTags = new List<string>();     // Get the entire tag list of the file.
                             string FoundGraylistedTags = string.Empty;      // The buffer for the tags that are graylisted.
                             string ReadTags = string.Empty;                 // The buffer for the tags for the .nfo
@@ -512,6 +542,7 @@ namespace aphrodite {
                                     break;
                             }
 
+                            #region Tag parsing + filtering
                             // Create new tag list to merge all the tag groups into one.
                             ReadTags += "          General: [ ";
                             switch (xmlTagsGeneral[i].ChildNodes.Count > 0) {
@@ -660,10 +691,6 @@ namespace aphrodite {
                                     }
                                 }
 
-                                if (PostIsBlacklisted) {
-                                    break;
-                                }
-
                                 if (DownloadInfo.Graylist.Length > 0) {
                                     for (int k = 0; k < DownloadInfo.Graylist.Length; k++) {
                                         if (PostTags[j] == DownloadInfo.Graylist[k]) {
@@ -675,27 +702,37 @@ namespace aphrodite {
                             }
 
                             // Continue if graylisted or blacklisted
-                            switch (PostIsBlacklisted) {
+                            switch (PostIsBlacklisted && !DownloadInfo.SaveBlacklistedFiles) {
                                 case true:
-                                    blacklistCount++;
-                                    totalCount++;
+                                    BlacklistSkippedCount++;
+                                    TotalCount++;
                                     continue;
                             }
                             switch (PostIsGraylisted && !DownloadInfo.SaveGraylistedFiles) {
                                 case true:
-                                    graylistTotalCount++;
-                                    totalCount++;
+                                    GraylistSkippedCount++;
+                                    TotalCount++;
                                     continue;
                             }
-
-                            // Set the description
-                            string ImageDescription = " No description";
-                            switch (string.IsNullOrWhiteSpace(xmlDescription[i].InnerText)) {
-                                case false:
-                                    ImageDescription = xmlDescription[i].InnerText;
-                                    break;
+                            switch (DownloadInfo.UseMinimumScore && Int32.Parse(xmlScore[i].InnerText) < DownloadInfo.MinimumScore) {
+                                case true:
+                                    TotalCount++;
+                                    if (PostIsBlacklisted) {
+                                        BlacklistSkippedCount++;
+                                        continue;
+                                    }
+                                    else if (PostIsGraylisted) {
+                                        GraylistSkippedCount++;
+                                        continue;
+                                    }
+                                    else {
+                                        CleanSkippedCount++;
+                                        continue;
+                                    }
                             }
+                            #endregion
 
+                            #region file name + e621 global blacklist fix
                             // File name artist for the schema
                             string fileNameArtist = "(none)";
                             bool useHardcodedFilter = false;
@@ -727,7 +764,7 @@ namespace aphrodite {
                                     break;
                             }
 
-                            string fileName = DownloadInfo.FileNameSchema.Replace("%md5%", xmlMD5[i].InnerText)
+                            string NewFileName = DownloadInfo.FileNameSchema.Replace("%md5%", xmlMD5[i].InnerText)
                                         .Replace("%id%", xmlID[i].InnerText)
                                         .Replace("%rating%", rating.ToLower())
                                         .Replace("%rating2%", xmlRating[i].InnerText)
@@ -740,66 +777,98 @@ namespace aphrodite {
                                         .Replace("%author%", xmlAuthor[i].InnerText) + "." + xmlExt[i].InnerText;
 
                             // Check for null file url + fix for files that are auto blacklisted :)
-                            string fileUrl = xmlURL[i].InnerText;
-                            if (string.IsNullOrEmpty(fileUrl)) {
+                            string NewUrl = xmlURL[i].InnerText;
+                            if (string.IsNullOrEmpty(NewUrl)) {
                                 if (xmlDeleted[i].InnerText.ToLower() == "false") {
-                                    fileUrl = apiTools.GetBlacklistedImageUrl(xmlMD5[i].InnerText, xmlExt[i].InnerText);
+                                    NewUrl = apiTools.GetBlacklistedImageUrl(xmlMD5[i].InnerText, xmlExt[i].InnerText);
                                 }
                             }
+                            #endregion
 
-                            // Add to the counts (and break for blacklisted)
-                            string outputDir = DownloadInfo.DownloadPath;
-                            if (PostIsGraylisted) {
-                                if (DownloadInfo.SeparateRatings) {
-                                    outputDir += "\\" + rating.ToLower() + "\\blacklisted\\";
+                            #region counts + lists
+                            // Add to the lists and counts
+                            string NewPath = DownloadInfo.DownloadPath;
+
+                            switch (xmlRating[i].InnerText.ToLower()) {
+                                case "e":
+                                case "explicit":
+                                    if (DownloadInfo.SeparateRatings) {
+                                        NewPath += "\\explicit";
+                                    }
+                                    if (PostIsBlacklisted) {
+                                        NewPath += "\\blacklisted";
+                                    }
+                                    else if (PostIsGraylisted) {
+                                        NewPath += "\\graylisted";
+                                    }
+
                                     if (DownloadInfo.SeparateNonImages) {
                                         switch (xmlExt[i].InnerText.ToLower()) {
                                             case "gif":
-                                                outputDir += "gif\\";
+                                                NewPath += "\\gif";
                                                 break;
                                             case "apng":
-                                                outputDir += "apng\\";
+                                                NewPath += "\\apng";
                                                 break;
                                             case "webm":
-                                                outputDir += "webm\\";
+                                                NewPath += "\\webm";
                                                 break;
                                             case "swf":
-                                                outputDir += "swf\\";
+                                                NewPath += "\\swf";
                                                 break;
                                         }
                                     }
-                                    outputDir += fileName;
-                                    PostAlreadyExists = File.Exists(outputDir);
-                                }
-                                else {
-                                    outputDir += "\\blacklisted\\";
-                                    if (DownloadInfo.SeparateNonImages) {
-                                        switch (xmlExt[i].InnerText.ToLower()) {
-                                            case "gif":
-                                                outputDir += "gif\\";
-                                                break;
-                                            case "apng":
-                                                outputDir += "apng\\";
-                                                break;
-                                            case "webm":
-                                                outputDir += "webm\\";
-                                                break;
-                                            case "swf":
-                                                outputDir += "swf\\";
-                                                break;
+
+                                    NewPath += "\\" + NewFileName;
+
+                                    if (File.Exists(NewPath)) {
+                                        if (PostIsBlacklisted) {
+                                            BlacklistExplicitExistCount++;
+                                            BlacklistTotalExistCount++;
                                         }
-                                    }
-                                    PostAlreadyExists = File.Exists(outputDir);
-                                }
-
-
-                                switch (xmlRating[i].InnerText.ToLower()) {
-                                    case "e":
-                                    case "explicit":
-                                        if (PostAlreadyExists) {
-                                            graylistExplicitExistCount++;
+                                        else if (PostIsGraylisted) {
+                                            GraylistExplicitExistCount++;
+                                            GraylistTotalExistCount++;
                                         }
                                         else {
+                                            CleanExplicitExistCount++;
+                                            CleanTotalExistCount++;
+                                        }
+                                        continue;
+                                    }
+                                    else {
+                                        if (PostIsBlacklisted) {
+                                            if (DownloadInfo.SeparateNonImages) {
+                                                switch (xmlExt[i].InnerText.ToLower()) {
+                                                    case "gif":
+                                                        BlacklistedExplicitNonImages[0] = true;
+                                                        break;
+                                                    case "apng":
+                                                        BlacklistedExplicitNonImages[1] = true;
+                                                        break;
+                                                    case "webm":
+                                                        BlacklistedExplicitNonImages[2] = true;
+                                                        break;
+                                                    case "swf":
+                                                        BlacklistedExplicitNonImages[3] = true;
+                                                        break;
+                                                }
+                                            }
+
+                                            BlacklistExplicitCount++;
+                                            BlacklistTotalCount++;
+                                            if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                BlacklistedExplicitURLs.Add(NewUrl);
+                                                BlacklistedExplicitFileNames.Add(NewFileName);
+                                                BlacklistedExplicitFilePaths.Add(NewPath);
+                                            }
+                                            else {
+                                                BlacklistedURLs.Add(NewUrl);
+                                                BlacklistedFileNames.Add(NewFileName);
+                                                BlacklistedFilePaths.Add(NewPath);
+                                            }
+                                        }
+                                        else if (PostIsGraylisted) {
                                             if (DownloadInfo.SeparateNonImages) {
                                                 switch (xmlExt[i].InnerText.ToLower()) {
                                                     case "gif":
@@ -816,15 +885,132 @@ namespace aphrodite {
                                                         break;
                                                 }
                                             }
-                                            graylistExplicitCount++;
-                                        }
-                                        break;
-                                    case "q":
-                                    case "questionable":
-                                        if (PostAlreadyExists) {
-                                            graylistQuestionableExistCount++;
+
+                                            GraylistExplicitCount++;
+                                            GraylistTotalCount++;
+                                            if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                GraylistedExplicitURLs.Add(NewUrl);
+                                                GraylistedExplicitFileNames.Add(NewFileName);
+                                                GraylistedExplicitFilePaths.Add(NewPath);
+                                            }
+                                            else {
+                                                GraylistedURLs.Add(NewUrl);
+                                                GraylistedFileNames.Add(NewFileName);
+                                                GraylistedFilePaths.Add(NewPath);
+
+                                            }
                                         }
                                         else {
+                                            if (DownloadInfo.SeparateNonImages) {
+                                                switch (xmlExt[i].InnerText.ToLower()) {
+                                                    case "gif":
+                                                        CleanedExplicitNonImages[0] = true;
+                                                        break;
+                                                    case "apng":
+                                                        CleanedExplicitNonImages[1] = true;
+                                                        break;
+                                                    case "webm":
+                                                        CleanedExplicitNonImages[2] = true;
+                                                        break;
+                                                    case "swf":
+                                                        CleanedExplicitNonImages[3] = true;
+                                                        break;
+                                                }
+                                            }
+                                            CleanExplicitCount++;
+                                            CleanTotalCount++;
+                                            if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                CleanedExplicitURLs.Add(NewUrl);
+                                                CleanedExplicitFileNames.Add(NewFileName);
+                                                CleanedExplicitFilePaths.Add(NewPath);
+                                            }
+                                            else {
+                                                CleanedURLs.Add(NewUrl);
+                                                CleanedFileNames.Add(NewFileName);
+                                                CleanedFilePaths.Add(NewPath);
+                                            }
+                                        }
+                                    }
+                                    break;
+
+                                case "q":
+                                case "questionable":
+                                    if (DownloadInfo.SeparateRatings) {
+                                        NewPath += "\\questionable";
+                                    }
+                                    if (PostIsBlacklisted) {
+                                        NewPath += "\\blacklisted";
+                                    }
+                                    else if (PostIsGraylisted) {
+                                        NewPath += "\\graylisted";
+                                    }
+
+                                    if (DownloadInfo.SeparateNonImages) {
+                                        switch (xmlExt[i].InnerText.ToLower()) {
+                                            case "gif":
+                                                NewPath += "\\gif";
+                                                break;
+                                            case "apng":
+                                                NewPath += "\\apng";
+                                                break;
+                                            case "webm":
+                                                NewPath += "\\webm";
+                                                break;
+                                            case "swf":
+                                                NewPath += "\\swf";
+                                                break;
+                                        }
+                                    }
+
+                                    NewPath += "\\" + NewFileName;
+
+                                    if (File.Exists(NewPath)) {
+                                        if (PostIsBlacklisted) {
+                                            BlacklistQuestionableExistCount++;
+                                            BlacklistTotalExistCount++;
+                                        }
+                                        else if (PostIsGraylisted) {
+                                            GraylistQuestionableExistCount++;
+                                            GraylistTotalExistCount++;
+                                        }
+                                        else {
+                                            CleanQuestionableExistCount++;
+                                            CleanTotalExistCount++;
+                                        }
+                                        continue;
+                                    }
+                                    else {
+                                        if (PostIsBlacklisted) {
+                                            if (DownloadInfo.SeparateNonImages) {
+                                                switch (xmlExt[i].InnerText.ToLower()) {
+                                                    case "gif":
+                                                        BlacklistedQuestionableNonImages[0] = true;
+                                                        break;
+                                                    case "apng":
+                                                        BlacklistedQuestionableNonImages[1] = true;
+                                                        break;
+                                                    case "webm":
+                                                        BlacklistedQuestionableNonImages[2] = true;
+                                                        break;
+                                                    case "swf":
+                                                        BlacklistedQuestionableNonImages[3] = true;
+                                                        break;
+                                                }
+                                            }
+                                            BlacklistQuestionableCount++;
+                                            BlacklistTotalCount++;
+                                            if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                BlacklistedQuestionableURLs.Add(NewUrl);
+                                                BlacklistedQuestionableFileNames.Add(NewFileName);
+                                                BlacklistedQuestionableFilePaths.Add(NewPath);
+                                            }
+                                            else {
+                                                BlacklistedURLs.Add(NewUrl);
+                                                BlacklistedFileNames.Add(NewFileName);
+                                                BlacklistedFilePaths.Add(NewPath);
+                                            }
+                                        }
+                                        else if (PostIsGraylisted) {
                                             if (DownloadInfo.SeparateNonImages) {
                                                 switch (xmlExt[i].InnerText.ToLower()) {
                                                     case "gif":
@@ -841,15 +1027,132 @@ namespace aphrodite {
                                                         break;
                                                 }
                                             }
-                                            graylistQuestionableCount++;
-                                        }
-                                        break;
-                                    case "s":
-                                    case "safe":
-                                        if (PostAlreadyExists) {
-                                            graylistSafeExistCount++;
+                                            GraylistQuestionableCount++;
+                                            GraylistTotalCount++;
+                                            if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                GraylistedQuestionableURLs.Add(NewUrl);
+                                                GraylistedQuestionableFileNames.Add(NewFileName);
+                                                GraylistedQuestionableFilePaths.Add(NewPath);
+                                            }
+                                            else {
+                                                GraylistedURLs.Add(NewUrl);
+                                                GraylistedFileNames.Add(NewFileName);
+                                                GraylistedFilePaths.Add(NewPath);
+                                            }
                                         }
                                         else {
+                                            if (DownloadInfo.SeparateNonImages) {
+                                                switch (xmlExt[i].InnerText.ToLower()) {
+                                                    case "gif":
+                                                        CleanedQuestionableNonImages[0] = true;
+                                                        break;
+                                                    case "apng":
+                                                        CleanedQuestionableNonImages[1] = true;
+                                                        break;
+                                                    case "webm":
+                                                        CleanedQuestionableNonImages[2] = true;
+                                                        break;
+                                                    case "swf":
+                                                        CleanedQuestionableNonImages[3] = true;
+                                                        break;
+                                                }
+                                            }
+                                            CleanQuestionableCount++;
+                                            CleanTotalCount++;
+                                            if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                CleanedQuestionableURLs.Add(NewUrl);
+                                                CleanedQuestionableFileNames.Add(NewFileName);
+                                                CleanedQuestionableFilePaths.Add(NewPath);
+                                            }
+                                            else {
+                                                CleanedURLs.Add(NewUrl);
+                                                CleanedFileNames.Add(NewFileName);
+                                                CleanedFilePaths.Add(NewPath);
+                                            }
+                                        }
+                                    }
+                                    break;
+
+                                case "s":
+                                case "safe":
+                                    if (DownloadInfo.SeparateRatings) {
+                                        NewPath += "\\safe";
+                                    }
+                                    if (PostIsBlacklisted) {
+                                        NewPath += "\\blacklisted";
+                                    }
+                                    else if (PostIsGraylisted) {
+                                        NewPath += "\\graylisted";
+                                    }
+
+                                    if (DownloadInfo.SeparateNonImages) {
+                                        switch (xmlExt[i].InnerText.ToLower()) {
+                                            case "gif":
+                                                NewPath += "\\gif";
+                                                break;
+                                            case "apng":
+                                                NewPath += "\\apng";
+                                                break;
+                                            case "webm":
+                                                NewPath += "\\webm";
+                                                break;
+                                            case "swf":
+                                                NewPath += "\\swf";
+                                                break;
+                                        }
+                                    }
+
+                                    NewPath += "\\" + NewFileName;
+
+                                    if (File.Exists(NewPath)) {
+                                        if (PostIsBlacklisted) {
+                                            BlacklistSafeExistCount++;
+                                            BlacklistTotalExistCount++;
+                                        }
+                                        else if (PostIsGraylisted) {
+                                            GraylistSafeExistCount++;
+                                            GraylistTotalExistCount++;
+                                        }
+                                        else {
+                                            CleanSafeExistCount++;
+                                            CleanTotalExistCount++;
+                                        }
+                                        continue;
+                                    }
+                                    else {
+                                        if (PostIsBlacklisted) {
+                                            if (DownloadInfo.SeparateNonImages) {
+                                                switch (xmlExt[i].InnerText.ToLower()) {
+                                                    case "gif":
+                                                        BlacklistedSafeNonImages[0] = true;
+                                                        break;
+                                                    case "apng":
+                                                        BlacklistedSafeNonImages[1] = true;
+                                                        break;
+                                                    case "webm":
+                                                        BlacklistedSafeNonImages[2] = true;
+                                                        break;
+                                                    case "swf":
+                                                        BlacklistedSafeNonImages[3] = true;
+                                                        break;
+                                                }
+                                            }
+                                            BlacklistSafeCount++;
+                                            BlacklistTotalCount++;
+                                            if (DownloadInfo.SaveBlacklistedFiles) {
+                                                if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                    BlacklistedSafeURLs.Add(NewUrl);
+                                                    BlacklistedSafeFileNames.Add(NewFileName);
+                                                    BlacklistedSafeFilePaths.Add(NewPath);
+                                                }
+                                                else {
+                                                    BlacklistedURLs.Add(NewUrl);
+                                                    BlacklistedFileNames.Add(NewFileName);
+                                                    BlacklistedFilePaths.Add(NewPath);
+                                                }
+                                            }
+                                        }
+                                        else if (PostIsGraylisted) {
                                             if (DownloadInfo.SeparateNonImages) {
                                                 switch (xmlExt[i].InnerText.ToLower()) {
                                                     case "gif":
@@ -866,417 +1169,258 @@ namespace aphrodite {
                                                         break;
                                                 }
                                             }
-                                            graylistSafeCount++;
-                                        }
-                                        break;
-                                    default:
-                                        MessageBox.Show("An error occured when determining the rating. Open an issue.\r\n\nFound rating: " + xmlRating[i].InnerText);
-                                        break;
-                                }
-
-                                if (PostAlreadyExists) {
-                                    graylistTotalExistCount++;
-                                }
-                                else {
-                                    if (DownloadInfo.SeparateNonImages) {
-                                        switch (xmlExt[i].InnerText.ToLower()) {
-                                            case "gif":
-                                                GraylistedFileNonImages[0] = true;
-                                                break;
-                                            case "apng":
-                                                GraylistedFileNonImages[1] = true;
-                                                break;
-                                            case "webm":
-                                                GraylistedFileNonImages[2] = true;
-                                                break;
-                                            case "swf":
-                                                GraylistedFileNonImages[3] = true;
-                                                break;
-                                        }
-                                    }
-                                    graylistTotalCount++;
-                                }
-                                totalCount++;
-                            }
-                            else {
-                                if (DownloadInfo.SeparateRatings) {
-                                    outputDir += "\\" + rating.ToLower() + "\\";
-                                    if (DownloadInfo.SeparateNonImages) {
-                                        if (fileName.EndsWith("gif")) {
-                                            outputDir += "gif\\";
-                                        }
-                                        else if (fileName.EndsWith("apng")) {
-                                            outputDir += "apng\\";
-                                        }
-                                        else if (fileName.EndsWith("webm")) {
-                                            outputDir += "webm\\";
-                                        }
-                                        else if (fileName.EndsWith("swf")) {
-                                            outputDir += "swf\\";
-                                        }
-                                    }
-                                    outputDir += fileName;
-                                    PostAlreadyExists = File.Exists(outputDir);
-                                }
-                                else {
-                                    outputDir += "\\";
-                                    if (DownloadInfo.SeparateNonImages) {
-                                        if (fileName.EndsWith("gif")) {
-                                            outputDir += "gif\\";
-                                        }
-                                        else if (fileName.EndsWith("apng")) {
-                                            outputDir += "apng\\";
-                                        }
-                                        else if (fileName.EndsWith("webm")) {
-                                            outputDir += "webm\\";
-                                        }
-                                        else if (fileName.EndsWith("swf")) {
-                                            outputDir += "swf\\";
-                                        }
-                                    }
-                                    PostAlreadyExists = File.Exists(outputDir);
-                                }
-
-                                switch (xmlRating[i].InnerText.ToLower()) {
-                                    case "e":
-                                    case "explicit":
-                                        if (PostAlreadyExists) {
-                                            cleanExplicitExistCount++;
+                                            GraylistSafeCount++;
+                                            GraylistTotalCount++;
+                                            if (DownloadInfo.SaveGraylistedFiles) {
+                                                if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                    GraylistedSafeURLs.Add(NewUrl);
+                                                    GraylistedSafeFileNames.Add(NewFileName);
+                                                    GraylistedSafeFilePaths.Add(NewPath);
+                                                }
+                                                else {
+                                                    GraylistedURLs.Add(NewUrl);
+                                                    GraylistedFileNames.Add(NewFileName);
+                                                    GraylistedFilePaths.Add(NewPath);
+                                                }
+                                            }
                                         }
                                         else {
                                             if (DownloadInfo.SeparateNonImages) {
                                                 switch (xmlExt[i].InnerText.ToLower()) {
                                                     case "gif":
-                                                        ExplicitNonImages[0] = true;
+                                                        CleanedSafeNonImages[0] = true;
                                                         break;
                                                     case "apng":
-                                                        ExplicitNonImages[1] = true;
+                                                        CleanedSafeNonImages[1] = true;
                                                         break;
                                                     case "webm":
-                                                        ExplicitNonImages[2] = true;
+                                                        CleanedSafeNonImages[2] = true;
                                                         break;
                                                     case "swf":
-                                                        ExplicitNonImages[3] = true;
+                                                        CleanedSafeNonImages[3] = true;
                                                         break;
                                                 }
                                             }
-                                            cleanExplicitCount++;
-                                        }
-                                        break;
-                                    case "q":
-                                    case "questionable":
-                                        if (PostAlreadyExists) {
-                                            cleanQuestionableExistCount++;
-                                        }
-                                        else {
-                                            if (DownloadInfo.SeparateNonImages) {
-                                                switch (xmlExt[i].InnerText.ToLower()) {
-                                                    case "gif":
-                                                        QuestionableNonImages[0] = true;
-                                                        break;
-                                                    case "apng":
-                                                        QuestionableNonImages[1] = true;
-                                                        break;
-                                                    case "webm":
-                                                        QuestionableNonImages[2] = true;
-                                                        break;
-                                                    case "swf":
-                                                        QuestionableNonImages[3] = true;
-                                                        break;
-                                                }
+                                            CleanSafeCount++;
+                                            CleanTotalCount++;
+                                            if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                CleanedSafeURLs.Add(NewUrl);
+                                                CleanedSafeFileNames.Add(NewFileName);
+                                                CleanedSafeFilePaths.Add(NewPath);
                                             }
-                                            cleanQuestionableCount++;
-                                        }
-                                        break;
-                                    case "s":
-                                    case "safe":
-                                        if (PostAlreadyExists) {
-                                            cleanSafeExistCount++;
-                                        }
-                                        else {
-                                            if (DownloadInfo.SeparateNonImages) {
-                                                switch (xmlExt[i].InnerText.ToLower()) {
-                                                    case "gif":
-                                                        SafeNonImages[0] = true;
-                                                        break;
-                                                    case "apng":
-                                                        SafeNonImages[1] = true;
-                                                        break;
-                                                    case "webm":
-                                                        SafeNonImages[2] = true;
-                                                        break;
-                                                    case "swf":
-                                                        SafeNonImages[3] = true;
-                                                        break;
-                                                }
+                                            else {
+                                                CleanedURLs.Add(NewUrl);
+                                                CleanedFileNames.Add(NewFileName);
+                                                CleanedFilePaths.Add(NewPath);
                                             }
-                                            cleanSafeCount++;
-                                        }
-                                        break;
-                                    default:
-                                        MessageBox.Show("An error occured when determining the rating. Open an issue.\r\n\nFound rating: " + xmlRating[i].InnerText);
-                                        break;
-                                }
-
-                                if (PostAlreadyExists) {
-                                    cleanTotalExistCount++;
-                                }
-                                else {
-                                    if (DownloadInfo.SeparateNonImages) {
-                                        switch (xmlExt[i].InnerText.ToLower()) {
-                                            case "gif":
-                                                FileNonImages[0] = true;
-                                                break;
-                                            case "apng":
-                                                FileNonImages[1] = true;
-                                                break;
-                                            case "webm":
-                                                FileNonImages[2] = true;
-                                                break;
-                                            case "swf":
-                                                FileNonImages[3] = true;
-                                                break;
                                         }
                                     }
-                                    cleanTotalCount++;
-                                }
-                                totalCount++;
-                            }
-
-                            // Graylist check & options check
-                            if (PostIsGraylisted) {
-                                if (DownloadInfo.SaveGraylistedFiles) {
-                                    if (DownloadInfo.UseMinimumScore && Int32.Parse(xmlScore[i].InnerText) < DownloadInfo.MinimumScore)
-                                        continue;
-                                }
-                                else {
-                                    continue;
-                                }
-                            }
-                            else { // Not blacklisted
-                                if (DownloadInfo.UseMinimumScore && Int32.Parse(xmlScore[i].InnerText) < DownloadInfo.MinimumScore)
-                                    continue;
-                            }
-
-                            switch (rating.ToLower()) {
-                                case "explicit":
-                                    if (!DownloadInfo.SaveExplicit) {
-                                        continue;
-                                    }
-                                    break;
-                                case "questionable":
-                                    if (!DownloadInfo.SaveQuestionable) {
-                                        continue;
-                                    }
-                                    break;
-                                case "safe":
-                                    if (!DownloadInfo.SaveSafe) {
-                                        continue;
-                                    }
                                     break;
                             }
+                            #endregion
 
+                            #region description + .nfo files
                             // Start adding to the nfo buffer and URL lists
-                            if (PostIsGraylisted && DownloadInfo.SaveGraylistedFiles) {
-                                if (DownloadInfo.SeparateRatings) {
-                                    if (xmlRating[i].InnerText == "e") {
-                                        //GraylistedExplicitURLs.Add(xmlURL[i].InnerText);
-                                        GraylistedExplicitURLs.Add(fileUrl);
-                                        GraylistedExplicitFileNames.Add(fileName);
-                                    }
-                                    else if (xmlRating[i].InnerText == "q") {
-                                        //GraylistedQuestionableURLs.Add(xmlURL[i].InnerText);
-                                        GraylistedQuestionableURLs.Add(fileUrl);
-                                        GraylistedQuestionableFileNames.Add(fileName);
-                                    }
-                                    else if (xmlRating[i].InnerText == "s") {
-                                        //GraylistedSafeURLs.Add(xmlURL[i].InnerText);
-                                        GraylistedSafeURLs.Add(fileUrl);
-                                        GraylistedSafeFileNames.Add(fileName);
-                                    }
+                            if (DownloadInfo.SaveInfo) {
+                                // Set the description
+                                string ImageDescription = " No description";
+                                switch (string.IsNullOrWhiteSpace(xmlDescription[i].InnerText)) {
+                                    case false:
+                                        ImageDescription = xmlDescription[i].InnerText;
+                                        break;
+                                }
+
+                                if (PostIsBlacklisted) {
+                                    string[] Info = new string[] {
+                                        xmlID[i].InnerText,         //0
+                                        xmlMD5[i].InnerText,        // 1
+                                        xmlID[i].InnerText,         // 2
+                                        ReadTags,                   // 3
+                                        FoundGraylistedTags,        // 4
+                                        xmlScoreUp[i].InnerText,    // 5
+                                        xmlScoreDown[i].InnerText,  // 6
+                                        xmlScore[i].InnerText,      // 7
+                                        rating,                     // 8
+                                        ImageDescription            // 9
+                                    };
+
+                                    BlacklistInfoBuffer += string.Format(
+                                        "POST {0}\r\n" +
+                                        "    MD5: {1}\r\n" +
+                                        "    URL: https://e621.net/posts/show/{2}\r\n" +
+                                        "    TAGS {3}\r\n" +
+                                        "    OFFENDING TAGS: {4}\r\n" +
+                                        "    SCORE: Up {5}, Down {6}, Total {7}\r\n" +
+                                        "    RATING: {8}\r\n" +
+                                        "    DESCRIPTION: {9}\r\n\r\n", Info
+                                    );
+                                }
+                                else if (PostIsGraylisted && DownloadInfo.SaveGraylistedFiles) {
+                                    string[] Info = new string[] {
+                                        xmlID[i].InnerText,         //0
+                                        xmlMD5[i].InnerText,        // 1
+                                        xmlID[i].InnerText,         // 2
+                                        ReadTags,                   // 3
+                                        FoundGraylistedTags,        // 4
+                                        xmlScoreUp[i].InnerText,    // 5
+                                        xmlScoreDown[i].InnerText,  // 6
+                                        xmlScore[i].InnerText,      // 7
+                                        rating,                     // 8
+                                        ImageDescription            // 9
+                                    };
+
+                                    GraylistInfoBuffer += string.Format(
+                                        "POST {0}\r\n" +
+                                        "    MD5: {1}\r\n" +
+                                        "    URL: https://e621.net/posts/show/{2}\r\n" +
+                                        "    TAGS {3}\r\n" +
+                                        "    OFFENDING TAGS: {4}\r\n" +
+                                        "    SCORE: Up {5}, Down {6}, Total {7}\r\n" +
+                                        "    RATING: {8}\r\n" +
+                                        "    DESCRIPTION: {9}\r\n\r\n", Info
+                                    );
                                 }
                                 else {
-                                    //GraylistedURLs.Add(xmlURL[i].InnerText);
-                                    GraylistedURLs.Add(fileUrl);
-                                    GraylistedFileNames.Add(fileName);
+                                    CleanInfoBuffer += "POST " + xmlID[i].InnerText + ":\r\n" +
+                                               "    MD5: " + xmlMD5[i].InnerText + "\r\n" +
+                                               "    URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\r\n" +
+                                               "    TAGS:\r\n" + ReadTags + "\r\n" +
+                                               "    SCORE: Up " + xmlScoreUp[i].InnerText + ", Down " + xmlScoreDown[i].InnerText + ", Total " + xmlScore[i].InnerText + "\r\n" +
+                                               "    RATING: " + rating + "\r\n" +
+                                               "    DESCRIPITON:" + ImageDescription +
+                                               "\r\n\r\n";
                                 }
-
-                                string[] Info = new string[] {
-                                    xmlID[i].InnerText,         //0
-                                    xmlMD5[i].InnerText,        // 1
-                                    xmlID[i].InnerText,         // 2
-                                    ReadTags,                   // 3
-                                    FoundGraylistedTags,        // 4
-                                    xmlScoreUp[i].InnerText,    // 5
-                                    xmlScoreDown[i].InnerText,  // 6
-                                    xmlScore[i].InnerText,      // 7
-                                    rating,                     // 8
-                                    ImageDescription            // 9
-                                };
-
-                                BlacklistInfoBuffer += string.Format(
-                                    "POST {0}\r\n" +
-                                    "    MD5: {1}\r\n" +
-                                    "    URL: https://e621.net/posts/show/{2}\r\n" +
-                                    "    TAGS {3}\r\n" +
-                                    "    OFFENDING TAGS: {4}\r\n" +
-                                    "    SCORE: Up {5}, Down {6}, Total {7}\r\n" +
-                                    "    RATING: {8}\r\n" +
-                                    "    DESCRIPTION: {9}\r\n\r\n", Info
-                                );
                             }
-                            else {
-                                if (DownloadInfo.SeparateRatings) {
-                                    if (xmlRating[i].InnerText == "e") {
-                                        //ExplicitURLs.Add(xmlURL[i].InnerText);
-                                        ExplicitURLs.Add(fileUrl);
-                                        ExplicitFileNames.Add(fileName);
-                                    }
-                                    else if (xmlRating[i].InnerText == "q") {
-                                        //QuestionableURLs.Add(xmlURL[i].InnerText);
-                                        QuestionableURLs.Add(fileUrl);
-                                        QuestionableFileNames.Add(fileName);
-                                    }
-                                    else if (xmlRating[i].InnerText == "s") {
-                                        //SafeURLs.Add(xmlURL[i].InnerText);
-                                        SafeURLs.Add(fileUrl);
-                                        SafeFileNames.Add(fileName);
-                                    }
-                                }
-                                else {
-                                    //URLs.Add(xmlURL[i].InnerText);
-                                    URLs.Add(fileUrl);
-                                    FileNames.Add(fileName);
-                                }
-
-                                TagInfoBuffer += "POST " + xmlID[i].InnerText + ":\r\n" +
-                                           "    MD5: " + xmlMD5[i].InnerText + "\r\n" +
-                                           "    URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\r\n" +
-                                           "    TAGS:\r\n" + ReadTags + "\r\n" +
-                                           "    SCORE: Up " + xmlScoreUp[i].InnerText + ", Down " + xmlScoreDown[i].InnerText + ", Total " + xmlScore[i].InnerText + "\r\n" +
-                                           "    RATING: " + rating + "\r\n" +
-                                           "    DESCRIPITON:" + ImageDescription +
-                                           "\r\n\r\n";
-                            }
+                            #endregion
                         }
 
-
+                        #region after page update totals
                         this.BeginInvoke(new MethodInvoker(() => {
                             string labelBuffer = "";
-                            if (DownloadInfo.SeparateRatings) {
-                                object[] counts = new object[] {
-                            cleanTotalCount.ToString(),                 // 0
-                            cleanExplicitCount.ToString(),              // 1
-                            cleanQuestionableCount.ToString(),          // 2
-                            cleanSafeCount.ToString(),                  // 3
-                            graylistTotalCount.ToString(),              // 4
-                            graylistExplicitCount.ToString(),           // 5
-                            graylistQuestionableCount.ToString(),       // 6
-                            graylistSafeCount.ToString(),               // 7
-                            blacklistCount.ToString(),                  // 8
-                            totalCount.ToString(),                      // 9
-                            cleanTotalExistCount.ToString(),            // 10
-                            cleanExplicitExistCount.ToString(),         // 11
-                            cleanQuestionableExistCount.ToString(),     // 12
-                            cleanSafeExistCount.ToString(),             // 13
-                            graylistTotalExistCount.ToString(),         // 14
-                            graylistExplicitExistCount.ToString(),      // 15
-                            graylistQuestionableExistCount.ToString(),  // 16
-                            graylistSafeExistCount.ToString()           // 17
-                        };
 
-                                labelBuffer = string.Format("Files: {0} ( {1} E | {2} Q | {3} S )\r\n" +
-                                                            "Blacklisted: {4} ( {5} E | {6} Q | {7} S )\r\n" +
-                                                            "Zero Tolerance: {8}\r\n" +
-                                                            "Total: {9}\r\n\r\n" +
-                                                            "Files that exist: {10} ( {11} E | {12} Q | {13} S )\r\n" +
-                                                            "Blacklisted that exist: {14} ( {15} E | {16} Q | {17} S )", counts);
-                            }
-                            else {
-                                object[] counts = new object[] {
-                            cleanTotalCount.ToString(),
-                            graylistTotalCount.ToString(),
-                            blacklistCount.ToString(),
-                            totalCount.ToString(),
-                            cleanTotalExistCount.ToString(),
-                            graylistTotalExistCount.ToString()
-                        };
+                            //if (DownloadInfo.SeparateRatings) {
+                            object[] Counts = new object[] {
+                                    CleanTotalCount, CleanExplicitCount, CleanQuestionableCount, CleanSafeCount,
+                                    GraylistTotalCount, GraylistExplicitCount, GraylistQuestionableCount, GraylistSafeCount,
+                                    BlacklistTotalCount, BlacklistExplicitCount, BlacklistQuestionableCount, BlacklistSafeCount,
+                                    (CleanTotalCount + GraylistTotalCount + BlacklistTotalCount),
 
-                                labelBuffer = string.Format("Files: {0}\r\n" +
-                                                            "Blacklisted: {1}\r\n" +
-                                                            "Zero Tolerance: {2}\r\n" +
-                                                            "Total: {3}\r\n\r\n" +
-                                                            "Files that exist: {4}\r\n" +
-                                                            "Blacklisted that exist: {5}", counts);
-                            }
+                                    CleanTotalExistCount, CleanExplicitExistCount, CleanQuestionableExistCount, CleanSafeExistCount,
+                                    GraylistTotalExistCount, GraylistExplicitExistCount, GraylistQuestionableExistCount, GraylistSafeExistCount,
+                                    BlacklistTotalExistCount, BlacklistExplicitExistCount, BlacklistQuestionableExistCount, BlacklistSafeExistCount,
+                                    (CleanTotalExistCount + GraylistTotalExistCount + BlacklistTotalExistCount)
+                                };
+
+                            labelBuffer = string.Format("files: {0} ( {1} E | {2} Q | {3} S )\r\n" +
+                                          "graylisted: {4} ( {5} E | {6} Q | {7} S )\r\n" +
+                                          "blacklisted: {8} ( {9} E | {10} Q | {11} S )\r\n" +
+                                          "total parsed: {12}\r\n\r\n" +
+
+                                          "files that exist: {13} ( {14} E | {15} Q | {16} S )\r\n" +
+                                          "graylisted that exist: {17} ( {18} E | {19} Q | {20} S )\r\n" +
+                                          "blacklisted that exist: {21} ( {22} E | {23} Q | {24} S )\r\n" +
+                                          "total exist: {25}", Counts);
+                            //}
+                            //else {
+                            //    object[] Counts = new object[] {
+                            //        CleanTotalCount,
+                            //        GraylistTotalCount,
+                            //        BlacklistTotalCount,
+                            //        (CleanTotalCount + GraylistTotalCount + BlacklistTotalCount),
+
+                            //        CleanTotalExistCount,
+                            //        GraylistTotalExistCount,
+                            //        BlacklistTotalExistCount,
+                            //        (CleanTotalExistCount + GraylistTotalExistCount + BlacklistTotalExistCount),
+                            //    };
+                            //    labelBuffer = string.Format("files: {0}\r\n" +
+                            //                  "graylisted: {1}\r\n" +
+                            //                  "blacklisted: {2}\r\n" +
+                            //                  "total parsed: {3}\r\n\r\n" +
+
+                            //                  "files that exist: {4}\r\n" +
+                            //                  "graylisted that exist: {5}\r\n" +
+                            //                  "blacklisted that exist: {6}\r\n" +
+                            //                  "total exist: {7}", Counts);
+                            //}
+
                             lbBlacklist.Text = labelBuffer;
                         }));
+                        #endregion
+
                     }
 
-                    if (MaximumReached) {
+                    if (ImageLimitReached) {
                         break;
                     }
+
+                    switch (!DownloadInfo.FromUrl && xmlID.Count == 320) {
+                        case true:
+                            CurrentPage++;
+                            break;
+                    }
+
                 }
 
-                if (URLs.Count == 0 && SafeURLs.Count == 0 && QuestionableURLs.Count == 0 && ExplicitURLs.Count == 0 &&
+                if (CleanedURLs.Count == 0 && CleanedSafeURLs.Count == 0 && CleanedQuestionableURLs.Count == 0 && CleanedExplicitURLs.Count == 0 &&
                     GraylistedSafeURLs.Count == 0 && GraylistedQuestionableURLs.Count == 0 && GraylistedExplicitURLs.Count == 0) {
-                        throw new NoFilesToDownloadException();
+                    throw new NoFilesToDownloadException();
                 }
                 #endregion
 
                 #region output logic
-            // Create output folders
-                this.BeginInvoke((MethodInvoker)delegate() {
+                // Create output folders
+                this.BeginInvoke(new MethodInvoker(() => {
                     Program.Log(LogAction.WriteToLog, "Creating output folders (because System.Net doesn't do it for you...)");
-                });
+                }));
                 if (DownloadInfo.SeparateRatings) {
-                    if (ExplicitURLs.Count > 0) {
+                    if (CleanedExplicitURLs.Count > 0) {
                         Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit");
                         if (DownloadInfo.SeparateNonImages) {
-                            if (ExplicitNonImages[0]) {
+                            if (CleanedExplicitNonImages[0]) {
                                 Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\gif");
                             }
-                            if (ExplicitNonImages[1]) {
+                            if (CleanedExplicitNonImages[1]) {
                                 Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\apng");
                             }
-                            if (ExplicitNonImages[2]) {
+                            if (CleanedExplicitNonImages[2]) {
                                 Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\webm");
                             }
-                            if (ExplicitNonImages[3]) {
+                            if (CleanedExplicitNonImages[3]) {
                                 Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\swf");
                             }
                         }
                     }
-                    if (QuestionableURLs.Count > 0) {
+                    if (CleanedQuestionableURLs.Count > 0) {
                         Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable");
                         if (DownloadInfo.SeparateNonImages) {
-                            if (QuestionableNonImages[0]) {
+                            if (CleanedQuestionableNonImages[0]) {
                                 Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\gif");
                             }
-                            if (QuestionableNonImages[1]) {
+                            if (CleanedQuestionableNonImages[1]) {
                                 Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\apng");
                             }
-                            if (QuestionableNonImages[2]) {
+                            if (CleanedQuestionableNonImages[2]) {
                                 Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\webm");
                             }
-                            if (QuestionableNonImages[3]) {
+                            if (CleanedQuestionableNonImages[3]) {
                                 Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\swf");
                             }
                         }
                     }
-                    if (SafeURLs.Count > 0) {
+                    if (CleanedSafeURLs.Count > 0) {
                         Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe");
                         if (DownloadInfo.SeparateNonImages) {
-                            if (SafeNonImages[0]) {
+                            if (CleanedSafeNonImages[0]) {
                                 Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\gif");
                             }
-                            if (SafeNonImages[1]) {
+                            if (CleanedSafeNonImages[1]) {
                                 Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\apng");
                             }
-                            if (SafeNonImages[2]) {
+                            if (CleanedSafeNonImages[2]) {
                                 Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\webm");
                             }
-                            if (SafeNonImages[3]) {
+                            if (CleanedSafeNonImages[3]) {
                                 Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\swf");
                             }
                         }
@@ -1284,52 +1428,106 @@ namespace aphrodite {
 
                     if (DownloadInfo.SaveGraylistedFiles) {
                         if (GraylistedExplicitURLs.Count > 0) {
-                            Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\blacklisted");
+                            Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\graylisted");
                             if (DownloadInfo.SeparateNonImages) {
                                 if (GraylistedExplicitNonImages[0]) {
-                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\blacklisted\\gif");
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\graylisted\\gif");
                                 }
                                 if (GraylistedExplicitNonImages[1]) {
-                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\blacklisted\\apng");
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\graylisted\\apng");
                                 }
                                 if (GraylistedExplicitNonImages[2]) {
-                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\blacklisted\\webm");
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\graylisted\\webm");
                                 }
                                 if (GraylistedExplicitNonImages[3]) {
-                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\blacklisted\\swf");
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\graylisted\\swf");
                                 }
                             }
                         }
                         if (GraylistedQuestionableURLs.Count > 0) {
-                            Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\blacklisted");
+                            Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\graylisted");
                             if (DownloadInfo.SeparateNonImages) {
                                 if (GraylistedQuestionableNonImages[0]) {
-                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\blacklisted\\gif");
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\graylisted\\gif");
                                 }
                                 if (GraylistedQuestionableNonImages[1]) {
-                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\blacklisted\\apng");
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\graylisted\\apng");
                                 }
                                 if (GraylistedQuestionableNonImages[2]) {
-                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\blacklisted\\webm");
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\graylisted\\webm");
                                 }
                                 if (GraylistedQuestionableNonImages[3]) {
-                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\blacklisted\\swf");
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\graylisted\\swf");
                                 }
                             }
                         }
                         if (GraylistedSafeURLs.Count > 0) {
-                            Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\blacklisted");
+                            Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\graylisted");
                             if (DownloadInfo.SeparateNonImages) {
                                 if (GraylistedSafeNonImages[0]) {
-                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\blacklisted\\gif");
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\graylisted\\gif");
                                 }
                                 if (GraylistedSafeNonImages[1]) {
-                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\blacklisted\\apng");
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\graylisted\\apng");
                                 }
                                 if (GraylistedSafeNonImages[2]) {
-                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\blacklisted\\webm");
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\graylisted\\webm");
                                 }
                                 if (GraylistedSafeNonImages[3]) {
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\graylisted\\swf");
+                                }
+                            }
+                        }
+                    }
+
+                    if (DownloadInfo.SaveBlacklistedFiles) {
+                        if (BlacklistedExplicitURLs.Count > 0) {
+                            Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\blacklisted");
+                            if (DownloadInfo.SeparateNonImages) {
+                                if (BlacklistedExplicitNonImages[0]) {
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\blacklisted\\gif");
+                                }
+                                if (BlacklistedExplicitNonImages[1]) {
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\blacklisted\\apng");
+                                }
+                                if (BlacklistedExplicitNonImages[2]) {
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\blacklisted\\webm");
+                                }
+                                if (BlacklistedExplicitNonImages[3]) {
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit\\blacklisted\\swf");
+                                }
+                            }
+                        }
+                        if (BlacklistedQuestionableURLs.Count > 0) {
+                            Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\blacklisted");
+                            if (DownloadInfo.SeparateNonImages) {
+                                if (BlacklistedQuestionableNonImages[0]) {
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\blacklisted\\gif");
+                                }
+                                if (BlacklistedQuestionableNonImages[1]) {
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\blacklisted\\apng");
+                                }
+                                if (BlacklistedQuestionableNonImages[2]) {
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\blacklisted\\webm");
+                                }
+                                if (BlacklistedQuestionableNonImages[3]) {
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\questionable\\blacklisted\\swf");
+                                }
+                            }
+                        }
+                        if (BlacklistedSafeURLs.Count > 0) {
+                            Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\blacklisted");
+                            if (DownloadInfo.SeparateNonImages) {
+                                if (BlacklistedSafeNonImages[0]) {
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\blacklisted\\gif");
+                                }
+                                if (BlacklistedSafeNonImages[1]) {
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\blacklisted\\apng");
+                                }
+                                if (BlacklistedSafeNonImages[2]) {
+                                    Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\blacklisted\\webm");
+                                }
+                                if (BlacklistedSafeNonImages[3]) {
                                     Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\safe\\blacklisted\\swf");
                                 }
                             }
@@ -1339,33 +1537,52 @@ namespace aphrodite {
                 else {
                     Directory.CreateDirectory(DownloadInfo.DownloadPath);
                     if (DownloadInfo.SeparateNonImages) {
-                        if (FileNonImages[0]) {
+                        if (CleanedFileNonImages[0]) {
                             Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\gif");
                         }
-                        if (FileNonImages[1]) {
+                        if (CleanedFileNonImages[1]) {
                             Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\apng");
                         }
-                        if (FileNonImages[2]) {
+                        if (CleanedFileNonImages[2]) {
                             Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\webm");
                         }
-                        if (FileNonImages[3]) {
+                        if (CleanedFileNonImages[3]) {
                             Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\swf");
                         }
                     }
 
                     if (DownloadInfo.SaveGraylistedFiles && GraylistedURLs.Count > 0) {
-                        Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\blacklisted");
+                        Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\graylisted");
                         if (DownloadInfo.SeparateNonImages) {
                             if (GraylistedFileNonImages[0]) {
-                                Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\blacklisted\\gif");
+                                Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\graylisted\\gif");
                             }
                             if (GraylistedFileNonImages[1]) {
-                                Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\blacklisted\\apng");
+                                Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\graylisted\\apng");
                             }
                             if (GraylistedFileNonImages[2]) {
-                                Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\blacklisted\\webm");
+                                Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\graylisted\\webm");
                             }
                             if (GraylistedFileNonImages[3]) {
+                                Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\graylisted\\swf");
+                            }
+                        }
+                    }
+
+
+                    if (DownloadInfo.SaveBlacklistedFiles && BlacklistedURLs.Count > 0) {
+                        Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\blacklisted");
+                        if (DownloadInfo.SeparateNonImages) {
+                            if (BlacklistedFileNonImages[0]) {
+                                Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\blacklisted\\gif");
+                            }
+                            if (BlacklistedFileNonImages[1]) {
+                                Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\blacklisted\\apng");
+                            }
+                            if (BlacklistedFileNonImages[2]) {
+                                Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\blacklisted\\webm");
+                            }
+                            if (BlacklistedFileNonImages[3]) {
                                 Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\blacklisted\\swf");
                             }
                         }
@@ -1374,275 +1591,798 @@ namespace aphrodite {
                 #endregion
 
                 #region pre-download logic
-            // Update totals
+                // Update totals
                 if (DownloadInfo.SeparateRatings) {
-                    cleanTotalCount = cleanExplicitCount + cleanQuestionableCount + cleanSafeCount;
-                    graylistTotalCount = graylistExplicitCount + graylistQuestionableCount + graylistSafeCount;
+                    CleanTotalCount = CleanExplicitCount + CleanQuestionableCount + CleanSafeCount;
+                    GraylistTotalCount = GraylistExplicitCount + GraylistQuestionableCount + GraylistSafeCount;
                 }
 
-            // Save the info files from the buffer
+                // Save the info files from the buffer
                 if (DownloadInfo.SaveInfo) {
-                    this.BeginInvoke((MethodInvoker)delegate() {
+                    this.BeginInvoke(new MethodInvoker(() => {
                         Program.Log(LogAction.WriteToLog, "Saving infos.");
-                    });
-                    TagInfoBuffer.TrimEnd('\r').TrimEnd('\n');
-                    File.WriteAllText(DownloadInfo.DownloadPath + "\\tags.nfo", TagInfoBuffer, Encoding.UTF8);
+                    }));
+                    if (CleanTotalCount > 0) {
+                        CleanInfoBuffer.TrimEnd('\r').TrimEnd('\n');
+                        File.WriteAllText(DownloadInfo.DownloadPath + "\\tags.nfo", CleanInfoBuffer, Encoding.UTF8);
+                    }
 
-                    if (DownloadInfo.SaveGraylistedFiles && graylistTotalCount > 0) {
+                    if (DownloadInfo.SaveGraylistedFiles && GraylistTotalCount > 0) {
+                        GraylistInfoBuffer.TrimEnd('\r').TrimEnd('\n');
+                        File.WriteAllText(DownloadInfo.DownloadPath + "\\tags.graylisted.nfo", GraylistInfoBuffer, Encoding.UTF8);
+                    }
+
+                    if (DownloadInfo.SaveBlacklistedFiles && BlacklistTotalCount > 0) {
                         BlacklistInfoBuffer.TrimEnd('\r').TrimEnd('\n');
-                        if (DownloadInfo.SeparateRatings)
-                            File.WriteAllText(DownloadInfo.DownloadPath + "\\tags.blacklisted.nfo", BlacklistInfoBuffer, Encoding.UTF8);
-                        else
-                            File.WriteAllText(DownloadInfo.DownloadPath + "\\blacklisted\\tags.blacklisted.nfo", BlacklistInfoBuffer, Encoding.UTF8);
+                        File.WriteAllText(DownloadInfo.DownloadPath + "\\tags.blacklisted.nfo", BlacklistInfoBuffer, Encoding.UTF8);
                     }
                 }
 
                 // Set the progressbar style.
                 this.BeginInvoke(new MethodInvoker(() => {
                     string labelBuffer = "";
-                    if (DownloadInfo.SeparateRatings) {
-                        object[] counts = new object[] {
-                            cleanTotalCount.ToString(),                 // 0
-                            cleanExplicitCount.ToString(),              // 1
-                            cleanQuestionableCount.ToString(),          // 2
-                            cleanSafeCount.ToString(),                  // 3
-                            graylistTotalCount.ToString(),              // 4
-                            graylistExplicitCount.ToString(),           // 5
-                            graylistQuestionableCount.ToString(),       // 6
-                            graylistSafeCount.ToString(),               // 7
-                            blacklistCount.ToString(),                  // 8
-                            totalCount.ToString(),                      // 9
-                            cleanTotalExistCount.ToString(),            // 10
-                            cleanExplicitExistCount.ToString(),         // 11
-                            cleanQuestionableExistCount.ToString(),     // 12
-                            cleanSafeExistCount.ToString(),             // 13
-                            graylistTotalExistCount.ToString(),         // 14
-                            graylistExplicitExistCount.ToString(),      // 15
-                            graylistQuestionableExistCount.ToString(),  // 16
-                            graylistSafeExistCount.ToString()           // 17
-                        };
 
-                        labelBuffer = string.Format("Files: {0} ( {1} E | {2} Q | {3} S )\r\n" +
-                                                    "Blacklisted: {4} ( {5} E | {6} Q | {7} S )\r\n" +
-                                                    "Zero Tolerance: {8}\r\n" +
-                                                    "Total: {9}\r\n\r\n" +
-                                                    "Files that exist: {10} ( {11} E | {12} Q | {13} S )\r\n" +
-                                                    "Blacklisted that exist: {14} ( {15} E | {16} Q | {17} S )", counts);
-                    }
-                    else {
-                        object[] counts = new object[] {
-                            cleanTotalCount.ToString(),
-                            graylistTotalCount.ToString(),
-                            blacklistCount.ToString(),
-                            totalCount.ToString(),
-                            cleanTotalExistCount.ToString(),
-                            graylistTotalExistCount.ToString()
-                        };
+                    //if (DownloadInfo.SeparateRatings) {
+                    object[] Counts = new object[] {
+                                    CleanTotalCount, CleanExplicitCount, CleanQuestionableCount, CleanSafeCount,
+                                    GraylistTotalCount, GraylistExplicitCount, GraylistQuestionableCount, GraylistSafeCount,
+                                    BlacklistTotalCount, BlacklistExplicitCount, BlacklistQuestionableCount, BlacklistSafeCount,
+                                    (CleanTotalCount + GraylistTotalCount + BlacklistTotalCount),
 
-                        labelBuffer = string.Format("Files: {0}\r\n" +
-                                                    "Blacklisted: {1}\r\n" +
-                                                    "Zero Tolerance: {2}\r\n" +
-                                                    "Total: {3}\r\n\r\n" +
-                                                    "Files that exist: {4}\r\n" +
-                                                    "Blacklisted that exist: {5}", counts);
-                    }
+                                    CleanTotalExistCount, CleanExplicitExistCount, CleanQuestionableExistCount, CleanSafeExistCount,
+                                    GraylistTotalExistCount, GraylistExplicitExistCount, GraylistQuestionableExistCount, GraylistSafeExistCount,
+                                    BlacklistTotalExistCount, BlacklistExplicitExistCount, BlacklistQuestionableExistCount, BlacklistSafeExistCount,
+                                    (CleanTotalExistCount + GraylistTotalExistCount + BlacklistTotalExistCount)
+                                };
+
+                    labelBuffer = string.Format("files: {0} ( {1} E | {2} Q | {3} S )\r\n" +
+                                                "graylisted: {4} ( {5} E | {6} Q | {7} S )\r\n" +
+                                                "blacklisted: {8} ( {9} E | {10} Q | {11} S )\r\n" +
+                                                "total parsed: {12}\r\n\r\n" +
+
+                                                "files that exist: {13} ( {14} E | {15} Q | {16} S )\r\n" +
+                                                "graylisted that exist: {17} ( {18} E | {19} Q | {20} S )\r\n" +
+                                                "blacklisted that exist: {21} ( {22} E | {23} Q | {24} S )\r\n" +
+                                                "total exist: {25}", Counts);
+                    //}
+                    //else {
+                    //    object[] Counts = new object[] {
+                    //                CleanTotalCount,
+                    //                GraylistTotalCount,
+                    //                BlacklistTotalCount,
+                    //                (CleanTotalCount + GraylistTotalCount + BlacklistTotalCount),
+
+                    //                CleanTotalExistCount,
+                    //                GraylistTotalExistCount,
+                    //                BlacklistTotalExistCount,
+                    //                (CleanTotalExistCount + GraylistTotalExistCount + BlacklistTotalExistCount),
+                    //            };
+                    //    labelBuffer = string.Format("files: {0}\r\n" +
+                    //                                "graylisted: {1}\r\n" +
+                    //                                "blacklisted: {2}\r\n" +
+                    //                                "total parsed: {3}\r\n\r\n" +
+
+                    //                                "files that exist: {4}\r\n" +
+                    //                                "graylisted that exist: {5}\r\n" +
+                    //                                "blacklisted that exist: {6}\r\n" +
+                    //                                "total exist: {7}", Counts);
+                    //}
+
                     lbBlacklist.Text = labelBuffer;
 
-                    if (DownloadInfo.SaveGraylistedFiles)
-                        pbTotalStatus.Maximum = cleanTotalCount + graylistTotalCount;
-                    else
-                        pbTotalStatus.Maximum = cleanTotalCount;
+                    pbTotalStatus.Maximum = CleanTotalCount;
+                    if (DownloadInfo.SaveGraylistedFiles) {
+                        pbTotalStatus.Maximum += GraylistTotalCount;
+                    }
+                    if (DownloadInfo.SaveBlacklistedFiles) {
+                        pbTotalStatus.Maximum += BlacklistTotalCount;
+                    }
 
                     pbDownloadStatus.Style = ProgressBarStyle.Blocks;
+
                 }));
                 #endregion
 
-                #region download
+                // Enable using old logic by disabling UseNewDownloadLogic
+                #region download the images
+
                 // Start the download
                 using (Controls.ExtendedWebClient wc = new Controls.ExtendedWebClient()) {
                     wc.DownloadProgressChanged += (s, e) => {
-                        if (!this.IsDisposed) {
-                            //if (!sizeRecieved) {
-                            //    //this.Invoke((MethodInvoker)(() => pbDownloadStatus.Maximum = 101));
-                            //    if (!lbFile.Text.Contains(("(" + e.TotalBytesToReceive / 1024) + "kb)"))
-                            //        this.Invoke((MethodInvoker)(() => lbFile.Text += " (" + (e.TotalBytesToReceive / 1024) + "kb)"));
-                            //    sizeRecieved = true;
-                            //    Program.Log(LogAction.WriteToLog, (e.TotalBytesToReceive / 1024).ToString());
-                            //}
-                            this.BeginInvoke(new MethodInvoker(() => {
-                                pbDownloadStatus.Value = e.ProgressPercentage;
-                                pbDownloadStatus.Value++;
-                                pbDownloadStatus.Value--;
-                                lbPercentage.Text = e.ProgressPercentage.ToString() + "%";
-
-                                lbBytes.Text = (e.BytesReceived / 1024) + " kb / " + (e.TotalBytesToReceive / 1024) + " kb";
-                            }));
-                        }
+                        this.BeginInvoke(new MethodInvoker(() => {
+                            pbDownloadStatus.Value = e.ProgressPercentage;
+                            switch (pbDownloadStatus.Value) {
+                                case 100:
+                                    pbDownloadStatus.Value--;
+                                    pbDownloadStatus.Value++;
+                                    break;
+                                default:
+                                    pbDownloadStatus.Value++;
+                                    pbDownloadStatus.Value--;
+                                    pbDownloadStatus.Value++;
+                                    break;
+                            }
+                            lbPercentage.Text = e.ProgressPercentage.ToString() + "%";
+                            lbBytes.Text = (e.BytesReceived / 1024) + " kb / " + (e.TotalBytesToReceive / 1024) + " kb";
+                        }));
                     };
                     wc.DownloadFileCompleted += (s, e) => {
-                        if (!pbDownloadStatus.IsDisposed && !lbPercentage.IsDisposed) {
-                            lock (e.UserState) {
-                                this.BeginInvoke(new MethodInvoker(() => {
-                                    pbDownloadStatus.Value = 0;
-                                    lbPercentage.Text = "0%";
+                        lock (e.UserState) {
+                            this.BeginInvoke(new MethodInvoker(() => {
+                                pbDownloadStatus.Value = 0;
+                                lbPercentage.Text = "0%";
 
-                                    // protect from overflow
-                                    if (pbTotalStatus.Value != pbTotalStatus.Maximum)
-                                        pbTotalStatus.Value++;
-                                    else
-                                        lbRemoved.Visible = true;
-                                }));
-                                Monitor.Pulse(e.UserState);
-                            }
+                                // protect from overflow
+                                if (pbTotalStatus.Value < pbTotalStatus.Maximum) {
+                                    pbTotalStatus.Value++;
+                                }
+                                else {
+                                    lbRemoved.Visible = true;
+                                }
+                            }));
+                            Monitor.Pulse(e.UserState);
                         }
                     };
-
-                    var sync = new Object();
 
                     wc.Proxy = WebRequest.GetSystemWebProxy();
                     wc.Headers.Add("user-agent", Program.UserAgent);
                     wc.Method = "GET";
 
-                    if (DownloadInfo.SeparateRatings) {
-                        if (ExplicitURLs.Count > 0) {
-                            this.BeginInvoke((MethodInvoker)delegate() {
-                                Program.Log(LogAction.WriteToLog, "Downloading explicit files.");
-                            });
-
-                            for (int y = 0; y < ExplicitURLs.Count; y++) {
-                                if (string.IsNullOrEmpty(ExplicitURLs[y])) { continue; }
-                                CurrentUrl = ExplicitURLs[y];
-                                this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading explicit file " + (y + 1) + " of " + (cleanExplicitCount)));
-
-                                string fileName = ExplicitFileNames[y];
-                                string outputDir = DownloadInfo.DownloadPath + "\\explicit\\";
-                                switch (DownloadInfo.SeparateNonImages) {
-                                    case true:
-                                        if (fileName.EndsWith("gif")) {
-                                            outputDir += "gif\\";
-                                        }
-                                        else if (fileName.EndsWith("apng")) {
-                                            outputDir += "apng\\";
-                                        }
-                                        else if (fileName.EndsWith("webm")) {
-                                            outputDir += "webm\\";
-                                        }
-                                        else if (fileName.EndsWith("swf")) {
-                                            outputDir += "swf\\";
-                                        }
-                                        break;
-                                }
-                                outputDir += fileName;
-                                if (!File.Exists(outputDir)) {
-                                    this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
-                                    lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
-                                        Monitor.Wait(sync);
-                                    }
-                                }
-                                else {
-                                    this.Invoke((MethodInvoker)(() => status.Text = fileName + " already exists"));
-                                }
-                            }
-                        }
-
-                        if (QuestionableURLs.Count > 0) {
-                            this.BeginInvoke((MethodInvoker)delegate() {
-                                Program.Log(LogAction.WriteToLog, "Downloading questionable files.");
-                            });
-
-                            for (int y = 0; y < QuestionableURLs.Count; y++) {
-                                if (string.IsNullOrEmpty(QuestionableURLs[y])) { continue; }
-                                CurrentUrl = QuestionableURLs[y];
-                                this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading questionable file " + (y + 1) + " of " + (cleanQuestionableCount)));
-
-                                string fileName = QuestionableFileNames[y];
-                                string outputDir = DownloadInfo.DownloadPath + "\\questionable\\";
-                                switch (DownloadInfo.SeparateNonImages) {
-                                    case true:
-                                        if (fileName.EndsWith("gif")) {
-                                            outputDir += "gif\\";
-                                        }
-                                        else if (fileName.EndsWith("apng")) {
-                                            outputDir += "apng\\";
-                                        }
-                                        else if (fileName.EndsWith("webm")) {
-                                            outputDir += "webm\\";
-                                        }
-                                        else if (fileName.EndsWith("swf")) {
-                                            outputDir += "swf\\";
-                                        }
-                                        break;
-                                }
-                                outputDir += fileName;
-                                if (!File.Exists(outputDir)) {
-                                    this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
-                                    lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
-                                        Monitor.Wait(sync);
-                                    }
-                                }
-                                else {
-                                    this.Invoke((MethodInvoker)(() => status.Text = fileName + " already exists"));
-                                }
-                            }
-                        }
-
-                        if (SafeURLs.Count > 0) {
-                            this.BeginInvoke((MethodInvoker)delegate() {
-                                Program.Log(LogAction.WriteToLog, "Downloading safe files.");
-                            });
-
-                            for (int y = 0; y < SafeURLs.Count; y++) {
-                                if (string.IsNullOrEmpty(SafeURLs[y])) { continue; }
-                                CurrentUrl = SafeURLs[y];
-                                this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading safe file " + (y + 1) + " of " + (cleanSafeCount)));
-
-                                string fileName = SafeFileNames[y];
-                                string outputDir = DownloadInfo.DownloadPath + "\\safe\\";
-                                switch (DownloadInfo.SeparateNonImages) {
-                                    case true:
-                                        if (fileName.EndsWith("gif")) {
-                                            outputDir += "gif\\";
-                                        }
-                                        else if (fileName.EndsWith("apng")) {
-                                            outputDir += "apng\\";
-                                        }
-                                        else if (fileName.EndsWith("webm")) {
-                                            outputDir += "webm\\";
-                                        }
-                                        else if (fileName.EndsWith("swf")) {
-                                            outputDir += "swf\\";
-                                        }
-                                        break;
-                                }
-                                outputDir += fileName;
-                                if (!File.Exists(outputDir)) {
-                                    this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
-                                    lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
-                                        Monitor.Wait(sync);
-                                    }
-                                }
-                                else {
-                                    this.Invoke((MethodInvoker)(() => status.Text = fileName + " already exists"));
-                                }
-                            }
-                        }
-
-                        if (DownloadInfo.SaveGraylistedFiles) {
-                            if (GraylistedExplicitURLs.Count > 0) {
+                    #region download (new logic, though breaks for some reason)
+                    if (UseNewDownloadLogic) {
+                        if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                            if (CleanedExplicitURLs.Count > 0) {
                                 this.BeginInvoke((MethodInvoker)delegate() {
-                                    Program.Log(LogAction.WriteToLog, "Downloading graylisted explicit files.");
+                                    Program.Log(LogAction.WriteToLog, "Downloading explicit files.");
+                                });
+                                for (int CurrentFile = 0; CurrentFile < CleanedExplicitURLs.Count; CurrentFile++) {
+                                    this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading explicit file " + (CurrentFile + 1) + " of " + (CleanExplicitCount)));
+                                    if (!string.IsNullOrEmpty(CleanedExplicitURLs[CurrentFile]) && !File.Exists(CleanedExplicitFilePaths[CurrentFile])) {
+                                        this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + CleanedExplicitFileNames[CurrentFile]));
+                                        await wc.DownloadFileTaskAsync(new Uri(CleanedExplicitURLs[CurrentFile]), CleanedExplicitFilePaths[CurrentFile]);
+                                    }
+                                }
+                            }
+
+                            if (CleanedQuestionableURLs.Count > 0) {
+                                this.BeginInvoke((MethodInvoker)delegate() {
+                                    Program.Log(LogAction.WriteToLog, "Downloading questionable files.");
+                                });
+                                for (int CurrentFile = 0; CurrentFile < CleanedQuestionableURLs.Count; CurrentFile++) {
+                                    this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading questionable file " + (CurrentFile + 1) + " of " + (CleanQuestionableCount)));
+                                    if (!string.IsNullOrEmpty(CleanedQuestionableURLs[CurrentFile]) && !File.Exists(CleanedQuestionableFilePaths[CurrentFile])) {
+                                        this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + CleanedQuestionableFileNames[CurrentFile]));
+                                        await wc.DownloadFileTaskAsync(new Uri(CleanedQuestionableURLs[CurrentFile]), CleanedQuestionableFilePaths[CurrentFile]);
+                                    }
+                                }
+                            }
+
+                            if (CleanedSafeURLs.Count > 0) {
+                                this.BeginInvoke((MethodInvoker)delegate() {
+                                    Program.Log(LogAction.WriteToLog, "Downloading safe files.");
+                                });
+                                for (int CurrentFile = 0; CurrentFile < CleanedSafeURLs.Count; CurrentFile++) {
+                                    this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading safe file " + (CurrentFile + 1) + " of " + (CleanSafeCount)));
+                                    if (!string.IsNullOrEmpty(CleanedSafeURLs[CurrentFile]) && !File.Exists(CleanedSafeFilePaths[CurrentFile])) {
+                                        this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + CleanedSafeFileNames[CurrentFile]));
+                                        await wc.DownloadFileTaskAsync(new Uri(CleanedSafeURLs[CurrentFile]), CleanedSafeFilePaths[CurrentFile]);
+                                    }
+                                }
+                            }
+
+                            if (DownloadInfo.SaveGraylistedFiles) {
+                                if (GraylistedExplicitURLs.Count > 0) {
+                                    this.BeginInvoke((MethodInvoker)delegate() {
+                                        Program.Log(LogAction.WriteToLog, "Downloading graylisted explicit files.");
+                                    });
+                                    for (int CurrentFile = 0; CurrentFile < GraylistedExplicitURLs.Count; CurrentFile++) {
+                                        this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading graylisted (e) file " + (CurrentFile + 1) + " of " + (GraylistExplicitCount)));
+                                        if (!string.IsNullOrEmpty(GraylistedExplicitURLs[CurrentFile]) && !File.Exists(GraylistedExplicitFilePaths[CurrentFile])) {
+                                            this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + GraylistedExplicitFileNames[CurrentFile]));
+                                            await wc.DownloadFileTaskAsync(new Uri(GraylistedExplicitURLs[CurrentFile]), GraylistedExplicitFilePaths[CurrentFile]);
+                                        }
+                                    }
+                                }
+
+                                if (GraylistedQuestionableURLs.Count > 0) {
+                                    this.BeginInvoke((MethodInvoker)delegate() {
+                                        Program.Log(LogAction.WriteToLog, "Downloading graylisted questionable files.");
+                                    });
+                                    for (int CurrentFile = 0; CurrentFile < GraylistedQuestionableURLs.Count; CurrentFile++) {
+                                        this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading graylisted (q) file " + (CurrentFile + 1) + " of " + (GraylistQuestionableCount)));
+                                        if (!string.IsNullOrEmpty(GraylistedQuestionableURLs[CurrentFile]) && !File.Exists(GraylistedQuestionableFilePaths[CurrentFile])) {
+                                            this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + GraylistedQuestionableFileNames[CurrentFile]));
+                                            await wc.DownloadFileTaskAsync(new Uri(GraylistedQuestionableURLs[CurrentFile]), GraylistedQuestionableFilePaths[CurrentFile]);
+                                        }
+                                    }
+                                }
+
+                                if (GraylistedSafeURLs.Count > 0) {
+                                    this.BeginInvoke((MethodInvoker)delegate() {
+                                        Program.Log(LogAction.WriteToLog, "Downloading graylisted safe files.");
+                                    });
+                                    for (int CurrentFile = 0; CurrentFile < GraylistedSafeURLs.Count; CurrentFile++) {
+                                        this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading graylisted (s) file " + (CurrentFile + 1) + " of " + (GraylistSafeCount)));
+                                        if (!string.IsNullOrEmpty(GraylistedSafeURLs[CurrentFile]) && !File.Exists(GraylistedSafeFilePaths[CurrentFile])) {
+                                            this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + GraylistedSafeFileNames[CurrentFile]));
+                                            await wc.DownloadFileTaskAsync(new Uri(GraylistedSafeURLs[CurrentFile]), GraylistedSafeFilePaths[CurrentFile]);
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (DownloadInfo.SaveBlacklistedFiles) {
+                                if (BlacklistedExplicitURLs.Count > 0) {
+                                    this.BeginInvoke((MethodInvoker)delegate() {
+                                        Program.Log(LogAction.WriteToLog, "Downloading blacklisted explicit files.");
+                                    });
+                                    for (int CurrentFile = 0; CurrentFile < BlacklistedExplicitURLs.Count; CurrentFile++) {
+                                        this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted (e) file " + (CurrentFile + 1) + " of " + (BlacklistExplicitCount)));
+                                        if (!string.IsNullOrEmpty(BlacklistedExplicitURLs[CurrentFile]) && !File.Exists(BlacklistedExplicitFilePaths[CurrentFile])) {
+                                            this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + BlacklistedExplicitFileNames[CurrentFile]));
+                                            await wc.DownloadFileTaskAsync(new Uri(BlacklistedExplicitURLs[CurrentFile]), BlacklistedExplicitFilePaths[CurrentFile]);
+                                        }
+                                    }
+                                }
+
+                                if (BlacklistedQuestionableURLs.Count > 0) {
+                                    this.BeginInvoke((MethodInvoker)delegate() {
+                                        Program.Log(LogAction.WriteToLog, "Downloading blacklisted questionable files.");
+                                    });
+                                    for (int CurrentFile = 0; CurrentFile < BlacklistedQuestionableURLs.Count; CurrentFile++) {
+                                        this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted (q) file " + (CurrentFile + 1) + " of " + (BlacklistQuestionableCount)));
+                                        if (!string.IsNullOrEmpty(BlacklistedQuestionableURLs[CurrentFile]) && !File.Exists(BlacklistedQuestionableFilePaths[CurrentFile])) {
+                                            this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + BlacklistedQuestionableFileNames[CurrentFile]));
+                                            await wc.DownloadFileTaskAsync(new Uri(BlacklistedQuestionableURLs[CurrentFile]), BlacklistedQuestionableFilePaths[CurrentFile]);
+                                        }
+                                    }
+                                }
+
+                                if (BlacklistedSafeURLs.Count > 0) {
+                                    this.BeginInvoke((MethodInvoker)delegate() {
+                                        Program.Log(LogAction.WriteToLog, "Downloading blacklisted safe files.");
+                                    });
+                                    for (int CurrentFile = 0; CurrentFile < BlacklistedSafeURLs.Count; CurrentFile++) {
+                                        this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted (s) file " + (CurrentFile + 1) + " of " + (BlacklistSafeCount)));
+                                        if (!string.IsNullOrEmpty(BlacklistedSafeURLs[CurrentFile]) && !File.Exists(BlacklistedSafeFilePaths[CurrentFile])) {
+                                            this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + BlacklistedSafeFileNames[CurrentFile]));
+                                            await wc.DownloadFileTaskAsync(new Uri(BlacklistedSafeURLs[CurrentFile]), BlacklistedSafeFilePaths[CurrentFile]);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else {
+                            if (CleanedURLs.Count > 0) {
+                                this.BeginInvoke((MethodInvoker)delegate() {
+                                    Program.Log(LogAction.WriteToLog, "Downloading clean files.");
                                 });
 
-                                for (int y = 0; y < GraylistedExplicitURLs.Count; y++) {
-                                    if (string.IsNullOrEmpty(GraylistedExplicitURLs[y])) { continue; }
-                                    CurrentUrl = GraylistedExplicitURLs[y];
-                                    this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted (e) file " + (y + 1) + " of " + (graylistExplicitCount)));
+                                for (int CurrentFile = 0; CurrentFile < CleanedURLs.Count; CurrentFile++) {
+                                    this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading file " + (CurrentFile + 1) + " of " + (CleanTotalCount)));
+                                    if (!string.IsNullOrEmpty(CleanedURLs[CurrentFile]) && !File.Exists(CleanedFilePaths[CurrentFile])) {
+                                        this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + CleanedFileNames[CurrentFile]));
+                                        await wc.DownloadFileTaskAsync(new Uri(CleanedURLs[CurrentFile]), CleanedFilePaths[CurrentFile]);
+                                    }
+                                }
+                            }
 
-                                    string fileName = GraylistedExplicitFileNames[y];
-                                    string outputDir = DownloadInfo.DownloadPath + "\\explicit\\blacklisted\\";
+                            if (DownloadInfo.SaveGraylistedFiles && GraylistedURLs.Count > 0) {
+                                this.BeginInvoke((MethodInvoker)delegate() {
+                                    Program.Log(LogAction.WriteToLog, "Downloading graylisted files.");
+                                });
+
+                                for (int CurrentFile = 0; CurrentFile < GraylistedURLs.Count; CurrentFile++) {
+                                    this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading graylisted file " + (CurrentFile + 1) + " of " + (GraylistTotalCount)));
+                                    if (!string.IsNullOrEmpty(GraylistedURLs[CurrentFile]) && !File.Exists(GraylistedFilePaths[CurrentFile])) {
+                                        this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + GraylistedFileNames[CurrentFile]));
+                                        await wc.DownloadFileTaskAsync(new Uri(GraylistedURLs[CurrentFile]), GraylistedFilePaths[CurrentFile]);
+                                    }
+                                }
+                            }
+
+                            if (DownloadInfo.SaveBlacklistedFiles && BlacklistedURLs.Count > 0) {
+                                this.BeginInvoke((MethodInvoker)delegate() {
+                                    Program.Log(LogAction.WriteToLog, "Downloading blacklisted files.");
+                                });
+
+                                for (int CurrentFile = 0; CurrentFile < BlacklistedURLs.Count; CurrentFile++) {
+                                    this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted file " + (CurrentFile + 1) + " of " + (BlacklistTotalCount)));
+                                    if (!string.IsNullOrEmpty(BlacklistedURLs[CurrentFile]) && !File.Exists(BlacklistedFilePaths[CurrentFile])) {
+                                        this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + BlacklistedFileNames[CurrentFile]));
+                                        await wc.DownloadFileTaskAsync(new Uri(BlacklistedURLs[CurrentFile]), BlacklistedFilePaths[CurrentFile]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    #endregion
+
+                    #region Old download logic (doesnt break)
+                    // UseNewDownloadLogic = false;
+                    else {
+                        Object sync = new Object();
+                        if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                            if (CleanedExplicitURLs.Count > 0) {
+                                this.BeginInvoke((MethodInvoker)delegate() {
+                                    Program.Log(LogAction.WriteToLog, "Downloading explicit files.");
+                                });
+                                for (int y = 0; y < CleanedExplicitURLs.Count; y++) {
+                                    if (string.IsNullOrEmpty(CleanedExplicitURLs[y])) { continue; }
+                                    CurrentUrl = CleanedExplicitURLs[y];
+
+                                    string fileName = CleanedExplicitFileNames[y];
+                                    string outputDir = DownloadInfo.DownloadPath + "\\explicit\\";
+                                    switch (DownloadInfo.SeparateNonImages) {
+                                        case true:
+                                            if (fileName.EndsWith("gif")) {
+                                                outputDir += "gif\\";
+                                            }
+                                            else if (fileName.EndsWith("apng")) {
+                                                outputDir += "apng\\";
+                                            }
+                                            else if (fileName.EndsWith("webm")) {
+                                                outputDir += "webm\\";
+                                            }
+                                            else if (fileName.EndsWith("swf")) {
+                                                outputDir += "swf\\";
+                                            }
+                                            break;
+                                    }
+                                    outputDir += fileName;
+                                    if (!File.Exists(outputDir)) {
+                                        this.BeginInvoke((MethodInvoker)delegate() {
+                                            status.Text = "Downloading " + fileName;
+                                            lbFile.Text = "Downloading explicit file " + (y + 1) + " of " + (CleanExplicitCount);
+                                        });
+                                        lock (sync) {
+                                            wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
+                                            Monitor.Wait(sync);
+                                        }
+                                    }
+                                    else {
+                                        this.Invoke((MethodInvoker)(() => status.Text = fileName + " already exists"));
+                                    }
+                                }
+                            }
+
+                            if (CleanedQuestionableURLs.Count > 0) {
+                                this.BeginInvoke((MethodInvoker)delegate() {
+                                    Program.Log(LogAction.WriteToLog, "Downloading questionable files.");
+                                });
+
+                                for (int y = 0; y < CleanedQuestionableURLs.Count; y++) {
+                                    if (string.IsNullOrEmpty(CleanedQuestionableURLs[y])) { continue; }
+                                    CurrentUrl = CleanedQuestionableURLs[y];
+                                    this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading questionable file " + (y + 1) + " of " + (CleanQuestionableCount)));
+
+                                    string fileName = CleanedQuestionableFileNames[y];
+                                    string outputDir = DownloadInfo.DownloadPath + "\\questionable\\";
+                                    switch (DownloadInfo.SeparateNonImages) {
+                                        case true:
+                                            if (fileName.EndsWith("gif")) {
+                                                outputDir += "gif\\";
+                                            }
+                                            else if (fileName.EndsWith("apng")) {
+                                                outputDir += "apng\\";
+                                            }
+                                            else if (fileName.EndsWith("webm")) {
+                                                outputDir += "webm\\";
+                                            }
+                                            else if (fileName.EndsWith("swf")) {
+                                                outputDir += "swf\\";
+                                            }
+                                            break;
+                                    }
+                                    outputDir += fileName;
+                                    if (!File.Exists(outputDir)) {
+                                        this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
+                                        lock (sync) {
+                                            wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
+                                            Monitor.Wait(sync);
+                                        }
+                                    }
+                                    else {
+                                        this.Invoke((MethodInvoker)(() => status.Text = fileName + " already exists"));
+                                    }
+                                }
+                            }
+
+                            if (CleanedSafeURLs.Count > 0) {
+                                this.BeginInvoke((MethodInvoker)delegate() {
+                                    Program.Log(LogAction.WriteToLog, "Downloading safe files.");
+                                });
+
+                                for (int y = 0; y < CleanedSafeURLs.Count; y++) {
+                                    if (string.IsNullOrEmpty(CleanedSafeURLs[y])) { continue; }
+                                    CurrentUrl = CleanedSafeURLs[y];
+                                    this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading safe file " + (y + 1) + " of " + (CleanSafeCount)));
+
+                                    string fileName = CleanedSafeFileNames[y];
+                                    string outputDir = DownloadInfo.DownloadPath + "\\safe\\";
+                                    switch (DownloadInfo.SeparateNonImages) {
+                                        case true:
+                                            if (fileName.EndsWith("gif")) {
+                                                outputDir += "gif\\";
+                                            }
+                                            else if (fileName.EndsWith("apng")) {
+                                                outputDir += "apng\\";
+                                            }
+                                            else if (fileName.EndsWith("webm")) {
+                                                outputDir += "webm\\";
+                                            }
+                                            else if (fileName.EndsWith("swf")) {
+                                                outputDir += "swf\\";
+                                            }
+                                            break;
+                                    }
+                                    outputDir += fileName;
+                                    if (!File.Exists(outputDir)) {
+                                        this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
+                                        lock (sync) {
+                                            wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
+                                            Monitor.Wait(sync);
+                                        }
+                                    }
+                                    else {
+                                        this.Invoke((MethodInvoker)(() => status.Text = fileName + " already exists"));
+                                    }
+                                }
+                            }
+
+                            if (DownloadInfo.SaveGraylistedFiles) {
+                                if (GraylistedExplicitURLs.Count > 0) {
+                                    this.BeginInvoke((MethodInvoker)delegate() {
+                                        Program.Log(LogAction.WriteToLog, "Downloading graylisted explicit files.");
+                                    });
+
+                                    for (int y = 0; y < GraylistedExplicitURLs.Count; y++) {
+                                        if (string.IsNullOrEmpty(GraylistedExplicitURLs[y])) { continue; }
+                                        CurrentUrl = GraylistedExplicitURLs[y];
+                                        this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading graylisted (e) file " + (y + 1) + " of " + (GraylistExplicitCount)));
+
+                                        string fileName = GraylistedExplicitFileNames[y];
+                                        string outputDir = DownloadInfo.DownloadPath + "\\explicit\\graylisted\\";
+                                        switch (DownloadInfo.SeparateNonImages) {
+                                            case true:
+                                                if (fileName.EndsWith("gif")) {
+                                                    outputDir += "gif\\";
+                                                }
+                                                else if (fileName.EndsWith("apng")) {
+                                                    outputDir += "apng\\";
+                                                }
+                                                else if (fileName.EndsWith("webm")) {
+                                                    outputDir += "webm\\";
+                                                }
+                                                else if (fileName.EndsWith("swf")) {
+                                                    outputDir += "swf\\";
+                                                }
+                                                break;
+                                        }
+                                        outputDir += fileName;
+                                        if (!File.Exists(outputDir)) {
+                                            this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
+                                            lock (sync) {
+                                                wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
+                                                Monitor.Wait(sync);
+                                            }
+                                        }
+                                        else {
+                                            this.Invoke((MethodInvoker)(() => status.Text = fileName + " already exists"));
+                                        }
+                                    }
+                                }
+
+                                if (GraylistedQuestionableURLs.Count > 0) {
+                                    this.BeginInvoke((MethodInvoker)delegate() {
+                                        Program.Log(LogAction.WriteToLog, "Downloading graylisted questionable files.");
+                                    });
+
+                                    for (int y = 0; y < GraylistedQuestionableURLs.Count; y++) {
+                                        if (string.IsNullOrEmpty(GraylistedQuestionableURLs[y])) { continue; }
+                                        CurrentUrl = GraylistedQuestionableURLs[y];
+                                        this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading graylisted (q) file " + (y + 1) + " of " + (GraylistQuestionableCount)));
+
+                                        string fileName = GraylistedQuestionableFileNames[y];
+                                        string outputDir = DownloadInfo.DownloadPath + "\\questionable\\graylisted\\";
+                                        switch (DownloadInfo.SeparateNonImages) {
+                                            case true:
+                                                if (fileName.EndsWith("gif")) {
+                                                    outputDir += "gif\\";
+                                                }
+                                                else if (fileName.EndsWith("apng")) {
+                                                    outputDir += "apng\\";
+                                                }
+                                                else if (fileName.EndsWith("webm")) {
+                                                    outputDir += "webm\\";
+                                                }
+                                                else if (fileName.EndsWith("swf")) {
+                                                    outputDir += "swf\\";
+                                                }
+                                                break;
+                                        }
+                                        outputDir += fileName;
+                                        if (!File.Exists(outputDir)) {
+                                            this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
+                                            lock (sync) {
+                                                wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
+                                                Monitor.Wait(sync);
+                                            }
+                                        }
+                                        else {
+                                            this.Invoke((MethodInvoker)(() => status.Text = fileName + " already exists"));
+                                        }
+                                    }
+                                }
+
+                                if (GraylistedSafeURLs.Count > 0) {
+                                    this.BeginInvoke((MethodInvoker)delegate() {
+                                        Program.Log(LogAction.WriteToLog, "Downloading graylisted safe files.");
+                                    });
+
+                                    for (int y = 0; y < GraylistedSafeURLs.Count; y++) {
+                                        if (string.IsNullOrEmpty(GraylistedSafeURLs[y])) { continue; }
+                                        CurrentUrl = GraylistedSafeURLs[y];
+                                        this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading graylisted (s) file " + (y + 1) + " of " + (GraylistSafeCount)));
+
+                                        string fileName = GraylistedSafeFileNames[y];
+                                        string outputDir = DownloadInfo.DownloadPath + "\\safe\\graylisted\\";
+                                        switch (DownloadInfo.SeparateNonImages) {
+                                            case true:
+                                                if (fileName.EndsWith("gif")) {
+                                                    outputDir += "gif\\";
+                                                }
+                                                else if (fileName.EndsWith("apng")) {
+                                                    outputDir += "apng\\";
+                                                }
+                                                else if (fileName.EndsWith("webm")) {
+                                                    outputDir += "webm\\";
+                                                }
+                                                else if (fileName.EndsWith("swf")) {
+                                                    outputDir += "swf\\";
+                                                }
+                                                break;
+                                        }
+                                        outputDir += fileName;
+                                        if (!File.Exists(outputDir)) {
+                                            this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
+                                            lock (sync) {
+                                                wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
+                                                Monitor.Wait(sync);
+                                            }
+                                        }
+                                        else {
+                                            this.Invoke((MethodInvoker)(() => status.Text = fileName + " already exists"));
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (DownloadInfo.SaveBlacklistedFiles) {
+                                if (BlacklistedExplicitURLs.Count > 0) {
+                                    this.BeginInvoke((MethodInvoker)delegate() {
+                                        Program.Log(LogAction.WriteToLog, "Downloading Blacklisted explicit files.");
+                                    });
+
+                                    for (int y = 0; y < BlacklistedExplicitURLs.Count; y++) {
+                                        if (string.IsNullOrEmpty(BlacklistedExplicitURLs[y])) { continue; }
+                                        CurrentUrl = BlacklistedExplicitURLs[y];
+                                        this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted (e) file " + (y + 1) + " of " + (BlacklistExplicitCount)));
+
+                                        string fileName = BlacklistedExplicitFileNames[y];
+                                        string outputDir = DownloadInfo.DownloadPath + "\\explicit\\blacklisted\\";
+                                        switch (DownloadInfo.SeparateNonImages) {
+                                            case true:
+                                                if (fileName.EndsWith("gif")) {
+                                                    outputDir += "gif\\";
+                                                }
+                                                else if (fileName.EndsWith("apng")) {
+                                                    outputDir += "apng\\";
+                                                }
+                                                else if (fileName.EndsWith("webm")) {
+                                                    outputDir += "webm\\";
+                                                }
+                                                else if (fileName.EndsWith("swf")) {
+                                                    outputDir += "swf\\";
+                                                }
+                                                break;
+                                        }
+                                        outputDir += fileName;
+                                        if (!File.Exists(outputDir)) {
+                                            this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
+                                            lock (sync) {
+                                                wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
+                                                Monitor.Wait(sync);
+                                            }
+                                        }
+                                        else {
+                                            this.Invoke((MethodInvoker)(() => status.Text = fileName + " already exists"));
+                                        }
+                                    }
+                                }
+
+                                if (BlacklistedQuestionableURLs.Count > 0) {
+                                    this.BeginInvoke((MethodInvoker)delegate() {
+                                        Program.Log(LogAction.WriteToLog, "Downloading Blacklisted questionable files.");
+                                    });
+
+                                    for (int y = 0; y < BlacklistedQuestionableURLs.Count; y++) {
+                                        if (string.IsNullOrEmpty(BlacklistedQuestionableURLs[y])) { continue; }
+                                        CurrentUrl = BlacklistedQuestionableURLs[y];
+                                        this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted (q) file " + (y + 1) + " of " + (BlacklistQuestionableCount)));
+
+                                        string fileName = BlacklistedQuestionableFileNames[y];
+                                        string outputDir = DownloadInfo.DownloadPath + "\\questionable\\blacklisted\\";
+                                        switch (DownloadInfo.SeparateNonImages) {
+                                            case true:
+                                                if (fileName.EndsWith("gif")) {
+                                                    outputDir += "gif\\";
+                                                }
+                                                else if (fileName.EndsWith("apng")) {
+                                                    outputDir += "apng\\";
+                                                }
+                                                else if (fileName.EndsWith("webm")) {
+                                                    outputDir += "webm\\";
+                                                }
+                                                else if (fileName.EndsWith("swf")) {
+                                                    outputDir += "swf\\";
+                                                }
+                                                break;
+                                        }
+                                        outputDir += fileName;
+                                        if (!File.Exists(outputDir)) {
+                                            this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
+                                            lock (sync) {
+                                                wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
+                                                Monitor.Wait(sync);
+                                            }
+                                        }
+                                        else {
+                                            this.Invoke((MethodInvoker)(() => status.Text = fileName + " already exists"));
+                                        }
+                                    }
+                                }
+
+                                if (BlacklistedSafeURLs.Count > 0) {
+                                    this.BeginInvoke((MethodInvoker)delegate() {
+                                        Program.Log(LogAction.WriteToLog, "Downloading Blacklisted safe files.");
+                                    });
+
+                                    for (int y = 0; y < BlacklistedSafeURLs.Count; y++) {
+                                        if (string.IsNullOrEmpty(BlacklistedSafeURLs[y])) { continue; }
+                                        CurrentUrl = BlacklistedSafeURLs[y];
+                                        this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted (s) file " + (y + 1) + " of " + (BlacklistSafeCount)));
+
+                                        string fileName = BlacklistedSafeFileNames[y];
+                                        string outputDir = DownloadInfo.DownloadPath + "\\safe\\blacklisted\\";
+                                        switch (DownloadInfo.SeparateNonImages) {
+                                            case true:
+                                                if (fileName.EndsWith("gif")) {
+                                                    outputDir += "gif\\";
+                                                }
+                                                else if (fileName.EndsWith("apng")) {
+                                                    outputDir += "apng\\";
+                                                }
+                                                else if (fileName.EndsWith("webm")) {
+                                                    outputDir += "webm\\";
+                                                }
+                                                else if (fileName.EndsWith("swf")) {
+                                                    outputDir += "swf\\";
+                                                }
+                                                break;
+                                        }
+                                        outputDir += fileName;
+                                        if (!File.Exists(outputDir)) {
+                                            this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
+                                            lock (sync) {
+                                                wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
+                                                Monitor.Wait(sync);
+                                            }
+                                        }
+                                        else {
+                                            this.Invoke((MethodInvoker)(() => status.Text = fileName + " already exists"));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else {
+                            if (CleanedURLs.Count > 0) {
+                                this.BeginInvoke((MethodInvoker)delegate() {
+                                    Program.Log(LogAction.WriteToLog, "Downloading clean files.");
+                                });
+
+                                for (int y = 0; y < CleanedURLs.Count; y++) {
+                                    if (string.IsNullOrEmpty(CleanedURLs[y])) { continue; }
+                                    CurrentUrl = CleanedURLs[y];
+                                    this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading file " + (y + 1) + " of " + (CleanTotalCount)));
+
+                                    string fileName = CleanedFileNames[y];
+                                    string outputDir = DownloadInfo.DownloadPath;
+                                    switch (DownloadInfo.SeparateNonImages) {
+                                        case true:
+                                            if (fileName.EndsWith("gif")) {
+                                                outputDir += "\\gif\\";
+                                            }
+                                            else if (fileName.EndsWith("apng")) {
+                                                outputDir += "\\apng\\";
+                                            }
+                                            else if (fileName.EndsWith("webm")) {
+                                                outputDir += "\\webm\\";
+                                            }
+                                            else if (fileName.EndsWith("swf")) {
+                                                outputDir += "\\swf\\";
+                                            }
+                                            break;
+                                    }
+                                    outputDir += fileName;
+                                    if (!File.Exists(outputDir)) {
+                                        this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
+                                        lock (sync) {
+                                            wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
+                                            Monitor.Wait(sync);
+                                        }
+                                    }
+                                    else {
+                                        this.Invoke((MethodInvoker)(() => status.Text = fileName + " already exists"));
+                                    }
+                                }
+                            }
+
+                            if (DownloadInfo.SaveGraylistedFiles && GraylistedURLs.Count > 0) {
+                                this.BeginInvoke((MethodInvoker)delegate() {
+                                    Program.Log(LogAction.WriteToLog, "Downloading graylisted files.");
+                                });
+
+                                for (int y = 0; y < GraylistedURLs.Count; y++) {
+                                    if (string.IsNullOrEmpty(GraylistedURLs[y])) { continue; }
+                                    CurrentUrl = GraylistedURLs[y];
+                                    this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading graylisted file " + (y) + " of " + (GraylistTotalCount)));
+
+                                    string fileName = GraylistedFileNames[y];
+                                    string outputDir = DownloadInfo.DownloadPath + "\\graylisted\\";
+                                    switch (DownloadInfo.SeparateNonImages) {
+                                        case true:
+                                            if (fileName.EndsWith("gif")) {
+                                                outputDir += "gif\\";
+                                            }
+                                            else if (fileName.EndsWith("apng")) {
+                                                outputDir += "apng\\";
+                                            }
+                                            else if (fileName.EndsWith("webm")) {
+                                                outputDir += "webm\\";
+                                            }
+                                            else if (fileName.EndsWith("swf")) {
+                                                outputDir += "swf\\";
+                                            }
+                                            break;
+                                    }
+                                    outputDir += fileName;
+                                    if (!File.Exists(outputDir)) {
+                                        this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
+                                        lock (sync) {
+                                            wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
+                                            Monitor.Wait(sync);
+                                        }
+                                    }
+                                    else {
+                                        this.Invoke((MethodInvoker)(() => status.Text = fileName + " already exists"));
+                                    }
+                                }
+                            }
+
+                            if (DownloadInfo.SaveBlacklistedFiles && BlacklistedURLs.Count > 0) {
+                                this.BeginInvoke((MethodInvoker)delegate() {
+                                    Program.Log(LogAction.WriteToLog, "Downloading blacklisted files.");
+                                });
+
+                                for (int y = 0; y < BlacklistedURLs.Count; y++) {
+                                    if (string.IsNullOrEmpty(BlacklistedURLs[y])) { continue; }
+                                    CurrentUrl = BlacklistedURLs[y];
+                                    this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted file " + (y) + " of " + (BlacklistTotalCount)));
+
+                                    string fileName = BlacklistedFileNames[y];
+                                    string outputDir = DownloadInfo.DownloadPath + "\\blacklisted\\";
                                     switch (DownloadInfo.SeparateNonImages) {
                                         case true:
                                             if (fileName.EndsWith("gif")) {
@@ -1673,196 +2413,33 @@ namespace aphrodite {
                                 }
                             }
                         }
-
-                        if (GraylistedQuestionableURLs.Count > 0) {
-                            this.BeginInvoke((MethodInvoker)delegate() {
-                                Program.Log(LogAction.WriteToLog, "Downloading graylisted questionable files.");
-                            });
-
-                            for (int y = 0; y < GraylistedQuestionableURLs.Count; y++) {
-                                if (string.IsNullOrEmpty(GraylistedQuestionableURLs[y])) { continue; }
-                                CurrentUrl = GraylistedQuestionableURLs[y];
-                                this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted (q) file " + (y + 1) + " of " + (graylistQuestionableCount)));
-
-                                string fileName = GraylistedQuestionableFileNames[y];
-                                string outputDir = DownloadInfo.DownloadPath + "\\questionable\\blacklisted\\";
-                                switch (DownloadInfo.SeparateNonImages) {
-                                    case true:
-                                        if (fileName.EndsWith("gif")) {
-                                            outputDir += "gif\\";
-                                        }
-                                        else if (fileName.EndsWith("apng")) {
-                                            outputDir += "apng\\";
-                                        }
-                                        else if (fileName.EndsWith("webm")) {
-                                            outputDir += "webm\\";
-                                        }
-                                        else if (fileName.EndsWith("swf")) {
-                                            outputDir += "swf\\";
-                                        }
-                                        break;
-                                }
-                                outputDir += fileName;
-                                if (!File.Exists(outputDir)) {
-                                    this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
-                                    lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
-                                        Monitor.Wait(sync);
-                                    }
-                                }
-                                else {
-                                    this.Invoke((MethodInvoker)(() => status.Text = fileName + " already exists"));
-                                }
-                            }
-                        }
-
-                        if (GraylistedSafeURLs.Count > 0) {
-                            this.BeginInvoke((MethodInvoker)delegate() {
-                                Program.Log(LogAction.WriteToLog, "Downloading graylisted safe files.");
-                            });
-
-                            for (int y = 0; y < GraylistedSafeURLs.Count; y++) {
-                                if (string.IsNullOrEmpty(GraylistedSafeURLs[y])) { continue; }
-                                CurrentUrl = GraylistedSafeURLs[y];
-                                this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted (s) file " + (y + 1) + " of " + (graylistSafeCount)));
-
-                                string fileName = GraylistedSafeFileNames[y];
-                                string outputDir = DownloadInfo.DownloadPath + "\\safe\\blacklisted\\";
-                                switch (DownloadInfo.SeparateNonImages) {
-                                    case true:
-                                        if (fileName.EndsWith("gif")) {
-                                            outputDir += "gif\\";
-                                        }
-                                        else if (fileName.EndsWith("apng")) {
-                                            outputDir += "apng\\";
-                                        }
-                                        else if (fileName.EndsWith("webm")) {
-                                            outputDir += "webm\\";
-                                        }
-                                        else if (fileName.EndsWith("swf")) {
-                                            outputDir += "swf\\";
-                                        }
-                                        break;
-                                }
-                                outputDir += fileName;
-                                if (!File.Exists(outputDir)) {
-                                    this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
-                                    lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
-                                        Monitor.Wait(sync);
-                                    }
-                                }
-                                else {
-                                    this.Invoke((MethodInvoker)(() => status.Text = fileName + " already exists"));
-                                }
-                            }
-                        }
-                    }
-                    else {
-                        if (URLs.Count > 0) {
-                            this.BeginInvoke((MethodInvoker)delegate() {
-                                Program.Log(LogAction.WriteToLog, "Downloading clean files.");
-                            });
-
-                            for (int y = 0; y < URLs.Count; y++) {
-                                if (string.IsNullOrEmpty(URLs[y])) { continue; }
-                                CurrentUrl = URLs[y];
-                                this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading file " + (y + 1) + " of " + (cleanTotalCount)));
-
-                                string fileName = FileNames[y];
-                                string outputDir = DownloadInfo.DownloadPath;
-                                switch (DownloadInfo.SeparateNonImages) {
-                                    case true:
-                                        if (fileName.EndsWith("gif")) {
-                                            outputDir += "\\gif\\";
-                                        }
-                                        else if (fileName.EndsWith("apng")) {
-                                            outputDir += "\\apng\\";
-                                        }
-                                        else if (fileName.EndsWith("webm")) {
-                                            outputDir += "\\webm\\";
-                                        }
-                                        else if (fileName.EndsWith("swf")) {
-                                            outputDir += "\\swf\\";
-                                        }
-                                        break;
-                                }
-                                outputDir += fileName;
-                                if (!File.Exists(outputDir)) {
-                                    this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
-                                    lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
-                                        Monitor.Wait(sync);
-                                    }
-                                }
-                                else {
-                                    this.Invoke((MethodInvoker)(() => status.Text = fileName + " already exists"));
-                                }
-                            }
-                        }
-
-                        if (DownloadInfo.SaveGraylistedFiles && GraylistedURLs.Count > 0) {
-                            this.BeginInvoke((MethodInvoker)delegate() {
-                                Program.Log(LogAction.WriteToLog, "Downloading graylisted files.");
-                            });
-
-                            for (int y = 0; y < GraylistedURLs.Count; y++) {
-                                if (string.IsNullOrEmpty(GraylistedURLs[y])) { continue; }
-                                CurrentUrl = GraylistedURLs[y];
-                                this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted file " + (y) + " of " + (graylistTotalCount)));
-
-                                string fileName = GraylistedFileNames[y];
-                                string outputDir = DownloadInfo.DownloadPath + "\\blacklisted\\";
-                                switch (DownloadInfo.SeparateNonImages) {
-                                    case true:
-                                        if (fileName.EndsWith("gif")) {
-                                            outputDir += "gif\\";
-                                        }
-                                        else if (fileName.EndsWith("apng")) {
-                                            outputDir += "apng\\";
-                                        }
-                                        else if (fileName.EndsWith("webm")) {
-                                            outputDir += "webm\\";
-                                        }
-                                        else if (fileName.EndsWith("swf")) {
-                                            outputDir += "swf\\";
-                                        }
-                                        break;
-                                }
-                                outputDir += fileName;
-                                if (!File.Exists(outputDir)) {
-                                    this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
-                                    lock (sync) {
-                                        wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
-                                        Monitor.Wait(sync);
-                                    }
-                                }
-                                else {
-                                    this.Invoke((MethodInvoker)(() => status.Text = fileName + " already exists"));
-                                }
-                            }
-                        }
                     }
                 }
+                    #endregion
+
                 #endregion
 
                 #region post download
                 if (DownloadInfo.SeparateRatings) {
-                    TotalFiles += (ExplicitURLs.Count + QuestionableURLs.Count + SafeURLs.Count);
-                    PresentFiles += cleanTotalCount;
+                    TotalFiles += (CleanedExplicitURLs.Count + CleanedQuestionableURLs.Count + CleanedSafeURLs.Count);
+                    PresentFiles += CleanTotalCount;
                     if (DownloadInfo.SaveGraylistedFiles) {
                         TotalFiles += (GraylistedExplicitURLs.Count + GraylistedQuestionableURLs.Count + GraylistedSafeURLs.Count);
-                        PresentFiles += graylistTotalCount;
+                        PresentFiles += GraylistTotalCount;
                     }
                 }
                 else {
-                    TotalFiles += URLs.Count;
-                    PresentFiles += cleanTotalCount;
+                    TotalFiles += CleanedURLs.Count;
+                    PresentFiles += CleanTotalCount;
                     if (DownloadInfo.SaveGraylistedFiles) {
                         TotalFiles += GraylistedURLs.Count;
-                        PresentFiles += graylistTotalCount;
+                        PresentFiles += GraylistTotalCount;
                     }
                 }
+
+                this.BeginInvoke(new MethodInvoker(() => {
+                    Program.Log(LogAction.WriteToLog, "Tags \"" + DownloadInfo.Tags + "\" was downloaded. (frmTagDownloader.cs)");
+                }));
 
                 CurrentStatus = DownloadStatus.Finished;
                 #endregion
@@ -1870,35 +2447,33 @@ namespace aphrodite {
             #endregion
 
             #region Downloader catch-statements
-            catch (ThreadAbortException) {
-                this.BeginInvoke((MethodInvoker)delegate() {
-                    Program.Log(LogAction.WriteToLog, "Thread was requested to be, and has been, aborted. (frmTagDownloader.cs)");
-                });
-                CurrentStatus = DownloadStatus.Aborted;
-            }
-            catch (ObjectDisposedException) {
-                this.BeginInvoke((MethodInvoker)delegate() {
-                    Program.Log(LogAction.WriteToLog, "Seems like the object got disposed. (frmTagDownloader.cs)");
-                });
-                CurrentStatus = DownloadStatus.Errored;
-            }
             catch (ApiReturnedNullOrEmptyException) {
-                this.BeginInvoke((MethodInvoker)delegate() {
-                    Program.Log(LogAction.WriteToLog, "Api returned null or empty. (frmTagDownloader.cs)");
-                });
+                this.BeginInvoke(new MethodInvoker(() => {
+                    Program.Log(LogAction.WriteToLog, "Tags \"" + DownloadInfo.Tags + "\" Api returned null or empty. (frmTagDownloader.cs)");
+                }));
                 CurrentStatus = DownloadStatus.ApiReturnedNullOrEmpty;
             }
             catch (NoFilesToDownloadException) {
-                this.BeginInvoke((MethodInvoker)delegate() {
-                    Program.Log(LogAction.WriteToLog, "No files are available for downloading. (frmTagDownloader.cs)");
-                });
+                this.BeginInvoke(new MethodInvoker(() => {
+                    Program.Log(LogAction.WriteToLog, "No files are available for tags \"" + DownloadInfo.Tags + "\". (frmTagDownloader.cs)");
+                }));
                 CurrentStatus = DownloadStatus.NothingToDownload;
             }
-            catch (WebException WebE) {
-                this.BeginInvoke((MethodInvoker)delegate() {
-                    Program.Log(LogAction.WriteToLog, "A WebException has occured. (frmTagDownloader.cs)");
-                });
+            catch (ThreadAbortException) {
                 this.BeginInvoke(new MethodInvoker(() => {
+                    Program.Log(LogAction.WriteToLog, "The download thread was aborted. (frmTagDownloader.cs)");
+                }));
+                CurrentStatus = DownloadStatus.Aborted;
+            }
+            catch (ObjectDisposedException) {
+                this.BeginInvoke(new MethodInvoker(() => {
+                    Program.Log(LogAction.WriteToLog, "Seems like the form got disposed. (frmTagDownloader.cs)");
+                }));
+                CurrentStatus = DownloadStatus.FormWasDisposed;
+            }
+            catch (WebException WebE) {
+                this.BeginInvoke(new MethodInvoker(() => {
+                    Program.Log(LogAction.WriteToLog, "A WebException has occured. (frmTagDownloader.cs)");
                     status.Text = "A WebException has occured";
                     pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
                     pbTotalStatus.State = aphrodite.Controls.ProgressBarState.Error;
@@ -1907,10 +2482,8 @@ namespace aphrodite {
                 ErrorLog.ReportWebException(WebE, CurrentUrl, "frmTagDownloader.cs");
             }
             catch (Exception ex) {
-                this.BeginInvoke((MethodInvoker)delegate() {
-                    Program.Log(LogAction.WriteToLog, "A general exception has occured. (frmTagDownloader.cs)");
-                });
                 this.BeginInvoke(new MethodInvoker(() => {
+                    Program.Log(LogAction.WriteToLog, "An Exception has occured. (frmTagDownloader.cs)");
                     status.Text = "A Exception has occured";
                     pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
                     pbTotalStatus.State = aphrodite.Controls.ProgressBarState.Error;
@@ -1922,9 +2495,11 @@ namespace aphrodite {
 
             #region After download finally statement
             finally {
-                this.BeginInvoke(new MethodInvoker(() => {
-                    AfterDownload();
-                }));
+                if (CurrentStatus != DownloadStatus.FormWasDisposed) {
+                    this.BeginInvoke(new MethodInvoker(() => {
+                        AfterDownload();
+                    }));
+                }
             }
             #endregion
         }
