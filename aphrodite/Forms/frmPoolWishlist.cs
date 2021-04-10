@@ -15,6 +15,7 @@ namespace aphrodite {
                 txtName.Text = AddTitle.Replace('|', '_');
                 txtURL.Text = AddUrl;
             }
+            lPoolLink.Text = string.Empty;
         }
 
         private void frmPoolWishlist_Load(object sender, EventArgs e) {
@@ -31,21 +32,27 @@ namespace aphrodite {
         }
 
         private void btnAddUpdate_Click(object sender, EventArgs e) {
-            if (string.IsNullOrEmpty(txtURL.Text) || string.IsNullOrEmpty(txtName.Text))
+            if (string.IsNullOrEmpty(txtURL.Text) || string.IsNullOrEmpty(txtName.Text)) {
                 return;
+            }
 
-            if (chkUpdate.Checked) {
-                PoolNames[listWishlistItems.SelectedIndex] = txtName.Text;
-                PoolURLS[listWishlistItems.SelectedIndex] = txtURL.Text;
-                listWishlistItems.Items[listWishlistItems.SelectedIndex] = txtName.Text;
-                lPoolLink.Text = txtURL.Text;
+            if (apiTools.IsValidPoolLink(txtURL.Text)) {
+                if (chkUpdate.Checked) {
+                    PoolNames[listWishlistItems.SelectedIndex] = txtName.Text;
+                    PoolURLS[listWishlistItems.SelectedIndex] = txtURL.Text;
+                    listWishlistItems.Items[listWishlistItems.SelectedIndex] = txtName.Text;
+                    lPoolLink.Text = txtURL.Text;
+                }
+                else {
+                    PoolURLS.Add(txtURL.Text);
+                    PoolNames.Add(txtName.Text);
+                    listWishlistItems.Items.Add(txtName.Text);
+                    txtName.Clear();
+                    txtURL.Clear();
+                }
             }
             else {
-                PoolURLS.Add(txtURL.Text);
-                PoolNames.Add(txtName.Text);
-                listWishlistItems.Items.Add(txtName.Text);
-                txtName.Clear();
-                txtURL.Clear();
+                System.Media.SystemSounds.Hand.Play();
             }
         }
 
@@ -65,26 +72,26 @@ namespace aphrodite {
         }
 
         private void btnDownload_Click(object sender, EventArgs e) {
-            string poolID = PoolURLS[listWishlistItems.SelectedIndex].Replace("http://", "https://").Replace("www.", "");
-            if (!poolID.StartsWith("https://"))
-                poolID = "https://" + poolID;
-            if (poolID.Contains("?"))
-                poolID = poolID.Split('?')[0];
-            poolID = poolID.Split('/')[5];
-            
-            Downloader.Arguments.DownloadPool(poolID);
+            if (apiTools.IsValidPoolLink(PoolURLS[listWishlistItems.SelectedIndex])) {            
+                Downloader.Arguments.DownloadPool(apiTools.GetPoolOrPostId(PoolURLS[listWishlistItems.SelectedIndex]));
+            }
         }
 
         private void lbWish_SelectedIndexChanged(object sender, EventArgs e) {
-            if (chkUpdate.Checked && listWishlistItems.SelectedItem != null) {
-                txtName.Text = PoolNames[listWishlistItems.SelectedIndex];
-                txtURL.Text = PoolURLS[listWishlistItems.SelectedIndex];
-                lPoolLink.Text = PoolURLS[listWishlistItems.SelectedIndex];
-            }
-            else if (listWishlistItems.SelectedItem != null) {
-                lPoolLink.Text = PoolURLS[listWishlistItems.SelectedIndex];
+            if (listWishlistItems.SelectedIndex > -1) {
+                if (chkUpdate.Checked) {
+                    txtName.Text = PoolNames[listWishlistItems.SelectedIndex];
+                    txtURL.Text = PoolURLS[listWishlistItems.SelectedIndex];
+                    lPoolLink.Text = PoolURLS[listWishlistItems.SelectedIndex];
+                    lPoolLink.Visible = true;
+                }
+                else {
+                    lPoolLink.Text = PoolURLS[listWishlistItems.SelectedIndex];
+                    lPoolLink.Visible = true;
+                }
             }
             else {
+                lPoolLink.Visible = false;
                 lPoolLink.Text = string.Empty;
             }
         }
@@ -96,6 +103,7 @@ namespace aphrodite {
                     txtName.Text = PoolNames[listWishlistItems.SelectedIndex];
                     txtURL.Text = PoolURLS[listWishlistItems.SelectedIndex];
                 }
+                lPoolLink.Visible = false;
             }
             else {
                 btnAddUpdate.Text = "Add";
@@ -105,7 +113,30 @@ namespace aphrodite {
         }
 
         private void lPoolLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
-            Process.Start(PoolURLS[listWishlistItems.SelectedIndex]);
+            if (e.Button == System.Windows.Forms.MouseButtons.Left) { 
+                Process.Start(PoolURLS[listWishlistItems.SelectedIndex]);
+            }
+            else if (e.Button == System.Windows.Forms.MouseButtons.Right) {
+                menuWishlist.Show(lPoolLink, new System.Drawing.Point(0, lPoolLink.Height - 2));
+            }
+        }
+
+        private void mOpenPoolInBrowser_Click(object sender, EventArgs e) {
+            if (apiTools.IsValidPoolLink(PoolURLS[listWishlistItems.SelectedIndex])) {
+                Process.Start(PoolURLS[listWishlistItems.SelectedIndex]);
+            }
+        }
+
+        private void mCopyPoolLink_Click(object sender, EventArgs e) {
+            if (apiTools.IsValidPoolLink(PoolURLS[listWishlistItems.SelectedIndex])) {
+                Clipboard.SetText(PoolURLS[listWishlistItems.SelectedIndex]);
+            }
+        }
+
+        private void mCopyPoolId_Click(object sender, EventArgs e) {
+            if (apiTools.IsValidPoolLink(PoolURLS[listWishlistItems.SelectedIndex])) {
+                Clipboard.SetText(apiTools.GetPoolOrPostId(PoolURLS[listWishlistItems.SelectedIndex]));
+            }
         }
     }
 }
