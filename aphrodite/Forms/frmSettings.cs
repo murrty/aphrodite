@@ -32,6 +32,7 @@ namespace aphrodite {
             if (Program.UseIni) {
                 tbMain.TabPages.Remove(tabProtocol);
                 tbMain.TabPages.Remove(tabPortable);
+                tbMain.TabPages.Remove(tabImportExport);
             }
             else {
                 checkProtocols();
@@ -53,10 +54,13 @@ namespace aphrodite {
                         tbMain.SelectedTab = tabProtocol;
                         break;
                     case 5:
-                        tbMain.SelectedTab = tabPortable;
+                        tbMain.SelectedTab = tabSchemas;
                         break;
                     case 6:
-                        tbMain.SelectedTab = tabSchemas;
+                        tbMain.SelectedTab = tabImportExport;
+                        break;
+                    case 7:
+                        tbMain.SelectedTab = tabPortable;
                         break;
                     default:
                         tbMain.SelectedTab = tabGeneral;
@@ -114,6 +118,8 @@ namespace aphrodite {
             Config.Settings.General.saveGraylisted = chkSaveGraylistedImages.Checked;
             Config.Settings.General.ignoreFinish = chkIgnoreFinish.Checked;
             Config.Settings.General.openAfter = chkOpenAfterDownload.Checked;
+            Config.Settings.Initialization.SkipArgumentCheck = chkSkipArgumentCheck.Checked;
+            Config.Settings.Initialization.AutoDownloadWithArguments = chkAutoDownloadWithArguments.Checked;
             //Config.Settings.General.saveMetadata = chkSaveMetadata.Checked;
             //Config.Settings.General.saveArtistMetadata = chkSaveArtistMetadata.Checked;
             //Config.Settings.General.saveTagMetadata = chkSaveTagMetadata.Checked;
@@ -186,6 +192,8 @@ namespace aphrodite {
             chkSaveGraylistedImages.Checked = Config.Settings.General.saveGraylisted;
             chkIgnoreFinish.Checked = Config.Settings.General.ignoreFinish;
             chkOpenAfterDownload.Checked = Config.Settings.General.openAfter;
+            chkSkipArgumentCheck.Checked = Config.Settings.Initialization.SkipArgumentCheck;
+            chkAutoDownloadWithArguments.Checked = Config.Settings.Initialization.AutoDownloadWithArguments;
             //chkSaveMetadata.Checked = Config.Settings.General.saveMetadata;
             //chkSaveArtistMetadata.Checked = Config.Settings.General.saveArtistMetadata;
             //chkSaveTagMetadata.Checked = Config.Settings.General.saveTagMetadata;
@@ -321,6 +329,61 @@ namespace aphrodite {
                 }
 
                 if (fbd.ShowDialog() == DialogResult.OK) {
+                    if (!string.IsNullOrWhiteSpace(txtSaveTo.Text) && Directory.Exists(txtSaveTo.Text)) {
+                        string MessageDialog = "Would you like to move your current downloads to the new directory?";
+                        string MessageTotalCount = string.Empty;
+
+                        if (Directory.Exists(txtSaveTo.Text + "\\Tags")) {
+                            MessageTotalCount += "\r\nYou have " + Directory.GetDirectories(txtSaveTo.Text + "\\Tags", "*", SearchOption.TopDirectoryOnly).Length + " downloaded tags";
+                        }
+                        if (Directory.Exists(txtSaveTo.Text + "\\Pages")) {
+                            MessageTotalCount += "\r\nYou have " + Directory.GetDirectories(txtSaveTo.Text + "\\Pages", "*", SearchOption.TopDirectoryOnly).Length + " downloaded pages";
+                        }
+                        if (Directory.Exists(txtSaveTo.Text + "\\Pools")) {
+                            MessageTotalCount += "\r\nYou have " + Directory.GetDirectories(txtSaveTo.Text + "\\Pools", "*", SearchOption.TopDirectoryOnly).Length + " downloaded pools";
+                        }
+                        if (Directory.Exists(txtSaveTo.Text + "\\Images")) {
+                            int ExplicitCount = 0;
+                            int QuestionableCount = 0;
+                            int SafeCount = 0;
+
+                            if (Directory.Exists(txtSaveTo.Text + "\\Images\\explicit")) {
+                                ExplicitCount += Directory.GetFiles(txtSaveTo.Text + "\\Images\\explicit", "*", SearchOption.TopDirectoryOnly).Length;
+                            }
+                            if (Directory.Exists(txtSaveTo.Text + "\\Images\\questionable")) {
+                                QuestionableCount += Directory.GetFiles(txtSaveTo.Text + "\\Images\\questionable", "*", SearchOption.TopDirectoryOnly).Length;
+                            }
+                            if (Directory.Exists(txtSaveTo.Text + "\\Images\\safe")) {
+                                SafeCount += Directory.GetFiles(txtSaveTo.Text + "\\Images\\safe", "*", SearchOption.TopDirectoryOnly).Length;
+                            }
+                            MessageTotalCount += string.Format("\r\nYou have " + (ExplicitCount + QuestionableCount + SafeCount) + " downloaded images\r\n({0} explicit, {1} questionable, {2} safe)", ExplicitCount, QuestionableCount, SafeCount);
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(MessageTotalCount)) {
+                            MessageTotalCount = "\r\n" + MessageTotalCount;
+                        }
+
+                        switch (MessageBox.Show(MessageDialog + MessageTotalCount, "aphrodite", MessageBoxButtons.YesNoCancel)) {
+                            case System.Windows.Forms.DialogResult.Cancel:
+                                return;
+
+                            case System.Windows.Forms.DialogResult.Yes:
+                                if (Directory.Exists(txtSaveTo.Text + "\\Tags")) {
+                                    Directory.Move(txtSaveTo.Text + "\\Tags", fbd.SelectedPath + "\\Tags");
+                                }
+                                if (Directory.Exists(txtSaveTo.Text + "\\Pages")) {
+                                    Directory.Move(txtSaveTo.Text + "\\Pages", fbd.SelectedPath + "\\Pages");
+                                }
+                                if (Directory.Exists(txtSaveTo.Text + "\\Pools")) {
+                                    Directory.Move(txtSaveTo.Text + "\\Pools", fbd.SelectedPath + "\\Pools");
+                                }
+                                if (Directory.Exists(txtSaveTo.Text + "\\Images")) {
+                                    Directory.Move(txtSaveTo.Text + "\\Images", fbd.SelectedPath + "\\Images");
+                                }
+                                break;
+                        }
+                    }
+
                     txtSaveTo.Text = fbd.SelectedPath;
                 }
             }
@@ -516,7 +579,11 @@ namespace aphrodite {
         }
 
         private void btnExportIni_Click(object sender, EventArgs e) {
-            MessageBox.Show("You can use the system-based settings for aphrodite by changing \"useIni\" to \"False\".\nAlso, graylist & blacklist have spaces between tags and are separate files, so... keep that in mind.");
+            switch (MessageBox.Show("Do you really want to export settings to an ini file?", "aphrodite", MessageBoxButtons.YesNo)) {
+                case DialogResult.Yes:
+                    break;
+            }
+            MessageBox.Show("You can use the system-based settings for aphrodite by changing \"useIni\" to \"False\".\r\nAlso, graylist & blacklist have spaces between tags and are separate files, so... keep that in mind.", "aphrodite");
             string bufferINI = "[aphrodite]\nuseIni=True";
             File.WriteAllText(Program.ApplicationPath + "\\graylist.cfg", Config.Settings.General.Graylist);
             File.WriteAllText(Program.ApplicationPath + "\\blacklist.cfg", Config.Settings.General.Blacklist);
@@ -565,7 +632,6 @@ namespace aphrodite {
         private void btnSchemaUndesiredTags_Click(object sender, EventArgs e) {
             frmUndesiredTags undesiredTags = new frmUndesiredTags();
             undesiredTags.ShowDialog();
-
             undesiredTags.Dispose();
         }
 
@@ -619,56 +685,113 @@ namespace aphrodite {
         }
 
         private void txtTagSchema_KeyDown(object sender, KeyEventArgs e) {
-            switch (e.Modifiers == Keys.Control) {
+            switch (e.Modifiers == Keys.Control && e.KeyCode == Keys.V && Clipboard.ContainsText()) {
                 case true:
-                    switch (e.KeyCode == Keys.V) {
-                        case true:
-                            switch (Clipboard.ContainsText()) {
-                                case true:
-                                    Clipboard.SetText(Clipboard.GetText().Replace("\\", "").Replace("/", "")
-                                        .Replace (":", "").Replace("*", "").Replace("?", "").Replace("\"", "")
-                                        .Replace("<", "").Replace(">", "").Replace("|", ""));
-                                    break;
-                            }
-                            break;
-                    }
+                    Clipboard.SetText(Clipboard.GetText().Replace("\\", "").Replace("/", "")
+                        .Replace(":", "").Replace("*", "").Replace("?", "").Replace("\"", "")
+                        .Replace("<", "").Replace(">", "").Replace("|", ""));
                     break;
             }
         }
 
         private void txtPoolSchema_KeyDown(object sender, KeyEventArgs e) {
-            switch (e.Modifiers == Keys.Control) {
+            switch (e.Modifiers == Keys.Control && e.KeyCode == Keys.V && Clipboard.ContainsText()) {
                 case true:
-                    switch (e.KeyCode == Keys.V) {
-                        case true:
-                            switch (Clipboard.ContainsText()) {
-                                case true:
-                                    Clipboard.SetText(Clipboard.GetText().Replace("\\", "").Replace("/", "")
-                                        .Replace(":", "").Replace("*", "").Replace("?", "").Replace("\"", "")
-                                        .Replace("<", "").Replace(">", "").Replace("|", ""));
-                                    break;
-                            }
-                            break;
-                    }
+                    Clipboard.SetText(Clipboard.GetText().Replace("\\", "").Replace("/", "")
+                        .Replace(":", "").Replace("*", "").Replace("?", "").Replace("\"", "")
+                        .Replace("<", "").Replace(">", "").Replace("|", ""));
                     break;
             }
         }
 
         private void txtImageSchema_KeyDown(object sender, KeyEventArgs e) {
-            switch (e.Modifiers == Keys.Control) {
+            switch (e.Modifiers == Keys.Control && e.KeyCode == Keys.V && Clipboard.ContainsText()) {
                 case true:
-                    switch (e.KeyCode == Keys.V) {
-                        case true:
-                            switch (Clipboard.ContainsText()) {
-                                case true:
-                                    Clipboard.SetText(Clipboard.GetText().Replace("\\", "").Replace("/", "")
-                                        .Replace(":", "").Replace("*", "").Replace("?", "").Replace("\"", "")
-                                        .Replace("<", "").Replace(">", "").Replace("|", ""));
-                                    break;
-                            }
-                            break;
-                    }
+                    Clipboard.SetText(Clipboard.GetText().Replace("\\", "").Replace("/", "")
+                        .Replace(":", "").Replace("*", "").Replace("?", "").Replace("\"", "")
+                        .Replace("<", "").Replace(">", "").Replace("|", ""));
                     break;
+            }
+        }
+
+        private void btnExportGraylist_Click(object sender, EventArgs e) {
+            using (Ookii.Dialogs.WinForms.VistaSaveFileDialog sfd = new Ookii.Dialogs.WinForms.VistaSaveFileDialog()) {
+                sfd.Title = "Save graylist as...";
+                sfd.Filter = "Text File (*.txt)|*.txt|All Files (*.*)|*.*";
+                if (sfd.ShowDialog() == DialogResult.OK) {
+                    File.WriteAllText(sfd.FileName, Config.Settings.General.Graylist.Replace(" ", "\r\n"));
+                }
+            }
+        }
+
+        private void btnImportGraylist_Click(object sender, EventArgs e) {
+            using (Ookii.Dialogs.WinForms.VistaOpenFileDialog ofd = new Ookii.Dialogs.WinForms.VistaOpenFileDialog()) {
+                ofd.Title = "Select a file for the graylist...";
+                ofd.Filter = "Text File (*.txt)|*.txt|All Files(*.*)|*.*";
+                ofd.Multiselect = false;
+                if (ofd.ShowDialog() == DialogResult.OK) {
+                    string NewGraylist = File.ReadAllText(ofd.FileName, System.Text.Encoding.Default).Replace("\r\n", "\n").Replace("\n", " ");
+                    if (chkOverwriteOnImport.Checked) {
+                        Config.Settings.General.Graylist = NewGraylist;
+                    }
+                    else {
+                        Config.Settings.General.Graylist += "\r\n" + NewGraylist;
+                    }
+                }
+            }
+        }
+
+        private void btnExportBlacklist_Click(object sender, EventArgs e) {
+            using (Ookii.Dialogs.WinForms.VistaSaveFileDialog sfd = new Ookii.Dialogs.WinForms.VistaSaveFileDialog()) {
+                sfd.Title = "Save blacklist as...";
+                sfd.Filter = "Text File (*.txt)|*.txt|All Files (*.*)|*.*";
+                if (sfd.ShowDialog() == DialogResult.OK) {
+                    File.WriteAllText(sfd.FileName, Config.Settings.General.Blacklist.Replace(" ", "\r\n"));
+                }
+            }
+        }
+
+        private void btnImportBlacklist_Click(object sender, EventArgs e) {
+            using (Ookii.Dialogs.WinForms.VistaOpenFileDialog ofd = new Ookii.Dialogs.WinForms.VistaOpenFileDialog()) {
+                ofd.Title = "Select a file for the blacklist...";
+                ofd.Filter = "Text File (*.txt)|*.txt|All Files(*.*)|*.*";
+                ofd.Multiselect = false;
+                if (ofd.ShowDialog() == DialogResult.OK) {
+                    string NewBlacklist = File.ReadAllText(ofd.FileName, System.Text.Encoding.Default).Replace("\r\n", "\n").Replace("\n", " ");
+                    if (chkOverwriteOnImport.Checked) {
+                        Config.Settings.General.Blacklist = NewBlacklist;
+                    }
+                    else {
+                        Config.Settings.General.Blacklist += "\r\n" + NewBlacklist;
+                    }
+                }
+            }
+        }
+
+        private void btnExportUndesiredTags_Click(object sender, EventArgs e) {
+            using (Ookii.Dialogs.WinForms.VistaSaveFileDialog sfd = new Ookii.Dialogs.WinForms.VistaSaveFileDialog()) {
+                sfd.Title = "Save undesired tags as...";
+                sfd.Filter = "Text File (*.txt)|*.txt|All Files (*.*)|*.*";
+                if (sfd.ShowDialog() == DialogResult.OK) {
+                    File.WriteAllText(sfd.FileName, Config.Settings.General.undesiredTags.Replace(" ", "\r\n"));
+                }
+            }
+        }
+
+        private void btnImportUndesiredTags_Click(object sender, EventArgs e) {
+            using (Ookii.Dialogs.WinForms.VistaOpenFileDialog ofd = new Ookii.Dialogs.WinForms.VistaOpenFileDialog()) {
+                ofd.Title = "Select a file for the undesired tags...";
+                ofd.Filter = "Text File (*.txt)|*.txt|All Files(*.*)|*.*";
+                ofd.Multiselect = false;
+                if (ofd.ShowDialog() == DialogResult.OK) {
+                    string NewUndesiredTags = File.ReadAllText(ofd.FileName, System.Text.Encoding.Default).Replace("\r\n", "\n").Replace("\n", " ");
+                    if (chkOverwriteOnImport.Checked) {
+                        Config.Settings.General.undesiredTags = NewUndesiredTags;
+                    }
+                    else {
+                        Config.Settings.General.undesiredTags += "\r\n" + NewUndesiredTags;
+                    }
+                }
             }
         }
     }

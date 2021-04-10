@@ -24,7 +24,6 @@
         /// </summary>
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmTagDownloader));
             this.lbID = new System.Windows.Forms.Label();
             this.lbFile = new System.Windows.Forms.Label();
             this.status = new System.Windows.Forms.StatusBar();
@@ -105,7 +104,7 @@
             this.lbBlacklist.Name = "lbBlacklist";
             this.lbBlacklist.Size = new System.Drawing.Size(288, 122);
             this.lbBlacklist.TabIndex = 7;
-            this.lbBlacklist.Text = resources.GetString("lbBlacklist.Text");
+            this.lbBlacklist.Text = "Waiting for first page to be parsed...";
             this.lbBlacklist.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // lbBytes

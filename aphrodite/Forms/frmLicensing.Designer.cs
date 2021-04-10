@@ -52,6 +52,7 @@
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Licensing";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmLicensing_FormClosing);
             this.ResumeLayout(false);
 
         }

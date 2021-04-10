@@ -72,7 +72,7 @@
             this.lbBody.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbBody.Location = new System.Drawing.Point(12, 36);
             this.lbBody.Name = "lbBody";
-            this.lbBody.Size = new System.Drawing.Size(248, 79);
+            this.lbBody.Size = new System.Drawing.Size(238, 79);
             this.lbBody.TabIndex = 3;
             this.lbBody.Text = "aphrodite by murrty\r\nicon is brad the bread.\r\ncredit to fuz for being fuz\r\ncoded " +
     "in VisualStudio 2013";

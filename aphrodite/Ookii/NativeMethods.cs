@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Drawing;
+using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
+using System.Text;
+using System.Windows.Forms;
 
 namespace Ookii.Dialogs.WinForms {
     static class NativeMethods {
@@ -9,6 +13,41 @@ namespace Ookii.Dialogs.WinForms {
                 return Environment.OSVersion.Platform == PlatformID.Win32NT && Environment.OSVersion.Version >= new Version(6, 0, 6000);
             }
         }
+
+        #region LoadLibrary
+
+        public const int ErrorFileNotFound = 2;
+
+        [DllImport("kernel32", CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern Ookii.Dialogs.WinForms.SafeModuleHandle LoadLibraryEx(
+            string lpFileName,
+            IntPtr hFile,
+            LoadLibraryExFlags dwFlags
+            );
+
+        [DllImport("kernel32", SetLastError = true),
+        ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool FreeLibrary(IntPtr hModule);
+
+        [Flags]
+        public enum LoadLibraryExFlags : uint {
+            DontResolveDllReferences = 0x00000001,
+            LoadLibraryAsDatafile = 0x00000002,
+            LoadWithAlteredSearchPath = 0x00000008,
+            LoadIgnoreCodeAuthzLevel = 0x00000010
+        }
+
+        #endregion
+
+        #region Activation Context
+
+        [DllImport("kernel32.dll"), ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+        public extern static void ReleaseActCtx(IntPtr hActCtx);
+
+        public const int ACTCTX_FLAG_ASSEMBLY_DIRECTORY_VALID = 0x004;
+
+        #endregion
 
         #region File Operations Definitions
 
@@ -143,6 +182,42 @@ namespace Ookii.Dialogs.WinForms {
             internal uint pid;
         }
 
+        #endregion
+
+        #region String resources
+
+        [Flags()]
+        public enum FormatMessageFlags {
+            FORMAT_MESSAGE_ALLOCATE_BUFFER = 0x00000100,
+            FORMAT_MESSAGE_IGNORE_INSERTS = 0x00000200,
+            FORMAT_MESSAGE_FROM_STRING = 0x00000400,
+            FORMAT_MESSAGE_FROM_HMODULE = 0x00000800,
+            FORMAT_MESSAGE_FROM_SYSTEM = 0x00001000,
+            FORMAT_MESSAGE_ARGUMENT_ARRAY = 0x00002000
+        }
+
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto, BestFitMapping = false, ThrowOnUnmappableChar = true)]
+        public static extern int LoadString(SafeModuleHandle hInstance, uint uID, StringBuilder lpBuffer, int nBufferMax);
+
+        [DllImport("Kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        public static extern uint FormatMessage([MarshalAs(UnmanagedType.U4)] FormatMessageFlags dwFlags, IntPtr lpSource,
+           uint dwMessageId, uint dwLanguageId, ref IntPtr lpBuffer,
+           uint nSize, string[] Arguments);
+
+        #endregion
+
+        #region Desktop Window Manager
+        public const int WM_NCHITTEST = 0x0084;
+        public const int WM_DWMCOMPOSITIONCHANGED = 0x031E;
+
+        [DllImport("gdi32.dll", ExactSpelling = true, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
+        public static extern bool DeleteObject(IntPtr hObject);
+        [DllImport("gdi32.dll", ExactSpelling = true, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
+        public static extern bool DeleteDC(IntPtr hdc);
         #endregion
 
         #region Shell Parsing Names

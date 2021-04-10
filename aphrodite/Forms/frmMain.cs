@@ -26,11 +26,17 @@ namespace aphrodite {
                         break;
                     case DownloadType.Pools:
                         txtPoolId.Text = Argument;
+                        tabMain.SelectedTab = tabPools;
                         break;
                     case DownloadType.Images:
                         txtImageUrl.Text = Argument;
+                        tabMain.SelectedTab = tabImages;
                         break;
                 }
+            }
+
+            if (!Program.UseIni) {
+                tabMain.TabPages.Remove(tabPortable);
             }
 
             if (Program.IsDebug) {
@@ -49,13 +55,6 @@ namespace aphrodite {
                 Config.Settings.General.saveLocation = Environment.CurrentDirectory;
             }
 
-            if (Program.UseIni) {
-                lbIni.Visible = true;
-            }
-            else {
-                tbMain.TabPages.Remove(tbIni);
-            }
-
             chkTagsDownloadExplicit.Checked = Config.Settings.Tags.Explicit;
             chkTagsDownloadQuestionable.Checked = Config.Settings.Tags.Questionable;
             chkTagsDownloadSafe.Checked = Config.Settings.Tags.Safe;
@@ -69,7 +68,7 @@ namespace aphrodite {
             chkPoolMergeGraylisted.Checked = Config.Settings.Pools.mergeGraylisted;
 
             chkImageSeparateRatings.Checked = Config.Settings.Images.separateRatings;
-            chkImageSeparateBlacklisted.Checked = Config.Settings.Images.separateGraylisted;
+            chkImageSeparateGraylisted.Checked = Config.Settings.Images.separateGraylisted;
             chkImageUseForm.Checked = Config.Settings.Images.useForm;
 
             if (Config.Settings.FormSettings.frmMain_Location.X != -32000 && Config.Settings.FormSettings.frmMain_Location.Y != -32000) {
@@ -90,15 +89,15 @@ namespace aphrodite {
             Config.Settings.Save(ConfigType.FormSettings);
         }
         private void tbMain_SelectedIndexChanged(object sender, EventArgs e) {
-            if (tbMain.SelectedTab == tbTags) {
+            if (tabMain.SelectedTab == tabTags) {
                 txtTags.Focus();
                 this.AcceptButton = btnDownloadTags;
             }
-            else if (tbMain.SelectedTab == tbPools) {
+            else if (tabMain.SelectedTab == tabPools) {
                 txtPoolId.Focus();
                 this.AcceptButton = btnDownloadPool;
             }
-            else if (tbMain.SelectedTab == tbImages) {
+            else if (tabMain.SelectedTab == tabImages) {
                 txtImageUrl.Focus();
                 this.AcceptButton = btnDownloadImage;
             }
@@ -229,6 +228,7 @@ namespace aphrodite {
             NewInfo.SeparateRatings = chkTagsSeparateRatings.Checked;
             NewInfo.SeparateNonImages = chkTagSeparateNonImages.Checked;
             NewInfo.OpenAfter = chkTagsOpenAfterDownload.Checked;
+            NewInfo.DownloadNewestToOldest = chkTagsDownloadInUploadOrder.Checked;
             frmTagDownloader Downloader = new frmTagDownloader();
             Downloader.DownloadInfo = NewInfo;
             Downloader.Show();
@@ -333,7 +333,7 @@ namespace aphrodite {
             }
             string ID = txtPoolId.Text;
             if (apiTools.IsValidPoolLink(ID)) {
-                ID = apiTools.GetPoolIdFromUrl(ID);
+                ID = ID.Split('/')[4].Split('?')[0];
             }
 
             PoolDownloadInfo NewInfo = new PoolDownloadInfo(txtPoolId.Text);
@@ -365,10 +365,11 @@ namespace aphrodite {
 
             ImageDownloadInfo NewInfo = new ImageDownloadInfo(txtImageUrl.Text);
             NewInfo.SeparateRatings = chkImageSeparateRatings.Checked;
-            NewInfo.SeparateGraylisted = chkImageSeparateBlacklisted.Checked;
+            NewInfo.SeparateGraylisted = chkImageSeparateGraylisted.Checked;
+            NewInfo.SeparateBlacklisted = chkImageSeparateBlacklisted.Checked;
+            NewInfo.SeparateNonImages = chkImageSeparateNonImages.Checked;
             NewInfo.SeparateArtists = chkImageSeparateArtists.Checked;
             NewInfo.UseForm = chkImageUseForm.Checked;
-            NewInfo.SeparateNonImages = chkImageSeparateNonImages.Checked;
             NewInfo.OpenAfter = chkImageOpenAfter.Checked;
 
             if (chkImageUseForm.Checked) {

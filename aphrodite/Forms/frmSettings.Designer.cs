@@ -23,10 +23,10 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmSettings));
             this.tbMain = new System.Windows.Forms.TabControl();
             this.tabGeneral = new System.Windows.Forms.TabPage();
+            this.chkSkipArgumentCheck = new System.Windows.Forms.CheckBox();
             this.chkIgnoreFinish = new System.Windows.Forms.CheckBox();
             this.chkSaveGraylistedImages = new System.Windows.Forms.CheckBox();
             this.chkOpenAfterDownload = new System.Windows.Forms.CheckBox();
@@ -39,6 +39,8 @@
             this.chkSaveArtistMetadata = new System.Windows.Forms.CheckBox();
             this.chkSaveMetadata = new System.Windows.Forms.CheckBox();
             this.tabTags = new System.Windows.Forms.TabPage();
+            this.chkTagsDownloadNewestToOldest = new System.Windows.Forms.CheckBox();
+            this.chkTagsDownloadBlacklisted = new System.Windows.Forms.CheckBox();
             this.chkTagsSeparateNonImages = new System.Windows.Forms.CheckBox();
             this.gbTagDownloadLimit = new System.Windows.Forms.GroupBox();
             this.numTagsDownloadLimit = new System.Windows.Forms.NumericUpDown();
@@ -70,15 +72,12 @@
             this.lbImagesHeader = new System.Windows.Forms.Label();
             this.tabProtocol = new System.Windows.Forms.TabPage();
             this.lbProtocolsSeparator = new System.Windows.Forms.Label();
+            this.lbProtocols = new System.Windows.Forms.Label();
             this.btnProtocolImagesUserscript = new aphrodite.Controls.ExtendedButton();
             this.btnProtocolUserscript = new aphrodite.Controls.ExtendedButton();
-            this.lbProtocols = new System.Windows.Forms.Label();
             this.btnProtocolInstallTags = new aphrodite.Controls.ExtendedButton();
             this.btnProtocolInstallPools = new aphrodite.Controls.ExtendedButton();
             this.btnProtocolInstallImages = new aphrodite.Controls.ExtendedButton();
-            this.tabPortable = new System.Windows.Forms.TabPage();
-            this.btnPortableExportIni = new aphrodite.Controls.ExtendedButton();
-            this.lbPortable = new System.Windows.Forms.Label();
             this.tabSchemas = new System.Windows.Forms.TabPage();
             this.btnSchemaUndesiredTags = new aphrodite.Controls.ExtendedButton();
             this.lbImageExt = new System.Windows.Forms.Label();
@@ -92,11 +91,23 @@
             this.txtTagSchema = new aphrodite.Controls.ExtendedTextBox();
             this.lbImageSchema = new System.Windows.Forms.Label();
             this.txtPoolSchema = new aphrodite.Controls.ExtendedTextBox();
-            this.JustTheTips = new System.Windows.Forms.ToolTip(this.components);
+            this.tabImportExport = new System.Windows.Forms.TabPage();
+            this.chkOverwriteOnImport = new System.Windows.Forms.CheckBox();
+            this.btnImportUndesiredTags = new System.Windows.Forms.Button();
+            this.btnExportUndesiredTags = new System.Windows.Forms.Button();
+            this.btnImportBlacklist = new System.Windows.Forms.Button();
+            this.btnExportBlacklist = new System.Windows.Forms.Button();
+            this.btnImportGraylist = new System.Windows.Forms.Button();
+            this.btnExportGraylist = new System.Windows.Forms.Button();
+            this.tabPortable = new System.Windows.Forms.TabPage();
+            this.btnPortableExportIni = new aphrodite.Controls.ExtendedButton();
+            this.lbPortable = new System.Windows.Forms.Label();
+            this.JustTheTips = new System.Windows.Forms.ToolTip();
             this.btnBlacklist = new aphrodite.Controls.ExtendedButton();
+            this.panel1 = new System.Windows.Forms.Panel();
             this.btnSave = new aphrodite.Controls.ExtendedButton();
             this.btnCancel = new aphrodite.Controls.ExtendedButton();
-            this.chkTagsDownloadBlacklisted = new System.Windows.Forms.CheckBox();
+            this.chkAutoDownloadWithArguments = new System.Windows.Forms.CheckBox();
             this.tbMain.SuspendLayout();
             this.tabGeneral.SuspendLayout();
             this.gbMetadata.SuspendLayout();
@@ -111,8 +122,10 @@
             this.tabPools.SuspendLayout();
             this.tabImages.SuspendLayout();
             this.tabProtocol.SuspendLayout();
-            this.tabPortable.SuspendLayout();
             this.tabSchemas.SuspendLayout();
+            this.tabImportExport.SuspendLayout();
+            this.tabPortable.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tbMain
@@ -122,17 +135,20 @@
             this.tbMain.Controls.Add(this.tabPools);
             this.tbMain.Controls.Add(this.tabImages);
             this.tbMain.Controls.Add(this.tabProtocol);
-            this.tbMain.Controls.Add(this.tabPortable);
             this.tbMain.Controls.Add(this.tabSchemas);
+            this.tbMain.Controls.Add(this.tabImportExport);
+            this.tbMain.Controls.Add(this.tabPortable);
             this.tbMain.Dock = System.Windows.Forms.DockStyle.Top;
             this.tbMain.Location = new System.Drawing.Point(0, 0);
             this.tbMain.Name = "tbMain";
             this.tbMain.SelectedIndex = 0;
-            this.tbMain.Size = new System.Drawing.Size(408, 223);
+            this.tbMain.Size = new System.Drawing.Size(408, 221);
             this.tbMain.TabIndex = 10;
             // 
             // tabGeneral
             // 
+            this.tabGeneral.Controls.Add(this.chkAutoDownloadWithArguments);
+            this.tabGeneral.Controls.Add(this.chkSkipArgumentCheck);
             this.tabGeneral.Controls.Add(this.chkIgnoreFinish);
             this.tabGeneral.Controls.Add(this.chkSaveGraylistedImages);
             this.tabGeneral.Controls.Add(this.chkOpenAfterDownload);
@@ -144,15 +160,26 @@
             this.tabGeneral.Location = new System.Drawing.Point(4, 22);
             this.tabGeneral.Name = "tabGeneral";
             this.tabGeneral.Padding = new System.Windows.Forms.Padding(3);
-            this.tabGeneral.Size = new System.Drawing.Size(400, 197);
+            this.tabGeneral.Size = new System.Drawing.Size(400, 195);
             this.tabGeneral.TabIndex = 0;
             this.tabGeneral.Text = "General";
             this.tabGeneral.UseVisualStyleBackColor = true;
             // 
+            // chkSkipArgumentCheck
+            // 
+            this.chkSkipArgumentCheck.AutoSize = true;
+            this.chkSkipArgumentCheck.Location = new System.Drawing.Point(22, 70);
+            this.chkSkipArgumentCheck.Name = "chkSkipArgumentCheck";
+            this.chkSkipArgumentCheck.Size = new System.Drawing.Size(132, 17);
+            this.chkSkipArgumentCheck.TabIndex = 18;
+            this.chkSkipArgumentCheck.Text = "Skip argument check";
+            this.JustTheTips.SetToolTip(this.chkSkipArgumentCheck, "Skips the argument check when downloading through arguments.");
+            this.chkSkipArgumentCheck.UseVisualStyleBackColor = true;
+            // 
             // chkIgnoreFinish
             // 
             this.chkIgnoreFinish.AutoSize = true;
-            this.chkIgnoreFinish.Location = new System.Drawing.Point(23, 133);
+            this.chkIgnoreFinish.Location = new System.Drawing.Point(22, 139);
             this.chkIgnoreFinish.Name = "chkIgnoreFinish";
             this.chkIgnoreFinish.Size = new System.Drawing.Size(193, 17);
             this.chkIgnoreFinish.TabIndex = 4;
@@ -166,7 +193,7 @@
             this.chkSaveGraylistedImages.AutoSize = true;
             this.chkSaveGraylistedImages.Checked = true;
             this.chkSaveGraylistedImages.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkSaveGraylistedImages.Location = new System.Drawing.Point(24, 110);
+            this.chkSaveGraylistedImages.Location = new System.Drawing.Point(22, 116);
             this.chkSaveGraylistedImages.Name = "chkSaveGraylistedImages";
             this.chkSaveGraylistedImages.Size = new System.Drawing.Size(140, 17);
             this.chkSaveGraylistedImages.TabIndex = 3;
@@ -178,7 +205,7 @@
             // chkOpenAfterDownload
             // 
             this.chkOpenAfterDownload.AutoSize = true;
-            this.chkOpenAfterDownload.Location = new System.Drawing.Point(23, 156);
+            this.chkOpenAfterDownload.Location = new System.Drawing.Point(22, 162);
             this.chkOpenAfterDownload.Name = "chkOpenAfterDownload";
             this.chkOpenAfterDownload.Size = new System.Drawing.Size(154, 17);
             this.chkOpenAfterDownload.TabIndex = 3;
@@ -191,7 +218,7 @@
             this.chkSaveInfoFiles.AutoSize = true;
             this.chkSaveInfoFiles.Checked = true;
             this.chkSaveInfoFiles.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkSaveInfoFiles.Location = new System.Drawing.Point(23, 87);
+            this.chkSaveInfoFiles.Location = new System.Drawing.Point(22, 93);
             this.chkSaveInfoFiles.Name = "chkSaveInfoFiles";
             this.chkSaveInfoFiles.Size = new System.Drawing.Size(96, 17);
             this.chkSaveInfoFiles.TabIndex = 2;
@@ -201,12 +228,13 @@
             // 
             // btnBrowseForSaveTo
             // 
-            this.btnBrowseForSaveTo.Location = new System.Drawing.Point(353, 36);
+            this.btnBrowseForSaveTo.Location = new System.Drawing.Point(353, 31);
             this.btnBrowseForSaveTo.Name = "btnBrowseForSaveTo";
-            this.btnBrowseForSaveTo.ShowUACShield = false;
             this.btnBrowseForSaveTo.Size = new System.Drawing.Size(24, 23);
             this.btnBrowseForSaveTo.TabIndex = 1;
             this.btnBrowseForSaveTo.Text = "...";
+            this.JustTheTips.SetToolTip(this.btnBrowseForSaveTo, "Browse for a new directory to save downloads to.\r\n\r\nYou\'ll have the option to mov" +
+        "e existing downloads.");
             this.btnBrowseForSaveTo.UseVisualStyleBackColor = true;
             this.btnBrowseForSaveTo.Click += new System.EventHandler(this.btnBrws_Click);
             // 
@@ -214,29 +242,24 @@
             // 
             this.txtSaveTo.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
             this.txtSaveTo.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
-            this.txtSaveTo.ButtonEnabled = false;
             this.txtSaveTo.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtSaveTo.ButtonImage = null;
-            this.txtSaveTo.ButtonImageAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.txtSaveTo.ButtonImageIndex = -1;
             this.txtSaveTo.ButtonImageKey = "";
-            this.txtSaveTo.ButtonImageList = null;
             this.txtSaveTo.ButtonSize = new System.Drawing.Size(22, 21);
             this.txtSaveTo.ButtonText = "";
             this.txtSaveTo.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.txtSaveTo.Location = new System.Drawing.Point(24, 39);
+            this.txtSaveTo.Location = new System.Drawing.Point(24, 32);
             this.txtSaveTo.Name = "txtSaveTo";
             this.txtSaveTo.ReadOnly = true;
             this.txtSaveTo.Size = new System.Drawing.Size(323, 22);
             this.txtSaveTo.TabIndex = 0;
             this.txtSaveTo.TextHint = "";
-            this.txtSaveTo.TextType = aphrodite.Controls.AllowedTextTypes.All;
             this.JustTheTips.SetToolTip(this.txtSaveTo, "The location where pools, tags, and images will be saved to.");
             // 
             // lbSaveTo
             // 
             this.lbSaveTo.AutoSize = true;
-            this.lbSaveTo.Location = new System.Drawing.Point(21, 23);
+            this.lbSaveTo.Location = new System.Drawing.Point(21, 16);
             this.lbSaveTo.Name = "lbSaveTo";
             this.lbSaveTo.Size = new System.Drawing.Size(47, 13);
             this.lbSaveTo.TabIndex = 17;
@@ -247,7 +270,7 @@
             this.gbMetadata.Controls.Add(this.chkSaveTagMetadata);
             this.gbMetadata.Controls.Add(this.chkSaveArtistMetadata);
             this.gbMetadata.Controls.Add(this.chkSaveMetadata);
-            this.gbMetadata.Location = new System.Drawing.Point(219, 84);
+            this.gbMetadata.Location = new System.Drawing.Point(223, 100);
             this.gbMetadata.Name = "gbMetadata";
             this.gbMetadata.Size = new System.Drawing.Size(171, 89);
             this.gbMetadata.TabIndex = 5;
@@ -298,6 +321,7 @@
             // 
             // tabTags
             // 
+            this.tabTags.Controls.Add(this.chkTagsDownloadNewestToOldest);
             this.tabTags.Controls.Add(this.chkTagsDownloadBlacklisted);
             this.tabTags.Controls.Add(this.chkTagsSeparateNonImages);
             this.tabTags.Controls.Add(this.gbTagDownloadLimit);
@@ -307,15 +331,37 @@
             this.tabTags.Location = new System.Drawing.Point(4, 22);
             this.tabTags.Name = "tabTags";
             this.tabTags.Padding = new System.Windows.Forms.Padding(3);
-            this.tabTags.Size = new System.Drawing.Size(400, 197);
+            this.tabTags.Size = new System.Drawing.Size(400, 195);
             this.tabTags.TabIndex = 1;
             this.tabTags.Text = "Tags";
             this.tabTags.UseVisualStyleBackColor = true;
             // 
+            // chkTagsDownloadNewestToOldest
+            // 
+            this.chkTagsDownloadNewestToOldest.AutoSize = true;
+            this.chkTagsDownloadNewestToOldest.Location = new System.Drawing.Point(209, 162);
+            this.chkTagsDownloadNewestToOldest.Name = "chkTagsDownloadNewestToOldest";
+            this.chkTagsDownloadNewestToOldest.Size = new System.Drawing.Size(168, 17);
+            this.chkTagsDownloadNewestToOldest.TabIndex = 8;
+            this.chkTagsDownloadNewestToOldest.Text = "Download newest to oldest";
+            this.JustTheTips.SetToolTip(this.chkTagsDownloadNewestToOldest, "Downloads images newest first to oldest last");
+            this.chkTagsDownloadNewestToOldest.UseVisualStyleBackColor = true;
+            // 
+            // chkTagsDownloadBlacklisted
+            // 
+            this.chkTagsDownloadBlacklisted.AutoSize = true;
+            this.chkTagsDownloadBlacklisted.Location = new System.Drawing.Point(58, 162);
+            this.chkTagsDownloadBlacklisted.Name = "chkTagsDownloadBlacklisted";
+            this.chkTagsDownloadBlacklisted.Size = new System.Drawing.Size(145, 17);
+            this.chkTagsDownloadBlacklisted.TabIndex = 7;
+            this.chkTagsDownloadBlacklisted.Text = "Save blacklisted images";
+            this.JustTheTips.SetToolTip(this.chkTagsDownloadBlacklisted, "Downloads any images in the blacklisted tags.");
+            this.chkTagsDownloadBlacklisted.UseVisualStyleBackColor = true;
+            // 
             // chkTagsSeparateNonImages
             // 
             this.chkTagsSeparateNonImages.AutoSize = true;
-            this.chkTagsSeparateNonImages.Location = new System.Drawing.Point(58, 148);
+            this.chkTagsSeparateNonImages.Location = new System.Drawing.Point(58, 139);
             this.chkTagsSeparateNonImages.Name = "chkTagsSeparateNonImages";
             this.chkTagsSeparateNonImages.Size = new System.Drawing.Size(134, 17);
             this.chkTagsSeparateNonImages.TabIndex = 6;
@@ -326,7 +372,7 @@
             // gbTagDownloadLimit
             // 
             this.gbTagDownloadLimit.Controls.Add(this.numTagsDownloadLimit);
-            this.gbTagDownloadLimit.Location = new System.Drawing.Point(203, 103);
+            this.gbTagDownloadLimit.Location = new System.Drawing.Point(203, 94);
             this.gbTagDownloadLimit.Name = "gbTagDownloadLimit";
             this.gbTagDownloadLimit.Size = new System.Drawing.Size(147, 57);
             this.gbTagDownloadLimit.TabIndex = 4;
@@ -353,7 +399,7 @@
             this.gbTagsRatings.Controls.Add(this.chkTagsSeparateRatings);
             this.gbTagsRatings.Controls.Add(this.chkTagsQuestionable);
             this.gbTagsRatings.Controls.Add(this.chkTagsSafe);
-            this.gbTagsRatings.Location = new System.Drawing.Point(50, 20);
+            this.gbTagsRatings.Location = new System.Drawing.Point(50, 11);
             this.gbTagsRatings.Name = "gbTagsRatings";
             this.gbTagsRatings.Size = new System.Drawing.Size(147, 67);
             this.gbTagsRatings.TabIndex = 1;
@@ -417,7 +463,7 @@
             this.gbTagsScoreLimit.Controls.Add(this.chkTagsIncludeScoreAsTag);
             this.gbTagsScoreLimit.Controls.Add(this.numTagsScoreLimit);
             this.gbTagsScoreLimit.Controls.Add(this.chkTagsEnableScoreLimit);
-            this.gbTagsScoreLimit.Location = new System.Drawing.Point(203, 20);
+            this.gbTagsScoreLimit.Location = new System.Drawing.Point(203, 11);
             this.gbTagsScoreLimit.Name = "gbTagsScoreLimit";
             this.gbTagsScoreLimit.Size = new System.Drawing.Size(147, 82);
             this.gbTagsScoreLimit.TabIndex = 2;
@@ -473,7 +519,7 @@
             // gbTagsPageLimit
             // 
             this.gbTagsPageLimit.Controls.Add(this.numTagsPageLimit);
-            this.gbTagsPageLimit.Location = new System.Drawing.Point(50, 93);
+            this.gbTagsPageLimit.Location = new System.Drawing.Point(50, 84);
             this.gbTagsPageLimit.Name = "gbTagsPageLimit";
             this.gbTagsPageLimit.Size = new System.Drawing.Size(147, 49);
             this.gbTagsPageLimit.TabIndex = 3;
@@ -503,7 +549,7 @@
             this.tabPools.Location = new System.Drawing.Point(4, 22);
             this.tabPools.Name = "tabPools";
             this.tabPools.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPools.Size = new System.Drawing.Size(400, 197);
+            this.tabPools.Size = new System.Drawing.Size(400, 195);
             this.tabPools.TabIndex = 2;
             this.tabPools.Text = "Pools";
             this.tabPools.UseVisualStyleBackColor = true;
@@ -511,7 +557,7 @@
             // chkPoolsMergeBlacklistedImages
             // 
             this.chkPoolsMergeBlacklistedImages.AutoSize = true;
-            this.chkPoolsMergeBlacklistedImages.Location = new System.Drawing.Point(49, 83);
+            this.chkPoolsMergeBlacklistedImages.Location = new System.Drawing.Point(49, 80);
             this.chkPoolsMergeBlacklistedImages.Name = "chkPoolsMergeBlacklistedImages";
             this.chkPoolsMergeBlacklistedImages.Size = new System.Drawing.Size(302, 17);
             this.chkPoolsMergeBlacklistedImages.TabIndex = 6;
@@ -525,11 +571,11 @@
             this.chkPoolsDownloadBlacklistedImages.AutoSize = true;
             this.chkPoolsDownloadBlacklistedImages.Checked = true;
             this.chkPoolsDownloadBlacklistedImages.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkPoolsDownloadBlacklistedImages.Location = new System.Drawing.Point(112, 60);
+            this.chkPoolsDownloadBlacklistedImages.Location = new System.Drawing.Point(128, 57);
             this.chkPoolsDownloadBlacklistedImages.Name = "chkPoolsDownloadBlacklistedImages";
-            this.chkPoolsDownloadBlacklistedImages.Size = new System.Drawing.Size(176, 17);
+            this.chkPoolsDownloadBlacklistedImages.Size = new System.Drawing.Size(145, 17);
             this.chkPoolsDownloadBlacklistedImages.TabIndex = 5;
-            this.chkPoolsDownloadBlacklistedImages.Text = "Download blacklisted images";
+            this.chkPoolsDownloadBlacklistedImages.Text = "Save blacklisted images";
             this.JustTheTips.SetToolTip(this.chkPoolsDownloadBlacklistedImages, "Downloads any blacklisted pages in the pool");
             this.chkPoolsDownloadBlacklistedImages.UseVisualStyleBackColor = true;
             // 
@@ -538,7 +584,7 @@
             this.chkPoolsMergeGraylistedImages.AutoSize = true;
             this.chkPoolsMergeGraylistedImages.Checked = true;
             this.chkPoolsMergeGraylistedImages.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkPoolsMergeGraylistedImages.Location = new System.Drawing.Point(54, 37);
+            this.chkPoolsMergeGraylistedImages.Location = new System.Drawing.Point(54, 34);
             this.chkPoolsMergeGraylistedImages.Name = "chkPoolsMergeGraylistedImages";
             this.chkPoolsMergeGraylistedImages.Size = new System.Drawing.Size(292, 17);
             this.chkPoolsMergeGraylistedImages.TabIndex = 2;
@@ -550,7 +596,7 @@
             // chkPoolsAddToWishlistSilently
             // 
             this.chkPoolsAddToWishlistSilently.AutoSize = true;
-            this.chkPoolsAddToWishlistSilently.Location = new System.Drawing.Point(114, 142);
+            this.chkPoolsAddToWishlistSilently.Location = new System.Drawing.Point(114, 139);
             this.chkPoolsAddToWishlistSilently.Name = "chkPoolsAddToWishlistSilently";
             this.chkPoolsAddToWishlistSilently.Size = new System.Drawing.Size(173, 17);
             this.chkPoolsAddToWishlistSilently.TabIndex = 4;
@@ -572,7 +618,7 @@
             this.tabImages.Location = new System.Drawing.Point(4, 22);
             this.tabImages.Name = "tabImages";
             this.tabImages.Padding = new System.Windows.Forms.Padding(3);
-            this.tabImages.Size = new System.Drawing.Size(400, 197);
+            this.tabImages.Size = new System.Drawing.Size(400, 195);
             this.tabImages.TabIndex = 4;
             this.tabImages.Text = "Images";
             this.tabImages.UseVisualStyleBackColor = true;
@@ -680,16 +726,16 @@
             // tabProtocol
             // 
             this.tabProtocol.Controls.Add(this.lbProtocolsSeparator);
+            this.tabProtocol.Controls.Add(this.lbProtocols);
             this.tabProtocol.Controls.Add(this.btnProtocolImagesUserscript);
             this.tabProtocol.Controls.Add(this.btnProtocolUserscript);
-            this.tabProtocol.Controls.Add(this.lbProtocols);
             this.tabProtocol.Controls.Add(this.btnProtocolInstallTags);
             this.tabProtocol.Controls.Add(this.btnProtocolInstallPools);
             this.tabProtocol.Controls.Add(this.btnProtocolInstallImages);
             this.tabProtocol.Location = new System.Drawing.Point(4, 22);
             this.tabProtocol.Name = "tabProtocol";
             this.tabProtocol.Padding = new System.Windows.Forms.Padding(3);
-            this.tabProtocol.Size = new System.Drawing.Size(400, 197);
+            this.tabProtocol.Size = new System.Drawing.Size(400, 195);
             this.tabProtocol.TabIndex = 3;
             this.tabProtocol.Text = "Protocols";
             this.tabProtocol.UseVisualStyleBackColor = true;
@@ -697,17 +743,25 @@
             // lbProtocolsSeparator
             // 
             this.lbProtocolsSeparator.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.lbProtocolsSeparator.Location = new System.Drawing.Point(59, 150);
+            this.lbProtocolsSeparator.Location = new System.Drawing.Point(59, 149);
             this.lbProtocolsSeparator.Name = "lbProtocolsSeparator";
             this.lbProtocolsSeparator.Size = new System.Drawing.Size(292, 2);
             this.lbProtocolsSeparator.TabIndex = 6;
             this.lbProtocolsSeparator.Text = "bark";
             // 
+            // lbProtocols
+            // 
+            this.lbProtocols.Location = new System.Drawing.Point(6, 5);
+            this.lbProtocols.Name = "lbProtocols";
+            this.lbProtocols.Size = new System.Drawing.Size(388, 80);
+            this.lbProtocols.TabIndex = 3;
+            this.lbProtocols.Text = resources.GetString("lbProtocols.Text");
+            this.lbProtocols.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
             // btnProtocolImagesUserscript
             // 
-            this.btnProtocolImagesUserscript.Location = new System.Drawing.Point(246, 161);
+            this.btnProtocolImagesUserscript.Location = new System.Drawing.Point(246, 160);
             this.btnProtocolImagesUserscript.Name = "btnProtocolImagesUserscript";
-            this.btnProtocolImagesUserscript.ShowUACShield = false;
             this.btnProtocolImagesUserscript.Size = new System.Drawing.Size(75, 23);
             this.btnProtocolImagesUserscript.TabIndex = 5;
             this.btnProtocolImagesUserscript.Text = "Userscript";
@@ -716,29 +770,18 @@
             // 
             // btnProtocolUserscript
             // 
-            this.btnProtocolUserscript.Location = new System.Drawing.Point(246, 108);
+            this.btnProtocolUserscript.Location = new System.Drawing.Point(246, 107);
             this.btnProtocolUserscript.Name = "btnProtocolUserscript";
-            this.btnProtocolUserscript.ShowUACShield = false;
             this.btnProtocolUserscript.Size = new System.Drawing.Size(75, 23);
             this.btnProtocolUserscript.TabIndex = 3;
             this.btnProtocolUserscript.Text = "Userscript";
             this.btnProtocolUserscript.UseVisualStyleBackColor = true;
             this.btnProtocolUserscript.Click += new System.EventHandler(this.btnUserscript_Click);
             // 
-            // lbProtocols
-            // 
-            this.lbProtocols.Location = new System.Drawing.Point(6, 7);
-            this.lbProtocols.Name = "lbProtocols";
-            this.lbProtocols.Size = new System.Drawing.Size(388, 80);
-            this.lbProtocols.TabIndex = 3;
-            this.lbProtocols.Text = resources.GetString("lbProtocols.Text");
-            this.lbProtocols.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            // 
             // btnProtocolInstallTags
             // 
-            this.btnProtocolInstallTags.Location = new System.Drawing.Point(89, 96);
+            this.btnProtocolInstallTags.Location = new System.Drawing.Point(89, 95);
             this.btnProtocolInstallTags.Name = "btnProtocolInstallTags";
-            this.btnProtocolInstallTags.ShowUACShield = false;
             this.btnProtocolInstallTags.Size = new System.Drawing.Size(151, 23);
             this.btnProtocolInstallTags.TabIndex = 1;
             this.btnProtocolInstallTags.Text = "Install \'tags:\' protocol";
@@ -747,9 +790,8 @@
             // 
             // btnProtocolInstallPools
             // 
-            this.btnProtocolInstallPools.Location = new System.Drawing.Point(89, 121);
+            this.btnProtocolInstallPools.Location = new System.Drawing.Point(89, 120);
             this.btnProtocolInstallPools.Name = "btnProtocolInstallPools";
-            this.btnProtocolInstallPools.ShowUACShield = false;
             this.btnProtocolInstallPools.Size = new System.Drawing.Size(151, 23);
             this.btnProtocolInstallPools.TabIndex = 2;
             this.btnProtocolInstallPools.Text = "Install pool protocols";
@@ -758,46 +800,13 @@
             // 
             // btnProtocolInstallImages
             // 
-            this.btnProtocolInstallImages.Location = new System.Drawing.Point(89, 161);
+            this.btnProtocolInstallImages.Location = new System.Drawing.Point(89, 160);
             this.btnProtocolInstallImages.Name = "btnProtocolInstallImages";
-            this.btnProtocolInstallImages.ShowUACShield = false;
             this.btnProtocolInstallImages.Size = new System.Drawing.Size(151, 23);
             this.btnProtocolInstallImages.TabIndex = 4;
             this.btnProtocolInstallImages.Text = "Install \'image:\' protocol";
             this.btnProtocolInstallImages.UseVisualStyleBackColor = true;
             this.btnProtocolInstallImages.Click += new System.EventHandler(this.btnImagesProtocol_Click);
-            // 
-            // tabPortable
-            // 
-            this.tabPortable.Controls.Add(this.btnPortableExportIni);
-            this.tabPortable.Controls.Add(this.lbPortable);
-            this.tabPortable.Location = new System.Drawing.Point(4, 22);
-            this.tabPortable.Name = "tabPortable";
-            this.tabPortable.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPortable.Size = new System.Drawing.Size(400, 197);
-            this.tabPortable.TabIndex = 5;
-            this.tabPortable.Text = "Portable";
-            this.tabPortable.UseVisualStyleBackColor = true;
-            // 
-            // btnPortableExportIni
-            // 
-            this.btnPortableExportIni.Location = new System.Drawing.Point(162, 159);
-            this.btnPortableExportIni.Name = "btnPortableExportIni";
-            this.btnPortableExportIni.ShowUACShield = false;
-            this.btnPortableExportIni.Size = new System.Drawing.Size(86, 24);
-            this.btnPortableExportIni.TabIndex = 1;
-            this.btnPortableExportIni.Text = "Export";
-            this.btnPortableExportIni.UseVisualStyleBackColor = true;
-            this.btnPortableExportIni.Click += new System.EventHandler(this.btnExportIni_Click);
-            // 
-            // lbPortable
-            // 
-            this.lbPortable.Location = new System.Drawing.Point(6, 14);
-            this.lbPortable.Name = "lbPortable";
-            this.lbPortable.Size = new System.Drawing.Size(388, 133);
-            this.lbPortable.TabIndex = 0;
-            this.lbPortable.Text = resources.GetString("lbPortable.Text");
-            this.lbPortable.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // tabSchemas
             // 
@@ -816,16 +825,15 @@
             this.tabSchemas.Location = new System.Drawing.Point(4, 22);
             this.tabSchemas.Name = "tabSchemas";
             this.tabSchemas.Padding = new System.Windows.Forms.Padding(3);
-            this.tabSchemas.Size = new System.Drawing.Size(400, 197);
+            this.tabSchemas.Size = new System.Drawing.Size(400, 195);
             this.tabSchemas.TabIndex = 6;
             this.tabSchemas.Text = "Schemas";
             this.tabSchemas.UseVisualStyleBackColor = true;
             // 
             // btnSchemaUndesiredTags
             // 
-            this.btnSchemaUndesiredTags.Location = new System.Drawing.Point(272, 81);
+            this.btnSchemaUndesiredTags.Location = new System.Drawing.Point(272, 80);
             this.btnSchemaUndesiredTags.Name = "btnSchemaUndesiredTags";
-            this.btnSchemaUndesiredTags.ShowUACShield = false;
             this.btnSchemaUndesiredTags.Size = new System.Drawing.Size(104, 23);
             this.btnSchemaUndesiredTags.TabIndex = 4;
             this.btnSchemaUndesiredTags.Text = "undesired tags...";
@@ -835,7 +843,7 @@
             // lbImageExt
             // 
             this.lbImageExt.AutoSize = true;
-            this.lbImageExt.Location = new System.Drawing.Point(333, 58);
+            this.lbImageExt.Location = new System.Drawing.Point(333, 57);
             this.lbImageExt.Name = "lbImageExt";
             this.lbImageExt.Size = new System.Drawing.Size(43, 13);
             this.lbImageExt.TabIndex = 51;
@@ -844,7 +852,7 @@
             // lbPoolExt
             // 
             this.lbPoolExt.AutoSize = true;
-            this.lbPoolExt.Location = new System.Drawing.Point(333, 34);
+            this.lbPoolExt.Location = new System.Drawing.Point(333, 33);
             this.lbPoolExt.Name = "lbPoolExt";
             this.lbPoolExt.Size = new System.Drawing.Size(43, 13);
             this.lbPoolExt.TabIndex = 50;
@@ -853,7 +861,7 @@
             // lbTagExt
             // 
             this.lbTagExt.AutoSize = true;
-            this.lbTagExt.Location = new System.Drawing.Point(333, 10);
+            this.lbTagExt.Location = new System.Drawing.Point(333, 9);
             this.lbTagExt.Name = "lbTagExt";
             this.lbTagExt.Size = new System.Drawing.Size(43, 13);
             this.lbTagExt.TabIndex = 49;
@@ -862,7 +870,7 @@
             // rtbParams
             // 
             this.rtbParams.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rtbParams.Location = new System.Drawing.Point(6, 109);
+            this.rtbParams.Location = new System.Drawing.Point(6, 108);
             this.rtbParams.Name = "rtbParams";
             this.rtbParams.ReadOnly = true;
             this.rtbParams.Size = new System.Drawing.Size(388, 84);
@@ -872,7 +880,7 @@
             // lbSchemaParam
             // 
             this.lbSchemaParam.AutoSize = true;
-            this.lbSchemaParam.Location = new System.Drawing.Point(8, 90);
+            this.lbSchemaParam.Location = new System.Drawing.Point(8, 89);
             this.lbSchemaParam.Name = "lbSchemaParam";
             this.lbSchemaParam.Size = new System.Drawing.Size(122, 13);
             this.lbSchemaParam.TabIndex = 47;
@@ -881,7 +889,7 @@
             // lblTagSchema
             // 
             this.lblTagSchema.AutoSize = true;
-            this.lblTagSchema.Location = new System.Drawing.Point(29, 10);
+            this.lblTagSchema.Location = new System.Drawing.Point(29, 9);
             this.lblTagSchema.Name = "lblTagSchema";
             this.lblTagSchema.Size = new System.Drawing.Size(102, 13);
             this.lblTagSchema.TabIndex = 46;
@@ -890,7 +898,7 @@
             // lbPoolSchema
             // 
             this.lbPoolSchema.AutoSize = true;
-            this.lbPoolSchema.Location = new System.Drawing.Point(27, 34);
+            this.lbPoolSchema.Location = new System.Drawing.Point(27, 33);
             this.lbPoolSchema.Name = "lbPoolSchema";
             this.lbPoolSchema.Size = new System.Drawing.Size(107, 13);
             this.lbPoolSchema.TabIndex = 22;
@@ -900,22 +908,17 @@
             // 
             this.txtImageSchema.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
             this.txtImageSchema.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
-            this.txtImageSchema.ButtonEnabled = false;
             this.txtImageSchema.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtImageSchema.ButtonImage = null;
-            this.txtImageSchema.ButtonImageAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.txtImageSchema.ButtonImageIndex = -1;
             this.txtImageSchema.ButtonImageKey = "";
-            this.txtImageSchema.ButtonImageList = null;
             this.txtImageSchema.ButtonSize = new System.Drawing.Size(22, 21);
             this.txtImageSchema.ButtonText = "";
             this.txtImageSchema.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.txtImageSchema.Location = new System.Drawing.Point(135, 55);
+            this.txtImageSchema.Location = new System.Drawing.Point(135, 54);
             this.txtImageSchema.Name = "txtImageSchema";
             this.txtImageSchema.Size = new System.Drawing.Size(197, 22);
             this.txtImageSchema.TabIndex = 3;
             this.txtImageSchema.TextHint = "%artist%_%md5%";
-            this.txtImageSchema.TextType = aphrodite.Controls.AllowedTextTypes.All;
             this.JustTheTips.SetToolTip(this.txtImageSchema, resources.GetString("txtImageSchema.ToolTip"));
             this.txtImageSchema.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtImageSchema_KeyDown);
             this.txtImageSchema.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtImageSchema_KeyPress);
@@ -924,22 +927,17 @@
             // 
             this.txtTagSchema.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
             this.txtTagSchema.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
-            this.txtTagSchema.ButtonEnabled = false;
             this.txtTagSchema.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtTagSchema.ButtonImage = null;
-            this.txtTagSchema.ButtonImageAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.txtTagSchema.ButtonImageIndex = -1;
             this.txtTagSchema.ButtonImageKey = "";
-            this.txtTagSchema.ButtonImageList = null;
             this.txtTagSchema.ButtonSize = new System.Drawing.Size(22, 21);
             this.txtTagSchema.ButtonText = "";
             this.txtTagSchema.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.txtTagSchema.Location = new System.Drawing.Point(135, 7);
+            this.txtTagSchema.Location = new System.Drawing.Point(135, 6);
             this.txtTagSchema.Name = "txtTagSchema";
             this.txtTagSchema.Size = new System.Drawing.Size(197, 22);
             this.txtTagSchema.TabIndex = 1;
             this.txtTagSchema.TextHint = "%md5%";
-            this.txtTagSchema.TextType = aphrodite.Controls.AllowedTextTypes.All;
             this.JustTheTips.SetToolTip(this.txtTagSchema, resources.GetString("txtTagSchema.ToolTip"));
             this.txtTagSchema.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtTagSchema_KeyDown);
             this.txtTagSchema.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtTagSchema_KeyPress);
@@ -947,7 +945,7 @@
             // lbImageSchema
             // 
             this.lbImageSchema.AutoSize = true;
-            this.lbImageSchema.Location = new System.Drawing.Point(24, 58);
+            this.lbImageSchema.Location = new System.Drawing.Point(24, 57);
             this.lbImageSchema.Name = "lbImageSchema";
             this.lbImageSchema.Size = new System.Drawing.Size(110, 13);
             this.lbImageSchema.TabIndex = 13;
@@ -957,70 +955,204 @@
             // 
             this.txtPoolSchema.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
             this.txtPoolSchema.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
-            this.txtPoolSchema.ButtonEnabled = false;
             this.txtPoolSchema.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtPoolSchema.ButtonImage = null;
-            this.txtPoolSchema.ButtonImageAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.txtPoolSchema.ButtonImageIndex = -1;
             this.txtPoolSchema.ButtonImageKey = "";
-            this.txtPoolSchema.ButtonImageList = null;
             this.txtPoolSchema.ButtonSize = new System.Drawing.Size(22, 21);
             this.txtPoolSchema.ButtonText = "";
             this.txtPoolSchema.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.txtPoolSchema.Location = new System.Drawing.Point(135, 31);
+            this.txtPoolSchema.Location = new System.Drawing.Point(135, 30);
             this.txtPoolSchema.Name = "txtPoolSchema";
             this.txtPoolSchema.Size = new System.Drawing.Size(197, 22);
             this.txtPoolSchema.TabIndex = 2;
             this.txtPoolSchema.TextHint = "%poolname%_%page%";
-            this.txtPoolSchema.TextType = aphrodite.Controls.AllowedTextTypes.All;
             this.JustTheTips.SetToolTip(this.txtPoolSchema, resources.GetString("txtPoolSchema.ToolTip"));
             this.txtPoolSchema.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtPoolSchema_KeyDown);
             this.txtPoolSchema.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtPoolSchema_KeyPress);
             // 
+            // tabImportExport
+            // 
+            this.tabImportExport.Controls.Add(this.chkOverwriteOnImport);
+            this.tabImportExport.Controls.Add(this.btnImportUndesiredTags);
+            this.tabImportExport.Controls.Add(this.btnExportUndesiredTags);
+            this.tabImportExport.Controls.Add(this.btnImportBlacklist);
+            this.tabImportExport.Controls.Add(this.btnExportBlacklist);
+            this.tabImportExport.Controls.Add(this.btnImportGraylist);
+            this.tabImportExport.Controls.Add(this.btnExportGraylist);
+            this.tabImportExport.Location = new System.Drawing.Point(4, 22);
+            this.tabImportExport.Name = "tabImportExport";
+            this.tabImportExport.Size = new System.Drawing.Size(400, 195);
+            this.tabImportExport.TabIndex = 7;
+            this.tabImportExport.Text = "Import/Export";
+            this.tabImportExport.UseVisualStyleBackColor = true;
+            // 
+            // chkOverwriteOnImport
+            // 
+            this.chkOverwriteOnImport.AutoSize = true;
+            this.chkOverwriteOnImport.Location = new System.Drawing.Point(72, 159);
+            this.chkOverwriteOnImport.Name = "chkOverwriteOnImport";
+            this.chkOverwriteOnImport.Size = new System.Drawing.Size(257, 17);
+            this.chkOverwriteOnImport.TabIndex = 6;
+            this.chkOverwriteOnImport.Text = "Overwrite saved information when importing";
+            this.JustTheTips.SetToolTip(this.chkOverwriteOnImport, "Instead of appending to the present information, it\'ll overwrite it with the new " +
+        "data");
+            this.chkOverwriteOnImport.UseVisualStyleBackColor = true;
+            // 
+            // btnImportUndesiredTags
+            // 
+            this.btnImportUndesiredTags.Location = new System.Drawing.Point(244, 61);
+            this.btnImportUndesiredTags.Name = "btnImportUndesiredTags";
+            this.btnImportUndesiredTags.Size = new System.Drawing.Size(140, 23);
+            this.btnImportUndesiredTags.TabIndex = 5;
+            this.btnImportUndesiredTags.Text = "Import Undesired Tags";
+            this.JustTheTips.SetToolTip(this.btnImportUndesiredTags, "Imports text from a file into the undesired tags.");
+            this.btnImportUndesiredTags.UseVisualStyleBackColor = true;
+            this.btnImportUndesiredTags.Click += new System.EventHandler(this.btnImportUndesiredTags_Click);
+            // 
+            // btnExportUndesiredTags
+            // 
+            this.btnExportUndesiredTags.Location = new System.Drawing.Point(244, 24);
+            this.btnExportUndesiredTags.Name = "btnExportUndesiredTags";
+            this.btnExportUndesiredTags.Size = new System.Drawing.Size(140, 23);
+            this.btnExportUndesiredTags.TabIndex = 4;
+            this.btnExportUndesiredTags.Text = "Export Undesired Tags";
+            this.JustTheTips.SetToolTip(this.btnExportUndesiredTags, "Exports the undesired tags to a selected file.");
+            this.btnExportUndesiredTags.UseVisualStyleBackColor = true;
+            this.btnExportUndesiredTags.Click += new System.EventHandler(this.btnExportUndesiredTags_Click);
+            // 
+            // btnImportBlacklist
+            // 
+            this.btnImportBlacklist.Location = new System.Drawing.Point(130, 61);
+            this.btnImportBlacklist.Name = "btnImportBlacklist";
+            this.btnImportBlacklist.Size = new System.Drawing.Size(100, 23);
+            this.btnImportBlacklist.TabIndex = 3;
+            this.btnImportBlacklist.Text = "Import Blacklist";
+            this.JustTheTips.SetToolTip(this.btnImportBlacklist, "Imports text from a file into the blacklist.");
+            this.btnImportBlacklist.UseVisualStyleBackColor = true;
+            this.btnImportBlacklist.Click += new System.EventHandler(this.btnImportBlacklist_Click);
+            // 
+            // btnExportBlacklist
+            // 
+            this.btnExportBlacklist.Location = new System.Drawing.Point(130, 24);
+            this.btnExportBlacklist.Name = "btnExportBlacklist";
+            this.btnExportBlacklist.Size = new System.Drawing.Size(100, 23);
+            this.btnExportBlacklist.TabIndex = 2;
+            this.btnExportBlacklist.Text = "Export Blacklist";
+            this.JustTheTips.SetToolTip(this.btnExportBlacklist, "Exports the blacklist to a selected file.");
+            this.btnExportBlacklist.UseVisualStyleBackColor = true;
+            this.btnExportBlacklist.Click += new System.EventHandler(this.btnExportBlacklist_Click);
+            // 
+            // btnImportGraylist
+            // 
+            this.btnImportGraylist.Location = new System.Drawing.Point(16, 61);
+            this.btnImportGraylist.Name = "btnImportGraylist";
+            this.btnImportGraylist.Size = new System.Drawing.Size(100, 23);
+            this.btnImportGraylist.TabIndex = 1;
+            this.btnImportGraylist.Text = "Import Graylist";
+            this.JustTheTips.SetToolTip(this.btnImportGraylist, "Imports text from a file into the graylist.");
+            this.btnImportGraylist.UseVisualStyleBackColor = true;
+            this.btnImportGraylist.Click += new System.EventHandler(this.btnImportGraylist_Click);
+            // 
+            // btnExportGraylist
+            // 
+            this.btnExportGraylist.Location = new System.Drawing.Point(16, 24);
+            this.btnExportGraylist.Name = "btnExportGraylist";
+            this.btnExportGraylist.Size = new System.Drawing.Size(100, 23);
+            this.btnExportGraylist.TabIndex = 0;
+            this.btnExportGraylist.Text = "Export Graylist";
+            this.JustTheTips.SetToolTip(this.btnExportGraylist, "Exports the graylist to a selected file.");
+            this.btnExportGraylist.UseVisualStyleBackColor = true;
+            this.btnExportGraylist.Click += new System.EventHandler(this.btnExportGraylist_Click);
+            // 
+            // tabPortable
+            // 
+            this.tabPortable.Controls.Add(this.btnPortableExportIni);
+            this.tabPortable.Controls.Add(this.lbPortable);
+            this.tabPortable.Location = new System.Drawing.Point(4, 22);
+            this.tabPortable.Name = "tabPortable";
+            this.tabPortable.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPortable.Size = new System.Drawing.Size(400, 195);
+            this.tabPortable.TabIndex = 5;
+            this.tabPortable.Text = "Portable";
+            this.tabPortable.UseVisualStyleBackColor = true;
+            // 
+            // btnPortableExportIni
+            // 
+            this.btnPortableExportIni.Location = new System.Drawing.Point(162, 156);
+            this.btnPortableExportIni.Name = "btnPortableExportIni";
+            this.btnPortableExportIni.Size = new System.Drawing.Size(86, 24);
+            this.btnPortableExportIni.TabIndex = 1;
+            this.btnPortableExportIni.Text = "Export";
+            this.btnPortableExportIni.UseVisualStyleBackColor = true;
+            this.btnPortableExportIni.Click += new System.EventHandler(this.btnExportIni_Click);
+            // 
+            // lbPortable
+            // 
+            this.lbPortable.Location = new System.Drawing.Point(6, 11);
+            this.lbPortable.Name = "lbPortable";
+            this.lbPortable.Size = new System.Drawing.Size(388, 133);
+            this.lbPortable.TabIndex = 0;
+            this.lbPortable.Text = resources.GetString("lbPortable.Text");
+            this.lbPortable.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // btnBlacklist
             // 
-            this.btnBlacklist.Location = new System.Drawing.Point(16, 230);
+            this.btnBlacklist.Location = new System.Drawing.Point(18, 9);
             this.btnBlacklist.Name = "btnBlacklist";
-            this.btnBlacklist.ShowUACShield = false;
             this.btnBlacklist.Size = new System.Drawing.Size(102, 23);
             this.btnBlacklist.TabIndex = 7;
             this.btnBlacklist.Text = "Manage blacklist";
-            this.JustTheTips.SetToolTip(this.btnBlacklist, "Manage your blacklist");
+            this.JustTheTips.SetToolTip(this.btnBlacklist, "Manage your graylist and blacklist");
             this.btnBlacklist.UseVisualStyleBackColor = true;
             this.btnBlacklist.Click += new System.EventHandler(this.btnBlacklist_Click);
             // 
+            // panel1
+            // 
+            this.panel1.BackColor = System.Drawing.SystemColors.Menu;
+            this.panel1.Controls.Add(this.btnBlacklist);
+            this.panel1.Controls.Add(this.btnSave);
+            this.panel1.Controls.Add(this.btnCancel);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panel1.Location = new System.Drawing.Point(0, 221);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(408, 42);
+            this.panel1.TabIndex = 11;
+            // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(319, 230);
+            this.btnSave.Location = new System.Drawing.Point(321, 9);
             this.btnSave.Name = "btnSave";
-            this.btnSave.ShowUACShield = false;
             this.btnSave.Size = new System.Drawing.Size(75, 23);
             this.btnSave.TabIndex = 8;
             this.btnSave.Text = "Save";
+            this.JustTheTips.SetToolTip(this.btnSave, "Save changes, does not apply to any in-progress operations.");
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(238, 230);
+            this.btnCancel.Location = new System.Drawing.Point(240, 9);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.ShowUACShield = false;
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 9;
             this.btnCancel.Text = "Cancel";
+            this.JustTheTips.SetToolTip(this.btnCancel, "Do not save any changes");
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
-            // chkTagsDownloadBlacklisted
+            // chkAutoDownloadWithArguments
             // 
-            this.chkTagsDownloadBlacklisted.AutoSize = true;
-            this.chkTagsDownloadBlacklisted.Location = new System.Drawing.Point(58, 171);
-            this.chkTagsDownloadBlacklisted.Name = "chkTagsDownloadBlacklisted";
-            this.chkTagsDownloadBlacklisted.Size = new System.Drawing.Size(176, 17);
-            this.chkTagsDownloadBlacklisted.TabIndex = 7;
-            this.chkTagsDownloadBlacklisted.Text = "Download blacklisted images";
-            this.JustTheTips.SetToolTip(this.chkTagsDownloadBlacklisted, "Downloads any images in the blacklisted tags.");
-            this.chkTagsDownloadBlacklisted.UseVisualStyleBackColor = true;
+            this.chkAutoDownloadWithArguments.AutoSize = true;
+            this.chkAutoDownloadWithArguments.Checked = true;
+            this.chkAutoDownloadWithArguments.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkAutoDownloadWithArguments.Location = new System.Drawing.Point(160, 70);
+            this.chkAutoDownloadWithArguments.Name = "chkAutoDownloadWithArguments";
+            this.chkAutoDownloadWithArguments.Size = new System.Drawing.Size(229, 17);
+            this.chkAutoDownloadWithArguments.TabIndex = 19;
+            this.chkAutoDownloadWithArguments.Text = "Auto-download when using arguments";
+            this.JustTheTips.SetToolTip(this.chkAutoDownloadWithArguments, "When enabled, the program will download files based on the arguments.\r\n\r\nWhen dis" +
+        "abled, the arguments will be sent to the main form.");
+            this.chkAutoDownloadWithArguments.UseVisualStyleBackColor = true;
             // 
             // frmSettings
             // 
@@ -1028,10 +1160,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(408, 263);
-            this.Controls.Add(this.btnBlacklist);
-            this.Controls.Add(this.btnSave);
-            this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.tbMain);
+            this.Controls.Add(this.panel1);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = global::aphrodite.Properties.Resources.Brad;
             this.MaximizeBox = false;
@@ -1063,9 +1193,12 @@
             this.tabImages.ResumeLayout(false);
             this.tabImages.PerformLayout();
             this.tabProtocol.ResumeLayout(false);
-            this.tabPortable.ResumeLayout(false);
             this.tabSchemas.ResumeLayout(false);
             this.tabSchemas.PerformLayout();
+            this.tabImportExport.ResumeLayout(false);
+            this.tabImportExport.PerformLayout();
+            this.tabPortable.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -1144,6 +1277,18 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox chkImagesSeparateBlacklisted;
         private System.Windows.Forms.CheckBox chkTagsDownloadBlacklisted;
+        private System.Windows.Forms.CheckBox chkTagsDownloadNewestToOldest;
+        private System.Windows.Forms.TabPage tabImportExport;
+        private System.Windows.Forms.Button btnImportUndesiredTags;
+        private System.Windows.Forms.Button btnExportUndesiredTags;
+        private System.Windows.Forms.Button btnImportBlacklist;
+        private System.Windows.Forms.Button btnExportBlacklist;
+        private System.Windows.Forms.Button btnImportGraylist;
+        private System.Windows.Forms.Button btnExportGraylist;
+        private System.Windows.Forms.CheckBox chkOverwriteOnImport;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.CheckBox chkSkipArgumentCheck;
+        private System.Windows.Forms.CheckBox chkAutoDownloadWithArguments;
 
     }
 }

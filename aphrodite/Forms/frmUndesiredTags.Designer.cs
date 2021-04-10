@@ -24,13 +24,15 @@
         /// </summary>
         private void InitializeComponent() {
             this.lbHeader = new System.Windows.Forms.Label();
-            this.btnReset = new Controls.ExtendedButton();
-            this.btnSave = new Controls.ExtendedButton();
-            this.btnCancel = new Controls.ExtendedButton();
+            this.btnReset = new aphrodite.Controls.ExtendedButton();
+            this.btnSave = new aphrodite.Controls.ExtendedButton();
+            this.btnCancel = new aphrodite.Controls.ExtendedButton();
             this.txtUndesired = new System.Windows.Forms.TextBox();
-            this.btnAdd = new Controls.ExtendedButton();
-            this.btnRemove = new Controls.ExtendedButton();
-            this.listTags = new Controls.AeroListBox();
+            this.btnAdd = new aphrodite.Controls.ExtendedButton();
+            this.btnRemove = new aphrodite.Controls.ExtendedButton();
+            this.listTags = new aphrodite.Controls.AeroListBox();
+            this.pnLower = new System.Windows.Forms.Panel();
+            this.pnLower.SuspendLayout();
             this.SuspendLayout();
             // 
             // lbHeader
@@ -47,7 +49,7 @@
             // 
             // btnReset
             // 
-            this.btnReset.Location = new System.Drawing.Point(12, 285);
+            this.btnReset.Location = new System.Drawing.Point(12, 286);
             this.btnReset.Name = "btnReset";
             this.btnReset.Size = new System.Drawing.Size(106, 23);
             this.btnReset.TabIndex = 22;
@@ -57,7 +59,7 @@
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(236, 285);
+            this.btnSave.Location = new System.Drawing.Point(236, 8);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(71, 23);
             this.btnSave.TabIndex = 21;
@@ -67,7 +69,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(155, 285);
+            this.btnCancel.Location = new System.Drawing.Point(155, 286);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(71, 23);
             this.btnCancel.TabIndex = 20;
@@ -115,20 +117,30 @@
             this.listTags.Sorted = true;
             this.listTags.TabIndex = 23;
             // 
+            // pnLower
+            // 
+            this.pnLower.BackColor = System.Drawing.SystemColors.Menu;
+            this.pnLower.Controls.Add(this.btnSave);
+            this.pnLower.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.pnLower.Location = new System.Drawing.Point(0, 278);
+            this.pnLower.Name = "pnLower";
+            this.pnLower.Size = new System.Drawing.Size(319, 42);
+            this.pnLower.TabIndex = 27;
+            // 
             // frmUndesiredTags
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(319, 320);
+            this.Controls.Add(this.btnReset);
+            this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnRemove);
             this.Controls.Add(this.btnAdd);
             this.Controls.Add(this.txtUndesired);
             this.Controls.Add(this.listTags);
-            this.Controls.Add(this.btnReset);
-            this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.lbHeader);
-            this.Controls.Add(this.btnSave);
+            this.Controls.Add(this.pnLower);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = global::aphrodite.Properties.Resources.Brad;
             this.MinimizeBox = false;
@@ -137,6 +149,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Undesired Tags";
             this.Load += new System.EventHandler(this.frmUndesiredTags_Load);
+            this.pnLower.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -152,5 +165,6 @@
         private System.Windows.Forms.TextBox txtUndesired;
         private Controls.ExtendedButton btnAdd;
         private Controls.ExtendedButton btnRemove;
+        private System.Windows.Forms.Panel pnLower;
     }
 }

@@ -5,5 +5,9 @@ namespace aphrodite {
         public frmLicensing() {
             InitializeComponent();
         }
+
+        private void frmLicensing_FormClosing(object sender, FormClosingEventArgs e) {
+            this.Dispose();
+        }
     }
 }

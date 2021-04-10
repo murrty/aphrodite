@@ -15,8 +15,7 @@ namespace aphrodite {
             rtbZTB.Text = Config.Settings.General.Blacklist.Replace(" ", "\r\n");
 
             if (Program.UseIni) {
-                lbIni.Visible = true;
-                lbMutual.Location = new Point(lbMutual.Location.X, (lbIni.Location.X + lbIni.Size.Height));
+                this.Text += " (editing portable lists)";
             }
         }
 
@@ -77,11 +76,11 @@ namespace aphrodite {
         }
 
         private void llGraylist_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
-            MessageBox.Show("Tags in this category will be downloaded into a separated folder, unless specified otherwise. If the user disallows blacklisted files from being saved, they will not be downloaded at all.", "aphrodite", MessageBoxButtons.OK);
+            MessageBox.Show("Tags in this category are downloaded into their own separate directory by default. Use this category for tags you might enjoy on a rare occasion.", "aphrodite graylist info", MessageBoxButtons.OK);
         }
 
         private void llBlacklist_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
-            MessageBox.Show("Tags in this category will never be downloaded no matter what. They will still be parsed for counting, but never added to any download list.", "aphrodite", MessageBoxButtons.OK);
+            MessageBox.Show("Tags in this category are not downloaded by default. Use this category for tags you never want to see, no matter what, not even if hell freezes over with semen.", "aphrodite blacklist info", MessageBoxButtons.OK);
         }
     }
 }

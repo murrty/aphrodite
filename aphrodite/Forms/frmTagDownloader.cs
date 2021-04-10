@@ -510,8 +510,7 @@ namespace aphrodite {
                             string ReadTags = string.Empty;                 // The buffer for the tags for the .nfo
 
                             switch (xmlRating[i].InnerText.ToLower()) {
-                                case "e":
-                                case "explicit":
+                                case "e": case "explicit":
                                     switch (DownloadInfo.SaveExplicit) {
                                         case false:
                                             continue;
@@ -519,8 +518,7 @@ namespace aphrodite {
                                     rating = "Explicit";
                                     break;
 
-                                case "q":
-                                case "questionable":
+                                case "q": case "questionable":
                                     switch (DownloadInfo.SaveQuestionable) {
                                         case false:
                                             continue;
@@ -528,8 +526,7 @@ namespace aphrodite {
                                     rating = "Questionable";
                                     break;
 
-                                case "s":
-                                case "safe":
+                                case "s": case "safe":
                                     switch (DownloadInfo.SaveSafe) {
                                         case false:
                                             continue;
@@ -544,7 +541,7 @@ namespace aphrodite {
 
                             #region Tag parsing + filtering
                             // Create new tag list to merge all the tag groups into one.
-                            ReadTags += "          General: [ ";
+                            ReadTags += "\r\n          General: [ ";
                             switch (xmlTagsGeneral[i].ChildNodes.Count > 0) {
                                 case true:
                                     for (int x = 0; x < xmlTagsGeneral[i].ChildNodes.Count; x++) {
@@ -781,6 +778,80 @@ namespace aphrodite {
                             if (string.IsNullOrEmpty(NewUrl)) {
                                 if (xmlDeleted[i].InnerText.ToLower() == "false") {
                                     NewUrl = apiTools.GetBlacklistedImageUrl(xmlMD5[i].InnerText, xmlExt[i].InnerText);
+                                }
+                            }
+                            #endregion
+
+                            #region description + .nfo files (so the existing ones don't get replaced)
+                            // Start adding to the nfo buffer and URL lists
+                            if (DownloadInfo.SaveInfo) {
+                                // Set the description
+                                string ImageDescription = " No description";
+                                switch (string.IsNullOrWhiteSpace(xmlDescription[i].InnerText)) {
+                                    case false:
+                                        ImageDescription = xmlDescription[i].InnerText;
+                                        break;
+                                }
+
+                                if (PostIsBlacklisted && DownloadInfo.SaveBlacklistedFiles) {
+                                    string[] Info = new string[] {
+                                        xmlID[i].InnerText,         //0
+                                        xmlMD5[i].InnerText,        // 1
+                                        xmlID[i].InnerText,         // 2
+                                        ReadTags,                   // 3
+                                        FoundGraylistedTags,        // 4
+                                        xmlScoreUp[i].InnerText,    // 5
+                                        xmlScoreDown[i].InnerText,  // 6
+                                        xmlScore[i].InnerText,      // 7
+                                        rating,                     // 8
+                                        ImageDescription            // 9
+                                    };
+
+                                    BlacklistInfoBuffer += string.Format(
+                                        "POST {0}\r\n" +
+                                        "    MD5: {1}\r\n" +
+                                        "    URL: https://e621.net/posts/show/{2}\r\n" +
+                                        "    TAGS {3}\r\n" +
+                                        "    OFFENDING TAGS: {4}\r\n" +
+                                        "    SCORE: Up {5}, Down {6}, Total {7}\r\n" +
+                                        "    RATING: {8}\r\n" +
+                                        "    DESCRIPTION: {9}\r\n\r\n", Info
+                                    );
+                                }
+                                else if (PostIsGraylisted && DownloadInfo.SaveGraylistedFiles) {
+                                    string[] Info = new string[] {
+                                        xmlID[i].InnerText,         //0
+                                        xmlMD5[i].InnerText,        // 1
+                                        xmlID[i].InnerText,         // 2
+                                        ReadTags,                   // 3
+                                        FoundGraylistedTags,        // 4
+                                        xmlScoreUp[i].InnerText,    // 5
+                                        xmlScoreDown[i].InnerText,  // 6
+                                        xmlScore[i].InnerText,      // 7
+                                        rating,                     // 8
+                                        ImageDescription            // 9
+                                    };
+
+                                    GraylistInfoBuffer += string.Format(
+                                        "POST {0}\r\n" +
+                                        "    MD5: {1}\r\n" +
+                                        "    URL: https://e621.net/posts/show/{2}\r\n" +
+                                        "    TAGS {3}\r\n" +
+                                        "    OFFENDING TAGS: {4}\r\n" +
+                                        "    SCORE: Up {5}, Down {6}, Total {7}\r\n" +
+                                        "    RATING: {8}\r\n" +
+                                        "    DESCRIPTION: {9}\r\n\r\n", Info
+                                    );
+                                }
+                                else {
+                                    CleanInfoBuffer += "POST " + xmlID[i].InnerText + ":\r\n" +
+                                               "    MD5: " + xmlMD5[i].InnerText + "\r\n" +
+                                               "    URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\r\n" +
+                                               "    TAGS:\r\n" + ReadTags + "\r\n" +
+                                               "    SCORE: Up " + xmlScoreUp[i].InnerText + ", Down " + xmlScoreDown[i].InnerText + ", Total " + xmlScore[i].InnerText + "\r\n" +
+                                               "    RATING: " + rating + "\r\n" +
+                                               "    DESCRIPITON:" + ImageDescription +
+                                               "\r\n\r\n";
                                 }
                             }
                             #endregion
@@ -1218,80 +1289,6 @@ namespace aphrodite {
                                     break;
                             }
                             #endregion
-
-                            #region description + .nfo files
-                            // Start adding to the nfo buffer and URL lists
-                            if (DownloadInfo.SaveInfo) {
-                                // Set the description
-                                string ImageDescription = " No description";
-                                switch (string.IsNullOrWhiteSpace(xmlDescription[i].InnerText)) {
-                                    case false:
-                                        ImageDescription = xmlDescription[i].InnerText;
-                                        break;
-                                }
-
-                                if (PostIsBlacklisted) {
-                                    string[] Info = new string[] {
-                                        xmlID[i].InnerText,         //0
-                                        xmlMD5[i].InnerText,        // 1
-                                        xmlID[i].InnerText,         // 2
-                                        ReadTags,                   // 3
-                                        FoundGraylistedTags,        // 4
-                                        xmlScoreUp[i].InnerText,    // 5
-                                        xmlScoreDown[i].InnerText,  // 6
-                                        xmlScore[i].InnerText,      // 7
-                                        rating,                     // 8
-                                        ImageDescription            // 9
-                                    };
-
-                                    BlacklistInfoBuffer += string.Format(
-                                        "POST {0}\r\n" +
-                                        "    MD5: {1}\r\n" +
-                                        "    URL: https://e621.net/posts/show/{2}\r\n" +
-                                        "    TAGS {3}\r\n" +
-                                        "    OFFENDING TAGS: {4}\r\n" +
-                                        "    SCORE: Up {5}, Down {6}, Total {7}\r\n" +
-                                        "    RATING: {8}\r\n" +
-                                        "    DESCRIPTION: {9}\r\n\r\n", Info
-                                    );
-                                }
-                                else if (PostIsGraylisted && DownloadInfo.SaveGraylistedFiles) {
-                                    string[] Info = new string[] {
-                                        xmlID[i].InnerText,         //0
-                                        xmlMD5[i].InnerText,        // 1
-                                        xmlID[i].InnerText,         // 2
-                                        ReadTags,                   // 3
-                                        FoundGraylistedTags,        // 4
-                                        xmlScoreUp[i].InnerText,    // 5
-                                        xmlScoreDown[i].InnerText,  // 6
-                                        xmlScore[i].InnerText,      // 7
-                                        rating,                     // 8
-                                        ImageDescription            // 9
-                                    };
-
-                                    GraylistInfoBuffer += string.Format(
-                                        "POST {0}\r\n" +
-                                        "    MD5: {1}\r\n" +
-                                        "    URL: https://e621.net/posts/show/{2}\r\n" +
-                                        "    TAGS {3}\r\n" +
-                                        "    OFFENDING TAGS: {4}\r\n" +
-                                        "    SCORE: Up {5}, Down {6}, Total {7}\r\n" +
-                                        "    RATING: {8}\r\n" +
-                                        "    DESCRIPTION: {9}\r\n\r\n", Info
-                                    );
-                                }
-                                else {
-                                    CleanInfoBuffer += "POST " + xmlID[i].InnerText + ":\r\n" +
-                                               "    MD5: " + xmlMD5[i].InnerText + "\r\n" +
-                                               "    URL: https://e621.net/post/show/" + xmlID[i].InnerText + "\r\n" +
-                                               "    TAGS:\r\n" + ReadTags + "\r\n" +
-                                               "    SCORE: Up " + xmlScoreUp[i].InnerText + ", Down " + xmlScoreDown[i].InnerText + ", Total " + xmlScore[i].InnerText + "\r\n" +
-                                               "    RATING: " + rating + "\r\n" +
-                                               "    DESCRIPITON:" + ImageDescription +
-                                               "\r\n\r\n";
-                                }
-                            }
-                            #endregion
                         }
 
                         #region after page update totals
@@ -1312,39 +1309,23 @@ namespace aphrodite {
                                 };
 
                             labelBuffer = string.Format("files: {0} ( {1} E | {2} Q | {3} S )\r\n" +
-                                          "graylisted: {4} ( {5} E | {6} Q | {7} S )\r\n" +
-                                          "blacklisted: {8} ( {9} E | {10} Q | {11} S )\r\n" +
-                                          "total parsed: {12}\r\n\r\n" +
+                                                        "not saving graylisted tags" + //"graylisted: {4} ( {5} E | {6} Q | {7} S )\r\n" +
+                                                        "not saving blacklisted tags" +//"blacklisted: {8} ( {9} E | {10} Q | {11} S )\r\n" +
+                                                        "total parsed: {12}\r\n\r\n" +
 
-                                          "files that exist: {13} ( {14} E | {15} Q | {16} S )\r\n" +
-                                          "graylisted that exist: {17} ( {18} E | {19} Q | {20} S )\r\n" +
-                                          "blacklisted that exist: {21} ( {22} E | {23} Q | {24} S )\r\n" +
-                                          "total exist: {25}", Counts);
-                            //}
-                            //else {
-                            //    object[] Counts = new object[] {
-                            //        CleanTotalCount,
-                            //        GraylistTotalCount,
-                            //        BlacklistTotalCount,
-                            //        (CleanTotalCount + GraylistTotalCount + BlacklistTotalCount),
+                                                        "files that exist: {13} ( {14} E | {15} Q | {16} S )\r\n" +
+                                                        "graylisted that exist: {17} ( {18} E | {19} Q | {20} S )\r\n" +
+                                                        "blacklisted that exist: {21} ( {22} E | {23} Q | {24} S )\r\n" +
+                                                        "total exist: {25}", Counts);
 
-                            //        CleanTotalExistCount,
-                            //        GraylistTotalExistCount,
-                            //        BlacklistTotalExistCount,
-                            //        (CleanTotalExistCount + GraylistTotalExistCount + BlacklistTotalExistCount),
-                            //    };
-                            //    labelBuffer = string.Format("files: {0}\r\n" +
-                            //                  "graylisted: {1}\r\n" +
-                            //                  "blacklisted: {2}\r\n" +
-                            //                  "total parsed: {3}\r\n\r\n" +
+                            if (DownloadInfo.SaveGraylistedFiles) {
+                                labelBuffer = labelBuffer.Replace("not saving graylisted tags", "graylisted: {4} ( {5} E | {6} Q | {7} S )");
+                            }
+                            if (DownloadInfo.SaveBlacklistedFiles) {
+                                labelBuffer = labelBuffer.Replace("not saving blacklisted tags", "blacklisted: {8} ( {9} E | {10} Q | {11} S )");
+                            }
 
-                            //                  "files that exist: {4}\r\n" +
-                            //                  "graylisted that exist: {5}\r\n" +
-                            //                  "blacklisted that exist: {6}\r\n" +
-                            //                  "total exist: {7}", Counts);
-                            //}
-
-                            lbBlacklist.Text = labelBuffer;
+                            lbBlacklist.Text = string.Format(labelBuffer, Counts);
                         }));
                         #endregion
 
@@ -1618,58 +1599,8 @@ namespace aphrodite {
                     }
                 }
 
-                // Set the progressbar style.
+                // Set the progressbar info.
                 this.BeginInvoke(new MethodInvoker(() => {
-                    string labelBuffer = "";
-
-                    //if (DownloadInfo.SeparateRatings) {
-                    object[] Counts = new object[] {
-                                    CleanTotalCount, CleanExplicitCount, CleanQuestionableCount, CleanSafeCount,
-                                    GraylistTotalCount, GraylistExplicitCount, GraylistQuestionableCount, GraylistSafeCount,
-                                    BlacklistTotalCount, BlacklistExplicitCount, BlacklistQuestionableCount, BlacklistSafeCount,
-                                    (CleanTotalCount + GraylistTotalCount + BlacklistTotalCount),
-
-                                    CleanTotalExistCount, CleanExplicitExistCount, CleanQuestionableExistCount, CleanSafeExistCount,
-                                    GraylistTotalExistCount, GraylistExplicitExistCount, GraylistQuestionableExistCount, GraylistSafeExistCount,
-                                    BlacklistTotalExistCount, BlacklistExplicitExistCount, BlacklistQuestionableExistCount, BlacklistSafeExistCount,
-                                    (CleanTotalExistCount + GraylistTotalExistCount + BlacklistTotalExistCount)
-                                };
-
-                    labelBuffer = string.Format("files: {0} ( {1} E | {2} Q | {3} S )\r\n" +
-                                                "graylisted: {4} ( {5} E | {6} Q | {7} S )\r\n" +
-                                                "blacklisted: {8} ( {9} E | {10} Q | {11} S )\r\n" +
-                                                "total parsed: {12}\r\n\r\n" +
-
-                                                "files that exist: {13} ( {14} E | {15} Q | {16} S )\r\n" +
-                                                "graylisted that exist: {17} ( {18} E | {19} Q | {20} S )\r\n" +
-                                                "blacklisted that exist: {21} ( {22} E | {23} Q | {24} S )\r\n" +
-                                                "total exist: {25}", Counts);
-                    //}
-                    //else {
-                    //    object[] Counts = new object[] {
-                    //                CleanTotalCount,
-                    //                GraylistTotalCount,
-                    //                BlacklistTotalCount,
-                    //                (CleanTotalCount + GraylistTotalCount + BlacklistTotalCount),
-
-                    //                CleanTotalExistCount,
-                    //                GraylistTotalExistCount,
-                    //                BlacklistTotalExistCount,
-                    //                (CleanTotalExistCount + GraylistTotalExistCount + BlacklistTotalExistCount),
-                    //            };
-                    //    labelBuffer = string.Format("files: {0}\r\n" +
-                    //                                "graylisted: {1}\r\n" +
-                    //                                "blacklisted: {2}\r\n" +
-                    //                                "total parsed: {3}\r\n\r\n" +
-
-                    //                                "files that exist: {4}\r\n" +
-                    //                                "graylisted that exist: {5}\r\n" +
-                    //                                "blacklisted that exist: {6}\r\n" +
-                    //                                "total exist: {7}", Counts);
-                    //}
-
-                    lbBlacklist.Text = labelBuffer;
-
                     pbTotalStatus.Maximum = CleanTotalCount;
                     if (DownloadInfo.SaveGraylistedFiles) {
                         pbTotalStatus.Maximum += GraylistTotalCount;
@@ -1679,7 +1610,6 @@ namespace aphrodite {
                     }
 
                     pbDownloadStatus.Style = ProgressBarStyle.Blocks;
-
                 }));
                 #endregion
 

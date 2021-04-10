@@ -24,27 +24,29 @@
         /// </summary>
         private void InitializeComponent() {
             this.txtUpdateAvailableName = new System.Windows.Forms.TextBox();
-            this.btnUpdateAvailableSkip = new Controls.ExtendedButton();
-            this.btnUpdateAvailableOk = new Controls.ExtendedButton();
-            this.btnUpdateAvailableUpdate = new Controls.ExtendedButton();
+            this.btnUpdateAvailableSkip = new aphrodite.Controls.ExtendedButton();
+            this.btnUpdateAvailableOk = new aphrodite.Controls.ExtendedButton();
+            this.btnUpdateAvailableUpdate = new aphrodite.Controls.ExtendedButton();
             this.lbUpdateAvailableChangelog = new System.Windows.Forms.Label();
             this.rtbUpdateAvailableChangelog = new System.Windows.Forms.RichTextBox();
             this.lbUpdateAvailableCurrentVersion = new System.Windows.Forms.Label();
             this.lbUpdateAvailableUpdateVersion = new System.Windows.Forms.Label();
             this.lbUpdateAvailableHeader = new System.Windows.Forms.Label();
+            this.pnLower = new System.Windows.Forms.Panel();
+            this.pnLower.SuspendLayout();
             this.SuspendLayout();
             // 
             // txtUpdateAvailableName
             // 
-            this.txtUpdateAvailableName.Location = new System.Drawing.Point(12, 107);
+            this.txtUpdateAvailableName.Location = new System.Drawing.Point(11, 107);
             this.txtUpdateAvailableName.Name = "txtUpdateAvailableName";
             this.txtUpdateAvailableName.ReadOnly = true;
-            this.txtUpdateAvailableName.Size = new System.Drawing.Size(298, 22);
+            this.txtUpdateAvailableName.Size = new System.Drawing.Size(300, 22);
             this.txtUpdateAvailableName.TabIndex = 13;
             // 
             // btnUpdateAvailableSkip
             // 
-            this.btnUpdateAvailableSkip.Location = new System.Drawing.Point(12, 276);
+            this.btnUpdateAvailableSkip.Location = new System.Drawing.Point(12, 7);
             this.btnUpdateAvailableSkip.Name = "btnUpdateAvailableSkip";
             this.btnUpdateAvailableSkip.Size = new System.Drawing.Size(90, 24);
             this.btnUpdateAvailableSkip.TabIndex = 15;
@@ -54,7 +56,7 @@
             // 
             // btnUpdateAvailableOk
             // 
-            this.btnUpdateAvailableOk.Location = new System.Drawing.Point(235, 276);
+            this.btnUpdateAvailableOk.Location = new System.Drawing.Point(235, 7);
             this.btnUpdateAvailableOk.Name = "btnUpdateAvailableOk";
             this.btnUpdateAvailableOk.Size = new System.Drawing.Size(75, 24);
             this.btnUpdateAvailableOk.TabIndex = 17;
@@ -64,7 +66,7 @@
             // 
             // btnUpdateAvailableUpdate
             // 
-            this.btnUpdateAvailableUpdate.Location = new System.Drawing.Point(108, 276);
+            this.btnUpdateAvailableUpdate.Location = new System.Drawing.Point(108, 7);
             this.btnUpdateAvailableUpdate.Name = "btnUpdateAvailableUpdate";
             this.btnUpdateAvailableUpdate.Size = new System.Drawing.Size(75, 24);
             this.btnUpdateAvailableUpdate.TabIndex = 16;
@@ -75,18 +77,18 @@
             // lbUpdateAvailableChangelog
             // 
             this.lbUpdateAvailableChangelog.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbUpdateAvailableChangelog.Location = new System.Drawing.Point(9, 83);
+            this.lbUpdateAvailableChangelog.Location = new System.Drawing.Point(8, 83);
             this.lbUpdateAvailableChangelog.Name = "lbUpdateAvailableChangelog";
-            this.lbUpdateAvailableChangelog.Size = new System.Drawing.Size(301, 21);
+            this.lbUpdateAvailableChangelog.Size = new System.Drawing.Size(303, 21);
             this.lbUpdateAvailableChangelog.TabIndex = 12;
             this.lbUpdateAvailableChangelog.Text = "Changelog:";
             // 
             // rtbUpdateAvailableChangelog
             // 
-            this.rtbUpdateAvailableChangelog.Location = new System.Drawing.Point(12, 133);
+            this.rtbUpdateAvailableChangelog.Location = new System.Drawing.Point(11, 133);
             this.rtbUpdateAvailableChangelog.Name = "rtbUpdateAvailableChangelog";
             this.rtbUpdateAvailableChangelog.ReadOnly = true;
-            this.rtbUpdateAvailableChangelog.Size = new System.Drawing.Size(298, 137);
+            this.rtbUpdateAvailableChangelog.Size = new System.Drawing.Size(300, 140);
             this.rtbUpdateAvailableChangelog.TabIndex = 14;
             this.rtbUpdateAvailableChangelog.Text = "";
             // 
@@ -95,7 +97,7 @@
             this.lbUpdateAvailableCurrentVersion.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbUpdateAvailableCurrentVersion.Location = new System.Drawing.Point(36, 55);
             this.lbUpdateAvailableCurrentVersion.Name = "lbUpdateAvailableCurrentVersion";
-            this.lbUpdateAvailableCurrentVersion.Size = new System.Drawing.Size(274, 21);
+            this.lbUpdateAvailableCurrentVersion.Size = new System.Drawing.Size(275, 21);
             this.lbUpdateAvailableCurrentVersion.TabIndex = 11;
             this.lbUpdateAvailableCurrentVersion.Text = "Current version: 0.0";
             // 
@@ -104,34 +106,44 @@
             this.lbUpdateAvailableUpdateVersion.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbUpdateAvailableUpdateVersion.Location = new System.Drawing.Point(35, 34);
             this.lbUpdateAvailableUpdateVersion.Name = "lbUpdateAvailableUpdateVersion";
-            this.lbUpdateAvailableUpdateVersion.Size = new System.Drawing.Size(275, 21);
+            this.lbUpdateAvailableUpdateVersion.Size = new System.Drawing.Size(276, 21);
             this.lbUpdateAvailableUpdateVersion.TabIndex = 10;
             this.lbUpdateAvailableUpdateVersion.Text = "Update version: 0.0";
             // 
             // lbUpdateAvailableHeader
             // 
             this.lbUpdateAvailableHeader.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbUpdateAvailableHeader.Location = new System.Drawing.Point(8, 9);
+            this.lbUpdateAvailableHeader.Location = new System.Drawing.Point(11, 9);
             this.lbUpdateAvailableHeader.Name = "lbUpdateAvailableHeader";
-            this.lbUpdateAvailableHeader.Size = new System.Drawing.Size(302, 23);
+            this.lbUpdateAvailableHeader.Size = new System.Drawing.Size(300, 23);
             this.lbUpdateAvailableHeader.TabIndex = 9;
             this.lbUpdateAvailableHeader.Text = "An update is available";
+            // 
+            // pnLower
+            // 
+            this.pnLower.BackColor = System.Drawing.SystemColors.Menu;
+            this.pnLower.Controls.Add(this.btnUpdateAvailableOk);
+            this.pnLower.Controls.Add(this.btnUpdateAvailableSkip);
+            this.pnLower.Controls.Add(this.btnUpdateAvailableUpdate);
+            this.pnLower.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.pnLower.Location = new System.Drawing.Point(0, 281);
+            this.pnLower.Name = "pnLower";
+            this.pnLower.Size = new System.Drawing.Size(322, 42);
+            this.pnLower.TabIndex = 18;
             // 
             // frmUpdateAvailable
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(322, 312);
+            this.ClientSize = new System.Drawing.Size(322, 323);
             this.Controls.Add(this.txtUpdateAvailableName);
-            this.Controls.Add(this.btnUpdateAvailableSkip);
-            this.Controls.Add(this.btnUpdateAvailableOk);
-            this.Controls.Add(this.btnUpdateAvailableUpdate);
             this.Controls.Add(this.lbUpdateAvailableChangelog);
             this.Controls.Add(this.rtbUpdateAvailableChangelog);
             this.Controls.Add(this.lbUpdateAvailableCurrentVersion);
             this.Controls.Add(this.lbUpdateAvailableUpdateVersion);
             this.Controls.Add(this.lbUpdateAvailableHeader);
+            this.Controls.Add(this.pnLower);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = global::aphrodite.Properties.Resources.Brad;
             this.MaximizeBox = false;
@@ -139,6 +151,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Update available";
             this.Load += new System.EventHandler(this.frmUpdateAvailable_Load);
+            this.pnLower.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -155,5 +168,6 @@
         private System.Windows.Forms.Label lbUpdateAvailableCurrentVersion;
         private System.Windows.Forms.Label lbUpdateAvailableUpdateVersion;
         private System.Windows.Forms.Label lbUpdateAvailableHeader;
+        private System.Windows.Forms.Panel pnLower;
     }
 }

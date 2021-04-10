@@ -1,11 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.Text;
 using System.Runtime.InteropServices;
 
-namespace Ookii.Dialogs.WinForms.Interop
-{
+namespace Ookii.Dialogs.WinForms.Interop {
     // Dummy base interface for CommonFileDialog coclasses
-    internal interface NativeCommonFileDialog
-    { }
+    internal interface NativeCommonFileDialog { }
 
     // ---------------------------------------------------------
     // Coclass interfaces - designed to "look like" the object 
@@ -13,10 +13,21 @@ namespace Ookii.Dialogs.WinForms.Interop
     // straightforward way. Behind the scenes, the C# compiler
     // morphs all 'new CoClass()' calls to 'new CoClassWrapper()'
     [ComImport,
-    Guid(IIDGuid.IFileOpenDialog), 
+    Guid(IIDGuid.IFileOpenDialog),
     CoClass(typeof(FileOpenDialogRCW))]
-    internal interface NativeFileOpenDialog : IFileOpenDialog
-    {
+    internal interface NativeFileOpenDialog : IFileOpenDialog {
+    }
+
+    [ComImport,
+    Guid(IIDGuid.IFileSaveDialog),
+    CoClass(typeof(FileSaveDialogRCW))]
+    internal interface NativeFileSaveDialog : IFileSaveDialog {
+    }
+
+    [ComImport,
+    Guid(IIDGuid.IKnownFolderManager),
+    CoClass(typeof(KnownFolderManagerRCW))]
+    internal interface KnownFolderManager : IKnownFolderManager {
     }
 
     // ---------------------------------------------------
@@ -25,15 +36,20 @@ namespace Ookii.Dialogs.WinForms.Interop
     ClassInterface(ClassInterfaceType.None),
     TypeLibType(TypeLibTypeFlags.FCanCreate),
     Guid(CLSIDGuid.FileOpenDialog)]
-    internal class FileOpenDialogRCW
-    {
+    internal class FileOpenDialogRCW {
+    }
+
+    [ComImport,
+    ClassInterface(ClassInterfaceType.None),
+    TypeLibType(TypeLibTypeFlags.FCanCreate),
+    Guid(CLSIDGuid.FileSaveDialog)]
+    internal class FileSaveDialogRCW {
     }
 
     [ComImport,
     ClassInterface(ClassInterfaceType.None),
     TypeLibType(TypeLibTypeFlags.FCanCreate),
     Guid(CLSIDGuid.KnownFolderManager)]
-    internal class KnownFolderManagerRCW
-    {
+    internal class KnownFolderManagerRCW {
     }
 }
