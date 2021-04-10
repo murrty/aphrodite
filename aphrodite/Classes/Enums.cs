@@ -8,13 +8,16 @@ namespace aphrodite {
 
     public enum DownloadStatus {
         Waiting,
+        ReadyToDownload,
         Finished,
         Errored,
         Aborted,
+        FormWasDisposed,
+        FileAlreadyExists,
         NothingToDownload,
         PostOrPoolWasDeleted,
         ApiReturnedNullOrEmpty,
-        FileWasNullAfterBypassingBlacklist
+        FileWasNullAfterBypassingBlacklist,
     }
 
     public enum DownloadType : int {

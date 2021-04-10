@@ -14,8 +14,8 @@ namespace aphrodite {
         public static volatile IniFile Ini = new IniFile(ApplicationPath + "\\aphrodite.ini");
         public static volatile bool UseIni = false;
 
-        private static volatile DownloadType type = DownloadType.None;
-        private static volatile string arg = null;
+        private static volatile string PushedArgument = null;
+        private static volatile DownloadType PushedType = DownloadType.None;
         private static volatile frmLog Logger;
         private static volatile bool LogEnabled = false;
 
@@ -70,7 +70,7 @@ namespace aphrodite {
                 if (!HasArgumentsThatSkipMainForm()) {
                     Log(LogAction.WriteToLog, "No arguments were passed that didn't require the main form");
                     Config.Settings.Load(ConfigType.All);
-                    Application.Run(new frmMain(arg, type));
+                    Application.Run(new frmMain(PushedArgument, PushedType));
                 }
             }
         }
@@ -160,22 +160,169 @@ namespace aphrodite {
                 #region "tags:*" (only for pages)
                 else if (CurrentArg.StartsWith("tags:")) {
                     CurrentArg = CurrentArg.Substring(5).Replace("|", " ");
-
-                    if (apiTools.IsValidPageLink(CurrentArg)) {
-                        Config.Settings.Load(ConfigType.General);
-                        Config.Settings.Load(ConfigType.Tags);
-                        Downloader.Arguments.DownloadPage(CurrentArg);
-                        return true;
-                    }
-                    else if (CurrentArg == "start") {
+                    if (CurrentArg == "start") {
                         Log(LogAction.WriteToLog, "Using tags: protocol to start aphrodite");
+                        PushedType = DownloadType.Tags;
                         return false;
                     }
                     else {
                         Log(LogAction.WriteToLog, "Some tags were passed to the program");
-                        type = DownloadType.Tags;
-                        arg = CurrentArg.Replace("%20", " ");
+                        bool IsPage = false;
+                        if (apiTools.IsValidPageLink(CurrentArg)) {
+                            IsPage = true;
+                        }
+
+                        if (Config.Settings.Initialization.AutoDownloadWithArguments) {
+                            if (!Config.Settings.Initialization.SkipArgumentCheck) {
+                                using (frmArgumentDialog ArgumentDialog = new frmArgumentDialog(CurrentArg, DownloadType.Tags)) {
+                                    switch (ArgumentDialog.ShowDialog()) {
+                                        case DialogResult.Yes:
+                                            CurrentArg = ArgumentDialog.AppendedArgument;
+                                            Config.Settings.Load(ConfigType.General);
+                                            Config.Settings.Load(ConfigType.Tags);
+
+                                            if (IsPage) {
+                                                Downloader.Arguments.DownloadPage(CurrentArg);
+                                            }
+                                            else {
+                                                Downloader.Arguments.DownloadTags(CurrentArg.Replace("%20", " "));
+                                            }
+                                            return true;
+
+                                        case DialogResult.No:
+                                            CurrentArg = ArgumentDialog.AppendedArgument;
+                                            Log(LogAction.WriteToLog, "Pushing the arguments to the main form");
+                                            PushedArgument = CurrentArg;
+                                            PushedType = DownloadType.Tags;
+                                            return false;
+
+                                        case DialogResult.Cancel:
+                                            return true;
+                                    }
+                                }
+                            }
+
+                            Config.Settings.Load(ConfigType.General);
+                            Config.Settings.Load(ConfigType.Tags);
+
+                            if (IsPage) {
+                                Downloader.Arguments.DownloadPage(CurrentArg);
+                            }
+                            else {
+                                Downloader.Arguments.DownloadTags(CurrentArg.Replace("%20", " "));
+                            }
+                        }
+                        else {
+                            Log(LogAction.WriteToLog, "Pushing the arguments to the main form");
+                            PushedArgument = CurrentArg;
+                            PushedType = DownloadType.Tags;
+                            return false;
+                        }
+                    }
+                }
+                #endregion
+
+                #region "pools:"
+                else if (CurrentArg.StartsWith("pools:")) {
+                    CurrentArg = CurrentArg.Substring(6);
+
+                    if (CurrentArg == "start") {
+                        Log(LogAction.WriteToLog, "Using pools: protocol to start aphrodite");
+                        PushedType = DownloadType.Pools;
                         return false;
+                    }
+                    else {
+                        Log(LogAction.WriteToLog, "A pool was passed to the program");
+                        if (apiTools.IsValidPoolLink(CurrentArg)) {
+                            Log(LogAction.WriteToLog, "It seems like it was a valid pool link.");
+                            CurrentArg = apiTools.GetPoolOrPostId(CurrentArg);
+                        }
+
+                        if (Config.Settings.Initialization.AutoDownloadWithArguments) {
+                            if (!Config.Settings.Initialization.SkipArgumentCheck) {
+                                using (frmArgumentDialog ArgumentDialog = new frmArgumentDialog(CurrentArg, DownloadType.Pools)) {
+                                    switch (ArgumentDialog.ShowDialog()) {
+                                        case DialogResult.Yes:
+                                            CurrentArg = ArgumentDialog.AppendedArgument;
+                                            Config.Settings.Load(ConfigType.General);
+                                            Config.Settings.Load(ConfigType.Pools);
+                                            Downloader.Arguments.DownloadPool(CurrentArg);
+                                            return true;
+
+                                        case DialogResult.No:
+                                            CurrentArg = ArgumentDialog.AppendedArgument;
+                                            Log(LogAction.WriteToLog, "Pushing the arguments to the main form");
+                                            PushedArgument = CurrentArg;
+                                            PushedType = DownloadType.Pools;
+                                            return false;
+
+                                        case DialogResult.Cancel:
+                                            return true;
+                                    }
+                                }
+                            }
+
+                        }
+                        else {
+                            Log(LogAction.WriteToLog, "Pushing the arguments to the main form");
+                            PushedArgument = CurrentArg;
+                            PushedType = DownloadType.Pools;
+                            return false;
+                        }
+                    }
+                }
+                #endregion
+
+                #region "images:"
+                else if (CurrentArg.StartsWith("images:")) {
+                    CurrentArg = CurrentArg.Substring(7);
+                    if (CurrentArg == "start") {
+                        Log(LogAction.WriteToLog, "Using images: protocol to start aphrodite");
+                        PushedType = DownloadType.Images;
+                        return false;
+                    }
+                    else {
+                        Log(LogAction.WriteToLog, "An image was passed to the program");
+                        if (apiTools.IsValidImageLink(CurrentArg)) {
+                            Log(LogAction.WriteToLog, "It seems like it was a valid image link.");
+                            CurrentArg = apiTools.GetPoolOrPostId(CurrentArg);
+                        }
+
+                        if (Config.Settings.Initialization.AutoDownloadWithArguments) {
+                            if (!Config.Settings.Initialization.SkipArgumentCheck) {
+                                using (frmArgumentDialog ArgumentDialog = new frmArgumentDialog(CurrentArg, DownloadType.Images)) {
+                                    switch (ArgumentDialog.ShowDialog()) {
+                                        case DialogResult.Yes:
+                                            CurrentArg = ArgumentDialog.AppendedArgument;
+                                            Config.Settings.Load(ConfigType.General);
+                                            Config.Settings.Load(ConfigType.Images);
+                                            Downloader.Arguments.DownloadImage(CurrentArg);
+                                            return true;
+
+                                        case DialogResult.No:
+                                            CurrentArg = ArgumentDialog.AppendedArgument;
+                                            Log(LogAction.WriteToLog, "Pushing the arguments to the main form");
+                                            PushedArgument = CurrentArg;
+                                            PushedType = DownloadType.Images;
+                                            return false;
+
+                                        case DialogResult.Cancel:
+                                            return true;
+                                    }
+                                }
+                            }
+
+                            Config.Settings.Load(ConfigType.General);
+                            Config.Settings.Load(ConfigType.Images);
+                            Downloader.Arguments.DownloadImage(CurrentArg);
+                            return true;
+                        }
+                        else {
+                            Log(LogAction.WriteToLog, "Pushing the arguments to the main form");
+                            PushedArgument = CurrentArg;
+                            PushedType = DownloadType.Images;
+                            return false;
+                        }
                     }
                 }
                 #endregion
@@ -222,60 +369,6 @@ namespace aphrodite {
                         }
                     }
                     return true;
-                }
-                #endregion
-
-                #region "pools:"
-                else if (CurrentArg.StartsWith("pools:") && apiTools.IsValidPoolLink(CurrentArg.Replace("pools:", ""))) {
-                    CurrentArg = CurrentArg.Substring(6);
-                    CurrentArg = CurrentArg.Replace("http://", "https://").Replace("https://www.", "https://");
-
-                    if (apiTools.IsValidPoolLink(CurrentArg)) {
-                        Config.Settings.Load(ConfigType.General);
-                        Config.Settings.Load(ConfigType.Pools);
-                        if (CurrentArg.Contains("?")) {
-                            CurrentArg = CurrentArg.Split('?')[0];
-                        }
-
-                        CurrentArg = CurrentArg.Split('/')[4];
-
-                        Downloader.Arguments.DownloadPool(CurrentArg);
-                        return true;
-                    }
-                    else if (CurrentArg == "start") {
-                        Log(LogAction.WriteToLog, "Using pools: protocol to start aphrodite");
-                        return false;
-                    }
-                    else {
-                        Log(LogAction.WriteToLog, "A pool id was passed to the program");
-                        arg = CurrentArg;
-                        type = DownloadType.Pools;
-                        return false;
-                    }
-
-                }
-                #endregion
-
-                #region "images:"
-                else if (CurrentArg.StartsWith("images:") && apiTools.IsValidImageLink(CurrentArg.Replace("images:", ""))) {
-                    CurrentArg = CurrentArg.Substring(7);
-                    CurrentArg = CurrentArg.Split('?')[0];
-                    if (apiTools.IsValidImageLink(CurrentArg)) {
-                        Config.Settings.Load(ConfigType.General);
-                        Config.Settings.Load(ConfigType.Images);
-                        Downloader.Arguments.DownloadImage(CurrentArg);
-                        return true;
-                    }
-                    else if (CurrentArg == "start") {
-                        Log(LogAction.WriteToLog, "Using images: protocol to start aphrodite");
-                        return false;
-                    }
-                    else {
-                        Log(LogAction.WriteToLog, "An image id was passed to the program");
-                        arg = CurrentArg;
-                        type = DownloadType.Images;
-                        return false;
-                    }
                 }
                 #endregion
 

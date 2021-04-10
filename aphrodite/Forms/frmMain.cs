@@ -19,20 +19,24 @@ namespace aphrodite {
         public frmMain(string Argument = null, DownloadType Type = DownloadType.None) {
             InitializeComponent();
 
-            if (Argument != null && Type != DownloadType.None) {
-                switch (Type) {
-                    case DownloadType.Tags:
+            switch (Type) {
+                case DownloadType.Tags:
+                    if (Argument != null) {
                         txtTags.Text = Argument;
-                        break;
-                    case DownloadType.Pools:
+                    }
+                    break;
+                case DownloadType.Pools:
+                    if (Argument != null) {
                         txtPoolId.Text = Argument;
-                        tabMain.SelectedTab = tabPools;
-                        break;
-                    case DownloadType.Images:
+                    }
+                    tabMain.SelectedTab = tabPools;
+                    break;
+                case DownloadType.Images:
+                    if (Argument != null) {
                         txtImageUrl.Text = Argument;
-                        tabMain.SelectedTab = tabImages;
-                        break;
-                }
+                    }
+                    tabMain.SelectedTab = tabImages;
+                    break;
             }
 
             if (!Program.UseIni) {

@@ -38,6 +38,7 @@ namespace aphrodite {
         public bool SkipExistingFiles;
         public string FileNameSchema;
         public bool SaveBlacklistedFiles;
+        public bool DownloadNewestToOldest;
 
         /// <summary>
         /// Initializes new TagDownloadInfo for downloading specified tags.
@@ -80,6 +81,7 @@ namespace aphrodite {
             SaveSafe = aphrodite.Config.Settings.Tags.Safe;
             FileNameSchema = apiTools.ReplaceIllegalCharacters(aphrodite.Config.Settings.Tags.fileNameSchema.ToLower());
             SaveBlacklistedFiles = Config.Settings.Tags.downloadBlacklisted;
+            DownloadNewestToOldest = Config.Settings.Tags.DownloadNewestToOldest;
         }
         /// <summary>
         /// Initializes new TagDownloadInfo for downloading a page.
@@ -142,6 +144,7 @@ namespace aphrodite {
             SaveSafe = aphrodite.Config.Settings.Tags.Safe;
             FileNameSchema = apiTools.ReplaceIllegalCharacters(aphrodite.Config.Settings.Tags.fileNameSchema.ToLower());
             SaveBlacklistedFiles = Config.Settings.Tags.downloadBlacklisted;
+            DownloadNewestToOldest = Config.Settings.Tags.DownloadNewestToOldest;
         }
     }
     public class PoolDownloadInfo {

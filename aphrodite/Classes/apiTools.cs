@@ -45,26 +45,7 @@ namespace aphrodite {
                 throw;
             }
         }
-        public static bool DownloadImage(string ImageURL, string SavePath) {
-            try {
-                using (Controls.ExtendedWebClient WC = new Controls.ExtendedWebClient()) {
-                    WC.Proxy = WebRequest.GetSystemWebProxy();
-                    WC.Method = "GET";
-                    WC.Headers.Add("User-Agent: " + Program.UserAgent);
-                    WC.DownloadFile(ImageURL, SavePath);
-                }
-                return true;
-            }
-            catch (ThreadAbortException) {
-                throw;
-            }
-            catch (WebException) {
-                throw;
-            }
-            catch (Exception) {
-                throw;
-            }
-        }
+
         public static bool IsXmlDead(string xml) {
             if (string.IsNullOrWhiteSpace(xml) || xml == EmptyXML)
                 return true;
@@ -96,77 +77,12 @@ namespace aphrodite {
             return "https://static1.e621.net/data/" + md5.Substring(0, 2) + "/" + md5.Substring(2, 2) + "/" + md5 + "." + ext;
         }
 
-        public static bool GetTagsFromUrl(string url, out string output) {
-            output = null;
-
-            url = SetUrlString(url);
-
-            if (!IsValidE621Link(url)) {
-                return false;
-            }
-            try {
-                if (url.Contains("posts?tags=")) {
-                    url = url.Split('/')[3].Replace("posts?tags=", "");
-                    if (url.Contains('&')) {
-                        url = url.Split('&')[0];
-                    }
-                }
-                else {
-                    string[] urls = url.Split('&');
-                    url = null;
-                    for (int i = 0; i < urls.Length; i++) {
-                        if (urls[i].StartsWith("tags=")) {
-                            url = urls[i].Replace("tags=", "").Replace("+", " ");
-                            break;
-                        }
-                    }
-                }
-                output = url;
-                return true;
-            }
-            catch {
-                throw;
-            }
-        }
-        public static string GetPoolIdFromUrl(string url) {
-            try {
-                string output = null;
-
-                if (url != null) {
-                    url = SetUrlString(url);
-
-                    if (IsValidE621Link(url)) {
-                        url = url.Split('/')[4];
-                        if (url.Contains('?')) {
-                            url = url.Split('?')[0];
-                        }
-
-                        output = url;
-                    }
-                }
-
-                return output;
-            }
-            catch {
-                throw;
-            }
-        }
-        public static string GetPostIdFromUrl(string url) {
-            url = SetUrlString(url);
-
-            if (!IsValidE621Link(url))
-                return null;
-
-            url = url.Split('/')[4];
-            if (url.Contains('?')) {
-                url = url.Split('?')[0];
-            }
-
-            return url;
-        }
-
         public static int CountPoolPages(decimal PageCount) {
             return (int)Math.Ceiling(PageCount / 320);
+        }
+
+        public static string GetPoolOrPostId(string url) {
+            return SetUrlString(url).Split('/')[4].Split('?')[0];
         }
 
         #region Validation checks for e621

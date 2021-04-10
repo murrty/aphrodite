@@ -112,13 +112,41 @@ namespace aphrodite {
             }
 
             public bool firstTime = true;
+            public bool SkipArgumentCheck = false;
+            public bool AutoDownloadWithArguments = true;
+
+            private bool firstTime_First = true;
+            private bool SkipArgumentCheck_First = false;
+            private bool AutoDownloadWithArguments_First = true;
 
             public void Save() {
                 Program.Log(LogAction.WriteToLog, "Attempting to save Config_Initialization settings");
 
                 switch (Program.UseIni) {
                     case true:
-                        Program.Ini.WriteBool("firstTime", firstTime, "General");
+                        switch (firstTime != firstTime_First) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "General -> firstTime changed!");
+                                Program.Ini.WriteBool("firstTime", firstTime, "General");
+                                firstTime_First = firstTime;
+                                break;
+                        }
+
+                        switch (SkipArgumentCheck != SkipArgumentCheck_First) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "General -> SkipArgumentCheck changed!");
+                                Program.Ini.WriteBool("SkipArgumentCheck", SkipArgumentCheck, "General");
+                                SkipArgumentCheck_First = SkipArgumentCheck;
+                                break;
+                        }
+
+                        switch (AutoDownloadWithArguments != AutoDownloadWithArguments_First) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "General -> SkipArgumentCheck changed!");
+                                Program.Ini.WriteBool("AutoDownloadWithArguments", AutoDownloadWithArguments, "General");
+                                AutoDownloadWithArguments_First = AutoDownloadWithArguments;
+                                break;
+                        }
                         break;
 
                     case false: {
@@ -127,6 +155,20 @@ namespace aphrodite {
                             switch (aphrodite.Settings.General.Default.firstTime != firstTime) {
                                 case true:
                                     aphrodite.Settings.General.Default.firstTime = firstTime;
+                                    Save = true;
+                                    break;
+                            }
+
+                            switch (aphrodite.Settings.General.Default.SkipArgumentCheck != SkipArgumentCheck) {
+                                case true:
+                                    aphrodite.Settings.General.Default.SkipArgumentCheck = SkipArgumentCheck;
+                                    Save = true;
+                                    break;
+                            }
+
+                            switch (aphrodite.Settings.General.Default.AutoDownloadWithArguments != AutoDownloadWithArguments) {
+                                case true:
+                                    aphrodite.Settings.General.Default.AutoDownloadWithArguments = AutoDownloadWithArguments;
                                     Save = true;
                                     break;
                             }
@@ -149,6 +191,27 @@ namespace aphrodite {
                         switch (Program.Ini.KeyExists("firstTime", "General")) {
                             case true:
                                 firstTime = Program.Ini.ReadBool("firstTime", "General");
+                                firstTime_First = firstTime;
+                                break;
+
+                            case false:
+                                break;
+                        }
+
+                        switch (Program.Ini.KeyExists("SkipArgumentCheck", "General")) {
+                            case true:
+                                SkipArgumentCheck = Program.Ini.ReadBool("SkipArgumentCheck", "General");
+                                SkipArgumentCheck_First = SkipArgumentCheck;
+                                break;
+
+                            case false:
+                                break;
+                        }
+
+                        switch (Program.Ini.KeyExists("AutoDownloadWithArguments", "General")) {
+                            case true:
+                                AutoDownloadWithArguments = Program.Ini.ReadBool("AutoDownloadWithArguments", "General");
+                                AutoDownloadWithArguments_First = AutoDownloadWithArguments;
                                 break;
 
                             case false:
@@ -158,6 +221,8 @@ namespace aphrodite {
 
                     case false:
                         firstTime = aphrodite.Settings.General.Default.firstTime;
+                        SkipArgumentCheck = aphrodite.Settings.General.Default.SkipArgumentCheck;
+                        AutoDownloadWithArguments = aphrodite.Settings.General.Default.AutoDownloadWithArguments;
                         break;
                 }
             }
@@ -532,6 +597,7 @@ namespace aphrodite {
             public int pageLimit = 0;
             public string fileNameSchema = "%md5%";
             public bool downloadBlacklisted = false;
+            public bool DownloadNewestToOldest = true;
 
             private bool Safe_First = true;
             private bool Questionable_First = true;
@@ -545,6 +611,7 @@ namespace aphrodite {
             private int pageLimit_First = 0;
             private string fileNameSchema_First = "%md5%";
             private bool downloadBlacklisted_First = false;
+            private bool DownloadNewestToOldest_First = true;
             #endregion
 
             public void Save() {
@@ -636,6 +703,14 @@ namespace aphrodite {
                                 downloadBlacklisted_First = downloadBlacklisted;
                                 break;
                         }
+
+                        switch (DownloadNewestToOldest != DownloadNewestToOldest_First) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> DownloadNewestToOldest changed!");
+                                Program.Ini.WriteBool("DownloadNewestToOldest", DownloadNewestToOldest, "Tags");
+                                DownloadNewestToOldest_First = DownloadNewestToOldest;
+                                break;
+                        }
                         break;
 
                     case false:
@@ -725,6 +800,13 @@ namespace aphrodite {
                                 Save = true;
                                 break;
                         }
+                        switch (aphrodite.Settings.Tags.Default.DownloadNewestToOldest != DownloadNewestToOldest) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> DownloadNewestToOldest changed!");
+                                aphrodite.Settings.Tags.Default.DownloadNewestToOldest = DownloadNewestToOldest;
+                                Save = true;
+                                break;
+                        }
 
                         switch (Save) {
                             case true:
@@ -781,12 +863,16 @@ namespace aphrodite {
                             pageLimit_First = pageLimit;
                         }
                         if (Program.Ini.KeyExists("fileNameSchema", "Tags")) {
-                            fileNameSchema = Program.Ini.ReadString("fileNameSchema", "Tags");
+                            fileNameSchema = apiTools.ReplaceIllegalCharacters(Program.Ini.ReadString("fileNameSchema", "Tags"));
                             fileNameSchema_First = fileNameSchema;
                         }
                         if (Program.Ini.KeyExists("downloadBlacklisted", "Tags")) {
                             downloadBlacklisted = Program.Ini.ReadBool("downloadBlacklisted", "Tags");
                             downloadBlacklisted_First = downloadBlacklisted;
+                        }
+                        if (Program.Ini.KeyExists("DownloadNewestToOldest", "Tags")) {
+                            DownloadNewestToOldest = Program.Ini.ReadBool("DownloadNewestToOldest", "Tags");
+                            DownloadNewestToOldest_First = DownloadNewestToOldest;
                         }
                         break;
 
@@ -801,8 +887,9 @@ namespace aphrodite {
                         scoreMin = aphrodite.Settings.Tags.Default.scoreMin;
                         imageLimit = aphrodite.Settings.Tags.Default.imageLimit;
                         pageLimit = aphrodite.Settings.Tags.Default.pageLimit;
-                        fileNameSchema = aphrodite.Settings.Tags.Default.fileNameSchema;
+                        fileNameSchema = apiTools.ReplaceIllegalCharacters(aphrodite.Settings.Tags.Default.fileNameSchema);
                         downloadBlacklisted = aphrodite.Settings.Tags.Default.downloadBlacklisted;
+                        DownloadNewestToOldest = aphrodite.Settings.Tags.Default.DownloadNewestToOldest;
                         break;
                 }
             }
@@ -1005,7 +1092,7 @@ namespace aphrodite {
                         }
                         switch (Program.Ini.KeyExists("fileNameSchema", "Pools")) {
                             case true:
-                                fileNameSchema = Program.Ini.ReadString("fileNameSchema", "Pools");
+                                fileNameSchema = apiTools.ReplaceIllegalCharacters(Program.Ini.ReadString("fileNameSchema", "Pools"));
                                 fileNameSchema_First = fileNameSchema;
                                 break;
                         }
@@ -1045,7 +1132,7 @@ namespace aphrodite {
                         wishlist = aphrodite.Settings.Pools.Default.wishlist;
                         wishlistNames = aphrodite.Settings.Pools.Default.wishlistNames;
                         addWishlistSilent = aphrodite.Settings.Pools.Default.addWishlistSilent;
-                        fileNameSchema = aphrodite.Settings.Pools.Default.fileNameSchema;
+                        fileNameSchema = apiTools.ReplaceIllegalCharacters(aphrodite.Settings.Pools.Default.fileNameSchema);
                         downloadBlacklisted = aphrodite.Settings.Pools.Default.downloadBlacklisted;
                         mergeBlacklisted = aphrodite.Settings.Pools.Default.mergeBlacklisted;
                         break;
@@ -1226,7 +1313,7 @@ namespace aphrodite {
                         }
                         switch (Program.Ini.KeyExists("fileNameSchema", "Images")) {
                             case true:
-                                fileNameSchema = Program.Ini.ReadString("fileNameSchema", "Images");
+                                fileNameSchema = apiTools.ReplaceIllegalCharacters(Program.Ini.ReadString("fileNameSchema", "Images"));
                                 fileNameSchema_First = fileNameSchema;
                                 break;
                         }
@@ -1249,7 +1336,7 @@ namespace aphrodite {
                         separateGraylisted = aphrodite.Settings.Images.Default.separateGraylisted;
                         useForm = aphrodite.Settings.Images.Default.useForm;
                         separateArtists = aphrodite.Settings.Images.Default.separateArtists;
-                        fileNameSchema = aphrodite.Settings.Images.Default.fileNameSchema;
+                        fileNameSchema = apiTools.ReplaceIllegalCharacters(aphrodite.Settings.Images.Default.fileNameSchema);
                         separateNonImages = aphrodite.Settings.Images.Default.separateNonImages;
                         separateBlacklisted = aphrodite.Settings.Images.Default.separateBlacklisted;
                         break;
