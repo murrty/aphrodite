@@ -29,7 +29,9 @@ namespace aphrodite {
         #endregion
 
         #region Private Variables
-        private Thread TagDownloadThread;                     // New thread for the downloader.
+        private Thread DownloadThread;                      // New thread for the downloader.
+        private Controls.ExtendedWebClient DownloadClient;  // The downloader client.
+        private DownloadStatus CurrentStatus = DownloadStatus.Waiting;
 
         private int CleanTotalCount = 0;                // Will be the count of how many files that are set for download.
         private int CleanExplicitCount = 0;             // Will be the count of how many explicit files that are set for download.
@@ -65,8 +67,6 @@ namespace aphrodite {
 
         private int PresentFiles = 0;
         private int TotalFiles = 0;
-
-        private DownloadStatus CurrentStatus = DownloadStatus.Waiting;
         #endregion
 
         private bool UseNewDownloadLogic = false;
@@ -160,8 +160,8 @@ namespace aphrodite {
                     break;
 
                 default:
-                    if (TagDownloadThread != null && TagDownloadThread.IsAlive) {
-                        TagDownloadThread.Abort();
+                    if (DownloadThread != null && DownloadThread.IsAlive) {
+                        DownloadThread.Abort();
                     }
 
                     if (!DownloadInfo.IgnoreFinish) {
@@ -182,12 +182,12 @@ namespace aphrodite {
         #region Downloader
         private void StartDownload() {
             Program.Log(LogAction.WriteToLog, "Starting Tag download for \"" + DownloadInfo.Tags + "\"");
-            TagDownloadThread = new Thread(() => {
+            DownloadThread = new Thread(() => {
                 Thread.CurrentThread.IsBackground = true;
                 DownloadPosts();
             });
 
-            TagDownloadThread.Start();
+            DownloadThread.Start();
             tmrTitle.Start();
         }
 
@@ -1618,8 +1618,8 @@ namespace aphrodite {
                 #region download the images
 
                 // Start the download
-                using (Controls.ExtendedWebClient wc = new Controls.ExtendedWebClient()) {
-                    wc.DownloadProgressChanged += (s, e) => {
+                using (DownloadClient = new Controls.ExtendedWebClient()) {
+                    DownloadClient.DownloadProgressChanged += (s, e) => {
                         this.BeginInvoke((MethodInvoker)delegate() {
                             pbDownloadStatus.Value = e.ProgressPercentage;
                             switch (pbDownloadStatus.Value) {
@@ -1637,7 +1637,7 @@ namespace aphrodite {
                             lbBytes.Text = (e.BytesReceived / 1024) + " kb / " + (e.TotalBytesToReceive / 1024) + " kb";
                         });
                     };
-                    wc.DownloadFileCompleted += (s, e) => {
+                    DownloadClient.DownloadFileCompleted += (s, e) => {
                         lock (e.UserState) {
                             this.BeginInvoke((MethodInvoker)delegate() {
                                 pbDownloadStatus.Value = 0;
@@ -1654,9 +1654,9 @@ namespace aphrodite {
                         }
                     };
 
-                    wc.Proxy = WebRequest.GetSystemWebProxy();
-                    wc.Headers.Add("user-agent", Program.UserAgent);
-                    wc.Method = "GET";
+                    DownloadClient.Proxy = WebRequest.GetSystemWebProxy();
+                    DownloadClient.Headers.Add("user-agent", Program.UserAgent);
+                    DownloadClient.Method = "GET";
 
                     #region download (new logic, though breaks for some reason)
                     if (UseNewDownloadLogic) {
@@ -1669,7 +1669,7 @@ namespace aphrodite {
                                     this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading explicit file " + (CurrentFile + 1) + " of " + (CleanExplicitCount)));
                                     if (!string.IsNullOrEmpty(CleanedExplicitURLs[CurrentFile]) && !File.Exists(CleanedExplicitFilePaths[CurrentFile])) {
                                         this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + CleanedExplicitFileNames[CurrentFile]));
-                                        await wc.DownloadFileTaskAsync(new Uri(CleanedExplicitURLs[CurrentFile]), CleanedExplicitFilePaths[CurrentFile]);
+                                        await DownloadClient.DownloadFileTaskAsync(new Uri(CleanedExplicitURLs[CurrentFile]), CleanedExplicitFilePaths[CurrentFile]);
                                     }
                                 }
                             }
@@ -1682,7 +1682,7 @@ namespace aphrodite {
                                     this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading questionable file " + (CurrentFile + 1) + " of " + (CleanQuestionableCount)));
                                     if (!string.IsNullOrEmpty(CleanedQuestionableURLs[CurrentFile]) && !File.Exists(CleanedQuestionableFilePaths[CurrentFile])) {
                                         this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + CleanedQuestionableFileNames[CurrentFile]));
-                                        await wc.DownloadFileTaskAsync(new Uri(CleanedQuestionableURLs[CurrentFile]), CleanedQuestionableFilePaths[CurrentFile]);
+                                        await DownloadClient.DownloadFileTaskAsync(new Uri(CleanedQuestionableURLs[CurrentFile]), CleanedQuestionableFilePaths[CurrentFile]);
                                     }
                                 }
                             }
@@ -1695,7 +1695,7 @@ namespace aphrodite {
                                     this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading safe file " + (CurrentFile + 1) + " of " + (CleanSafeCount)));
                                     if (!string.IsNullOrEmpty(CleanedSafeURLs[CurrentFile]) && !File.Exists(CleanedSafeFilePaths[CurrentFile])) {
                                         this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + CleanedSafeFileNames[CurrentFile]));
-                                        await wc.DownloadFileTaskAsync(new Uri(CleanedSafeURLs[CurrentFile]), CleanedSafeFilePaths[CurrentFile]);
+                                        await DownloadClient.DownloadFileTaskAsync(new Uri(CleanedSafeURLs[CurrentFile]), CleanedSafeFilePaths[CurrentFile]);
                                     }
                                 }
                             }
@@ -1709,7 +1709,7 @@ namespace aphrodite {
                                         this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading graylisted (e) file " + (CurrentFile + 1) + " of " + (GraylistExplicitCount)));
                                         if (!string.IsNullOrEmpty(GraylistedExplicitURLs[CurrentFile]) && !File.Exists(GraylistedExplicitFilePaths[CurrentFile])) {
                                             this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + GraylistedExplicitFileNames[CurrentFile]));
-                                            await wc.DownloadFileTaskAsync(new Uri(GraylistedExplicitURLs[CurrentFile]), GraylistedExplicitFilePaths[CurrentFile]);
+                                            await DownloadClient.DownloadFileTaskAsync(new Uri(GraylistedExplicitURLs[CurrentFile]), GraylistedExplicitFilePaths[CurrentFile]);
                                         }
                                     }
                                 }
@@ -1722,7 +1722,7 @@ namespace aphrodite {
                                         this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading graylisted (q) file " + (CurrentFile + 1) + " of " + (GraylistQuestionableCount)));
                                         if (!string.IsNullOrEmpty(GraylistedQuestionableURLs[CurrentFile]) && !File.Exists(GraylistedQuestionableFilePaths[CurrentFile])) {
                                             this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + GraylistedQuestionableFileNames[CurrentFile]));
-                                            await wc.DownloadFileTaskAsync(new Uri(GraylistedQuestionableURLs[CurrentFile]), GraylistedQuestionableFilePaths[CurrentFile]);
+                                            await DownloadClient.DownloadFileTaskAsync(new Uri(GraylistedQuestionableURLs[CurrentFile]), GraylistedQuestionableFilePaths[CurrentFile]);
                                         }
                                     }
                                 }
@@ -1735,7 +1735,7 @@ namespace aphrodite {
                                         this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading graylisted (s) file " + (CurrentFile + 1) + " of " + (GraylistSafeCount)));
                                         if (!string.IsNullOrEmpty(GraylistedSafeURLs[CurrentFile]) && !File.Exists(GraylistedSafeFilePaths[CurrentFile])) {
                                             this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + GraylistedSafeFileNames[CurrentFile]));
-                                            await wc.DownloadFileTaskAsync(new Uri(GraylistedSafeURLs[CurrentFile]), GraylistedSafeFilePaths[CurrentFile]);
+                                            await DownloadClient.DownloadFileTaskAsync(new Uri(GraylistedSafeURLs[CurrentFile]), GraylistedSafeFilePaths[CurrentFile]);
                                         }
                                     }
                                 }
@@ -1750,7 +1750,7 @@ namespace aphrodite {
                                         this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted (e) file " + (CurrentFile + 1) + " of " + (BlacklistExplicitCount)));
                                         if (!string.IsNullOrEmpty(BlacklistedExplicitURLs[CurrentFile]) && !File.Exists(BlacklistedExplicitFilePaths[CurrentFile])) {
                                             this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + BlacklistedExplicitFileNames[CurrentFile]));
-                                            await wc.DownloadFileTaskAsync(new Uri(BlacklistedExplicitURLs[CurrentFile]), BlacklistedExplicitFilePaths[CurrentFile]);
+                                            await DownloadClient.DownloadFileTaskAsync(new Uri(BlacklistedExplicitURLs[CurrentFile]), BlacklistedExplicitFilePaths[CurrentFile]);
                                         }
                                     }
                                 }
@@ -1763,7 +1763,7 @@ namespace aphrodite {
                                         this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted (q) file " + (CurrentFile + 1) + " of " + (BlacklistQuestionableCount)));
                                         if (!string.IsNullOrEmpty(BlacklistedQuestionableURLs[CurrentFile]) && !File.Exists(BlacklistedQuestionableFilePaths[CurrentFile])) {
                                             this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + BlacklistedQuestionableFileNames[CurrentFile]));
-                                            await wc.DownloadFileTaskAsync(new Uri(BlacklistedQuestionableURLs[CurrentFile]), BlacklistedQuestionableFilePaths[CurrentFile]);
+                                            await DownloadClient.DownloadFileTaskAsync(new Uri(BlacklistedQuestionableURLs[CurrentFile]), BlacklistedQuestionableFilePaths[CurrentFile]);
                                         }
                                     }
                                 }
@@ -1776,7 +1776,7 @@ namespace aphrodite {
                                         this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted (s) file " + (CurrentFile + 1) + " of " + (BlacklistSafeCount)));
                                         if (!string.IsNullOrEmpty(BlacklistedSafeURLs[CurrentFile]) && !File.Exists(BlacklistedSafeFilePaths[CurrentFile])) {
                                             this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + BlacklistedSafeFileNames[CurrentFile]));
-                                            await wc.DownloadFileTaskAsync(new Uri(BlacklistedSafeURLs[CurrentFile]), BlacklistedSafeFilePaths[CurrentFile]);
+                                            await DownloadClient.DownloadFileTaskAsync(new Uri(BlacklistedSafeURLs[CurrentFile]), BlacklistedSafeFilePaths[CurrentFile]);
                                         }
                                     }
                                 }
@@ -1792,7 +1792,7 @@ namespace aphrodite {
                                     this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading file " + (CurrentFile + 1) + " of " + (CleanTotalCount)));
                                     if (!string.IsNullOrEmpty(CleanedURLs[CurrentFile]) && !File.Exists(CleanedFilePaths[CurrentFile])) {
                                         this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + CleanedFileNames[CurrentFile]));
-                                        await wc.DownloadFileTaskAsync(new Uri(CleanedURLs[CurrentFile]), CleanedFilePaths[CurrentFile]);
+                                        await DownloadClient.DownloadFileTaskAsync(new Uri(CleanedURLs[CurrentFile]), CleanedFilePaths[CurrentFile]);
                                     }
                                 }
                             }
@@ -1806,7 +1806,7 @@ namespace aphrodite {
                                     this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading graylisted file " + (CurrentFile + 1) + " of " + (GraylistTotalCount)));
                                     if (!string.IsNullOrEmpty(GraylistedURLs[CurrentFile]) && !File.Exists(GraylistedFilePaths[CurrentFile])) {
                                         this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + GraylistedFileNames[CurrentFile]));
-                                        await wc.DownloadFileTaskAsync(new Uri(GraylistedURLs[CurrentFile]), GraylistedFilePaths[CurrentFile]);
+                                        await DownloadClient.DownloadFileTaskAsync(new Uri(GraylistedURLs[CurrentFile]), GraylistedFilePaths[CurrentFile]);
                                     }
                                 }
                             }
@@ -1820,7 +1820,7 @@ namespace aphrodite {
                                     this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading blacklisted file " + (CurrentFile + 1) + " of " + (BlacklistTotalCount)));
                                     if (!string.IsNullOrEmpty(BlacklistedURLs[CurrentFile]) && !File.Exists(BlacklistedFilePaths[CurrentFile])) {
                                         this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + BlacklistedFileNames[CurrentFile]));
-                                        await wc.DownloadFileTaskAsync(new Uri(BlacklistedURLs[CurrentFile]), BlacklistedFilePaths[CurrentFile]);
+                                        await DownloadClient.DownloadFileTaskAsync(new Uri(BlacklistedURLs[CurrentFile]), BlacklistedFilePaths[CurrentFile]);
                                     }
                                 }
                             }
@@ -1866,7 +1866,7 @@ namespace aphrodite {
                                             lbFile.Text = "Downloading explicit file " + (y + 1) + " of " + (CleanExplicitCount);
                                         });
                                         lock (sync) {
-                                            wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
+                                            DownloadClient.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
                                             Monitor.Wait(sync);
                                         }
                                     }
@@ -1908,7 +1908,7 @@ namespace aphrodite {
                                     if (!File.Exists(outputDir)) {
                                         this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                         lock (sync) {
-                                            wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
+                                            DownloadClient.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
                                             Monitor.Wait(sync);
                                         }
                                     }
@@ -1950,7 +1950,7 @@ namespace aphrodite {
                                     if (!File.Exists(outputDir)) {
                                         this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                         lock (sync) {
-                                            wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
+                                            DownloadClient.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
                                             Monitor.Wait(sync);
                                         }
                                     }
@@ -1993,7 +1993,7 @@ namespace aphrodite {
                                         if (!File.Exists(outputDir)) {
                                             this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                             lock (sync) {
-                                                wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
+                                                DownloadClient.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
                                                 Monitor.Wait(sync);
                                             }
                                         }
@@ -2035,7 +2035,7 @@ namespace aphrodite {
                                         if (!File.Exists(outputDir)) {
                                             this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                             lock (sync) {
-                                                wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
+                                                DownloadClient.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
                                                 Monitor.Wait(sync);
                                             }
                                         }
@@ -2077,7 +2077,7 @@ namespace aphrodite {
                                         if (!File.Exists(outputDir)) {
                                             this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                             lock (sync) {
-                                                wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
+                                                DownloadClient.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
                                                 Monitor.Wait(sync);
                                             }
                                         }
@@ -2121,7 +2121,7 @@ namespace aphrodite {
                                         if (!File.Exists(outputDir)) {
                                             this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                             lock (sync) {
-                                                wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
+                                                DownloadClient.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
                                                 Monitor.Wait(sync);
                                             }
                                         }
@@ -2163,7 +2163,7 @@ namespace aphrodite {
                                         if (!File.Exists(outputDir)) {
                                             this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                             lock (sync) {
-                                                wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
+                                                DownloadClient.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
                                                 Monitor.Wait(sync);
                                             }
                                         }
@@ -2205,7 +2205,7 @@ namespace aphrodite {
                                         if (!File.Exists(outputDir)) {
                                             this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                             lock (sync) {
-                                                wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
+                                                DownloadClient.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
                                                 Monitor.Wait(sync);
                                             }
                                         }
@@ -2228,20 +2228,20 @@ namespace aphrodite {
                                     this.Invoke((MethodInvoker)(() => lbFile.Text = "Downloading file " + (y + 1) + " of " + (CleanTotalCount)));
 
                                     string fileName = CleanedFileNames[y];
-                                    string outputDir = DownloadInfo.DownloadPath;
+                                    string outputDir = DownloadInfo.DownloadPath + "\\";
                                     switch (DownloadInfo.SeparateNonImages) {
                                         case true:
                                             if (fileName.EndsWith("gif")) {
-                                                outputDir += "\\gif\\";
+                                                outputDir += "gif\\";
                                             }
                                             else if (fileName.EndsWith("apng")) {
-                                                outputDir += "\\apng\\";
+                                                outputDir += "apng\\";
                                             }
                                             else if (fileName.EndsWith("webm")) {
-                                                outputDir += "\\webm\\";
+                                                outputDir += "webm\\";
                                             }
                                             else if (fileName.EndsWith("swf")) {
-                                                outputDir += "\\swf\\";
+                                                outputDir += "swf\\";
                                             }
                                             break;
                                     }
@@ -2249,7 +2249,7 @@ namespace aphrodite {
                                     if (!File.Exists(outputDir)) {
                                         this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                         lock (sync) {
-                                            wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
+                                            DownloadClient.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
                                             Monitor.Wait(sync);
                                         }
                                     }
@@ -2291,7 +2291,7 @@ namespace aphrodite {
                                     if (!File.Exists(outputDir)) {
                                         this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                         lock (sync) {
-                                            wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
+                                            DownloadClient.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
                                             Monitor.Wait(sync);
                                         }
                                     }
@@ -2333,7 +2333,7 @@ namespace aphrodite {
                                     if (!File.Exists(outputDir)) {
                                         this.Invoke((MethodInvoker)(() => status.Text = "Downloading " + fileName));
                                         lock (sync) {
-                                            wc.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
+                                            DownloadClient.DownloadFileAsync(new Uri(CurrentUrl), outputDir, sync);
                                             Monitor.Wait(sync);
                                         }
                                     }
@@ -2393,6 +2393,9 @@ namespace aphrodite {
                 this.BeginInvoke((MethodInvoker)delegate() {
                     Program.Log(LogAction.WriteToLog, "The download thread was aborted. (frmTagDownloader.cs)");
                 });
+                if (DownloadClient.IsBusy) {
+                    DownloadClient.CancelAsync();
+                }
                 CurrentStatus = DownloadStatus.Aborted;
             }
             catch (ObjectDisposedException) {
@@ -2418,6 +2421,9 @@ namespace aphrodite {
                     pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
                     pbTotalStatus.State = aphrodite.Controls.ProgressBarState.Error;
                 });
+                if (DownloadClient.IsBusy) {
+                    DownloadClient.CancelAsync();
+                }
                 CurrentStatus = DownloadStatus.Errored;
                 ErrorLog.ReportException(ex, "frmTagDownloader.cs");
             }

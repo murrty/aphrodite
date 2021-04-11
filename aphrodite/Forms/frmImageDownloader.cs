@@ -16,8 +16,9 @@ namespace aphrodite {
         public ImageDownloadInfo DownloadInfo;
     #endregion
 
-    #region PrivateVariables
-        private Thread imageDownload;                   // The thread for the downloader.
+    #region Private Variables
+        private Thread DownloadThread;                       // The thread for the downloader.
+        private Controls.ExtendedWebClient DownloadClient;  // The downloader client.
         private DownloadStatus CurrentStatus = DownloadStatus.Waiting;
     #endregion
 
@@ -44,12 +45,12 @@ namespace aphrodite {
 
     #region Downloader
         private void StartDownload() {
-            imageDownload = new Thread(() => {
+            DownloadThread = new Thread(() => {
                 Thread.CurrentThread.IsBackground = true;
                 DownloadImage();
             });
             tmrTitle.Start();
-            imageDownload.Start();
+            DownloadThread.Start();
         }
         private void AfterDownload() {
             tmrTitle.Stop();
@@ -219,6 +220,9 @@ namespace aphrodite {
                 this.BeginInvoke(new MethodInvoker(() => {
                     Program.Log(LogAction.WriteToLog, "The download thread was aborted. (frmImageDownloader.cs)");
                 }));
+                if (DownloadClient.IsBusy) {
+                    DownloadClient.CancelAsync();
+                }
                 CurrentStatus = DownloadStatus.Aborted;
             }
             catch (ObjectDisposedException) {
@@ -240,6 +244,9 @@ namespace aphrodite {
                     status.Text = "An Exception has occured";
                     pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
                 }));
+                if (DownloadClient.IsBusy) {
+                    DownloadClient.CancelAsync();
+                }
                 ErrorLog.ReportException(ex, "frmImageDownloader.cs");
                 CurrentStatus = DownloadStatus.Errored;
             }
@@ -679,6 +686,7 @@ namespace aphrodite {
 
         #region Variables
         public ImageDownloadInfo DownloadInfo;
+        private Controls.ExtendedWebClient DownloadClient;
         #endregion
 
         public ImageDownloader(ImageDownloadInfo Info) {
@@ -707,12 +715,12 @@ namespace aphrodite {
 
                     case DownloadStatus.ReadyToDownload:
                         // Download file.
-                        using (Controls.ExtendedWebClient wc = new Controls.ExtendedWebClient()) {
-                            wc.Proxy = WebRequest.GetSystemWebProxy();
-                            wc.Headers.Add("User-Agent: " + Program.UserAgent);
-                            wc.Method = "GET";
+                        using (DownloadClient = new Controls.ExtendedWebClient()) {
+                            DownloadClient.Proxy = WebRequest.GetSystemWebProxy();
+                            DownloadClient.Headers.Add("User-Agent: " + Program.UserAgent);
+                            DownloadClient.Method = "GET";
 
-                            wc.DownloadFile(Image.FileUrl, Image.DownloadPath);
+                            DownloadClient.DownloadFile(Image.FileUrl, Image.DownloadPath);
                         }
 
                         return true;
@@ -742,6 +750,9 @@ namespace aphrodite {
                 return false;
             }
             catch (ThreadAbortException) {
+                if (DownloadClient.IsBusy) {
+                    DownloadClient.CancelAsync();
+                }
                 return false;
             }
             catch (ObjectDisposedException) {
@@ -754,6 +765,9 @@ namespace aphrodite {
             }
             catch (Exception ex) {
                 System.Media.SystemSounds.Hand.Play();
+                if (DownloadClient.IsBusy) {
+                    DownloadClient.CancelAsync();
+                }
                 ErrorLog.ReportException(ex, "ImageDownloader.cs");
                 return false;
             }

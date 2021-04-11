@@ -16,7 +16,10 @@ namespace aphrodite {
         #endregion
 
         #region Private Variables
+        private Thread DownloadThread;
+        private Controls.ExtendedWebClient DownloadClient;
         private DownloadStatus CurrentStatus = DownloadStatus.Waiting;
+
         private string CurrentURL;
 
         private int CleanPageExplicitCount = 0;
@@ -48,8 +51,6 @@ namespace aphrodite {
         int BlacklistQuestionableExistingFiles = 0;
         int BlacklistSafeExistingFiles = 0;
         int BlacklistExistingTotalFiles = 0;
-
-        private Thread poolDownloader;
         #endregion
 
         #region Form
@@ -69,8 +70,8 @@ namespace aphrodite {
             StartDownload();
         }
         private void frmDownload_FormClosing(object sender, FormClosingEventArgs e) {
-            if (poolDownloader != null && poolDownloader.IsAlive) {
-                poolDownloader.Abort();
+            if (DownloadThread != null && DownloadThread.IsAlive) {
+                DownloadThread.Abort();
                 if (!DownloadInfo.IgnoreFinish) {
                     e.Cancel = true;
                     return;
@@ -92,12 +93,12 @@ namespace aphrodite {
 
         #region Downloader
         private void StartDownload() {
-            poolDownloader = new Thread(() => {
+            DownloadThread = new Thread(() => {
                 Thread.CurrentThread.IsBackground = true;
                 DownloadPool();
             });
             tmrTitle.Start();
-            poolDownloader.Start();
+            DownloadThread.Start();
         }
         private void AfterDownload() {
             tmrTitle.Stop();
@@ -852,8 +853,8 @@ namespace aphrodite {
                 this.BeginInvoke((MethodInvoker)delegate() {
                     Program.Log(LogAction.WriteToLog, "Downloading pool pages. (frmPoolDownloader.cs)");
                 });
-                using (Controls.ExtendedWebClient wc = new Controls.ExtendedWebClient()) {
-                    wc.DownloadProgressChanged += (s, e) => {
+                using (DownloadClient = new Controls.ExtendedWebClient()) {
+                    DownloadClient.DownloadProgressChanged += (s, e) => {
                         this.BeginInvoke((MethodInvoker)delegate() {
                             if (pbDownloadStatus.Value < 100) {
                                 pbDownloadStatus.Value = e.ProgressPercentage;
@@ -863,7 +864,7 @@ namespace aphrodite {
                         });
                     };
 
-                    wc.DownloadFileCompleted += (s, e) => {
+                    DownloadClient.DownloadFileCompleted += (s, e) => {
                         this.BeginInvoke((MethodInvoker)delegate() {
                             pbDownloadStatus.Value = 0;
                             lbPercentage.Text = "0%";
@@ -873,16 +874,16 @@ namespace aphrodite {
                         });
                     };
 
-                    wc.Proxy = WebRequest.GetSystemWebProxy();
-                    wc.Headers.Add("user-agent", Program.UserAgent);
-                    wc.Method = "GET";
+                    DownloadClient.Proxy = WebRequest.GetSystemWebProxy();
+                    DownloadClient.Headers.Add("user-agent", Program.UserAgent);
+                    DownloadClient.Method = "GET";
 
                     for (int y = 0; y < URLs.Count; y++) {
                         CurrentURL = URLs[y].Replace("www.", "");
 
                         if (!File.Exists(FilePaths[y])) {
                             var sync = new Object();
-                            await wc.DownloadFileTaskAsync(new Uri(CurrentURL), FilePaths[y]);
+                            await DownloadClient.DownloadFileTaskAsync(new Uri(CurrentURL), FilePaths[y]);
                         }
                     }
                 }
@@ -918,6 +919,9 @@ namespace aphrodite {
                 this.BeginInvoke((MethodInvoker)delegate() {
                     Program.Log(LogAction.WriteToLog, "The download thread was aborted. (frmPoolDownloader.cs)");
                 });
+                if (DownloadClient.IsBusy) {
+                    DownloadClient.CancelAsync();
+                }
                 CurrentStatus = DownloadStatus.Aborted;
             }
             catch (ObjectDisposedException) {
@@ -943,6 +947,9 @@ namespace aphrodite {
                     pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
                     pbTotalStatus.State = aphrodite.Controls.ProgressBarState.Error;
                 });
+                if (DownloadClient.IsBusy) {
+                    DownloadClient.CancelAsync();
+                }
                 ErrorLog.ReportException(ex, "frmPoolDownloader.cs", false);
                 CurrentStatus = DownloadStatus.Errored;
             }

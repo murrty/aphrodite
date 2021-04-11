@@ -597,7 +597,7 @@ namespace aphrodite {
             public int pageLimit = 0;
             public string fileNameSchema = "%md5%";
             public bool downloadBlacklisted = false;
-            public bool DownloadNewestToOldest = true;
+            public bool DownloadNewestToOldest = false;
 
             private bool Safe_First = true;
             private bool Questionable_First = true;
@@ -611,7 +611,7 @@ namespace aphrodite {
             private int pageLimit_First = 0;
             private string fileNameSchema_First = "%md5%";
             private bool downloadBlacklisted_First = false;
-            private bool DownloadNewestToOldest_First = true;
+            private bool DownloadNewestToOldest_First = false;
             #endregion
 
             public void Save() {
