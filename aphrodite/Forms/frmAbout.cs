@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace aphrodite {
     public partial class frmAbout : Form {
-        List<Thread> thr = new List<Thread>();
+        Thread UpdateCheckThread;
 
         public frmAbout() {
             InitializeComponent();
@@ -29,24 +29,30 @@ namespace aphrodite {
         }
 
         private void llbCheckForUpdates_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
-            Thread checkUpdates = new Thread(() => {
-                decimal cV = Updater.getCloudVersion();
+            if (UpdateCheckThread != null && UpdateCheckThread.IsAlive) {
+                UpdateCheckThread.Abort();
+            }
 
-                if (Updater.isUpdateAvailable(cV)) {
-                    if (MessageBox.Show("An update is available. \nNew verison: " + cV.ToString() + " | Your version: " + Properties.Settings.Default.currentVersion.ToString() + "\n\nWould you like to update?", "aphrodite", MessageBoxButtons.YesNo) == System.Windows.Forms.DialogResult.Yes) {
-                        Process.Start(Updater.githubURL + "/releases/lates");
+            try {
+                UpdateCheckThread = new Thread(() => {
+                    decimal cV = Updater.getCloudVersion();
+
+                    if (Updater.isUpdateAvailable(cV)) {
+                        if (MessageBox.Show("An update is available. \nNew verison: " + cV.ToString() + " | Your version: " + Properties.Settings.Default.currentVersion.ToString() + "\n\nWould you like to update?", "aphrodite", MessageBoxButtons.YesNo) == System.Windows.Forms.DialogResult.Yes) {
+                            Process.Start(Updater.githubURL + "/releases/latest");
+                        }
                     }
-                }
-                else {
-                    MessageBox.Show("No update is available at this time.");
-                }
-                foreach (Thread thd in thr) {
-                    thd.Abort();
-                }
-            });
+                    else {
+                        MessageBox.Show("No update is available at this time.");
+                    }
+                });
 
-            checkUpdates.Start();
-            thr.Add(checkUpdates);
+                UpdateCheckThread.Start();
+            }
+            catch (ThreadAbortException) {
+                return;
+            }
+
         }
 
         private void pbIcon_Click(object sender, EventArgs e) { Process.Start("https://github.com/murrty/aphrodite/"); }
