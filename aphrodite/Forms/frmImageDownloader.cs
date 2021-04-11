@@ -268,18 +268,18 @@ namespace aphrodite {
         public DownloadStatus Status;
         public string DownloadPath;
 
-        public ImageInfo(ImageDownloadInfo Info) {
+        public ImageInfo(ImageDownloadInfo DownloadInfo) {
             try {
             // Set the SaveTo to \\Images.
-                if (!Info.DownloadPath.EndsWith("\\Images")) {
-                    Info.DownloadPath += "\\Images";
+                if (!DownloadInfo.DownloadPath.EndsWith("\\Images")) {
+                    DownloadInfo.DownloadPath += "\\Images";
                 }
 
             // New varaibles for the API parse.
                 string imageInfo = string.Empty;
                 string blacklistInfo = string.Empty;
-                string url = string.Format("https://e621.net/posts/{0}.json", Info.PostId);
-                DownloadPath = Info.DownloadPath;
+                string url = string.Format("https://e621.net/posts/{0}.json", DownloadInfo.PostId);
+                DownloadPath = DownloadInfo.DownloadPath;
 
             // Begin to get the XML
                 string postXML = apiTools.GetJsonToXml(url);
@@ -323,7 +323,7 @@ namespace aphrodite {
                         if (FileUrl == null) {
                             FileUrl = apiTools.GetBlacklistedImageUrl(xmlMD5[0].InnerText, xmlExt[0].InnerText);
                             if (FileUrl == null) {
-                                throw new ImageWasNullAfterBypassingException(Info.PostId + " was still null.");
+                                throw new ImageWasNullAfterBypassingException(DownloadInfo.PostId + " was still null.");
                             }
                         }
 
@@ -494,9 +494,9 @@ namespace aphrodite {
                         bool isBlacklisted = false;
                         string offendingTags = string.Empty;
                         for (int i = 0; i < PostTags.Count; i++) {
-                            if (Info.Graylist.Length > 0) {
-                                for (int j = 0; j < Info.Graylist.Length; j++) {
-                                    if (PostTags[i] == Info.Graylist[j]) {
+                            if (DownloadInfo.Graylist.Length > 0) {
+                                for (int j = 0; j < DownloadInfo.Graylist.Length; j++) {
+                                    if (PostTags[i] == DownloadInfo.Graylist[j]) {
                                         offendingTags += PostTags[i];
                                         isGraylisted = true;
                                     }
@@ -505,9 +505,9 @@ namespace aphrodite {
                         // Since the image downloader is user specific, the blacklist won't cancel downloading.
                         // Image downloading is basically the user consenting to downloading it, therefore they want it despite the blacklist.
                         // Worst-case, just delete it after downloading.
-                            if (Info.Blacklist.Length > 0) {
-                                for (int j = 0; j < Info.Blacklist.Length; j++) {
-                                    if (PostTags[i] == Info.Blacklist[j]) {
+                            if (DownloadInfo.Blacklist.Length > 0) {
+                                for (int j = 0; j < DownloadInfo.Blacklist.Length; j++) {
+                                    if (PostTags[i] == DownloadInfo.Blacklist[j]) {
                                         offendingTags += PostTags[i];
                                         isBlacklisted = true;
                                     }
@@ -516,9 +516,9 @@ namespace aphrodite {
                         }
 
                     // set the .nfo buffer.
-                        InfoBuffer += "POST " + Info.PostId + ":\r\n" +
+                        InfoBuffer += "POST " + DownloadInfo.PostId + ":\r\n" +
                             "    MD5: " + xmlMD5[0].InnerText + "\r\n" +
-                            "    URL: https://e621.net/posts/" + Info.PostId + "\r\n" +
+                            "    URL: https://e621.net/posts/" + DownloadInfo.PostId + "\r\n" +
                             "    TAGS:\r\n" + InfoTags +
                             "    SCORE: Up " + xmlScoreUp[0].InnerText + ", Down " + xmlScoreDown[0].InnerText + ", Total" + xmlScoreTotal[0].InnerText + "\r\n" +
                             "    RATING: " + rating + "\r\n";
@@ -560,7 +560,7 @@ namespace aphrodite {
                             }
                         }
 
-                        Info.FileName = Info.FileNameSchema.Replace("%md5%", xmlMD5[0].InnerText)
+                        DownloadInfo.FileName = DownloadInfo.FileNameSchema.Replace("%md5%", xmlMD5[0].InnerText)
                                         .Replace("%id%", xmlID[0].InnerText)
                                         .Replace("%rating%", rating.ToLower())
                                         .Replace("%rating2%", xmlRating[0].InnerText)
@@ -573,7 +573,7 @@ namespace aphrodite {
                                         .Replace("%author%", xmlAuthor[0].InnerText) + "." + xmlExt[0].InnerText;
 
                     // Start working on the SaveTo string.
-                        if (Info.SeparateRatings) {
+                        if (DownloadInfo.SeparateRatings) {
                             switch (xmlRating[0].InnerText.ToLower()) {
                                 case "e": case "explicit":
                                     DownloadPath += "\\explicit";
@@ -587,17 +587,17 @@ namespace aphrodite {
                             }
                         }
 
-                        if (isBlacklisted && Info.SeparateBlacklisted) {
+                        if (isBlacklisted && DownloadInfo.SeparateBlacklisted) {
                             DownloadPath += "\\blacklisted";
                         }
-                        else if (isGraylisted && Info.SeparateGraylisted) {
+                        else if (isGraylisted && DownloadInfo.SeparateGraylisted) {
                             DownloadPath += "\\graylisted";
                         }
-                        if (Info.SeparateArtists) {
+                        if (DownloadInfo.SeparateArtists) {
                             DownloadPath += "\\" + fileNameArtist;
                         }
 
-                        switch (Info.SeparateNonImages) {
+                        switch (DownloadInfo.SeparateNonImages) {
                             case true:
                                 switch (xmlExt[0].InnerText) {
                                     case "gif":
@@ -623,7 +623,7 @@ namespace aphrodite {
                         }
 
                     // Set the path to the full path with file.
-                        DownloadPath += "\\" + Info.FileName;
+                        DownloadPath += "\\" + DownloadInfo.FileName;
 
                     // Check file before continuing.
                         if (File.Exists(DownloadPath)) {
@@ -632,41 +632,41 @@ namespace aphrodite {
                         }
 
                     // Save image.nfo.
-                        if (Info.SaveInfo) {
+                        if (DownloadInfo.SaveInfo) {
                             if (isBlacklisted) {
-                                if (File.Exists(Info.DownloadPath + "\\images.blacklisted.nfo")) {
+                                if (File.Exists(DownloadInfo.DownloadPath + "\\images.blacklisted.nfo")) {
                                     InfoBuffer = "\n\n" + InfoBuffer;
-                                    string readInfo = File.ReadAllText(Info.DownloadPath + "\\images.blacklisted.nfo");
+                                    string readInfo = File.ReadAllText(DownloadInfo.DownloadPath + "\\images.blacklisted.nfo");
                                     if (!readInfo.Contains("MD5: " + xmlMD5[0].InnerText)) {
-                                        File.AppendAllText(Info.DownloadPath + "\\images.blacklisted.nfo", InfoBuffer, Encoding.UTF8);
+                                        File.AppendAllText(DownloadInfo.DownloadPath + "\\images.blacklisted.nfo", InfoBuffer, Encoding.UTF8);
                                     }
                                 }
                                 else {
-                                    File.WriteAllText(Info.DownloadPath + "\\images.blacklisted.nfo", InfoBuffer, Encoding.UTF8);
+                                    File.WriteAllText(DownloadInfo.DownloadPath + "\\images.blacklisted.nfo", InfoBuffer, Encoding.UTF8);
                                 }
                             }
                             else if (isGraylisted) {
-                                if (File.Exists(Info.DownloadPath + "\\images.graylisted.nfo")) {
+                                if (File.Exists(DownloadInfo.DownloadPath + "\\images.graylisted.nfo")) {
                                     InfoBuffer = "\n\n" + InfoBuffer;
-                                    string readInfo = File.ReadAllText(Info.DownloadPath + "\\images.graylisted.nfo");
+                                    string readInfo = File.ReadAllText(DownloadInfo.DownloadPath + "\\images.graylisted.nfo");
                                     if (!readInfo.Contains("MD5: " + xmlMD5[0].InnerText)) {
-                                        File.AppendAllText(Info.DownloadPath + "\\images.graylisted.nfo", InfoBuffer, Encoding.UTF8);
+                                        File.AppendAllText(DownloadInfo.DownloadPath + "\\images.graylisted.nfo", InfoBuffer, Encoding.UTF8);
                                     }
                                 }
                                 else {
-                                    File.WriteAllText(Info.DownloadPath + "\\images.blacklisted.nfo", InfoBuffer, Encoding.UTF8);
+                                    File.WriteAllText(DownloadInfo.DownloadPath + "\\images.blacklisted.nfo", InfoBuffer, Encoding.UTF8);
                                 }
                             }
                             else {
-                                if (File.Exists(Info.DownloadPath + "\\images.nfo")) {
+                                if (File.Exists(DownloadInfo.DownloadPath + "\\images.nfo")) {
                                     InfoBuffer = "\n\n" + InfoBuffer;
-                                    string readInfo = File.ReadAllText(Info.DownloadPath + "\\images.nfo");
+                                    string readInfo = File.ReadAllText(DownloadInfo.DownloadPath + "\\images.nfo");
                                     if (!readInfo.Contains("MD5: " + xmlMD5[0].InnerText)) {
-                                        File.AppendAllText(Info.DownloadPath + "\\images.nfo", InfoBuffer, Encoding.UTF8);
+                                        File.AppendAllText(DownloadInfo.DownloadPath + "\\images.nfo", InfoBuffer, Encoding.UTF8);
                                     }
                                 }
                                 else {
-                                    File.WriteAllText(Info.DownloadPath + "\\images.nfo", InfoBuffer, Encoding.UTF8);
+                                    File.WriteAllText(DownloadInfo.DownloadPath + "\\images.nfo", InfoBuffer, Encoding.UTF8);
                                 }
                             }
                         }

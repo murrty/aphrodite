@@ -339,32 +339,23 @@ namespace aphrodite {
                         return false;
                     }
                     else {
-                        CurrentArg = CurrentArg.Substring(7);
+                        CurrentArg = CurrentArg.Substring(7).Replace("%$|%", " ");
                         string[] ArgumentSplit = CurrentArg.Split('|');
-                        if (ArgumentSplit.Length != 1) {
+                        if (ArgumentSplit.Length == 2) {
                             string url = ArgumentSplit[0];
-                            string title = string.Empty;
+                            string title = title = ArgumentSplit[1];
 
-                            if (ArgumentSplit.Length > 2) {
-                                for (int j = 1; j < ArgumentSplit.Length; j++) {
-                                    switch (string.IsNullOrWhiteSpace(ArgumentSplit[j])) {
-                                        case true:
-                                            continue;
-                                    }
-                                    title += ArgumentSplit[j] + "|";
-                                }
-                                title = title.Substring(0, title.Length - 1);
+                            if (apiTools.IsValidPoolLink(ArgumentSplit[0])) {
+                                title = title
+                                    .Replace("%20", " ")
+                                    .Replace("%22", "\"")
+                                    .Trim(' ');
+
+                                Config.Config_Pools.AppendToWishlist(title, url);
                             }
                             else {
-                                title = ArgumentSplit[1];
+                                System.Media.SystemSounds.Hand.Play();
                             }
-
-                            title = title
-                                .Replace("%20", " ")
-                                .Replace("%22", "\"")
-                                .Trim(' ');
-
-                            Config.Config_Pools.AppendToWishlist(title, url);
 
                         }
                     }
@@ -400,6 +391,7 @@ namespace aphrodite {
             IsDebug = true;
         }
 
+        [System.Diagnostics.DebuggerStepThrough]
         public static bool Log(LogAction Action, string LogMessage = "") {
             switch (Action) {
                 default:
@@ -493,6 +485,7 @@ namespace aphrodite {
                     return false;
             }
         }
+        [System.Diagnostics.DebuggerStepThrough]
         public static bool QuickLog(string LogMessage) {
             if (LogEnabled && Logger != null) {
                 Logger.Append(LogMessage);

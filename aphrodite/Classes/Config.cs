@@ -906,25 +906,26 @@ namespace aphrodite {
             public static void AppendToWishlist(string Name, string URL) {
                 Program.Log(LogAction.WriteToLog, "Appending new Wishlist pool");
 
-                if (Program.UseIni) {
-                    if (Program.Ini.KeyExists("addWishlistSilent", "Pools") && Program.Ini.ReadBool("addWishlistSilent", "Pools")) {
+                if (Config.Settings.Pools.addWishlistSilent) {
+                    if (Program.UseIni) {
                         if (File.Exists(WishlistFile)) {
-                            File.AppendAllText(WishlistFile, Environment.NewLine + URL + "|" + Name);
+                            string WishlistBuffer = File.ReadAllText(WishlistFile);
+                            if (!WishlistBuffer.Contains(URL)) {
+                                File.AppendAllText(WishlistFile, Environment.NewLine + URL + "|" + Name);
+                                System.Media.SystemSounds.Asterisk.Play();
+                            }
+                            else {
+                                System.Media.SystemSounds.Exclamation.Play();
+                            }
                         }
                         else {
                             File.Create(WishlistFile).Dispose();
                             File.AppendAllText(WishlistFile, URL + "|" + Name);
+                            System.Media.SystemSounds.Asterisk.Play();
                         }
                     }
                     else {
-                        frmPoolWishlist WishList = new frmPoolWishlist(true, URL, Name);
-                        WishList.ShowDialog();
-                        return;
-                    }
-                }
-                else {
-                    if (!Config.Settings.Pools.wishlist.Contains(URL)) {
-                        if (Config.Settings.Pools.addWishlistSilent) {
+                        if (!Config.Settings.Pools.wishlist.Contains(URL)) {
                             if (!string.IsNullOrWhiteSpace(aphrodite.Settings.Pools.Default.wishlistNames) && !string.IsNullOrWhiteSpace(Config.Settings.Pools.wishlist)) {
                                 Config.Settings.Pools.wishlist += "|" + URL;
                                 Config.Settings.Pools.wishlistNames += "|" + Name;
@@ -933,13 +934,18 @@ namespace aphrodite {
                                 Config.Settings.Pools.wishlist = URL;
                                 Config.Settings.Pools.wishlistNames = Name;
                             }
-                            Config.Settings.Save(ConfigType.Pools);
+                            Config.Settings.Pools.Save();
+                            System.Media.SystemSounds.Asterisk.Play();
                         }
                         else {
-                            frmPoolWishlist WishList = new frmPoolWishlist(true, URL, Name);
-                            WishList.ShowDialog();
+                            System.Media.SystemSounds.Exclamation.Play();
                         }
                     }
+                }
+                else {
+                    frmPoolWishlist WishList = new frmPoolWishlist(true, URL, Name);
+                    WishList.ShowDialog();
+                    return;
                 }
             }
             public static void SaveWishlist(List<string> Names, List<string> URLs) {
@@ -956,11 +962,13 @@ namespace aphrodite {
                                 FileOutput = FileOutput.Trim('\n').Trim('\r');
                                 File.WriteAllText(WishlistFile, FileOutput);
                                 break;
-                        }
 
-                        Settings.Pools.wishlist = string.Join("|", URLs);
-                        Settings.Pools.wishlistNames = string.Join("|", Names);
-                        Settings.Save(ConfigType.Pools);
+                            case false:
+                                Settings.Pools.wishlist = string.Join("|", URLs);
+                                Settings.Pools.wishlistNames = string.Join("|", Names);
+                                Settings.Save(ConfigType.Pools);
+                                break;
+                        }
                         break;
                 }
             }
@@ -1032,6 +1040,20 @@ namespace aphrodite {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Pools -> mergeBlacklisted changed!");
                                 aphrodite.Settings.Pools.Default.mergeGraylisted = mergeGraylisted;
+                                Save = true;
+                                break;
+                        }
+                        switch (aphrodite.Settings.Pools.Default.wishlist != wishlist) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "Pools -> wishlist changed!");
+                                aphrodite.Settings.Pools.Default.wishlist = wishlist;
+                                Save = true;
+                                break;
+                        }
+                        switch (aphrodite.Settings.Pools.Default.wishlistNames != wishlistNames) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "Pools -> wishlistNames changed!");
+                                aphrodite.Settings.Pools.Default.wishlistNames = wishlistNames;
                                 Save = true;
                                 break;
                         }
