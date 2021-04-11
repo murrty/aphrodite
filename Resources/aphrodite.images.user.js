@@ -6,8 +6,8 @@
 // @version     1.6
 
 // @homepage    https://github.com/murrty/aphrodite
-// @updateURL   https://github.com/murrty/aphrodite/raw/master/Addons/aphrodite.images.user.js
-// @downloadURL https://github.com/murrty/aphrodite/raw/master/Addons/aphrodite.images.user.js
+// @updateURL   https://github.com/murrty/aphrodite/raw/master/addons/aphrodite.images.user.js
+// @downloadURL https://github.com/murrty/aphrodite/raw/master/addons/aphrodite.images.user.js
 
 // @run-at      document-end
 // @grant       none
