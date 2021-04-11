@@ -6,8 +6,8 @@
 // @version     1.7
 
 // @homepage    https://github.com/murrty/aphrodite
-// @updateURL   https://github.com/murrty/aphrodite/raw/master/Resources/aphrodite.user.js
-// @downloadURL https://github.com/murrty/aphrodite/raw/master/Resources/aphrodite.user.js
+// @updateURL   https://github.com/murrty/aphrodite/raw/master/Addons/aphrodite.user.js
+// @downloadURL https://github.com/murrty/aphrodite/raw/master/Addons/aphrodite.user.js
 
 // @run-at      document-end
 // @grant       none
