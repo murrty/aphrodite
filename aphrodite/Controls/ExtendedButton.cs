@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System.ComponentModel;
+using System.Windows.Forms;
 
 namespace aphrodite.Controls {
 
@@ -87,6 +88,7 @@ namespace aphrodite.Controls {
             IsRefreshing = false;
         }
 
+        [Category("Appearance"), Description("Indicates if the UAC Shield should be displayed on the button."), DefaultValue(false)]
         public bool ShowUACShield {
             get { return _ShowUACShield; }
             set { _ShowUACShield = value; this.Refresh(); }

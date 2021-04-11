@@ -69,7 +69,7 @@ namespace aphrodite {
         private DownloadStatus CurrentStatus = DownloadStatus.Waiting;
         #endregion
 
-        private bool UseNewDownloadLogic = true;
+        private bool UseNewDownloadLogic = false;
 
         #region Form
         public frmTagDownloader() {
@@ -283,6 +283,7 @@ namespace aphrodite {
         }
 
         private async void DownloadPosts() {
+
             #region Download variables
             string CurrentUrl = string.Empty;               // The URL being accessed, changes per API call/File download.
             string CleanInfoBuffer = string.Empty;            // The buffer for the 'tag.nfo' file that will be created.
@@ -432,16 +433,16 @@ namespace aphrodite {
 
                 for (int ApiPage = 0; ApiPage < CurrentPage; ApiPage++) {
                     if (DownloadInfo.PageLimit > 0 && CurrentPage > DownloadInfo.PageLimit) {
-                        this.BeginInvoke(new MethodInvoker(() => {
+                        this.BeginInvoke((MethodInvoker)delegate() {
                             Program.Log(LogAction.WriteToLog, "PageLimit reached, breaking parse loop.");
-                        }));
+                        });
                         break;
                     }
 
-                    this.BeginInvoke(new MethodInvoker(() => {
+                    this.BeginInvoke((MethodInvoker)delegate() {
                         Program.Log(LogAction.WriteToLog, "Downloading tag api page " + CurrentPage);
                         status.Text = "Downloading api page " + CurrentPage;
-                    }));
+                    });
 
                     // Get XML of page.
                     if (DownloadInfo.FromUrl) {
@@ -486,19 +487,19 @@ namespace aphrodite {
                     xmlDeleted = doc.DocumentElement.SelectNodes("/root/posts/item/flags/deleted");
 
                     if (xmlID.Count > 0) {
-                        this.BeginInvoke(new MethodInvoker(() => {
+                        this.BeginInvoke((MethodInvoker)delegate() {
                             Program.Log(LogAction.WriteToLog, "Parsing tag api page " + CurrentPage);
                             status.Text = "Parsing api page " + CurrentPage;
-                        }));
+                        });
 
                         // Begin parsing the XML for tag information per item.
                         for (int i = 0; i < xmlID.Count; i++) {
 
                             if (DownloadInfo.ImageLimit > 0 && DownloadInfo.ImageLimit == TotalCount) {
                                 ImageLimitReached = true;
-                                this.BeginInvoke(new MethodInvoker(() => {
+                                this.BeginInvoke((MethodInvoker)delegate() {
                                     Program.Log(LogAction.WriteToLog, "ImageLimit reached, breaking parse loop.");
-                                }));
+                                });
                                 break;
                             }
 
@@ -1292,7 +1293,7 @@ namespace aphrodite {
                         }
 
                         #region after page update totals
-                        this.BeginInvoke(new MethodInvoker(() => {
+                        this.BeginInvoke((MethodInvoker)delegate() {
                             string labelBuffer = "";
 
                             //if (DownloadInfo.SeparateRatings) {
@@ -1309,8 +1310,8 @@ namespace aphrodite {
                                 };
 
                             labelBuffer = string.Format("files: {0} ( {1} E | {2} Q | {3} S )\r\n" +
-                                                        "not saving graylisted tags" + //"graylisted: {4} ( {5} E | {6} Q | {7} S )\r\n" +
-                                                        "not saving blacklisted tags" +//"blacklisted: {8} ( {9} E | {10} Q | {11} S )\r\n" +
+                                                        "not saving graylisted tags\r\n" + //"graylisted: {4} ( {5} E | {6} Q | {7} S )\r\n" +
+                                                        "not saving blacklisted tags\r\n" +//"blacklisted: {8} ( {9} E | {10} Q | {11} S )\r\n" +
                                                         "total parsed: {12}\r\n\r\n" +
 
                                                         "files that exist: {13} ( {14} E | {15} Q | {16} S )\r\n" +
@@ -1326,7 +1327,7 @@ namespace aphrodite {
                             }
 
                             lbBlacklist.Text = string.Format(labelBuffer, Counts);
-                        }));
+                        });
                         #endregion
 
                     }
@@ -1351,9 +1352,9 @@ namespace aphrodite {
 
                 #region output logic
                 // Create output folders
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.BeginInvoke((MethodInvoker)delegate() {
                     Program.Log(LogAction.WriteToLog, "Creating output folders (because System.Net doesn't do it for you...)");
-                }));
+                });
                 if (DownloadInfo.SeparateRatings) {
                     if (CleanedExplicitURLs.Count > 0) {
                         Directory.CreateDirectory(DownloadInfo.DownloadPath + "\\explicit");
@@ -1580,9 +1581,9 @@ namespace aphrodite {
 
                 // Save the info files from the buffer
                 if (DownloadInfo.SaveInfo) {
-                    this.BeginInvoke(new MethodInvoker(() => {
+                    this.BeginInvoke((MethodInvoker)delegate() {
                         Program.Log(LogAction.WriteToLog, "Saving infos.");
-                    }));
+                    });
                     if (CleanTotalCount > 0) {
                         CleanInfoBuffer.TrimEnd('\r').TrimEnd('\n');
                         File.WriteAllText(DownloadInfo.DownloadPath + "\\tags.nfo", CleanInfoBuffer, Encoding.UTF8);
@@ -1600,7 +1601,7 @@ namespace aphrodite {
                 }
 
                 // Set the progressbar info.
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.BeginInvoke((MethodInvoker)delegate() {
                     pbTotalStatus.Maximum = CleanTotalCount;
                     if (DownloadInfo.SaveGraylistedFiles) {
                         pbTotalStatus.Maximum += GraylistTotalCount;
@@ -1610,7 +1611,7 @@ namespace aphrodite {
                     }
 
                     pbDownloadStatus.Style = ProgressBarStyle.Blocks;
-                }));
+                });
                 #endregion
 
                 // Enable using old logic by disabling UseNewDownloadLogic
@@ -1619,7 +1620,7 @@ namespace aphrodite {
                 // Start the download
                 using (Controls.ExtendedWebClient wc = new Controls.ExtendedWebClient()) {
                     wc.DownloadProgressChanged += (s, e) => {
-                        this.BeginInvoke(new MethodInvoker(() => {
+                        this.BeginInvoke((MethodInvoker)delegate() {
                             pbDownloadStatus.Value = e.ProgressPercentage;
                             switch (pbDownloadStatus.Value) {
                                 case 100:
@@ -1634,13 +1635,12 @@ namespace aphrodite {
                             }
                             lbPercentage.Text = e.ProgressPercentage.ToString() + "%";
                             lbBytes.Text = (e.BytesReceived / 1024) + " kb / " + (e.TotalBytesToReceive / 1024) + " kb";
-                        }));
+                        });
                     };
                     wc.DownloadFileCompleted += (s, e) => {
                         lock (e.UserState) {
-                            this.BeginInvoke(new MethodInvoker(() => {
+                            this.BeginInvoke((MethodInvoker)delegate() {
                                 pbDownloadStatus.Value = 0;
-                                lbPercentage.Text = "0%";
 
                                 // protect from overflow
                                 if (pbTotalStatus.Value < pbTotalStatus.Maximum) {
@@ -1649,7 +1649,7 @@ namespace aphrodite {
                                 else {
                                     lbRemoved.Visible = true;
                                 }
-                            }));
+                            });
                             Monitor.Pulse(e.UserState);
                         }
                     };
@@ -2367,9 +2367,9 @@ namespace aphrodite {
                     }
                 }
 
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.BeginInvoke((MethodInvoker)delegate() {
                     Program.Log(LogAction.WriteToLog, "Tags \"" + DownloadInfo.Tags + "\" was downloaded. (frmTagDownloader.cs)");
-                }));
+                });
 
                 CurrentStatus = DownloadStatus.Finished;
                 #endregion
@@ -2378,46 +2378,46 @@ namespace aphrodite {
 
             #region Downloader catch-statements
             catch (ApiReturnedNullOrEmptyException) {
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.BeginInvoke((MethodInvoker)delegate() {
                     Program.Log(LogAction.WriteToLog, "Tags \"" + DownloadInfo.Tags + "\" Api returned null or empty. (frmTagDownloader.cs)");
-                }));
+                });
                 CurrentStatus = DownloadStatus.ApiReturnedNullOrEmpty;
             }
             catch (NoFilesToDownloadException) {
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.BeginInvoke((MethodInvoker)delegate() {
                     Program.Log(LogAction.WriteToLog, "No files are available for tags \"" + DownloadInfo.Tags + "\". (frmTagDownloader.cs)");
-                }));
+                });
                 CurrentStatus = DownloadStatus.NothingToDownload;
             }
             catch (ThreadAbortException) {
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.BeginInvoke((MethodInvoker)delegate() {
                     Program.Log(LogAction.WriteToLog, "The download thread was aborted. (frmTagDownloader.cs)");
-                }));
+                });
                 CurrentStatus = DownloadStatus.Aborted;
             }
             catch (ObjectDisposedException) {
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.BeginInvoke((MethodInvoker)delegate() {
                     Program.Log(LogAction.WriteToLog, "Seems like the form got disposed. (frmTagDownloader.cs)");
-                }));
+                });
                 CurrentStatus = DownloadStatus.FormWasDisposed;
             }
             catch (WebException WebE) {
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.BeginInvoke((MethodInvoker)delegate() {
                     Program.Log(LogAction.WriteToLog, "A WebException has occured. (frmTagDownloader.cs)");
                     status.Text = "A WebException has occured";
                     pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
                     pbTotalStatus.State = aphrodite.Controls.ProgressBarState.Error;
-                }));
+                });
                 CurrentStatus = DownloadStatus.Errored;
                 ErrorLog.ReportWebException(WebE, CurrentUrl, "frmTagDownloader.cs");
             }
             catch (Exception ex) {
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.BeginInvoke((MethodInvoker)delegate() {
                     Program.Log(LogAction.WriteToLog, "An Exception has occured. (frmTagDownloader.cs)");
                     status.Text = "A Exception has occured";
                     pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
                     pbTotalStatus.State = aphrodite.Controls.ProgressBarState.Error;
-                }));
+                });
                 CurrentStatus = DownloadStatus.Errored;
                 ErrorLog.ReportException(ex, "frmTagDownloader.cs");
             }
@@ -2426,12 +2426,13 @@ namespace aphrodite {
             #region After download finally statement
             finally {
                 if (CurrentStatus != DownloadStatus.FormWasDisposed) {
-                    this.BeginInvoke(new MethodInvoker(() => {
+                    this.BeginInvoke((MethodInvoker)delegate() {
                         AfterDownload();
-                    }));
+                    });
                 }
             }
             #endregion
+
         }
         #endregion
 

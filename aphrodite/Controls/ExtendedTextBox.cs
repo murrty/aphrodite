@@ -28,6 +28,7 @@ namespace aphrodite.Controls {
             TextAlign = ContentAlignment.MiddleCenter,
             UseVisualStyleBackColor = true,
             Visible = false,
+            Cursor = Cursors.Default,
         };
 
         public ExtendedTextBox() {
@@ -197,97 +198,73 @@ namespace aphrodite.Controls {
         #endregion
 
         #region Public Properties
-        /// <summary>
-        /// Sets the location of the Button in the TextBox.
-        /// </summary>
+        [Category("Appearance"), Description("The position of the button inside the Text Box."), DefaultValue(ButtonAlignments.Right)]
         public ButtonAlignments ButtonAlignment {
             get { return _ButtonAlignment; }
             set { _ButtonAlignment = value; UpdateButton(); this.Refresh(); }
         }
 
-        /// <summary>
-        /// Gets or sets the cursor of the Button.
-        /// </summary>
+        [Category("Appearance"), Description("The cursor that will appear when hovering over the Button.")]
         public Cursor ButtonCursor {
             get { return btn.Cursor; }
             set { btn.Cursor = value; }
         }
 
-        /// <summary>
-        /// Gets or sets the Font on the Button.
-        /// </summary>
+        [Category("Appearance"), Description("The Font of the Text that appears within the Button.")]
         public Font ButtonFont {
             get { return btn.Font; }
             set { btn.Font = value; }
         }
 
-        /// <summary>
-        /// Gets or sets the Image on the Button.
-        /// </summary>
+        [Category("Appearance"), Description("The Image that appears on the Button."), DefaultValue(null)]
         public Image ButtonImage {
             get { return btn.Image; }
             set { btn.Image = value; }
         }
 
-        /// <summary>
-        /// Gets or sets the Image Align on the Button.
-        /// </summary>
+        [Category("Appearance"), Description("The Image Alignment of an Image on the Button."), DefaultValue(ContentAlignment.MiddleCenter)]
         public ContentAlignment ButtonImageAlign {
             get { return btn.ImageAlign; }
             set { btn.ImageAlign = value; }
         }
 
-        /// <summary>
-        /// Gets or sets the Image Index on the Button.
-        /// </summary>
+        [Category("Appearance"), Description("The Image Index of the Image on the Button within the Image List."), DefaultValue(null)]
         public int ButtonImageIndex {
             get { return btn.ImageIndex; }
             set { btn.ImageIndex = value; }
         }
 
-        /// <summary>
-        /// Gets or sets the Image Key on the Button.
-        /// </summary>
+        [Category("Appearance"), Description("The Image Key of the Image on the Button."), DefaultValue(null)]
         public string ButtonImageKey {
             get { return btn.ImageKey; }
             set { btn.ImageKey = value; }
         }
 
-        /// <summary>
-        /// Gets or sets the Image List on the Button.
-        /// </summary>
+        [Category("Appearance"), Description("The Image List for use with the Button."), DefaultValue(null)]
         public ImageList ButtonImageList {
             get { return btn.ImageList; }
             set { btn.ImageList = value; }
         }
 
-        /// <summary>
-        /// Gets or sets the size of the Button.
-        /// </summary>
+        [Category("Appearance"), Description("The Size of the Button.")]
         public Size ButtonSize {
             get { return btn.Size; }
             set { btn.Size = value; }
         }
 
-        /// <summary>
-        /// Gets or sets the text visible on the Button.
-        /// </summary>
+        [Category("Appearance"), Description("The Text that appears on the Button."), DefaultValue("X")]
         public string ButtonText {
             get { return btn.Text; }
             set { btn.Text = value; }
         }
 
-        /// <summary>
-        /// Gets or sets the Text Alignment on the Button.
-        /// </summary>
+        [Category("Appearance"), Description("The Alignment of the Text on the Button."), DefaultValue(ContentAlignment.MiddleRight)]
         public ContentAlignment ButtonTextAlign {
             get { return btn.TextAlign; }
             set { btn.TextAlign = value; }
         }
 
-        /// <summary>
-        /// Enable or Disable the Button in the TextBox.
-        /// </summary>
+        [Category("Appearance"), Description("The Button on the Text Box is enabled and usable."), DefaultValue(false)]
         public bool ButtonEnabled {
             get { return _ButtonEnabled; }
             set {
@@ -297,9 +274,7 @@ namespace aphrodite.Controls {
             }
         }
 
-        /// <summary>
-        /// Gets or sets the text hint on the TextBox.
-        /// </summary>
+        [Category("Appearance"), Description("The Text that will appear as a hint in the Text Box."), DefaultValue(null)]
         public string TextHint {
             get { return _TextHint; }
             set {
@@ -308,9 +283,7 @@ namespace aphrodite.Controls {
             }
         }
 
-        /// <summary>
-        /// Sets the text that's allowed to be entered into the text box.
-        /// </summary>
+        [Category("Appearance"), Description("Determines if the Text Box wil only accept certain kinds of characters."), DefaultValue(AllowedTextTypes.All)]
         public AllowedTextTypes TextType {
             get { return _TextType; }
             set { _TextType = value; }

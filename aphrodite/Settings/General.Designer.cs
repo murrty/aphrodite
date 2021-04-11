@@ -166,5 +166,29 @@ namespace aphrodite.Settings {
                 this["openAfter"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SkipArgumentCheck {
+            get {
+                return ((bool)(this["SkipArgumentCheck"]));
+            }
+            set {
+                this["SkipArgumentCheck"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AutoDownloadWithArguments {
+            get {
+                return ((bool)(this["AutoDownloadWithArguments"]));
+            }
+            set {
+                this["AutoDownloadWithArguments"] = value;
+            }
+        }
     }
 }

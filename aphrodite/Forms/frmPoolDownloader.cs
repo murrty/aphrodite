@@ -228,10 +228,10 @@ namespace aphrodite {
 
                 #region initial api parse for main pool info
                 // Begin the XML download
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.BeginInvoke((MethodInvoker)delegate() {
                     Program.Log(LogAction.WriteToLog, "Downloading pool information. (frmPoolDownloader.cs)");
                     status.Text = "Getting pool information...";
-                }));
+                });
                 CurrentURL = poolJson;
                 string postXML = apiTools.GetJsonToXml(poolJson);
 
@@ -282,9 +282,9 @@ namespace aphrodite {
                 // Set the output folder name.
                 poolName = apiTools.ReplaceIllegalCharacters(xmlName[0].InnerText);
                 DownloadInfo.DownloadPath += "\\" + poolName;
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.BeginInvoke((MethodInvoker)delegate() {
                     Program.Log(LogAction.WriteToLog, "Updated saveTo to \"\\Pools\\" + poolName + "\". (frmPoolDownloader.cs)");
-                }));
+                });
                 #endregion
 
                 #region Parse for the images in the pools
@@ -603,6 +603,7 @@ namespace aphrodite {
 
                             poolInfo += "    " + InfoBuffer + "\r\n\r\n";
                         }
+                        #endregion
 
                         #region Counts + lists
                         string NewPath = DownloadInfo.DownloadPath;
@@ -770,12 +771,10 @@ namespace aphrodite {
                         FilePaths.Add(NewPath + "\\" + fileName);
                         #endregion
 
-                        #endregion
-
                     }
 
                     #region update totals
-                    this.BeginInvoke(new MethodInvoker(() => {
+                    this.BeginInvoke((MethodInvoker)delegate() {
                         object[] Counts = new object[] {
                             CleanPageTotalCount, CleanPageExplicitCount, CleanPageQuestionableCount, CleanPageSafeCount,
                             GraylistPageTotalCount, GraylistPageExplicitCount, GraylistPageQuestionableCount, GraylistPageSafeCount,
@@ -806,7 +805,7 @@ namespace aphrodite {
                         }
 
                         lbTotal.Text = string.Format(InfoLabelBuffer, Counts);
-                    }));
+                    });
                     #endregion
                 }
 
@@ -819,9 +818,9 @@ namespace aphrodite {
                     throw new NoFilesToDownloadException("No files are available to download");
                 }
 
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.BeginInvoke((MethodInvoker)delegate() {
                     Program.Log(LogAction.WriteToLog, "There are " + URLs.Count + " pages to download. (frmPoolDownloader.cs)");
-                }));
+                });
 
                 // Create directories.
                 if (!Directory.Exists(DownloadInfo.DownloadPath)) {
@@ -843,35 +842,35 @@ namespace aphrodite {
                     File.WriteAllText(DownloadInfo.DownloadPath + "\\pool.nfo", poolInfo, Encoding.UTF8);
                 }
 
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.BeginInvoke((MethodInvoker)delegate() {
                     pbDownloadStatus.Style = ProgressBarStyle.Blocks;
                     pbTotalStatus.Maximum = URLs.Count;
                     lbFile.Text = "File 1 of " + (CleanPageTotalCount + GraylistPageTotalCount + BlacklistPageTotalCount);
-                }));
+                });
 
                 // Download pool.
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.BeginInvoke((MethodInvoker)delegate() {
                     Program.Log(LogAction.WriteToLog, "Downloading pool pages. (frmPoolDownloader.cs)");
-                }));
+                });
                 using (Controls.ExtendedWebClient wc = new Controls.ExtendedWebClient()) {
                     wc.DownloadProgressChanged += (s, e) => {
-                        this.BeginInvoke(new MethodInvoker(() => {
+                        this.BeginInvoke((MethodInvoker)delegate() {
                             if (pbDownloadStatus.Value < 100) {
                                 pbDownloadStatus.Value = e.ProgressPercentage;
                             }
                             lbPercentage.Text = e.ProgressPercentage.ToString() + "%";
                             lbBytes.Text = (e.BytesReceived / 1024) + " kb / " + (e.TotalBytesToReceive / 1024) + " kb";
-                        }));
+                        });
                     };
 
                     wc.DownloadFileCompleted += (s, e) => {
-                        this.BeginInvoke(new MethodInvoker(() => {
+                        this.BeginInvoke((MethodInvoker)delegate() {
                             pbDownloadStatus.Value = 0;
                             lbPercentage.Text = "0%";
 
                             if (pbTotalStatus.Value != pbTotalStatus.Maximum)
                                 pbTotalStatus.Value++;
-                        }));
+                        });
                     };
 
                     wc.Proxy = WebRequest.GetSystemWebProxy();
@@ -889,61 +888,61 @@ namespace aphrodite {
                 }
                 #endregion
 
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.BeginInvoke((MethodInvoker)delegate() {
                     Program.Log(LogAction.WriteToLog, "The pool " + DownloadInfo.PoolId + " was downloaded. (frmPoolDownloader.cs)");
-                }));
+                });
                 CurrentStatus = DownloadStatus.Finished;
             }
             #endregion
 
             #region catch statements
             catch (PoolOrPostWasDeletedException) {
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.BeginInvoke((MethodInvoker)delegate() {
                     Program.Log(LogAction.WriteToLog, "The pool " + DownloadInfo.PoolId + " was deleted. (frmPoolDownloader.cs)");
-                }));
+                });
                 CurrentStatus = DownloadStatus.PostOrPoolWasDeleted;
             }
             catch (ApiReturnedNullOrEmptyException) {
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.BeginInvoke((MethodInvoker)delegate() {
                     Program.Log(LogAction.WriteToLog, "The pool " + DownloadInfo.PoolId + " API Returned null or empty. (frmPoolDownloader.cs)");
-                }));
+                });
                 CurrentStatus = DownloadStatus.ApiReturnedNullOrEmpty;
             }
             catch (NoFilesToDownloadException) {
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.BeginInvoke((MethodInvoker)delegate() {
                     Program.Log(LogAction.WriteToLog, "No files are available for pool " + DownloadInfo.PoolId + ". (frmPoolDownloader.cs)");
-                }));
+                });
                 CurrentStatus = DownloadStatus.NothingToDownload;
             }
             catch (ThreadAbortException) {
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.BeginInvoke((MethodInvoker)delegate() {
                     Program.Log(LogAction.WriteToLog, "The download thread was aborted. (frmPoolDownloader.cs)");
-                }));
+                });
                 CurrentStatus = DownloadStatus.Aborted;
             }
             catch (ObjectDisposedException) {
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.BeginInvoke((MethodInvoker)delegate() {
                     Program.Log(LogAction.WriteToLog, "Seems like the form got disposed. (frmPoolDownloader.cs)");
-                }));
+                });
                 CurrentStatus = DownloadStatus.FormWasDisposed;
             }
             catch (WebException WebE) {
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.BeginInvoke((MethodInvoker)delegate() {
                     Program.Log(LogAction.WriteToLog, "A WebException has occured. (frmPoolDownloader.cs)");
                     status.Text = "A WebException has occured";
                     pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
                     pbTotalStatus.State = aphrodite.Controls.ProgressBarState.Error;
-                }));
+                });
                 ErrorLog.ReportWebException(WebE, "frmPoolDownloader.cs", CurrentURL);
                 CurrentStatus = DownloadStatus.Errored;
             }
             catch (Exception ex) {
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.BeginInvoke((MethodInvoker)delegate() {
                     Program.Log(LogAction.WriteToLog, "An exception has occured. (frmPoolDownloader.cs)");
                     status.Text = "An Exception has occured";
                     pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
                     pbTotalStatus.State = aphrodite.Controls.ProgressBarState.Error;
-                }));
+                });
                 ErrorLog.ReportException(ex, "frmPoolDownloader.cs", false);
                 CurrentStatus = DownloadStatus.Errored;
             }
@@ -952,9 +951,9 @@ namespace aphrodite {
             #region finally statement
             finally {
                 if (CurrentStatus != DownloadStatus.FormWasDisposed) {
-                    this.BeginInvoke(new MethodInvoker(() => {
+                    this.BeginInvoke((MethodInvoker)delegate() {
                         AfterDownload();
-                    }));
+                    });
                 }
             }
             #endregion

@@ -166,5 +166,17 @@ namespace aphrodite.Settings {
                 this["downloadBlacklisted"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool DownloadNewestToOldest {
+            get {
+                return ((bool)(this["DownloadNewestToOldest"]));
+            }
+            set {
+                this["DownloadNewestToOldest"] = value;
+            }
+        }
     }
 }

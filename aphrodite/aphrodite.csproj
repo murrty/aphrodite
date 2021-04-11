@@ -98,6 +98,12 @@
     <Compile Include="Controls\TransparentLabel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Forms\frmArgumentDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmArgumentDialog.Designer.cs">
+      <DependentUpon>frmArgumentDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\frmException.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -122,12 +128,25 @@
     <Compile Include="Forms\frmUpdateAvailable.Designer.cs">
       <DependentUpon>frmUpdateAvailable.cs</DependentUpon>
     </Compile>
+    <Compile Include="Ookii\Interop\ComDlgResources.cs" />
     <Compile Include="Ookii\Interop\COMGuids.cs" />
     <Compile Include="Ookii\Interop\ErrorHelper.cs" />
     <Compile Include="Ookii\Interop\ShellComInterfaces.cs" />
     <Compile Include="Ookii\Interop\ShellWrapperDefinitions.cs" />
+    <Compile Include="Ookii\Interop\Win32Resources.cs" />
     <Compile Include="Ookii\Interop\WindowHandleWrapper.cs" />
     <Compile Include="Ookii\NativeMethods.cs" />
+    <Compile Include="Ookii\SafeHandles.cs" />
+    <Compile Include="Ookii\VistaFileDialog.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Ookii\VistaFileDialogEvents.cs" />
+    <Compile Include="Ookii\VistaOpenFileDialog.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Ookii\VistaSaveFileDialog.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Settings\FormSettings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -221,6 +240,9 @@
     <EmbeddedResource Include="Forms\frmAbout.resx">
       <DependentUpon>frmAbout.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmArgumentDialog.resx">
+      <DependentUpon>frmArgumentDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmBlacklist.resx">
       <DependentUpon>frmBlacklist.cs</DependentUpon>
     </EmbeddedResource>
@@ -311,6 +333,8 @@
     <Content Include="Resources\Brad.ico" />
     <Content Include="Resources\Brad.png" />
     <Content Include="Resources\Icon32.png" />
+    <Content Include="TextFile1.txt" />
+    <Content Include="TextFile2.txt" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">

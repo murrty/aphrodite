@@ -32,6 +32,9 @@
             // 
             // rtbLog
             // 
+            this.rtbLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.rtbLog.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.rtbLog.Location = new System.Drawing.Point(12, 12);
             this.rtbLog.Name = "rtbLog";
@@ -55,7 +58,6 @@
             // 
             this.btnClear.Location = new System.Drawing.Point(12, 9);
             this.btnClear.Name = "btnClear";
-            this.btnClear.ShowUACShield = false;
             this.btnClear.Size = new System.Drawing.Size(75, 23);
             this.btnClear.TabIndex = 1;
             this.btnClear.Text = "Clear";
@@ -67,7 +69,6 @@
             this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnClose.Location = new System.Drawing.Point(525, 9);
             this.btnClose.Name = "btnClose";
-            this.btnClose.ShowUACShield = false;
             this.btnClose.Size = new System.Drawing.Size(75, 23);
             this.btnClose.TabIndex = 0;
             this.btnClose.Text = "Close";
@@ -83,6 +84,7 @@
             this.Controls.Add(this.panelControls);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = global::aphrodite.Properties.Resources.Brad;
+            this.MinimumSize = new System.Drawing.Size(360, 260);
             this.Name = "frmLog";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "aphrodite log";
