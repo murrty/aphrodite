@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Windows.Forms;
 
 namespace aphrodite.Controls {
@@ -67,7 +68,7 @@ namespace aphrodite.Controls {
                 case true:
                     this.FlatStyle = System.Windows.Forms.FlatStyle.System;
                     base.Text = " " + base.Text;
-                    NativeMethods.SendMessage(this.Handle, NativeMethods.BCM_SETSHIELD, 0, 2);
+                    NativeMethods.SendMessage(this.Handle, NativeMethods.BCM_SETSHIELD, IntPtr.Zero, (IntPtr)2);
                     break;
 
                 case false:
@@ -81,7 +82,7 @@ namespace aphrodite.Controls {
                             base.Text = string.Empty;
                             break;
                     }
-                    NativeMethods.SendMessage(this.Handle, NativeMethods.BCM_FIRST, 0, 2);
+                    NativeMethods.SendMessage(this.Handle, NativeMethods.BCM_FIRST, IntPtr.Zero, (IntPtr)2);
                     break;
             }
             base.Refresh();

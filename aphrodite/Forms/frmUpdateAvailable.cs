@@ -3,27 +3,26 @@ using System.Windows.Forms;
 
 namespace aphrodite {
     public partial class frmUpdateAvailable : Form {
-        //Language lang = Language.GetInstance();
-        //GitData Cloud = GitData.GetInstance();
         public bool BlockSkip = false;
+        public string NewVersion;
+        public string UpdateHeader;
+        public string UpdateBody;
 
         public frmUpdateAvailable() {
             InitializeComponent();
-            //this.Text = lang.frmUpdateAvailable;
-            //lbUpdateAvailableHeader.Text = lang.lbUpdateAvailableHeader;
-            //lbUpdateAvailableUpdateVersion.Text = lang.lbUpdateAvailableUpdateVersion + " " + Cloud.UpdateVersion;
-            //lbUpdateAvailableCurrentVersion.Text = lang.lbUpdateAvailableCurrentVersion + " " + Properties.Settings.Default.currentVersion.ToString();
-            //lbUpdateAvailableChangelog.Text = lang.lbUpdateAvailableChangelog;
-            //txtUpdateAvailableName.Text = Cloud.UpdateName;
-            //rtbUpdateAvailableChangelog.Text = Cloud.UpdateBody;
-            //btnUpdateAvailableUpdate.Text = lang.btnUpdateAvailableUpdate;
-            //btnUpdateAvailableSkip.Text = lang.btnUpdateAvailableSkipVersion;
-            //btnUpdateAvailableOk.Text = lang.btnUpdateAvailableOk;
-
+            lbUpdateAvailableCurrentVersion.Text = string.Format("Current version: {0}", Properties.Settings.Default.CurrentVersion);
         }
         private void frmUpdateAvailable_Load(object sender, EventArgs e) {
-            if (BlockSkip) {
-                btnUpdateAvailableSkip.Enabled = false;
+            btnUpdateAvailableSkip.Enabled = !BlockSkip;
+            if (NewVersion != null && UpdateHeader != null && UpdateBody != null) {
+                lbUpdateAvailableUpdateVersion.Text = string.Format("Update version: {0}", NewVersion);
+                txtUpdateAvailableName.Text = UpdateHeader;
+                rtbUpdateAvailableChangelog.Text = UpdateBody;
+            }
+            else {
+                lbUpdateAvailableUpdateVersion.Text = "Unknown version";
+                txtUpdateAvailableName.Text = "New version available";
+                rtbUpdateAvailableChangelog.Text = "A new version has been released, but no information was given to this form to show you.";
             }
         }
 
@@ -36,6 +35,10 @@ namespace aphrodite {
 
         private void btnUpdateAvailableOk_Click(object sender, EventArgs e) {
             this.DialogResult = DialogResult.OK;
+        }
+
+        private void rtbUpdateAvailableChangelog_KeyPress(object sender, KeyPressEventArgs e) {
+            e.Handled = true;
         }
     }
 }

@@ -91,11 +91,11 @@
             this.txtArguments.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
             this.txtArguments.ButtonCursor = System.Windows.Forms.Cursors.Default;
             this.txtArguments.ButtonEnabled = true;
-            this.txtArguments.ButtonFont = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtArguments.ButtonFont = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtArguments.ButtonImageIndex = -1;
             this.txtArguments.ButtonImageKey = "";
             this.txtArguments.ButtonSize = new System.Drawing.Size(22, 19);
-            this.txtArguments.ButtonText = "";
+            this.txtArguments.ButtonText = "X";
             this.txtArguments.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.txtArguments.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtArguments.Location = new System.Drawing.Point(51, 58);

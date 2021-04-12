@@ -258,56 +258,83 @@ namespace aphrodite {
         }
     }
 
-
     class Downloader {
         /// <summary>
         /// Uses the program's internal settings for settings
         /// </summary>
         public static class Arguments {
-            public static bool DownloadTags(string Tags) {
+            public static bool DownloadTags(string Tags, bool UseDialog = true) {
                 try {
                     frmTagDownloader tagDL = new frmTagDownloader();
                     tagDL.DownloadInfo = new TagDownloadInfo(Tags);
-                    tagDL.ShowDialog();
-                    tagDL.Dispose();
+                    switch (UseDialog) {
+                        case true:
+                            tagDL.ShowDialog();
+                            break;
+
+                        case false:
+                            tagDL.Show();
+                            break;
+                    }
                     return true;
                 }
                 catch {
                     throw;
                 }
             }
-            public static bool DownloadPage(string PageUrl) {
+            public static bool DownloadPage(string PageUrl, bool UseDialog = true) {
                 try {
                     frmTagDownloader tagDL = new frmTagDownloader();
                     tagDL.DownloadInfo = new TagDownloadInfo(true, PageUrl);
-                    tagDL.ShowDialog();
-                    tagDL.Dispose();
+                    switch (UseDialog) {
+                        case true:
+                            tagDL.ShowDialog();
+                            break;
+
+                        case false:
+                            tagDL.Show();
+                            break;
+                    }
                     return true;
                 }
                 catch {
                     throw;
                 }
             }
-            public static bool DownloadPool(string PoolId) {
+            public static bool DownloadPool(string PoolId, bool UseDialog = true) {
                 try {
                     frmPoolDownloader PoolDL = new frmPoolDownloader();
                     PoolDL.DownloadInfo = new PoolDownloadInfo(PoolId);
-                    PoolDL.ShowDialog();
-                    PoolDL.Dispose();
+                    switch (UseDialog) {
+                        case true:
+                            PoolDL.ShowDialog();
+                            break;
+
+                        case false:
+                            PoolDL.Show();
+                            break;
+                    }
                     return true;
                 }
                 catch {
                     throw;
                 }
             }
-            public static bool DownloadImage(string ImageId) {
+            public static bool DownloadImage(string ImageId, bool UseDialog = true) {
             try {
                 ImageDownloadInfo NewInfo = new ImageDownloadInfo(ImageId);
                 if (NewInfo.UseForm) {
                     frmImageDownloader imageDL = new frmImageDownloader();
                     imageDL.DownloadInfo = NewInfo;
-                    imageDL.ShowDialog();
-                    imageDL.Dispose();
+                    switch (UseDialog) {
+                        case true:
+                            imageDL.ShowDialog();
+                            break;
+
+                        case false:
+                            imageDL.Show();
+                            break;
+                    }
                 }
                 else {
                     ImageDownloader imageDL = new ImageDownloader(NewInfo);

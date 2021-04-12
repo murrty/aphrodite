@@ -24,55 +24,27 @@
         /// </summary>
         private void InitializeComponent() {
             this.txtUpdateAvailableName = new System.Windows.Forms.TextBox();
-            this.btnUpdateAvailableSkip = new aphrodite.Controls.ExtendedButton();
-            this.btnUpdateAvailableOk = new aphrodite.Controls.ExtendedButton();
-            this.btnUpdateAvailableUpdate = new aphrodite.Controls.ExtendedButton();
             this.lbUpdateAvailableChangelog = new System.Windows.Forms.Label();
             this.rtbUpdateAvailableChangelog = new System.Windows.Forms.RichTextBox();
             this.lbUpdateAvailableCurrentVersion = new System.Windows.Forms.Label();
             this.lbUpdateAvailableUpdateVersion = new System.Windows.Forms.Label();
             this.lbUpdateAvailableHeader = new System.Windows.Forms.Label();
             this.pnLower = new System.Windows.Forms.Panel();
+            this.btnUpdateAvailableOk = new aphrodite.Controls.ExtendedButton();
+            this.btnUpdateAvailableSkip = new aphrodite.Controls.ExtendedButton();
+            this.btnUpdateAvailableUpdate = new aphrodite.Controls.ExtendedButton();
             this.pnLower.SuspendLayout();
             this.SuspendLayout();
             // 
             // txtUpdateAvailableName
             // 
+            this.txtUpdateAvailableName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txtUpdateAvailableName.Location = new System.Drawing.Point(11, 107);
             this.txtUpdateAvailableName.Name = "txtUpdateAvailableName";
             this.txtUpdateAvailableName.ReadOnly = true;
             this.txtUpdateAvailableName.Size = new System.Drawing.Size(300, 22);
             this.txtUpdateAvailableName.TabIndex = 13;
-            // 
-            // btnUpdateAvailableSkip
-            // 
-            this.btnUpdateAvailableSkip.Location = new System.Drawing.Point(12, 7);
-            this.btnUpdateAvailableSkip.Name = "btnUpdateAvailableSkip";
-            this.btnUpdateAvailableSkip.Size = new System.Drawing.Size(90, 24);
-            this.btnUpdateAvailableSkip.TabIndex = 15;
-            this.btnUpdateAvailableSkip.Text = "Skip version";
-            this.btnUpdateAvailableSkip.UseVisualStyleBackColor = true;
-            this.btnUpdateAvailableSkip.Click += new System.EventHandler(this.btnUpdateAvailableSkip_Click);
-            // 
-            // btnUpdateAvailableOk
-            // 
-            this.btnUpdateAvailableOk.Location = new System.Drawing.Point(235, 7);
-            this.btnUpdateAvailableOk.Name = "btnUpdateAvailableOk";
-            this.btnUpdateAvailableOk.Size = new System.Drawing.Size(75, 24);
-            this.btnUpdateAvailableOk.TabIndex = 17;
-            this.btnUpdateAvailableOk.Text = "OK";
-            this.btnUpdateAvailableOk.UseVisualStyleBackColor = true;
-            this.btnUpdateAvailableOk.Click += new System.EventHandler(this.btnUpdateAvailableOk_Click);
-            // 
-            // btnUpdateAvailableUpdate
-            // 
-            this.btnUpdateAvailableUpdate.Location = new System.Drawing.Point(108, 7);
-            this.btnUpdateAvailableUpdate.Name = "btnUpdateAvailableUpdate";
-            this.btnUpdateAvailableUpdate.Size = new System.Drawing.Size(75, 24);
-            this.btnUpdateAvailableUpdate.TabIndex = 16;
-            this.btnUpdateAvailableUpdate.Text = "Update";
-            this.btnUpdateAvailableUpdate.UseVisualStyleBackColor = true;
-            this.btnUpdateAvailableUpdate.Click += new System.EventHandler(this.btnUpdateAvailableUpdate_Click);
             // 
             // lbUpdateAvailableChangelog
             // 
@@ -85,12 +57,16 @@
             // 
             // rtbUpdateAvailableChangelog
             // 
+            this.rtbUpdateAvailableChangelog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.rtbUpdateAvailableChangelog.Location = new System.Drawing.Point(11, 133);
             this.rtbUpdateAvailableChangelog.Name = "rtbUpdateAvailableChangelog";
             this.rtbUpdateAvailableChangelog.ReadOnly = true;
             this.rtbUpdateAvailableChangelog.Size = new System.Drawing.Size(300, 140);
             this.rtbUpdateAvailableChangelog.TabIndex = 14;
             this.rtbUpdateAvailableChangelog.Text = "";
+            this.rtbUpdateAvailableChangelog.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.rtbUpdateAvailableChangelog_KeyPress);
             // 
             // lbUpdateAvailableCurrentVersion
             // 
@@ -131,11 +107,43 @@
             this.pnLower.Size = new System.Drawing.Size(322, 42);
             this.pnLower.TabIndex = 18;
             // 
+            // btnUpdateAvailableOk
+            // 
+            this.btnUpdateAvailableOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnUpdateAvailableOk.Location = new System.Drawing.Point(235, 7);
+            this.btnUpdateAvailableOk.Name = "btnUpdateAvailableOk";
+            this.btnUpdateAvailableOk.Size = new System.Drawing.Size(75, 24);
+            this.btnUpdateAvailableOk.TabIndex = 17;
+            this.btnUpdateAvailableOk.Text = "OK";
+            this.btnUpdateAvailableOk.UseVisualStyleBackColor = true;
+            this.btnUpdateAvailableOk.Click += new System.EventHandler(this.btnUpdateAvailableOk_Click);
+            // 
+            // btnUpdateAvailableSkip
+            // 
+            this.btnUpdateAvailableSkip.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnUpdateAvailableSkip.Location = new System.Drawing.Point(12, 7);
+            this.btnUpdateAvailableSkip.Name = "btnUpdateAvailableSkip";
+            this.btnUpdateAvailableSkip.Size = new System.Drawing.Size(80, 24);
+            this.btnUpdateAvailableSkip.TabIndex = 15;
+            this.btnUpdateAvailableSkip.Text = "Skip version";
+            this.btnUpdateAvailableSkip.UseVisualStyleBackColor = true;
+            this.btnUpdateAvailableSkip.Click += new System.EventHandler(this.btnUpdateAvailableSkip_Click);
+            // 
+            // btnUpdateAvailableUpdate
+            // 
+            this.btnUpdateAvailableUpdate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnUpdateAvailableUpdate.Location = new System.Drawing.Point(154, 7);
+            this.btnUpdateAvailableUpdate.Name = "btnUpdateAvailableUpdate";
+            this.btnUpdateAvailableUpdate.Size = new System.Drawing.Size(75, 24);
+            this.btnUpdateAvailableUpdate.TabIndex = 16;
+            this.btnUpdateAvailableUpdate.Text = "Update";
+            this.btnUpdateAvailableUpdate.UseVisualStyleBackColor = true;
+            this.btnUpdateAvailableUpdate.Click += new System.EventHandler(this.btnUpdateAvailableUpdate_Click);
+            // 
             // frmUpdateAvailable
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(322, 323);
             this.Controls.Add(this.txtUpdateAvailableName);
             this.Controls.Add(this.lbUpdateAvailableChangelog);
@@ -147,7 +155,9 @@
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = global::aphrodite.Properties.Resources.Brad;
             this.MaximizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(340, 360);
             this.Name = "frmUpdateAvailable";
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Update available";
             this.Load += new System.EventHandler(this.frmUpdateAvailable_Load);

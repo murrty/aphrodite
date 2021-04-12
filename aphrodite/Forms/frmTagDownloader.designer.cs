@@ -53,7 +53,7 @@
             // 
             this.lbFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbFile.Location = new System.Drawing.Point(12, 230);
+            this.lbFile.Location = new System.Drawing.Point(12, 250);
             this.lbFile.Name = "lbFile";
             this.lbFile.Size = new System.Drawing.Size(288, 18);
             this.lbFile.TabIndex = 2;
@@ -62,7 +62,7 @@
             // 
             // status
             // 
-            this.status.Location = new System.Drawing.Point(0, 321);
+            this.status.Location = new System.Drawing.Point(0, 341);
             this.status.Name = "status";
             this.status.Size = new System.Drawing.Size(312, 22);
             this.status.SizingGrip = false;
@@ -88,7 +88,7 @@
             // lbLimits
             // 
             this.lbLimits.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbLimits.Location = new System.Drawing.Point(15, 172);
+            this.lbLimits.Location = new System.Drawing.Point(15, 193);
             this.lbLimits.Name = "lbLimits";
             this.lbLimits.Size = new System.Drawing.Size(285, 55);
             this.lbLimits.TabIndex = 8;
@@ -100,9 +100,9 @@
             // 
             this.lbBlacklist.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbBlacklist.Location = new System.Drawing.Point(12, 46);
+            this.lbBlacklist.Location = new System.Drawing.Point(12, 45);
             this.lbBlacklist.Name = "lbBlacklist";
-            this.lbBlacklist.Size = new System.Drawing.Size(288, 122);
+            this.lbBlacklist.Size = new System.Drawing.Size(288, 145);
             this.lbBlacklist.TabIndex = 7;
             this.lbBlacklist.Text = "Waiting for first page to be parsed...";
             this.lbBlacklist.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -111,7 +111,7 @@
             // 
             this.lbBytes.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbBytes.Location = new System.Drawing.Point(12, 246);
+            this.lbBytes.Location = new System.Drawing.Point(12, 266);
             this.lbBytes.Name = "lbBytes";
             this.lbBytes.Size = new System.Drawing.Size(288, 20);
             this.lbBytes.TabIndex = 12;
@@ -122,7 +122,7 @@
             // 
             this.lbRemoved.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.lbRemoved.AutoSize = true;
-            this.lbRemoved.Location = new System.Drawing.Point(86, 295);
+            this.lbRemoved.Location = new System.Drawing.Point(86, 315);
             this.lbRemoved.Name = "lbRemoved";
             this.lbRemoved.Size = new System.Drawing.Size(141, 13);
             this.lbRemoved.TabIndex = 11;
@@ -133,7 +133,7 @@
             // 
             this.lbPercentage.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.lbPercentage.BackColor = System.Drawing.Color.Transparent;
-            this.lbPercentage.Location = new System.Drawing.Point(136, 272);
+            this.lbPercentage.Location = new System.Drawing.Point(136, 292);
             this.lbPercentage.Name = "lbPercentage";
             this.lbPercentage.Size = new System.Drawing.Size(41, 14);
             this.lbPercentage.TabIndex = 4;
@@ -145,7 +145,7 @@
             this.pbTotalStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pbTotalStatus.ContainerControl = this;
-            this.pbTotalStatus.Location = new System.Drawing.Point(12, 293);
+            this.pbTotalStatus.Location = new System.Drawing.Point(12, 313);
             this.pbTotalStatus.Name = "pbTotalStatus";
             this.pbTotalStatus.ShowInTaskbar = true;
             this.pbTotalStatus.Size = new System.Drawing.Size(288, 18);
@@ -156,7 +156,7 @@
             this.pbDownloadStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pbDownloadStatus.ContainerControl = this;
-            this.pbDownloadStatus.Location = new System.Drawing.Point(12, 270);
+            this.pbDownloadStatus.Location = new System.Drawing.Point(12, 290);
             this.pbDownloadStatus.Name = "pbDownloadStatus";
             this.pbDownloadStatus.Size = new System.Drawing.Size(288, 18);
             this.pbDownloadStatus.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
@@ -167,7 +167,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(312, 343);
+            this.ClientSize = new System.Drawing.Size(312, 363);
             this.Controls.Add(this.lbBytes);
             this.Controls.Add(this.lbRemoved);
             this.Controls.Add(this.pbTotalStatus);
@@ -182,9 +182,9 @@
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = global::aphrodite.Properties.Resources.Brad;
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(330, 380);
+            this.MaximumSize = new System.Drawing.Size(330, 400);
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(330, 380);
+            this.MinimumSize = new System.Drawing.Size(330, 400);
             this.Name = "frmTagDownloader";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Downloading tags ";

@@ -13,7 +13,7 @@ namespace aphrodite {
             pbIcon.Cursor = NativeMethods.SystemHandCursor;
             llbCheckForUpdates.Cursor = NativeMethods.SystemHandCursor;
             lnkLicense.Cursor = NativeMethods.SystemHandCursor;
-            lbBody.Text += "\r\n\r\n(last debug date " + Properties.Settings.Default.debugDate + ")";
+            lbBody.Text += "\r\n\r\n(last debug date " + Properties.Settings.Default.DebugDate + ")";
             if (Program.IsDebug) {
                 this.Text = "About aphrodite (debug)";
             }
@@ -23,7 +23,7 @@ namespace aphrodite {
                 }
                 else {
 
-                    lbVersion.Text = "v" + Properties.Settings.Default.currentVersion;
+                    lbVersion.Text = "v" + Properties.Settings.Default.CurrentVersion;
                 }
             }
         }
@@ -35,16 +35,7 @@ namespace aphrodite {
 
             try {
                 UpdateCheckThread = new Thread(() => {
-                    decimal cV = Updater.getCloudVersion();
-
-                    if (Updater.isUpdateAvailable(cV)) {
-                        if (MessageBox.Show("An update is available. \nNew verison: " + cV.ToString() + " | Your version: " + Properties.Settings.Default.currentVersion.ToString() + "\n\nWould you like to update?", "aphrodite", MessageBoxButtons.YesNo) == System.Windows.Forms.DialogResult.Yes) {
-                            Process.Start(Updater.githubURL + "/releases/latest");
-                        }
-                    }
-                    else {
-                        MessageBox.Show("No update is available at this time.");
-                    }
+                    Updater.CheckForUpdate(true);
                 });
 
                 UpdateCheckThread.Start();

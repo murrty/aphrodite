@@ -53,6 +53,7 @@ namespace aphrodite {
             DownloadThread.Start();
         }
         private void AfterDownload() {
+            Program.Log(LogAction.WriteToLog, "Image download for \"" + DownloadInfo.PostId + "\" finished.");
             tmrTitle.Stop();
             pbDownloadStatus.Style = ProgressBarStyle.Blocks;
             if (DownloadInfo.OpenAfter && CurrentStatus == DownloadStatus.Finished) {
@@ -146,105 +147,107 @@ namespace aphrodite {
         }
         public async void DownloadImage() {
             try {
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.Invoke((Action) delegate {
                     lbInfo.Text = "Downloading image id " + DownloadInfo.PostId;
                     status.Text = "Waiting for JSON parse...";
-                }));
+                });
 
                 ImageInfo Image = new ImageInfo(DownloadInfo);
                 CurrentStatus = Image.Status;
 
                 if (Image.Status == DownloadStatus.ReadyToDownload) {
-                    this.BeginInvoke(new MethodInvoker(() => {
+                    this.Invoke((Action) delegate {
                         status.Text = "Downloading image...";
                         pbDownloadStatus.Value = 0;
                         pbDownloadStatus.Style = ProgressBarStyle.Blocks;
                         pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Normal;
-                    }));
+                    });
 
                 // Download file.
-                    using (Controls.ExtendedWebClient wc = new Controls.ExtendedWebClient()) {
-                        wc.DownloadProgressChanged += (s, e) => {
-                            this.BeginInvoke(new MethodInvoker(() => {
+                    using (DownloadClient = new Controls.ExtendedWebClient()) {
+                        DownloadClient.DownloadProgressChanged += (s, e) => {
+                            this.Invoke((Action) delegate {
                                 pbDownloadStatus.Value = e.ProgressPercentage;
                                 pbDownloadStatus.Value++;
                                 pbDownloadStatus.Value--;
                                 lbPercentage.Text = e.ProgressPercentage.ToString() + "%";
-                            }));
+                            });
                         };
-                        wc.DownloadFileCompleted += (s, e) => {
-                            this.BeginInvoke(new MethodInvoker(() => {
+                        DownloadClient.DownloadFileCompleted += (s, e) => {
+                            this.Invoke((Action) delegate {
                                 pbDownloadStatus.Value = 100;
                                 lbPercentage.Text = "Done";
-                            }));
+                            });
                         };
 
-                        wc.Proxy = WebRequest.GetSystemWebProxy();
-                        wc.Headers.Add("User-Agent: " + Program.UserAgent);
-                        wc.Method = "GET";
+                        DownloadClient.Proxy = WebRequest.GetSystemWebProxy();
+                        DownloadClient.Headers.Add("User-Agent: " + Program.UserAgent);
+                        DownloadClient.Method = "GET";
 
-                        await wc.DownloadFileTaskAsync(Image.FileUrl, Image.DownloadPath);
+                        await DownloadClient.DownloadFileTaskAsync(Image.FileUrl, Image.DownloadPath);
                     }
                 }
 
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.Invoke((Action) delegate {
                     Program.Log(LogAction.WriteToLog, "The image " + DownloadInfo.PostId + " was downloaded. (frmImageDownloader.cs)");
-                }));
+                });
                 CurrentStatus = DownloadStatus.Finished;
             }
             catch (PoolOrPostWasDeletedException) {
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.Invoke((Action) delegate {
                     Program.Log(LogAction.WriteToLog, "The image " + DownloadInfo.PostId + " was deleted. (frmImageDownloader.cs)");
-                }));
+                });
                 CurrentStatus = DownloadStatus.PostOrPoolWasDeleted;
             }
             catch (ApiReturnedNullOrEmptyException) {
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.Invoke((Action) delegate {
                     Program.Log(LogAction.WriteToLog, "The image " + DownloadInfo.PostId + " API Returned null or empty. (frmImageDownloader.cs)");
-                }));
+                });
                 CurrentStatus = DownloadStatus.ApiReturnedNullOrEmpty;
             }
             catch (NoFilesToDownloadException) {
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.Invoke((Action) delegate {
                     Program.Log(LogAction.WriteToLog, "No files are available for image " + DownloadInfo.PostId + ". (frmImageDownloader.cs)");
-                }));
+                });
                 CurrentStatus = DownloadStatus.NothingToDownload;
             }
             catch (ImageWasNullAfterBypassingException) {
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.Invoke((Action) delegate {
                     Program.Log(LogAction.WriteToLog, "The image " + DownloadInfo.PostId + " was still null after trying to bypass e621's hard filter. (frmImageDownloader.cs)");
-                }));
+                });
                 CurrentStatus = DownloadStatus.FileWasNullAfterBypassingBlacklist;
             }
             catch (ThreadAbortException) {
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.Invoke((Action) delegate {
                     Program.Log(LogAction.WriteToLog, "The download thread was aborted. (frmImageDownloader.cs)");
-                }));
-                if (DownloadClient.IsBusy) {
+                });
+                if (DownloadClient != null && DownloadClient.IsBusy) {
                     DownloadClient.CancelAsync();
                 }
                 CurrentStatus = DownloadStatus.Aborted;
             }
             catch (ObjectDisposedException) {
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.Invoke((Action) delegate {
                     Program.Log(LogAction.WriteToLog, "Seems like the form got disposed. (frmImageDownloader.cs)");
-                }));
+                });
                 CurrentStatus = DownloadStatus.FormWasDisposed;
             }
             catch (WebException WebE) {
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.Invoke((Action) delegate {
+                    Program.Log(LogAction.WriteToLog, "A WebException occured. (frmImageDownloader.cs");
                     status.Text = "A WebException has occured";
                     pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
-                }));
+                });
                 ErrorLog.ReportWebException(WebE, DownloadInfo.ImageUrl, "frmImageDownloader.cs");
                 CurrentStatus = DownloadStatus.Errored;
             }
             catch (Exception ex) {
-                this.BeginInvoke(new MethodInvoker(() => {
+                this.Invoke((Action) delegate {
+                    Program.Log(LogAction.WriteToLog, "An Exception occured. (frmImageDownloader.cs");
                     status.Text = "An Exception has occured";
                     pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
-                }));
-                if (DownloadClient.IsBusy) {
+                });
+                if (DownloadClient != null && DownloadClient.IsBusy) {
                     DownloadClient.CancelAsync();
                 }
                 ErrorLog.ReportException(ex, "frmImageDownloader.cs");
@@ -252,9 +255,9 @@ namespace aphrodite {
             }
             finally {
                 if (CurrentStatus != DownloadStatus.FormWasDisposed) {
-                    this.BeginInvoke(new MethodInvoker(() => {
+                    this.Invoke((Action) delegate {
                         AfterDownload();
-                    }));
+                    });
                 }
             }
         }
@@ -750,7 +753,7 @@ namespace aphrodite {
                 return false;
             }
             catch (ThreadAbortException) {
-                if (DownloadClient.IsBusy) {
+                if (DownloadClient != null && DownloadClient.IsBusy) {
                     DownloadClient.CancelAsync();
                 }
                 return false;
@@ -765,7 +768,7 @@ namespace aphrodite {
             }
             catch (Exception ex) {
                 System.Media.SystemSounds.Hand.Play();
-                if (DownloadClient.IsBusy) {
+                if (DownloadClient != null && DownloadClient.IsBusy) {
                     DownloadClient.CancelAsync();
                 }
                 ErrorLog.ReportException(ex, "ImageDownloader.cs");

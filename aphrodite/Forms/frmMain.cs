@@ -44,7 +44,7 @@ namespace aphrodite {
             }
 
             if (Program.IsDebug) {
-                this.Text += " (debug " + Properties.Settings.Default.debugDate + ")";
+                this.Text += " (debug " + Properties.Settings.Default.DebugDate + ")";
             }
 
             txtTags.ButtonCursor = NativeMethods.SystemHandCursor;

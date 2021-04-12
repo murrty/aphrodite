@@ -155,7 +155,7 @@ namespace aphrodite {
         private void btnRedownload_Click(object sender, EventArgs e) {
             if (tcMain.SelectedIndex == 0) {
                 // tags
-                Downloader.Arguments.DownloadTags(getTags(Config.Settings.General.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem)));
+                Downloader.Arguments.DownloadTags(getTags(Config.Settings.General.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem)), false);
             }
             else if (tcMain.SelectedIndex == 1) {
                 // pools
@@ -164,19 +164,19 @@ namespace aphrodite {
                     return;
                 }
 
-                Downloader.Arguments.DownloadPool(poolid.ToString());
+                Downloader.Arguments.DownloadPool(poolid.ToString(), false);
             }
         }
         private void lbTags_MouseDoubleClick(object sender, MouseEventArgs e) {
             if (lbTags.IndexFromPoint(e.Location) != System.Windows.Forms.ListBox.NoMatches) {
-                Downloader.Arguments.DownloadTags(getTags(Config.Settings.General.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem)));
+                Downloader.Arguments.DownloadTags(getTags(Config.Settings.General.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem)), false);
             }
         }
         private void lbTags_SelectedIndexChanged(object sender, EventArgs e) {
             if (lbTags.SelectedIndex == -1) {
                 return;
             }
-            lbDownloadedOn.Text = "Selected tag: " + lbTags.GetItemText(lbTags.SelectedItem) + "\nDownloaded on: " + getTagDownloadOn(Config.Settings.General.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem));
+            lbDownloadedOn.Text = "Selected tag: " + lbTags.GetItemText(lbTags.SelectedItem) + "\r\nDownloaded on: " + getTagDownloadOn(Config.Settings.General.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem));
         }
         private void lbPools_MouseDoubleClick(object sender, MouseEventArgs e) {
             if (lbTags.IndexFromPoint(e.Location) != System.Windows.Forms.ListBox.NoMatches) {
@@ -185,14 +185,14 @@ namespace aphrodite {
                     return;
                 }
 
-                Downloader.Arguments.DownloadPool(poolid.ToString());
+                Downloader.Arguments.DownloadPool(poolid.ToString(), false);
             }
         }
         private void lbPools_SelectedIndexChanged(object sender, EventArgs e) {
             if (lbPools.SelectedIndex == -1) {
                 return;
             }
-            lbDownloadedOn.Text = "Selected pool: " + lbPools.GetItemText(lbPools.SelectedItem) + "\nDownloaded on: " + getPoolDownloadOn(Config.Settings.General.saveLocation + "\\Pools\\" + lbPools.GetItemText(lbPools.SelectedItem));
+            lbDownloadedOn.Text = "Selected pool: " + lbPools.GetItemText(lbPools.SelectedItem) + "\r\nDownloaded on: " + getPoolDownloadOn(Config.Settings.General.saveLocation + "\\Pools\\" + lbPools.GetItemText(lbPools.SelectedItem));
         }
 
         private void btnRenumerate_Click(object sender, EventArgs e) {

@@ -50,8 +50,8 @@
             this.chkPoolMergeBlacklisted = new System.Windows.Forms.CheckBox();
             this.chkPoolMergeGraylisted = new System.Windows.Forms.CheckBox();
             this.chkPoolOpenAfter = new System.Windows.Forms.CheckBox();
-            this.btnDownloadPool = new aphrodite.Controls.ExtendedButton();
             this.txtPoolId = new aphrodite.Controls.ExtendedTextBox();
+            this.btnDownloadPool = new aphrodite.Controls.ExtendedButton();
             this.tabImages = new System.Windows.Forms.TabPage();
             this.chkImageSeparateBlacklisted = new System.Windows.Forms.CheckBox();
             this.chkImageOpenAfter = new System.Windows.Forms.CheckBox();
@@ -60,8 +60,8 @@
             this.chkImageUseForm = new System.Windows.Forms.CheckBox();
             this.chkImageSeparateGraylisted = new System.Windows.Forms.CheckBox();
             this.chkImageSeparateRatings = new System.Windows.Forms.CheckBox();
-            this.btnDownloadImage = new aphrodite.Controls.ExtendedButton();
             this.txtImageUrl = new aphrodite.Controls.ExtendedTextBox();
+            this.btnDownloadImage = new aphrodite.Controls.ExtendedButton();
             this.tabPortable = new System.Windows.Forms.TabPage();
             this.lbPortable = new System.Windows.Forms.Label();
             this.toolMenu = new System.Windows.Forms.MainMenu(this.components);
@@ -282,11 +282,11 @@
             this.txtTags.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
             this.txtTags.ButtonCursor = System.Windows.Forms.Cursors.Default;
             this.txtTags.ButtonEnabled = true;
-            this.txtTags.ButtonFont = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtTags.ButtonFont = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtTags.ButtonImageIndex = -1;
             this.txtTags.ButtonImageKey = "";
             this.txtTags.ButtonSize = new System.Drawing.Size(22, 19);
-            this.txtTags.ButtonText = "";
+            this.txtTags.ButtonText = "X";
             this.txtTags.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.txtTags.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtTags.Location = new System.Drawing.Point(37, 9);
@@ -388,8 +388,8 @@
             this.tabPools.Controls.Add(this.chkPoolMergeBlacklisted);
             this.tabPools.Controls.Add(this.chkPoolMergeGraylisted);
             this.tabPools.Controls.Add(this.chkPoolOpenAfter);
-            this.tabPools.Controls.Add(this.btnDownloadPool);
             this.tabPools.Controls.Add(this.txtPoolId);
+            this.tabPools.Controls.Add(this.btnDownloadPool);
             this.tabPools.Location = new System.Drawing.Point(4, 22);
             this.tabPools.Name = "tabPools";
             this.tabPools.Padding = new System.Windows.Forms.Padding(3);
@@ -446,29 +446,18 @@
             this.TouchingTips.SetToolTip(this.chkPoolOpenAfter, "Opens the folder after download is finished");
             this.chkPoolOpenAfter.UseVisualStyleBackColor = true;
             // 
-            // btnDownloadPool
-            // 
-            this.btnDownloadPool.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.btnDownloadPool.Location = new System.Drawing.Point(112, 156);
-            this.btnDownloadPool.Name = "btnDownloadPool";
-            this.btnDownloadPool.Size = new System.Drawing.Size(80, 23);
-            this.btnDownloadPool.TabIndex = 4;
-            this.btnDownloadPool.Text = "Download";
-            this.btnDownloadPool.UseVisualStyleBackColor = true;
-            this.btnDownloadPool.Click += new System.EventHandler(this.btnDownloadPool_Click);
-            // 
             // txtPoolId
             // 
             this.txtPoolId.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.txtPoolId.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
             this.txtPoolId.ButtonCursor = System.Windows.Forms.Cursors.Default;
             this.txtPoolId.ButtonEnabled = true;
-            this.txtPoolId.ButtonFont = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtPoolId.ButtonFont = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtPoolId.ButtonImageAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.txtPoolId.ButtonImageIndex = -1;
             this.txtPoolId.ButtonImageKey = "";
             this.txtPoolId.ButtonSize = new System.Drawing.Size(22, 19);
-            this.txtPoolId.ButtonText = "";
+            this.txtPoolId.ButtonText = "X";
             this.txtPoolId.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.txtPoolId.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtPoolId.Location = new System.Drawing.Point(102, 26);
@@ -481,6 +470,17 @@
             this.txtPoolId.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtPoolId_KeyDown);
             this.txtPoolId.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtPoolId_KeyPress);
             // 
+            // btnDownloadPool
+            // 
+            this.btnDownloadPool.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.btnDownloadPool.Location = new System.Drawing.Point(112, 156);
+            this.btnDownloadPool.Name = "btnDownloadPool";
+            this.btnDownloadPool.Size = new System.Drawing.Size(80, 23);
+            this.btnDownloadPool.TabIndex = 4;
+            this.btnDownloadPool.Text = "Download";
+            this.btnDownloadPool.UseVisualStyleBackColor = true;
+            this.btnDownloadPool.Click += new System.EventHandler(this.btnDownloadPool_Click);
+            // 
             // tabImages
             // 
             this.tabImages.Controls.Add(this.chkImageSeparateBlacklisted);
@@ -490,8 +490,8 @@
             this.tabImages.Controls.Add(this.chkImageUseForm);
             this.tabImages.Controls.Add(this.chkImageSeparateGraylisted);
             this.tabImages.Controls.Add(this.chkImageSeparateRatings);
-            this.tabImages.Controls.Add(this.btnDownloadImage);
             this.tabImages.Controls.Add(this.txtImageUrl);
+            this.tabImages.Controls.Add(this.btnDownloadImage);
             this.tabImages.Location = new System.Drawing.Point(4, 22);
             this.tabImages.Name = "tabImages";
             this.tabImages.Padding = new System.Windows.Forms.Padding(3);
@@ -587,28 +587,17 @@
             this.chkImageSeparateRatings.Text = "Separate ratings";
             this.chkImageSeparateRatings.UseVisualStyleBackColor = true;
             // 
-            // btnDownloadImage
-            // 
-            this.btnDownloadImage.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.btnDownloadImage.Location = new System.Drawing.Point(112, 168);
-            this.btnDownloadImage.Name = "btnDownloadImage";
-            this.btnDownloadImage.Size = new System.Drawing.Size(81, 23);
-            this.btnDownloadImage.TabIndex = 7;
-            this.btnDownloadImage.Text = "Download";
-            this.btnDownloadImage.UseVisualStyleBackColor = true;
-            this.btnDownloadImage.Click += new System.EventHandler(this.btnDownloadImage_Click);
-            // 
             // txtImageUrl
             // 
             this.txtImageUrl.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.txtImageUrl.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
             this.txtImageUrl.ButtonCursor = System.Windows.Forms.Cursors.Default;
             this.txtImageUrl.ButtonEnabled = true;
-            this.txtImageUrl.ButtonFont = new System.Drawing.Font("Segoe Marker", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtImageUrl.ButtonFont = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtImageUrl.ButtonImageIndex = -1;
             this.txtImageUrl.ButtonImageKey = "";
             this.txtImageUrl.ButtonSize = new System.Drawing.Size(22, 19);
-            this.txtImageUrl.ButtonText = "";
+            this.txtImageUrl.ButtonText = "X";
             this.txtImageUrl.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.txtImageUrl.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtImageUrl.Location = new System.Drawing.Point(57, 19);
@@ -620,6 +609,17 @@
             this.TouchingTips.SetToolTip(this.txtImageUrl, "The image that will be downloaded");
             this.txtImageUrl.ButtonClick += new System.EventHandler(this.txtImageUrl_ButtonClick);
             this.txtImageUrl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtImageUrl_KeyDown);
+            // 
+            // btnDownloadImage
+            // 
+            this.btnDownloadImage.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.btnDownloadImage.Location = new System.Drawing.Point(112, 168);
+            this.btnDownloadImage.Name = "btnDownloadImage";
+            this.btnDownloadImage.Size = new System.Drawing.Size(81, 23);
+            this.btnDownloadImage.TabIndex = 7;
+            this.btnDownloadImage.Text = "Download";
+            this.btnDownloadImage.UseVisualStyleBackColor = true;
+            this.btnDownloadImage.Click += new System.EventHandler(this.btnDownloadImage_Click);
             // 
             // tabPortable
             // 

@@ -24,11 +24,11 @@ namespace aphrodite.Controls {
     class ExtendedTextBox : TextBox {
 
         private Button btn = new Button() {
+            Cursor = Cursors.Default,
             Enabled = false,
             TextAlign = ContentAlignment.MiddleCenter,
             UseVisualStyleBackColor = true,
             Visible = false,
-            Cursor = Cursors.Default,
         };
 
         public ExtendedTextBox() {
@@ -252,7 +252,7 @@ namespace aphrodite.Controls {
             set { btn.Size = value; }
         }
 
-        [Category("Appearance"), Description("The Text that appears on the Button."), DefaultValue("X")]
+        [Category("Appearance"), Description("The Text that appears on the Button.")]
         public string ButtonText {
             get { return btn.Text; }
             set { btn.Text = value; }

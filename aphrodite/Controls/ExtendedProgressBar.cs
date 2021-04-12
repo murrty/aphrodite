@@ -92,6 +92,11 @@ namespace aphrodite.Controls {
                 return base.Value;
             }
             set {
+                //switch (base.Value > 0) {
+                //    case true:
+                //        base.Value--;
+                //        break;
+                //}
                 base.Value = value;
 
                 // send signal to the taskbar.
@@ -134,7 +139,7 @@ namespace aphrodite.Controls {
                     Style = ProgressBarStyle.Blocks;
 
                 // set the progress bar state (Normal, Error, Paused)
-                TaskbarProgress.SendMessage(Handle, 0x410, (int)value, IntPtr.Zero);
+                NativeMethods.SendMessage(Handle, 0x410, (IntPtr)value, IntPtr.Zero);
 
 
                 if (wasMarquee)
@@ -215,6 +220,7 @@ namespace aphrodite.Controls {
     }
 
     public static class TaskbarProgress {
+        private static object ListLock = new object();
         /// <summary>
         /// The primary coordinator of the Windows 7 taskbar-related activities.
         /// </summary>
@@ -222,7 +228,8 @@ namespace aphrodite.Controls {
         internal static ITaskbarList3 TaskbarList {
             get {
                 if (_taskbarList == null) {
-                    lock (typeof(TaskbarProgress)) {
+                    //lock (typeof(TaskbarProgress)) {
+                    lock (ListLock) {
                         if (_taskbarList == null) {
                             _taskbarList = (ITaskbarList3)new CTaskbarList();
                             _taskbarList.HrInit();
@@ -264,8 +271,6 @@ namespace aphrodite.Controls {
                 TaskbarList.SetProgressValue(hwnd, current, maximum);
         }
 
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        internal static extern int SendMessage(IntPtr hWnd, int wMsg, int wParam, IntPtr lParam);
     }
 
     /// <summary>
