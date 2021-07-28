@@ -1248,9 +1248,6 @@ namespace aphrodite {
                                     if (File.Exists(NewPath)) {
                                         TotalThatExist++;
                                         if (PostIsBlacklisted) {
-                                            this.Invoke((Action)delegate() {
-                                                Program.Log(LogAction.WriteToLog, "blacklisted exists " + NewPath);
-                                            });
                                             BlacklistSafeExistCount++;
                                             BlacklistTotalExistCount++;
                                         }
@@ -1266,9 +1263,6 @@ namespace aphrodite {
                                     }
                                     else {
                                         if (PostIsBlacklisted) {
-                                            this.Invoke((Action)delegate() {
-                                                Program.Log(LogAction.WriteToLog, "blacklisted does not exist " + NewPath);
-                                            });
                                             if (DownloadInfo.SeparateNonImages) {
                                                 switch (xmlExt[CurrentPost].InnerText.ToLower()) {
                                                     case "gif":
@@ -1887,7 +1881,6 @@ namespace aphrodite {
                                 for (int CurrentFile = 0; CurrentFile < BlacklistedSafeURLs.Count; CurrentFile++) {
                                     if (!string.IsNullOrEmpty(BlacklistedSafeURLs[CurrentFile])) {
                                         this.Invoke((Action)delegate {
-                                            Program.Log(LogAction.WriteToLog, BlacklistedSafeFilePaths[CurrentFile]);
                                             lbFile.Text = "Downloading blacklisted (s) file " + (CurrentFile + 1) + " of " + (BlacklistSafeCount);
                                             status.Text = "Downloading " + BlacklistedSafeFileNames[CurrentFile];
                                         });
