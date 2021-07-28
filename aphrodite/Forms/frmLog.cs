@@ -16,15 +16,18 @@ namespace aphrodite {
 
         public frmLog() {
             InitializeComponent();
+        }
+        private void frmLog_Load(object sender, EventArgs e) {
+            if (Config.Settings.FormSettings.frmLog_Location.X == -32000 || Config.Settings.FormSettings.frmLog_Location.Y == -32000) {
+                this.StartPosition = FormStartPosition.CenterScreen;
+            }
+            else {
+                this.Location = Config.Settings.FormSettings.frmLog_Location;
+            }
 
-            //if (Config.Default.LogFormLocation.X == -32000 || Config.Default.LogFormLocation.Y == -32000) {
-            //    this.StartPosition = FormStartPosition.CenterScreen;
-            //}
-            //else {
-            //    this.Location = Config.Default.LogFormLocation;
-            //}
-
-            //this.Size = Config.Default.LogFormSize;
+            if (Config.Settings.FormSettings.frmLog_Size.Width != -32000 && Config.Settings.FormSettings.frmLog_Size.Height != -32000) {
+                this.Size = Config.Settings.FormSettings.frmLog_Size;
+            }
         }
 
         [System.Diagnostics.DebuggerStepThrough]
@@ -67,5 +70,6 @@ namespace aphrodite {
             this.Hide();
             IsShown = false;
         }
+
     }
 }

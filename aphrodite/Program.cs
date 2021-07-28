@@ -7,8 +7,8 @@ using System.Windows.Forms;
 
 namespace aphrodite {
     static class Program {
-        public static readonly string UserAgent = "aphrodite/" + (Properties.Settings.Default.currentVersion) + " (Contact: https://github.com/murrty/aphrodite ... open an issue)";
-        public static readonly string ApplicationPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        public static readonly string UserAgent = "aphrodite/" + (Properties.Settings.Default.CurrentVersion) + " (Contact: https://github.com/murrty/aphrodite ... open an issue)";
+        public static volatile string ApplicationPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         public static volatile bool IsDebug = false;
         public static volatile bool IsAdmin = false;
         public static volatile IniFile Ini = new IniFile(ApplicationPath + "\\aphrodite.ini");
@@ -33,12 +33,16 @@ namespace aphrodite {
             else {
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
-                if (File.Exists(ApplicationPath + "\\aphrodite.ini")) {
-                    if (Ini.KeyExists("useIni")) {
-                        if (Ini.ReadBool("useIni")) {
-                            UseIni = true;
-                        }
-                    }
+                if (Environment.CurrentDirectory != ApplicationPath) {
+                    Log(LogAction.WriteToLog, "Environment.CurrentDirectory is set to \"" + Environment.CurrentDirectory + "\", when it should be \"" + ApplicationPath + "\".");
+                    Environment.CurrentDirectory = ApplicationPath;
+                    Log(LogAction.WriteToLog, "Set the Environment.CurrentDirectory to the correct one.");
+                }
+
+                switch (File.Exists(ApplicationPath + "\\aphrodite.ini") && Ini.KeyExists("useIni") && Ini.ReadBool("useIni")) {
+                    case true:
+                        UseIni = true;
+                        break;
                 }
 
                 Log(LogAction.EnableLog);
@@ -71,7 +75,9 @@ namespace aphrodite {
                     Log(LogAction.WriteToLog, "No arguments were passed that didn't require the main form");
                     Config.Settings.Load(ConfigType.All);
                     Application.Run(new frmMain(PushedArgument, PushedType));
+                    Log(LogAction.DisableLog);
                 }
+                Config.Settings.FormSettings.Save();
             }
         }
 
@@ -180,6 +186,7 @@ namespace aphrodite {
                                             CurrentArg = ArgumentDialog.AppendedArgument;
                                             Config.Settings.Load(ConfigType.General);
                                             Config.Settings.Load(ConfigType.Tags);
+                                            Config.Settings.Load(ConfigType.FormSettings);
 
                                             if (IsPage) {
                                                 Downloader.Arguments.DownloadPage(CurrentArg);
@@ -204,6 +211,7 @@ namespace aphrodite {
 
                             Config.Settings.Load(ConfigType.General);
                             Config.Settings.Load(ConfigType.Tags);
+                            Config.Settings.Load(ConfigType.FormSettings);
 
                             if (IsPage) {
                                 Downloader.Arguments.DownloadPage(CurrentArg);
@@ -246,6 +254,7 @@ namespace aphrodite {
                                             CurrentArg = ArgumentDialog.AppendedArgument;
                                             Config.Settings.Load(ConfigType.General);
                                             Config.Settings.Load(ConfigType.Pools);
+                                            Config.Settings.Load(ConfigType.FormSettings);
                                             Downloader.Arguments.DownloadPool(CurrentArg);
                                             return true;
 
@@ -296,6 +305,7 @@ namespace aphrodite {
                                             CurrentArg = ArgumentDialog.AppendedArgument;
                                             Config.Settings.Load(ConfigType.General);
                                             Config.Settings.Load(ConfigType.Images);
+                                            Config.Settings.Load(ConfigType.FormSettings);
                                             Downloader.Arguments.DownloadImage(CurrentArg);
                                             return true;
 
@@ -314,6 +324,7 @@ namespace aphrodite {
 
                             Config.Settings.Load(ConfigType.General);
                             Config.Settings.Load(ConfigType.Images);
+                            Config.Settings.Load(ConfigType.FormSettings);
                             Downloader.Arguments.DownloadImage(CurrentArg);
                             return true;
                         }
@@ -330,6 +341,7 @@ namespace aphrodite {
                 #region "poolwl:*"
                 else if (CurrentArg.StartsWith("poolwl:")) {
                     Config.Settings.Load(ConfigType.Pools);
+                    Config.Settings.Load(ConfigType.FormSettings);
                     if (CurrentArg == "poolwl:showwl") {
                         frmPoolWishlist WishList = new frmPoolWishlist();
                         WishList.ShowDialog();
@@ -375,8 +387,13 @@ namespace aphrodite {
                 #region "-blacklist"
                 else if (CurrentArg.ToLower().StartsWith("-blacklist")) {
                     Config.Settings.Load(ConfigType.General);
-                    frmBlacklist bList = new frmBlacklist();
-                    bList.ShowDialog();
+                    Config.Settings.Load(ConfigType.FormSettings);
+                    using (frmBlacklist Blacklist = new frmBlacklist()) {
+                        Blacklist.ShowDialog();
+                        if (Config.Settings.FormSettings.frmBlacklist_Location != Blacklist.Location) {
+                            Config.Settings.FormSettings.frmBlacklist_Location = Blacklist.Location;
+                        }
+                    }
                     return true;
                 }
                 #endregion
@@ -413,19 +430,17 @@ namespace aphrodite {
                     if (LogEnabled) {
                         System.Diagnostics.Debug.Print("Disabling log");
 
-                        if (Logger.WindowState == FormWindowState.Minimized) {
+                        if (Logger.WindowState == FormWindowState.Minimized || Logger.WindowState == FormWindowState.Maximized) {
                             Logger.Opacity = 0;
                             Logger.WindowState = FormWindowState.Normal;
                         }
-                        //if (Config.Default.LogFormLocation != Logger.Location) {
-                        //    Config.Default.LogFormLocation = Logger.Location;
-                        //    Properties.Settings.Default.ConfigChanged = true;
-                        //}
 
-                        //if (Config.Default.LogFormSize != Logger.Size) {
-                        //    Config.Default.LogFormSize = Logger.Size;
-                        //    Properties.Settings.Default.ConfigChanged = true;
-                        //}
+                        if (Logger.Location != Config.Settings.FormSettings.frmLog_Location) {
+                            Config.Settings.FormSettings.frmLog_Location = Logger.Location;
+                        }
+                        if (Logger.Size != Config.Settings.FormSettings.frmLog_Size) {
+                            Config.Settings.FormSettings.frmLog_Size = Logger.Size;
+                        }
 
                         Logger.Dispose();
                         LogEnabled = false;

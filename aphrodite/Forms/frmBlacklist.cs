@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
@@ -16,6 +15,13 @@ namespace aphrodite {
 
             if (Program.UseIni) {
                 this.Text += " (editing portable lists)";
+            }
+
+            if (Config.Settings.FormSettings.frmBlacklist_Location.X == -32000 || Config.Settings.FormSettings.frmBlacklist_Location.Y == -32000) {
+                this.StartPosition = FormStartPosition.CenterScreen;
+            }
+            else {
+                this.Location = Config.Settings.FormSettings.frmBlacklist_Location;
             }
         }
 

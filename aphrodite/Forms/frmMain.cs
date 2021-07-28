@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
@@ -9,6 +8,9 @@ namespace aphrodite {
     public partial class frmMain : Form {
 
         #region Variables
+        frmAbout About;
+        frmPoolWishlist PoolWishlist;
+        frmRedownloader Redownloader;
         // Valid protocols:
         //                  'pools:'
         //                  'tags:'
@@ -47,9 +49,6 @@ namespace aphrodite {
                 this.Text += " (debug " + Properties.Settings.Default.DebugDate + ")";
             }
 
-            txtTags.ButtonCursor = NativeMethods.SystemHandCursor;
-            txtPoolId.ButtonCursor = NativeMethods.SystemHandCursor;
-            txtImageUrl.ButtonCursor = NativeMethods.SystemHandCursor;
             txtTags.Refresh();
             txtPoolId.Refresh();
             txtImageUrl.Refresh();
@@ -64,7 +63,7 @@ namespace aphrodite {
             chkTagsDownloadSafe.Checked = Config.Settings.Tags.Safe;
             chkTagsSeparateRatings.Checked = Config.Settings.Tags.separateRatings;
             chkTagsUseMinimumScore.Checked = Config.Settings.Tags.enableScoreMin;
-            chkTagsUseScoreAsTag.Checked = Config.Settings.Tags.scoreAsTag;
+            chkTagsMinimumScoreAsTag.Checked = Config.Settings.Tags.scoreAsTag;
             numTagsMinimumScore.Value = Convert.ToDecimal(Config.Settings.Tags.scoreMin);
             numTagsImageLimit.Value = Convert.ToDecimal(Config.Settings.Tags.imageLimit);
             numTagsPageLimit.Value = Convert.ToDecimal(Config.Settings.Tags.pageLimit);
@@ -90,7 +89,6 @@ namespace aphrodite {
             }
 
             Config.Settings.FormSettings.frmMain_Location = this.Location;
-            Config.Settings.Save(ConfigType.FormSettings);
         }
         private void tbMain_SelectedIndexChanged(object sender, EventArgs e) {
             if (tabMain.SelectedTab == tabTags) {
@@ -112,29 +110,53 @@ namespace aphrodite {
             settings.ShowDialog();
         }
         private void mBlacklist_Click(object sender, EventArgs e) {
-            frmBlacklist blackList = new frmBlacklist();
-            blackList.ShowDialog();
+            using (frmBlacklist Blacklist = new frmBlacklist()) {
+                Blacklist.ShowDialog();
+            }
         }
         private void mReverseSearch_Click(object sender, EventArgs e) {
             //Process.Start("https://saucenao.com/index.php");
             Process.Start("https://e621.net/iqdb_queries");
         }
         private void mWishlist_Click(object sender, EventArgs e) {
-            frmPoolWishlist wl = new frmPoolWishlist();
-            wl.ShowDialog();
-            wl.Dispose();
+            if (PoolWishlist == null) {
+                PoolWishlist = new frmPoolWishlist();
+                PoolWishlist.Show();
+            }
+            else {
+                if (PoolWishlist.WindowState == FormWindowState.Minimized) {
+                    PoolWishlist.WindowState = FormWindowState.Normal;
+                }
+                PoolWishlist.Activate();
+            }
         }
         private void mRedownloader_Click(object sender, EventArgs e) {
-            frmRedownloader rd = new frmRedownloader();
-            rd.Show();
+            if (Redownloader == null) {
+                Redownloader = new frmRedownloader();
+                Redownloader.Show();
+            }
+            else {
+                if (Redownloader.WindowState == FormWindowState.Minimized) {
+                    Redownloader.WindowState = FormWindowState.Normal;
+                }
+                Redownloader.Activate();
+            }
         }
         private void mLog_Click(object sender, EventArgs e) {
             Program.Log(LogAction.ShowLog);
         }
 
         private void mAbout_Click(object sender, EventArgs e) {
-            frmAbout frAbout = new frmAbout();
-            frAbout.Show();
+            if (About == null) {
+                About = new frmAbout();
+                About.Show();
+            }
+            else {
+                if (About.WindowState == FormWindowState.Minimized) {
+                    About.WindowState = FormWindowState.Normal;
+                }
+                About.Activate();
+            }
         }
         #endregion
 
@@ -197,6 +219,62 @@ namespace aphrodite {
         private void txtTags_ButtonClick(object sender, EventArgs e) {
             txtTags.Clear();
         }
+        private void rbTagsMinimumScore_CheckedChanged(object sender, System.EventArgs e) {
+            if (rbTagsMinimumScore.Checked) {
+                panelTagsMinimumScore.Visible = true;
+                panelTagsMinimumFavorites.Visible = false;
+                panelTagsLimits.Visible = false;
+                panelTagsRatings.Visible = false;
+                panelTagsOtherSettings.Visible = false;
+                lbTagsLimitsHint.Visible = false;
+            }
+        }
+        private void rbTagsMinimumFavorites_CheckedChanged(object sender, System.EventArgs e) {
+            if (rbTagsMinimumFavorites.Checked) {
+                panelTagsMinimumScore.Visible = false;
+                panelTagsMinimumFavorites.Visible = true;
+                panelTagsLimits.Visible = false;
+                panelTagsRatings.Visible = false;
+                panelTagsOtherSettings.Visible = false;
+                lbTagsLimitsHint.Visible = true;
+                lbTagsLimitsHint.Location = new Point(119, 67);
+            }
+        }
+        private void rbTagsLimits_CheckedChanged(object sender, System.EventArgs e) {
+            if (rbTagsLimits.Checked) {
+                panelTagsMinimumScore.Visible = false;
+                panelTagsMinimumFavorites.Visible = false;
+                panelTagsLimits.Visible = true;
+                panelTagsRatings.Visible = false;
+                panelTagsOtherSettings.Visible = false;
+                lbTagsLimitsHint.Visible = true;
+                lbTagsLimitsHint.Location = new Point(119, 55);
+            }
+        }
+        private void rbTagsRatings_CheckedChanged(object sender, System.EventArgs e) {
+            if (rbTagsRatings.Checked) {
+                panelTagsMinimumScore.Visible = false;
+                panelTagsMinimumFavorites.Visible = false;
+                panelTagsLimits.Visible = false;
+                panelTagsRatings.Visible = true;
+                panelTagsOtherSettings.Visible = false;
+                lbTagsLimitsHint.Visible = false;
+            }
+        }
+        private void rbTagsOtherSettings_CheckedChanged(object sender, System.EventArgs e) {
+            if (rbTagsOtherSettings.Checked) {
+                panelTagsMinimumScore.Visible = false;
+                panelTagsMinimumFavorites.Visible = false;
+                panelTagsLimits.Visible = false;
+                panelTagsRatings.Visible = false;
+                panelTagsOtherSettings.Visible = true;
+                lbTagsLimitsHint.Visible = false;
+            }
+        }
+        private void chkTagsUseMinimumScore_CheckedChanged(object sender, EventArgs e) {
+            numTagsMinimumScore.Enabled = chkTagsUseMinimumScore.Checked;
+            chkTagsMinimumScoreAsTag.Enabled = chkTagsUseMinimumScore.Checked;
+        }
 
         private void btnDownloadTags_Click(object sender, EventArgs e) {
             if (string.IsNullOrWhiteSpace(txtTags.Text)) {
@@ -223,7 +301,7 @@ namespace aphrodite {
             TagDownloadInfo NewInfo = new TagDownloadInfo(NewTags);
             NewInfo.PageLimit = (int)numTagsPageLimit.Value;
             NewInfo.UseMinimumScore = chkTagsUseMinimumScore.Checked;
-            NewInfo.MinimumScoreAsTag = chkTagsUseScoreAsTag.Checked;
+            NewInfo.MinimumScoreAsTag = chkTagsMinimumScoreAsTag.Checked;
             NewInfo.MinimumScore = (int)numTagsMinimumScore.Value;
             NewInfo.ImageLimit = (int)numTagsImageLimit.Value;
             NewInfo.SaveExplicit = chkTagsDownloadExplicit.Checked;
@@ -233,14 +311,11 @@ namespace aphrodite {
             NewInfo.SeparateNonImages = chkTagSeparateNonImages.Checked;
             NewInfo.OpenAfter = chkTagsOpenAfterDownload.Checked;
             NewInfo.DownloadNewestToOldest = chkTagsDownloadInUploadOrder.Checked;
+            NewInfo.FavoriteCount = (int)numTagsMinimumFavorites.Value;
+            NewInfo.FavoriteCountAsTag = chkTagsMinimumFavoritesAsTag.Checked;
             frmTagDownloader Downloader = new frmTagDownloader();
             Downloader.DownloadInfo = NewInfo;
             Downloader.Show();
-        }
-
-        private void chkTagsUseMinimumScore_CheckedChanged(object sender, EventArgs e) {
-            numTagsMinimumScore.Enabled = chkTagsUseMinimumScore.Checked;
-            chkTagsUseScoreAsTag.Enabled = chkTagsUseMinimumScore.Checked;
         }
         #endregion
 

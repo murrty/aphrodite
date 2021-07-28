@@ -148,6 +148,7 @@
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Undesired Tags";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmUndesiredTags_FormClosing);
             this.Load += new System.EventHandler(this.frmUndesiredTags_Load);
             this.pnLower.ResumeLayout(false);
             this.ResumeLayout(false);

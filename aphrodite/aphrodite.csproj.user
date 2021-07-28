@@ -16,4 +16,7 @@
     <FallbackCulture>en-US</FallbackCulture>
     <VerifyUploadedFiles>false</VerifyUploadedFiles>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <StartArguments>poolwl:https://e421.net/pools/23188|Magnta%27s%25%24|%25Animal%25%24|%25Crossing%25%24|%25Patreon%25%24|%25Comic</StartArguments>
+  </PropertyGroup>
 </Project>

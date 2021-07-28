@@ -30,7 +30,18 @@ namespace aphrodite {
             if (string.IsNullOrWhiteSpace(DownloadInfo.FileNameSchema)) {
                 DownloadInfo.FileNameSchema = "%artist%_%md5%";
             }
+            if (Config.Settings.FormSettings.frmImageDownloader_Location.X == -32000 || Config.Settings.FormSettings.frmImageDownloader_Location.Y == -32000) {
+                this.StartPosition = FormStartPosition.CenterScreen;
+            }
+            else {
+                this.Location = Config.Settings.FormSettings.frmImageDownloader_Location;
+            }
             StartDownload();
+        }
+        private void frmImageDownloader_FormClosing(object sender, FormClosingEventArgs e) {
+            if (Config.Settings.FormSettings.frmImageDownloader_Location != this.Location) {
+                Config.Settings.FormSettings.frmImageDownloader_Location = this.Location;
+            }
         }
 
         private void tmrTitle_Tick(object sender, EventArgs e) {
@@ -285,7 +296,7 @@ namespace aphrodite {
                 DownloadPath = DownloadInfo.DownloadPath;
 
             // Begin to get the XML
-                string postXML = apiTools.GetJsonToXml(url);
+                string postXML = apiTools.DownloadJsonToXml(url);
 
             // Check the XML.
                 if (postXML == apiTools.EmptyXML || string.IsNullOrWhiteSpace(postXML)) {
@@ -697,6 +708,10 @@ namespace aphrodite {
                 Info.FileNameSchema = "%artist%_%md5%";
             }
             DownloadInfo = Info;
+            StartDownload();
+        }
+
+        private void StartDownload() {
             switch (DownloadImage()) {
                 case true:
                     if (DownloadInfo.OpenAfter) {
@@ -707,7 +722,7 @@ namespace aphrodite {
         }
 
         #region Downloader
-        public bool DownloadImage() {
+        private bool DownloadImage() {
             try {
 
                 ImageInfo Image = new ImageInfo(DownloadInfo);
@@ -734,17 +749,14 @@ namespace aphrodite {
 
             }
             catch (PoolOrPostWasDeletedException) {
-                System.Media.SystemSounds.Hand.Play();
                 ErrorLog.ReportCustomException("The image was deleted.", "ImageDownloader.cs");
                 return false;
             }
             catch (ApiReturnedNullOrEmptyException) {
-                System.Media.SystemSounds.Hand.Play();
                 ErrorLog.ReportCustomException("The api returned null or empty.", "ImageDownloader.cs");
                 return false;
             }
             catch (NoFilesToDownloadException) {
-                System.Media.SystemSounds.Hand.Play();
                 ErrorLog.ReportCustomException("No image is available to download.", "ImageDownloader.cs");
                 return false;
             }
@@ -762,12 +774,10 @@ namespace aphrodite {
                 return false;
             }
             catch (WebException WebE) {
-                System.Media.SystemSounds.Hand.Play();
                 ErrorLog.ReportWebException(WebE, DownloadInfo.ImageUrl, "ImageDownloader.cs");
                 return false;
             }
             catch (Exception ex) {
-                System.Media.SystemSounds.Hand.Play();
                 if (DownloadClient != null && DownloadClient.IsBusy) {
                     DownloadClient.CancelAsync();
                 }

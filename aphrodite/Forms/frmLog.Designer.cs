@@ -89,6 +89,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "aphrodite log";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmLog_FormClosing);
+            this.Load += new System.EventHandler(this.frmLog_Load);
             this.panelControls.ResumeLayout(false);
             this.ResumeLayout(false);
 

@@ -5,13 +5,24 @@ using System.Windows.Forms;
 
 namespace aphrodite {
     public partial class frmUndesiredTags : Form {
+
         public frmUndesiredTags() {
             InitializeComponent();
         }
-
         private void frmUndesiredTags_Load(object sender, EventArgs e) {
             if (string.IsNullOrEmpty(Config.Settings.General.undesiredTags)) {
                 listTags.Items.AddRange(UndesiredTags.HardcodedUndesiredTags);
+            }
+            if (Config.Settings.FormSettings.frmUndesiredTags_Location.X == -32000 || Config.Settings.FormSettings.frmUndesiredTags_Location.Y == -32000) {
+                this.StartPosition = FormStartPosition.CenterScreen;
+            }
+            else {
+                this.Location = Config.Settings.FormSettings.frmUndesiredTags_Location;
+            }
+        }
+        private void frmUndesiredTags_FormClosing(object sender, FormClosingEventArgs e) {
+            if (Config.Settings.FormSettings.frmUndesiredTags_Location != this.Location) {
+                Config.Settings.FormSettings.frmUndesiredTags_Location = this.Location;
             }
         }
 
@@ -53,6 +64,7 @@ namespace aphrodite {
             txtSender.Text = Regex.Replace(txtSender.Text, " ", "_");
             txtSender.SelectionStart = curPos;
         }
+
     }
 
     class UndesiredTags {

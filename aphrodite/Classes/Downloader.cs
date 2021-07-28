@@ -2,7 +2,6 @@
 
 namespace aphrodite {
 
-
     public static class JsonDownloadInfo {
         public static readonly string postJsonBase = "https://e621.net/posts/{0}.json";
     }
@@ -39,6 +38,9 @@ namespace aphrodite {
         public string FileNameSchema;
         public bool SaveBlacklistedFiles;
         public bool DownloadNewestToOldest;
+        public bool UseMinimumFavoriteCount;
+        public bool FavoriteCountAsTag;
+        public int FavoriteCount;
 
         /// <summary>
         /// Initializes new TagDownloadInfo for downloading specified tags.
@@ -82,6 +84,8 @@ namespace aphrodite {
             FileNameSchema = apiTools.ReplaceIllegalCharacters(aphrodite.Config.Settings.Tags.fileNameSchema.ToLower());
             SaveBlacklistedFiles = Config.Settings.Tags.downloadBlacklisted;
             DownloadNewestToOldest = Config.Settings.Tags.DownloadNewestToOldest;
+            FavoriteCountAsTag = Config.Settings.Tags.FavoriteCountAsTag;
+            FavoriteCount = Config.Settings.Tags.FavoriteCount;
         }
         /// <summary>
         /// Initializes new TagDownloadInfo for downloading a page.
@@ -347,4 +351,5 @@ namespace aphrodite {
         }
         }
     }
+
 }

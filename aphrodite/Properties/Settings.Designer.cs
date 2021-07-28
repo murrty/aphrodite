@@ -25,43 +25,49 @@ namespace aphrodite.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2.2")]
-        public decimal currentVersion {
+        [global::System.Configuration.DefaultSettingValueAttribute("2.21")]
+        public decimal CurrentVersion {
             get {
-                return ((decimal)(this["currentVersion"]));
+                return ((decimal)(this["CurrentVersion"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2021-04-08")]
-        public string debugDate {
+        [global::System.Configuration.DefaultSettingValueAttribute("2021-04-11")]
+        public string DebugDate {
             get {
-                return ((string)(this["debugDate"]));
+                return ((string)(this["DebugDate"]));
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool IsBetaVersion {
             get {
                 return ((bool)(this["IsBetaVersion"]));
             }
-            set {
-                this["IsBetaVersion"] = value;
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2.3-pre1")]
+        public string BetaVersion {
+            get {
+                return ((string)(this["BetaVersion"]));
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2.3-pre-1")]
-        public string BetaVersion {
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public decimal SkippedVersion {
             get {
-                return ((string)(this["BetaVersion"]));
+                return ((decimal)(this["SkippedVersion"]));
             }
             set {
-                this["BetaVersion"] = value;
+                this["SkippedVersion"] = value;
             }
         }
     }

@@ -13,6 +13,7 @@ namespace aphrodite {
         public string CustomDescription = null;
         //Language lang = Language.GetInstance();
         public bool FromLanguage = false;
+        public bool AllowRetry = false;
 
         public frmException() {
             InitializeComponent();
@@ -81,6 +82,11 @@ namespace aphrodite {
                 outputBuffer = string.Format(outputBuffer, Properties.Settings.Default.CurrentVersion.ToString());
                 lbVersion.Text = "v" + Properties.Settings.Default.CurrentVersion.ToString();
             }
+
+            if (AllowRetry) {
+                btnExceptionRetry.Enabled = true;
+            }
+
             rtbExceptionDetails.Text += outputBuffer;
             System.Media.SystemSounds.Hand.Play();
         }
@@ -92,6 +98,13 @@ namespace aphrodite {
 
         private void btnExceptionGithub_Click(object sender, EventArgs e) {
             System.Diagnostics.Process.Start("https://github.com/murrty/aphrodite/issues");
+        }
+
+        private void btnExceptionRetry_Click(object sender, EventArgs e) {
+            if (AllowRetry) {
+                this.DialogResult = DialogResult.Retry;
+                this.Dispose();
+            }
         }
     }
 }

@@ -178,5 +178,29 @@ namespace aphrodite.Settings {
                 this["DownloadNewestToOldest"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool FavoriteCountAsTag {
+            get {
+                return ((bool)(this["FavoriteCountAsTag"]));
+            }
+            set {
+                this["FavoriteCountAsTag"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int FavoriteCount {
+            get {
+                return ((int)(this["FavoriteCount"]));
+            }
+            set {
+                this["FavoriteCount"] = value;
+            }
+        }
     }
 }

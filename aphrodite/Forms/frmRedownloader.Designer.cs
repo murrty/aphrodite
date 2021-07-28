@@ -96,7 +96,6 @@
             this.btnRedownload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnRedownload.Location = new System.Drawing.Point(152, 239);
             this.btnRedownload.Name = "btnRedownload";
-            this.btnRedownload.ShowUACShield = false;
             this.btnRedownload.Size = new System.Drawing.Size(130, 23);
             this.btnRedownload.TabIndex = 1;
             this.btnRedownload.Text = "Redownload selected";
@@ -108,7 +107,6 @@
             this.btnRenumerate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnRenumerate.Location = new System.Drawing.Point(10, 239);
             this.btnRenumerate.Name = "btnRenumerate";
-            this.btnRenumerate.ShowUACShield = false;
             this.btnRenumerate.Size = new System.Drawing.Size(80, 23);
             this.btnRenumerate.TabIndex = 2;
             this.btnRenumerate.Text = "Renumerate";
@@ -144,6 +142,7 @@
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Re-Downloader";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmRedownloader_FormClosing);
             this.Load += new System.EventHandler(this.frmTagRedownloader_Load);
             this.tcMain.ResumeLayout(false);
             this.tbTags.ResumeLayout(false);

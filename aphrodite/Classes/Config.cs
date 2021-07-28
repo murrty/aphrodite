@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Text;
 
 namespace aphrodite {
-
 
     class Config {
         public static volatile Config Settings;
@@ -114,10 +112,12 @@ namespace aphrodite {
             public bool firstTime = true;
             public bool SkipArgumentCheck = false;
             public bool AutoDownloadWithArguments = true;
+            public bool ArgumentFormTopMost = true;
 
             private bool firstTime_First = true;
             private bool SkipArgumentCheck_First = false;
             private bool AutoDownloadWithArguments_First = true;
+            private bool ArgumentFormTopMost_First = true;
 
             public void Save() {
                 Program.Log(LogAction.WriteToLog, "Attempting to save Config_Initialization settings");
@@ -127,7 +127,7 @@ namespace aphrodite {
                         switch (firstTime != firstTime_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "General -> firstTime changed!");
-                                Program.Ini.WriteBool("firstTime", firstTime, "General");
+                                Program.Ini.Write("firstTime", firstTime, "General");
                                 firstTime_First = firstTime;
                                 break;
                         }
@@ -135,7 +135,7 @@ namespace aphrodite {
                         switch (SkipArgumentCheck != SkipArgumentCheck_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "General -> SkipArgumentCheck changed!");
-                                Program.Ini.WriteBool("SkipArgumentCheck", SkipArgumentCheck, "General");
+                                Program.Ini.Write("SkipArgumentCheck", SkipArgumentCheck, "General");
                                 SkipArgumentCheck_First = SkipArgumentCheck;
                                 break;
                         }
@@ -143,8 +143,16 @@ namespace aphrodite {
                         switch (AutoDownloadWithArguments != AutoDownloadWithArguments_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "General -> SkipArgumentCheck changed!");
-                                Program.Ini.WriteBool("AutoDownloadWithArguments", AutoDownloadWithArguments, "General");
+                                Program.Ini.Write("AutoDownloadWithArguments", AutoDownloadWithArguments, "General");
                                 AutoDownloadWithArguments_First = AutoDownloadWithArguments;
+                                break;
+                        }
+
+                        switch (ArgumentFormTopMost != ArgumentFormTopMost_First) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "General -> ArgumentFormTopMost changed!");
+                                Program.Ini.Write("ArgumentFormTopMost", ArgumentFormTopMost, "General");
+                                ArgumentFormTopMost_First = ArgumentFormTopMost;
                                 break;
                         }
                         break;
@@ -169,6 +177,13 @@ namespace aphrodite {
                             switch (aphrodite.Settings.General.Default.AutoDownloadWithArguments != AutoDownloadWithArguments) {
                                 case true:
                                     aphrodite.Settings.General.Default.AutoDownloadWithArguments = AutoDownloadWithArguments;
+                                    Save = true;
+                                    break;
+                            }
+
+                            switch (aphrodite.Settings.General.Default.ArgumentFormTopMost != ArgumentFormTopMost) {
+                                case true:
+                                    aphrodite.Settings.General.Default.ArgumentFormTopMost = ArgumentFormTopMost;
                                     Save = true;
                                     break;
                             }
@@ -217,12 +232,23 @@ namespace aphrodite {
                             case false:
                                 break;
                         }
+
+                        switch (Program.Ini.KeyExists("ArgumentFormTopMost", "General")) {
+                            case true:
+                                ArgumentFormTopMost = Program.Ini.ReadBool("ArgumentFormTopMost", "General");
+                                ArgumentFormTopMost_First = ArgumentFormTopMost;
+                                break;
+
+                            case false:
+                                break;
+                        }
                         break;
 
                     case false:
                         firstTime = aphrodite.Settings.General.Default.firstTime;
                         SkipArgumentCheck = aphrodite.Settings.General.Default.SkipArgumentCheck;
                         AutoDownloadWithArguments = aphrodite.Settings.General.Default.AutoDownloadWithArguments;
+                        ArgumentFormTopMost = aphrodite.Settings.General.Default.ArgumentFormTopMost;
                         break;
                 }
             }
@@ -231,53 +257,37 @@ namespace aphrodite {
         public class Config_FormSettings {
             public Config_FormSettings(bool SkipLoad = false) {
                 Program.Log(LogAction.WriteToLog, "Initializing Config_FormSettings");
-                if (!SkipLoad) {
-                    Load();
+                switch (!SkipLoad) {
+                    case true:
+                        Load();
+                        break;
                 }
             }
 
             #region Variables
+            public Point frmBlacklist_Location = new Point(-32000, -32000);
+            public Point frmImageDownloader_Location = new Point(-32000, -32000);
+            public Point frmLog_Location = new Point(-32000, -32000);
+            public Size frmLog_Size = new Size(-32000, -32000);
             public Point frmMain_Location = new Point(-32000, -32000);
-            //public decimal frmMain_numTagsPageLimit = 0;
-            //public decimal frmMain_numTagsImageLimit = 0;
-            //public bool frmMain_chkTagsUseMinimumScore = false;
-            //public bool frmMain_chkTagsUseScoreAsTag = true;
-            //public decimal frmMain_numTagsMinimumScore = 0;
-            //public bool frmMain_chkTagsDownloadExplicit = true;
-            //public bool frmMain_chkTagsDownloadQuestionable = true;
-            //public bool frmMain_chkTagsDownloadSafe = true;
-            //public bool frmMain_chkTagsSeparateRatings = true;
-            //public bool frmMain_chkTagsOpenAfterDownload = false;
-            //public bool frmMain_chkTagSeparateNonImages = true;
-            //public bool frmMain_chkPoolOpenAfter = false;
-            //public bool frmMain_chkPoolMergeBlacklisted = true;
-            //public bool frmMain_chkImageSeparateRatings = true;
-            //public bool frmMain_chkImageSeparateBlacklisted = true;
-            //public bool frmMain_chkImageSeparateArtists = false;
-            //public bool frmMain_chkImageSeparateNonImages = true;
-            //public bool frmMain_chkImageUseForm = false;
-            //public bool frmMain_chkImageOpenAfter = false;
+            public Point frmPoolDownloader_Location = new Point(-32000, -32000);
+            public Point frmPoolWishlist_Location = new Point(-32000, -32000);
+            public Point frmRedownloader_Location = new Point(-32000, -32000);
+            public Point frmSettings_Location = new Point(-32000, -32000);
+            public Point frmTagDownloader_Location = new Point(-32000, -32000);
+            public Point frmUndesiredTags_Location = new Point(-32000, -32000);
 
+            private Point frmBlacklist_Location_First = new Point(-32000, -32000);
+            private Point frmImageDownloader_Location_First = new Point(-32000, -32000);
+            private Point frmLog_Location_First = new Point(-32000, -32000);
+            private Size frmLog_Size_First = new Size(-32000, -32000);
             private Point frmMain_Location_First = new Point(-32000, -32000);
-            //private decimal frmMain_numTagsPageLimit_First = 0;
-            //private decimal frmMain_numTagsImageLimit_First = 0;
-            //private bool frmMain_chkTagsUseMinimumScore_First = false;
-            //private bool frmMain_chkTagsUseScoreAsTag_First = true;
-            //private decimal frmMain_numTagsMinimumScore_First = 0;
-            //private bool frmMain_chkTagsDownloadExplicit_First = true;
-            //private bool frmMain_chkTagsDownloadQuestionable_First = true;
-            //private bool frmMain_chkTagsDownloadSafe_First = true;
-            //private bool frmMain_chkTagsSeparateRatings_First = true;
-            //private bool frmMain_chkTagsOpenAfterDownload_First = false;
-            //private bool frmMain_chkTagSeparateNonImages_First = true;
-            //private bool frmMain_chkPoolOpenAfter_First = false;
-            //private bool frmMain_chkPoolMergeBlacklisted_First = true;
-            //private bool frmMain_chkImageSeparateRatings_First = true;
-            //private bool frmMain_chkImageSeparateBlacklisted_First = true;
-            //private bool frmMain_chkImageSeparateArtists_First = false;
-            //private bool frmMain_chkImageSeparateNonImages_First = true;
-            //private bool frmMain_chkImageUseForm_First = false;
-            //private bool frmMain_chkImageOpenAfter_First = false;
+            private Point frmPoolDownloader_Location_First = new Point(-32000, -32000);
+            private Point frmPoolWishlist_Location_First = new Point(-32000, -32000);
+            private Point frmRedownloader_Location_First = new Point(-32000, -32000);
+            private Point frmSettings_Location_First = new Point(-32000, -32000);
+            private Point frmTagDownloader_Location_First = new Point(-32000, -32000);
+            private Point frmUndesiredTags_Location_First = new Point(-32000, -32000);
             #endregion
 
             public void Save() {
@@ -285,11 +295,81 @@ namespace aphrodite {
 
                 switch (Program.UseIni) {
                     case true:
+                        switch (frmBlacklist_Location != frmBlacklist_Location_First) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "FormSettings -> frmBlacklist_Location changed!");
+                                Program.Ini.Write("frmBlacklist_Location", frmBlacklist_Location, "FormSettings");
+                                frmBlacklist_Location_First = frmBlacklist_Location;
+                                break;
+                        }
+                        switch (frmImageDownloader_Location != frmImageDownloader_Location_First) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "FormSettings -> frmImageDownloader_Location changed!");
+                                Program.Ini.Write("frmImageDownloader_Location", frmImageDownloader_Location, "FormSettings");
+                                frmImageDownloader_Location_First = frmImageDownloader_Location;
+                                break;
+                        }
+                        switch (frmLog_Location != frmLog_Location_First) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "FormSettings -> frmLog_Location changed!");
+                                Program.Ini.Write("frmLog_Location", frmLog_Location, "FormSettings");
+                                frmLog_Location_First = frmLog_Location;
+                                break;
+                        }
+                        switch (frmLog_Size != frmLog_Size_First) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "FormSettings -> frmLog_Size changed!");
+                                Program.Ini.Write("frmLog_Size", frmLog_Size, "FormSettings");
+                                frmLog_Size_First = frmLog_Size;
+                                break;
+                        }
                         switch (frmMain_Location != frmMain_Location_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "FormSettings -> frmMain_Location changed!");
-                                Program.Ini.WritePoint("frmMain_Location", frmMain_Location, "FormSettings");
+                                Program.Ini.Write("frmMain_Location", frmMain_Location, "FormSettings");
                                 frmMain_Location_First = frmMain_Location;
+                                break;
+                        }
+                        switch (frmPoolDownloader_Location != frmPoolDownloader_Location_First) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "FormSettings -> frmPoolDownloader_Location changed!");
+                                Program.Ini.Write("frmPoolDownloader_Location", frmPoolDownloader_Location, "FormSettings");
+                                frmPoolDownloader_Location_First = frmPoolDownloader_Location;
+                                break;
+                        }
+                        switch (frmPoolWishlist_Location != frmPoolWishlist_Location_First) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "FormSettings -> frmPoolWishlist_Location changed!");
+                                Program.Ini.Write("frmPoolWishlist_Location", frmPoolWishlist_Location, "FormSettings");
+                                frmPoolWishlist_Location_First = frmPoolWishlist_Location;
+                                break;
+                        }
+                        switch (frmRedownloader_Location != frmRedownloader_Location_First) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "FormSettings -> frmRedownloader_Location changed!");
+                                Program.Ini.Write("frmRedownloader_Location", frmRedownloader_Location, "FormSettings");
+                                frmRedownloader_Location_First = frmRedownloader_Location;
+                                break;
+                        }
+                        switch (frmSettings_Location != frmSettings_Location_First) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "FormSettings -> frmSettings_Location changed!");
+                                Program.Ini.Write("frmSettings_Location", frmSettings_Location, "FormSettings");
+                                frmSettings_Location_First = frmSettings_Location;
+                                break;
+                        }
+                        switch (frmTagDownloader_Location != frmTagDownloader_Location_First) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "FormSettings -> frmTagDownloader_Location changed!");
+                                Program.Ini.Write("frmTagDownloader_Location", frmTagDownloader_Location, "FormSettings");
+                                frmTagDownloader_Location_First = frmTagDownloader_Location;
+                                break;
+                        }
+                        switch (frmUndesiredTags_Location != frmUndesiredTags_Location_First) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "FormSettings -> frmUndesiredTags_Location changed!");
+                                Program.Ini.Write("frmUndesiredTags_Location", frmUndesiredTags_Location, "FormSettings");
+                                frmUndesiredTags_Location_First = frmUndesiredTags_Location;
                                 break;
                         }
                         break;
@@ -297,10 +377,80 @@ namespace aphrodite {
                     case false: {
                             bool Save = false;
 
+                            switch (aphrodite.Settings.FormSettings.Default.frmBlacklist_Location != frmBlacklist_Location) {
+                                case true:
+                                    Program.Log(LogAction.WriteToLog, "FormSettings -> frmBlacklist_Location changed!");
+                                    aphrodite.Settings.FormSettings.Default.frmBlacklist_Location = frmBlacklist_Location;
+                                    Save = true;
+                                    break;
+                            }
+                            switch (aphrodite.Settings.FormSettings.Default.frmImageDownloader_Location != frmImageDownloader_Location) {
+                                case true:
+                                    Program.Log(LogAction.WriteToLog, "FormSettings -> frmImageDownloader_Location changed!");
+                                    aphrodite.Settings.FormSettings.Default.frmImageDownloader_Location = frmImageDownloader_Location;
+                                    Save = true;
+                                    break;
+                            }
+                            switch (aphrodite.Settings.FormSettings.Default.frmLog_Location != frmLog_Location) {
+                                case true:
+                                    Program.Log(LogAction.WriteToLog, "FormSettings -> frmLog_Location changed!");
+                                    aphrodite.Settings.FormSettings.Default.frmLog_Location = frmLog_Location;
+                                    Save = true;
+                                    break;
+                            }
+                            switch (aphrodite.Settings.FormSettings.Default.frmLog_Size != frmLog_Size) {
+                                case true:
+                                    Program.Log(LogAction.WriteToLog, "FormSettings -> frmLog_Size changed!");
+                                    aphrodite.Settings.FormSettings.Default.frmLog_Size = frmLog_Size;
+                                    Save = true;
+                                    break;
+                            }
                             switch (aphrodite.Settings.FormSettings.Default.frmMain_Location != frmMain_Location) {
                                 case true:
                                     Program.Log(LogAction.WriteToLog, "FormSettings -> frmMain_Location changed!");
                                     aphrodite.Settings.FormSettings.Default.frmMain_Location = frmMain_Location;
+                                    Save = true;
+                                    break;
+                            }
+                            switch (aphrodite.Settings.FormSettings.Default.frmPoolDownloader_Location != frmPoolDownloader_Location) {
+                                case true:
+                                    Program.Log(LogAction.WriteToLog, "FormSettings -> frmPoolDownloader_Location changed!");
+                                    aphrodite.Settings.FormSettings.Default.frmPoolDownloader_Location = frmPoolDownloader_Location;
+                                    Save = true;
+                                    break;
+                            }
+                            switch (aphrodite.Settings.FormSettings.Default.frmPoolWishlist_Location != frmPoolWishlist_Location) {
+                                case true:
+                                    Program.Log(LogAction.WriteToLog, "FormSettings -> frmPoolWishlist_Location changed!");
+                                    aphrodite.Settings.FormSettings.Default.frmPoolWishlist_Location = frmPoolWishlist_Location;
+                                    Save = true;
+                                    break;
+                            }
+                            switch (aphrodite.Settings.FormSettings.Default.frmRedownloader_Location != frmRedownloader_Location) {
+                                case true:
+                                    Program.Log(LogAction.WriteToLog, "FormSettings -> frmRedownloader_Location changed!");
+                                    aphrodite.Settings.FormSettings.Default.frmRedownloader_Location = frmRedownloader_Location;
+                                    Save = true;
+                                    break;
+                            }
+                            switch (aphrodite.Settings.FormSettings.Default.frmSettings_Location != frmSettings_Location) {
+                                case true:
+                                    Program.Log(LogAction.WriteToLog, "FormSettings -> frmSettings_Location changed!");
+                                    aphrodite.Settings.FormSettings.Default.frmSettings_Location = frmSettings_Location;
+                                    Save = true;
+                                    break;
+                            }
+                            switch (aphrodite.Settings.FormSettings.Default.frmTagDownloader_Location != frmTagDownloader_Location) {
+                                case true:
+                                    Program.Log(LogAction.WriteToLog, "FormSettings -> frmTagDownloader_Location changed!");
+                                    aphrodite.Settings.FormSettings.Default.frmTagDownloader_Location = frmTagDownloader_Location;
+                                    Save = true;
+                                    break;
+                            }
+                            switch (aphrodite.Settings.FormSettings.Default.frmUndesiredTags_Location != frmUndesiredTags_Location) {
+                                case true:
+                                    Program.Log(LogAction.WriteToLog, "FormSettings -> frmUndesiredTags_Location changed!");
+                                    aphrodite.Settings.FormSettings.Default.frmUndesiredTags_Location = frmUndesiredTags_Location;
                                     Save = true;
                                     break;
                             }
@@ -320,14 +470,86 @@ namespace aphrodite {
 
                 switch (Program.UseIni) {
                     case true:
-                        if (Program.Ini.KeyExists("frmMain_Location", "FormSettings")) {
-                            frmMain_Location = Program.Ini.ReadPoint("frmMain_Location", "FormSettings");
-                            frmMain_Location_First = frmMain_Location;
+                        switch (Program.Ini.KeyExists("frmBlacklist_Location", "FormSettings")) {
+                            case true:
+                                frmBlacklist_Location = Program.Ini.ReadPoint("frmBlacklist_Location", "FormSettings");
+                                frmBlacklist_Location_First = frmBlacklist_Location;
+                                break;
+                        }
+                        switch (Program.Ini.KeyExists("frmImageDownloader_Location", "FormSettings")) {
+                            case true:
+                                frmImageDownloader_Location = Program.Ini.ReadPoint("frmImageDownloader_Location", "FormSettings");
+                                frmImageDownloader_Location_First = frmImageDownloader_Location;
+                                break;
+                        }
+                        switch (Program.Ini.KeyExists("frmLog_Location", "FormSettings")) {
+                            case true:
+                                frmLog_Location = Program.Ini.ReadPoint("frmLog_Location", "FormSettings");
+                                frmLog_Location_First = frmLog_Location;
+                                break;
+                        }
+                        switch (Program.Ini.KeyExists("frmLog_Size", "FormSettings")) {
+                            case true:
+                                frmLog_Size = Program.Ini.ReadSize("frmLog_Size", "FormSettings");
+                                frmLog_Size_First = frmLog_Size;
+                                break;
+                        }
+                        switch (Program.Ini.KeyExists("frmMain_Location", "FormSettings")) {
+                            case true:
+                                frmMain_Location = Program.Ini.ReadPoint("frmMain_Location", "FormSettings");
+                                frmMain_Location_First = frmMain_Location;
+                                break;
+                        }
+                        switch (Program.Ini.KeyExists("frmPoolDownloader_Location", "FormSettings")) {
+                            case true:
+                                frmPoolDownloader_Location = Program.Ini.ReadPoint("frmPoolDownloader_Location", "FormSettings");
+                                frmPoolDownloader_Location_First = frmPoolDownloader_Location;
+                                break;
+                        }
+                        switch (Program.Ini.KeyExists("frmPoolWishlist_Location", "FormSettings")) {
+                            case true:
+                                frmPoolWishlist_Location = Program.Ini.ReadPoint("frmPoolWishlist_Location", "FormSettings");
+                                frmPoolWishlist_Location_First = frmPoolWishlist_Location;
+                                break;
+                        }
+                        switch (Program.Ini.KeyExists("frmRedownloader_Location", "FormSettings")) {
+                            case true:
+                                frmRedownloader_Location = Program.Ini.ReadPoint("frmRedownloader_Location", "FormSettings");
+                                frmRedownloader_Location_First = frmRedownloader_Location;
+                                break;
+                        }
+                        switch (Program.Ini.KeyExists("frmSettings_Location", "FormSettings")) {
+                            case true:
+                                frmSettings_Location = Program.Ini.ReadPoint("frmSettings_Location", "FormSettings");
+                                frmSettings_Location_First = frmSettings_Location;
+                                break;
+                        }
+                        switch (Program.Ini.KeyExists("frmTagDownloader_Location", "FormSettings")) {
+                            case true:
+                                frmTagDownloader_Location = Program.Ini.ReadPoint("frmTagDownloader_Location", "FormSettings");
+                                frmTagDownloader_Location_First = frmTagDownloader_Location;
+                                break;
+                        }
+                        switch (Program.Ini.KeyExists("frmUndesiredTags_Location", "FormSettings")) {
+                            case true:
+                                frmUndesiredTags_Location = Program.Ini.ReadPoint("frmUndesiredTags_Location", "FormSettings");
+                                frmUndesiredTags_Location_First = frmUndesiredTags_Location;
+                                break;
                         }
                         break;
 
                     case false:
+                        frmBlacklist_Location = aphrodite.Settings.FormSettings.Default.frmBlacklist_Location;
+                        frmImageDownloader_Location = aphrodite.Settings.FormSettings.Default.frmImageDownloader_Location;
+                        frmLog_Location = aphrodite.Settings.FormSettings.Default.frmLog_Location;
+                        frmLog_Size = aphrodite.Settings.FormSettings.Default.frmLog_Size;
                         frmMain_Location = aphrodite.Settings.FormSettings.Default.frmMain_Location;
+                        frmPoolDownloader_Location = aphrodite.Settings.FormSettings.Default.frmPoolDownloader_Location;
+                        frmPoolWishlist_Location = aphrodite.Settings.FormSettings.Default.frmPoolWishlist_Location;
+                        frmRedownloader_Location = aphrodite.Settings.FormSettings.Default.frmRedownloader_Location;
+                        frmSettings_Location = aphrodite.Settings.FormSettings.Default.frmSettings_Location;
+                        frmTagDownloader_Location = aphrodite.Settings.FormSettings.Default.frmTagDownloader_Location;
+                        frmUndesiredTags_Location = aphrodite.Settings.FormSettings.Default.frmUndesiredTags_Location;
                         break;
                 }
             }
@@ -336,8 +558,10 @@ namespace aphrodite {
         public class Config_General {
             public Config_General(bool SkipLoad = false) {
                 Program.Log(LogAction.WriteToLog, "Initializing Config_General");
-                if (!SkipLoad) {
-                    Load();
+                switch (!SkipLoad) {
+                    case true:
+                        Load();
+                        break;
                 }
             }
 
@@ -369,70 +593,76 @@ namespace aphrodite {
                         switch (saveLocation != saveLocation_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "General -> saveLocation changed!");
-                                Program.Ini.WriteString("saveLocation", saveLocation, "General");
+                                Program.Ini.Write("saveLocation", saveLocation, "General");
                                 saveLocation_First = saveLocation;
                                 break;
                         }
                         switch (Graylist != Graylist_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "General -> Graylist changed!");
-                                if (Graylist.Length > 0) {
-                                    File.WriteAllText(
-                                        Program.ApplicationPath + "\\graylist.cfg",
-                                        Graylist.Replace(" ", "_").Replace("\r\n", " ")
-                                    );
-                                }
-                                else {
-                                    File.Delete(Program.ApplicationPath + "\\graylist.cfg");
+                                switch (Graylist.Length) {
+                                    case 0:
+                                        File.Delete(Program.ApplicationPath + "\\graylist.cfg");
+                                        break;
+
+                                    default:
+                                        File.WriteAllText(
+                                            Program.ApplicationPath + "\\graylist.cfg",
+                                            Graylist.Replace(" ", "_").Replace("\r\n", " ")
+                                        );
+                                        break;
                                 }
                                 break;
                         }
                         switch (saveGraylisted != saveGraylisted_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "General -> saveGraylisted changed!");
-                                Program.Ini.WriteBool("saveGraylisted", saveGraylisted, "General");
+                                Program.Ini.Write("saveGraylisted", saveGraylisted, "General");
                                 saveGraylisted_First = saveGraylisted;
                                 break;
                         }
                         switch (saveInfo != saveInfo_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "General -> saveInfo changed!");
-                                Program.Ini.WriteBool("saveInfo", saveInfo, "General");
+                                Program.Ini.Write("saveInfo", saveInfo, "General");
                                 saveInfo_First = saveInfo;
                                 break;
                         }
                         switch (ignoreFinish != ignoreFinish_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "General -> ignoreFinish changed!");
-                                Program.Ini.WriteBool("ignoreFinish", ignoreFinish, "General");
+                                Program.Ini.Write("ignoreFinish", ignoreFinish, "General");
                                 ignoreFinish_First = ignoreFinish;
                                 break;
                         }
                         switch (Blacklist != Blacklist_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "General -> Blacklist changed!");
-                                if (Graylist.Length > 0) {
-                                    File.WriteAllText(
-                                        Program.ApplicationPath + "\\blacklist.cfg",
-                                        Blacklist.Replace(" ", "_").Replace("\r\n", " ")
-                                    );
-                                }
-                                else {
-                                    File.Delete(Program.ApplicationPath + "\\blacklist.cfg");
+                                switch (Graylist.Length) {
+                                    case 0:
+                                        File.Delete(Program.ApplicationPath + "\\blacklist.cfg");
+                                        break;
+
+                                    default:
+                                        File.WriteAllText(
+                                            Program.ApplicationPath + "\\blacklist.cfg",
+                                            Blacklist.Replace(" ", "_").Replace("\r\n", " ")
+                                        );
+                                        break;
                                 }
                                 break;
                         }
                         switch (undesiredTags != undesiredTags_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "General -> undesiredTags changed!");
-                                Program.Ini.WriteString("undesiredTags", undesiredTags, "General");
+                                Program.Ini.Write("undesiredTags", undesiredTags, "General");
                                 undesiredTags_First = undesiredTags;
                                 break;
                         }
                         switch (openAfter != openAfter_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "General -> openAfter changed!");
-                                Program.Ini.WriteBool("openAfter", openAfter, "General");
+                                Program.Ini.Write("openAfter", openAfter, "General");
                                 openAfter_First = openAfter;
                                 break;
                         }
@@ -579,8 +809,10 @@ namespace aphrodite {
         public class Config_Tags {
             public Config_Tags(bool SkipLoad = false) {
                 Program.Log(LogAction.WriteToLog, "Initializing Config_Tags");
-                if (!SkipLoad) {
-                    Load();
+                switch (!SkipLoad) {
+                    case true:
+                        Load();
+                        break;
                 }
             }
 
@@ -598,6 +830,8 @@ namespace aphrodite {
             public string fileNameSchema = "%md5%";
             public bool downloadBlacklisted = false;
             public bool DownloadNewestToOldest = false;
+            public int FavoriteCount = 0;
+            public bool FavoriteCountAsTag = false;
 
             private bool Safe_First = true;
             private bool Questionable_First = true;
@@ -612,6 +846,8 @@ namespace aphrodite {
             private string fileNameSchema_First = "%md5%";
             private bool downloadBlacklisted_First = false;
             private bool DownloadNewestToOldest_First = false;
+            public int FavoriteCount_First = 0;
+            public bool FavoriteCountAsTag_First = false;
             #endregion
 
             public void Save() {
@@ -622,93 +858,106 @@ namespace aphrodite {
                         switch (Safe != Safe_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Tags -> Safe changed!");
-                                Program.Ini.WriteBool("Safe", Safe, "Tags");
+                                Program.Ini.Write("Safe", Safe, "Tags");
                                 Safe_First = Safe;
                                 break;
                         }
                         switch (Questionable != Questionable_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Tags -> Questionable changed!");
-                                Program.Ini.WriteBool("Questionable", Questionable, "Tags");
+                                Program.Ini.Write("Questionable", Questionable, "Tags");
                                 Questionable_First = Questionable;
                                 break;
                         }
                         switch (Explicit != Explicit_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Tags -> Explicit changed!");
-                                Program.Ini.WriteBool("Explicit", Explicit, "Tags");
+                                Program.Ini.Write("Explicit", Explicit, "Tags");
                                 Explicit_First = Explicit;
                                 break;
                         }
                         switch (separateRatings != separateRatings_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Tags -> separateRatings changed!");
-                                Program.Ini.WriteBool("separateRatings", separateRatings, "Tags");
+                                Program.Ini.Write("separateRatings", separateRatings, "Tags");
                                 separateRatings_First = separateRatings;
                                 break;
                         }
                         switch (separateNonImages != separateNonImages_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Tags -> separateNonImages changed!");
-                                Program.Ini.WriteBool("separateNonImages", separateNonImages, "Tags");
+                                Program.Ini.Write("separateNonImages", separateNonImages, "Tags");
                                 separateNonImages_First = separateNonImages;
                                 break;
                         }
                         switch (enableScoreMin != enableScoreMin_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Tags -> enableScoreMin changed!");
-                                Program.Ini.WriteBool("enableScoreMin", enableScoreMin, "Tags");
+                                Program.Ini.Write("enableScoreMin", enableScoreMin, "Tags");
                                 enableScoreMin_First = enableScoreMin;
                                 break;
                         }
                         switch (scoreAsTag != scoreAsTag_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Tags -> scoreAsTag changed!");
-                                Program.Ini.WriteBool("scoreAsTag", scoreAsTag, "Tags");
+                                Program.Ini.Write("scoreAsTag", scoreAsTag, "Tags");
                                 scoreAsTag_First = scoreAsTag;
                                 break;
                         }
                         switch (scoreMin != scoreMin_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Tags -> scoreMin changed!");
-                                Program.Ini.WriteInt("scoreMin", scoreMin, "Tags");
+                                Program.Ini.Write("scoreMin", scoreMin, "Tags");
                                 scoreMin_First = scoreMin;
                                 break;
                         }
                         switch (imageLimit != imageLimit_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Tags -> imageLimit changed!");
-                                Program.Ini.WriteInt("imageLimit", imageLimit, "Tags");
+                                Program.Ini.Write("imageLimit", imageLimit, "Tags");
                                 imageLimit_First = imageLimit;
                                 break;
                         }
                         switch (pageLimit != pageLimit_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Tags -> pageLimit changed!");
-                                Program.Ini.WriteInt("pageLimit", pageLimit, "Tags");
+                                Program.Ini.Write("pageLimit", pageLimit, "Tags");
                                 pageLimit_First = pageLimit;
                                 break;
                         }
                         switch (fileNameSchema != fileNameSchema_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Tags -> fileNameSchema changed!");
-                                Program.Ini.WriteString("fileNameSchema", fileNameSchema, "Tags");
+                                Program.Ini.Write("fileNameSchema", fileNameSchema, "Tags");
                                 fileNameSchema_First = fileNameSchema;
                                 break;
                         }
                         switch (downloadBlacklisted != downloadBlacklisted_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Tags -> downloadBlacklisted changed!");
-                                Program.Ini.WriteBool("downloadBlacklisted", downloadBlacklisted, "Tags");
+                                Program.Ini.Write("downloadBlacklisted", downloadBlacklisted, "Tags");
                                 downloadBlacklisted_First = downloadBlacklisted;
                                 break;
                         }
-
                         switch (DownloadNewestToOldest != DownloadNewestToOldest_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Tags -> DownloadNewestToOldest changed!");
-                                Program.Ini.WriteBool("DownloadNewestToOldest", DownloadNewestToOldest, "Tags");
+                                Program.Ini.Write("DownloadNewestToOldest", DownloadNewestToOldest, "Tags");
                                 DownloadNewestToOldest_First = DownloadNewestToOldest;
+                                break;
+                        }
+                        switch (FavoriteCount != FavoriteCount_First) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> FavoriteCount changed!");
+                                Program.Ini.Write("FavoriteCount", FavoriteCount, "Tags");
+                                FavoriteCount_First = FavoriteCount;
+                                break;
+                        }
+                        switch (FavoriteCountAsTag != FavoriteCountAsTag_First) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> FavoriteCountAsTag changed!");
+                                Program.Ini.Write("FavoriteCountAsTag", FavoriteCountAsTag, "Tags");
+                                FavoriteCountAsTag_First = FavoriteCountAsTag;
                                 break;
                         }
                         break;
@@ -807,6 +1056,20 @@ namespace aphrodite {
                                 Save = true;
                                 break;
                         }
+                        switch (aphrodite.Settings.Tags.Default.FavoriteCount != FavoriteCount) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> FavoriteCount changed!");
+                                aphrodite.Settings.Tags.Default.FavoriteCount = FavoriteCount;
+                                Save = true;
+                                break;
+                        }
+                        switch (aphrodite.Settings.Tags.Default.FavoriteCountAsTag != FavoriteCountAsTag) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "Tags -> FavoriteCountAsTag changed!");
+                                aphrodite.Settings.Tags.Default.FavoriteCountAsTag = FavoriteCountAsTag;
+                                Save = true;
+                                break;
+                        }
 
                         switch (Save) {
                             case true:
@@ -822,57 +1085,95 @@ namespace aphrodite {
 
                 switch (Program.UseIni) {
                     case true:
-                        if (Program.Ini.KeyExists("Safe", "Tags")) {
-                            Safe = Program.Ini.ReadBool("Safe", "Tags");
-                            Safe_First = Safe;
+                        switch (Program.Ini.KeyExists("Safe", "Tags")) {
+                            case true:
+                                Safe = Program.Ini.ReadBool("Safe", "Tags");
+                                Safe_First = Safe;
+                                break;
                         }
-                        if (Program.Ini.KeyExists("Questionable", "Tags")) {
-                            Questionable = Program.Ini.ReadBool("Questionable", "Tags");
-                            Questionable_First = Questionable;
+                        switch (Program.Ini.KeyExists("Questionable", "Tags")) {
+                            case true:
+                                Questionable = Program.Ini.ReadBool("Questionable", "Tags");
+                                Questionable_First = Questionable;
+                                break;
                         }
-                        if (Program.Ini.KeyExists("Explicit", "Tags")) {
-                            Explicit = Program.Ini.ReadBool("Explicit", "Tags");
-                            Explicit_First = Explicit;
+                        switch (Program.Ini.KeyExists("Explicit", "Tags")) {
+                            case true:
+                                Explicit = Program.Ini.ReadBool("Explicit", "Tags");
+                                Explicit_First = Explicit;
+                                break;
                         }
-                        if (Program.Ini.KeyExists("separateRatings", "Tags")) {
-                            separateRatings = Program.Ini.ReadBool("separateRatings", "Tags");
-                            separateRatings_First = separateRatings;
+                        switch (Program.Ini.KeyExists("separateRatings", "Tags")) {
+                            case true:
+                                separateRatings = Program.Ini.ReadBool("separateRatings", "Tags");
+                                separateRatings_First = separateRatings;
+                                break;
                         }
-                        if (Program.Ini.KeyExists("separateNonImages", "Tags")) {
-                            separateNonImages = Program.Ini.ReadBool("separateNonImages", "Tags");
-                            separateNonImages_First = separateNonImages;
+                        switch (Program.Ini.KeyExists("separateNonImages", "Tags")) {
+                            case true:
+                                separateNonImages = Program.Ini.ReadBool("separateNonImages", "Tags");
+                                separateNonImages_First = separateNonImages;
+                                break;
                         }
-                        if (Program.Ini.KeyExists("enableScoreMin", "Tags")) {
-                            enableScoreMin = Program.Ini.ReadBool("enableScoreMin", "Tags");
-                            enableScoreMin_First = enableScoreMin;
+                        switch (Program.Ini.KeyExists("enableScoreMin", "Tags")) {
+                            case true:
+                                enableScoreMin = Program.Ini.ReadBool("enableScoreMin", "Tags");
+                                enableScoreMin_First = enableScoreMin;
+                                break;
                         }
-                        if (Program.Ini.KeyExists("scoreAsTag", "Tags")) {
-                            scoreAsTag = Program.Ini.ReadBool("scoreAsTag", "Tags");
-                            scoreAsTag_First = scoreAsTag;
+                        switch (Program.Ini.KeyExists("scoreAsTag", "Tags")) {
+                            case true:
+                                scoreAsTag = Program.Ini.ReadBool("scoreAsTag", "Tags");
+                                scoreAsTag_First = scoreAsTag;
+                                break;
                         }
-                        if (Program.Ini.KeyExists("scoreMin", "Tags")) {
-                            scoreMin = Program.Ini.ReadInt("scoreMin", "Tags");
-                            scoreMin_First = scoreMin;
+                        switch (Program.Ini.KeyExists("scoreMin", "Tags")) {
+                            case true:
+                                scoreMin = Program.Ini.ReadInt("scoreMin", "Tags");
+                                scoreMin_First = scoreMin;
+                                break;
                         }
-                        if (Program.Ini.KeyExists("imageLimit", "Tags")) {
-                            imageLimit = Program.Ini.ReadInt("imageLimit", "Tags");
-                            imageLimit_First = imageLimit;
+                        switch (Program.Ini.KeyExists("imageLimit", "Tags")) {
+                            case true:
+                                imageLimit = Program.Ini.ReadInt("imageLimit", "Tags");
+                                imageLimit_First = imageLimit;
+                                break;
                         }
-                        if (Program.Ini.KeyExists("pageLimit", "Tags")) {
-                            pageLimit = Program.Ini.ReadInt("pageLimit", "Tags");
-                            pageLimit_First = pageLimit;
+                        switch (Program.Ini.KeyExists("pageLimit", "Tags")) {
+                            case true:
+                                pageLimit = Program.Ini.ReadInt("pageLimit", "Tags");
+                                pageLimit_First = pageLimit;
+                                break;
                         }
-                        if (Program.Ini.KeyExists("fileNameSchema", "Tags")) {
-                            fileNameSchema = apiTools.ReplaceIllegalCharacters(Program.Ini.ReadString("fileNameSchema", "Tags"));
-                            fileNameSchema_First = fileNameSchema;
+                        switch (Program.Ini.KeyExists("fileNameSchema", "Tags")) {
+                            case true:
+                                fileNameSchema = apiTools.ReplaceIllegalCharacters(Program.Ini.ReadString("fileNameSchema", "Tags"));
+                                fileNameSchema_First = fileNameSchema;
+                                break;
                         }
-                        if (Program.Ini.KeyExists("downloadBlacklisted", "Tags")) {
-                            downloadBlacklisted = Program.Ini.ReadBool("downloadBlacklisted", "Tags");
-                            downloadBlacklisted_First = downloadBlacklisted;
+                        switch (Program.Ini.KeyExists("downloadBlacklisted", "Tags")) {
+                            case true:
+                                downloadBlacklisted = Program.Ini.ReadBool("downloadBlacklisted", "Tags");
+                                downloadBlacklisted_First = downloadBlacklisted;
+                                break;
                         }
-                        if (Program.Ini.KeyExists("DownloadNewestToOldest", "Tags")) {
-                            DownloadNewestToOldest = Program.Ini.ReadBool("DownloadNewestToOldest", "Tags");
-                            DownloadNewestToOldest_First = DownloadNewestToOldest;
+                        switch (Program.Ini.KeyExists("DownloadNewestToOldest", "Tags")) {
+                            case true:
+                                DownloadNewestToOldest = Program.Ini.ReadBool("DownloadNewestToOldest", "Tags");
+                                DownloadNewestToOldest_First = DownloadNewestToOldest;
+                                break;
+                        }
+                        switch (Program.Ini.KeyExists("FavoriteCount", "Tags")) {
+                            case true:
+                                FavoriteCount = Program.Ini.ReadInt("FavoriteCount", "Tags");
+                                FavoriteCount_First = FavoriteCount;
+                                break;
+                        }
+                        switch (Program.Ini.KeyExists("FavoriteCountAsTag", "Tags")) {
+                            case true:
+                                FavoriteCountAsTag = Program.Ini.ReadBool("FavoriteCountAsTag", "Tags");
+                                FavoriteCountAsTag_First = FavoriteCountAsTag;
+                                break;
                         }
                         break;
 
@@ -890,6 +1191,8 @@ namespace aphrodite {
                         fileNameSchema = apiTools.ReplaceIllegalCharacters(aphrodite.Settings.Tags.Default.fileNameSchema);
                         downloadBlacklisted = aphrodite.Settings.Tags.Default.downloadBlacklisted;
                         DownloadNewestToOldest = aphrodite.Settings.Tags.Default.DownloadNewestToOldest;
+                        FavoriteCount = aphrodite.Settings.Tags.Default.FavoriteCount;
+                        FavoriteCountAsTag = aphrodite.Settings.Tags.Default.FavoriteCountAsTag;
                         break;
                 }
             }
@@ -999,35 +1302,35 @@ namespace aphrodite {
                         switch (mergeGraylisted != mergeGraylisted_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Pools -> mergeGraylisted changed!");
-                                Program.Ini.WriteBool("mergeBlacklisted", mergeGraylisted, "Pools");
+                                Program.Ini.Write("mergeBlacklisted", mergeGraylisted, "Pools");
                                 mergeGraylisted_First = mergeGraylisted;
                                 break;
                         }
                         switch (addWishlistSilent != addWishlistSilent_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Pools -> addWishlistSilent changed!");
-                                Program.Ini.WriteBool("addWishlistSilent", addWishlistSilent, "Pools");
+                                Program.Ini.Write("addWishlistSilent", addWishlistSilent, "Pools");
                                 addWishlistSilent_First = addWishlistSilent;
                                 break;
                         }
                         switch (fileNameSchema != fileNameSchema_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Pools -> fileNameSchema changed!");
-                                Program.Ini.WriteString("fileNameSchema", fileNameSchema, "Pools");
+                                Program.Ini.Write("fileNameSchema", fileNameSchema, "Pools");
                                 fileNameSchema_First = fileNameSchema;
                                 break;
                         }
                         switch (downloadBlacklisted != downloadBlacklisted_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Pools -> downloadBlacklisted changed!");
-                                Program.Ini.WriteBool("downloadBlacklisted", downloadBlacklisted, "Pools");
+                                Program.Ini.Write("downloadBlacklisted", downloadBlacklisted, "Pools");
                                 downloadBlacklisted_First = downloadBlacklisted;
                                 break;
                         }
                         switch (mergeBlacklisted != mergeBlacklisted_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Pools -> mergeBlacklisted changed!");
-                                Program.Ini.WriteBool("mergeBlacklisted", mergeBlacklisted, "Pools");
+                                Program.Ini.Write("mergeBlacklisted", mergeBlacklisted, "Pools");
                                 mergeBlacklisted_First = mergeBlacklisted;
                                 break;
                         }
@@ -1194,49 +1497,49 @@ namespace aphrodite {
                         switch (separateRatings != separateRatings_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Images -> separateRatings changed!");
-                                Program.Ini.WriteBool("separateRatings", separateRatings, "Images");
+                                Program.Ini.Write("separateRatings", separateRatings, "Images");
                                 separateRatings_First = separateRatings;
                                 break;
                         }
                         switch (separateGraylisted != separateGraylisted_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Images -> separateBlacklisted changed!");
-                                Program.Ini.WriteBool("separateBlacklisted", separateGraylisted, "Images");
+                                Program.Ini.Write("separateBlacklisted", separateGraylisted, "Images");
                                 separateGraylisted_First = separateGraylisted;
                                 break;
                         }
                         switch (useForm != useForm_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Images -> useForm changed!");
-                                Program.Ini.WriteBool("useForm", useForm, "Images");
+                                Program.Ini.Write("useForm", useForm, "Images");
                                 useForm_First = useForm;
                                 break;
                         }
                         switch (separateArtists != separateArtists_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Images -> separateArtists changed!");
-                                Program.Ini.WriteBool("separateArtists", separateArtists, "Images");
+                                Program.Ini.Write("separateArtists", separateArtists, "Images");
                                 separateArtists_First = separateArtists;
                                 break;
                         }
                         switch (fileNameSchema != fileNameSchema_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Images -> fileNameSchema changed!");
-                                Program.Ini.WriteString("fileNameSchema", fileNameSchema, "Images");
+                                Program.Ini.Write("fileNameSchema", fileNameSchema, "Images");
                                 fileNameSchema_First = fileNameSchema;
                                 break;
                         }
                         switch (separateNonImages != separateNonImages_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Images -> separateNonImages changed!");
-                                Program.Ini.WriteBool("separateNonImages", separateNonImages, "Images");
+                                Program.Ini.Write("separateNonImages", separateNonImages, "Images");
                                 separateNonImages_First = separateNonImages;
                                 break;
                         }
                         switch (separateBlacklisted != separateBlacklisted_First) {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "Images -> separateBlacklisted changed!");
-                                Program.Ini.WriteBool("separateBlacklisted", separateBlacklisted, "Images");
+                                Program.Ini.Write("separateBlacklisted", separateBlacklisted, "Images");
                                 separateBlacklisted_First = separateBlacklisted;
                                 break;
                         }
@@ -1368,21 +1671,32 @@ namespace aphrodite {
     }
 
     class IniFile {
-        string Path;
-        string EXE = Assembly.GetExecutingAssembly().GetName().Name;
 
-        public IniFile(string IniPath = null) {
-            Path = new FileInfo(IniPath ?? EXE + ".ini").FullName.ToString();
+        /// <summary>
+        /// The full path of the Ini File (Generally, in the same folder as the executable)
+        /// </summary>
+        private string IniPath;
+        /// <summary>
+        /// The name of the executing file.
+        /// </summary>
+        private string ExecutableName = Assembly.GetExecutingAssembly().GetName().Name;
+
+        public IniFile(string NewIniPath = null) {
+            ChangeIniPath(NewIniPath);
+        }
+
+        public void ChangeIniPath(string NewIniPath = null) {
+            IniPath = new FileInfo(NewIniPath ?? ExecutableName + ".ini").FullName.ToString();
         }
 
         public string ReadString(string Key, string Section = null) {
-            var RetVal = new StringBuilder(255);
-            NativeMethods.GetPrivateProfileString(Section ?? EXE, Key, "", RetVal, 255, Path);
+            StringBuilder RetVal = new StringBuilder(255);
+            NativeMethods.GetPrivateProfileString(Section ?? ExecutableName, Key, "", RetVal, 255, IniPath);
             return RetVal.ToString();
         }
         public bool ReadBool(string Key, string Section = null) {
-            var RetVal = new StringBuilder(255);
-            NativeMethods.GetPrivateProfileString(Section ?? EXE, Key.ToLower(), "", RetVal, 255, Path);
+            StringBuilder RetVal = new StringBuilder(255);
+            NativeMethods.GetPrivateProfileString(Section ?? ExecutableName, Key.ToLower(), "", RetVal, 255, IniPath);
             switch (RetVal.ToString().ToLower()) {
                 case "true":
                     return true;
@@ -1391,95 +1705,75 @@ namespace aphrodite {
             }
         }
         public int ReadInt(string Key, string Section = null) {
-            var RetVal = new StringBuilder(255);
-            NativeMethods.GetPrivateProfileString(Section ?? EXE, Key.ToLower(), "", RetVal, 255, Path);
-            string RetStr = RetVal.ToString();
+            StringBuilder RetVal = new StringBuilder(255);
+            NativeMethods.GetPrivateProfileString(Section ?? ExecutableName, Key.ToLower(), "", RetVal, 255, IniPath);
             int RetInt;
-            if (int.TryParse(RetStr, out RetInt)) {
-                return RetInt;
-            }
-            return 0;
+            int.TryParse(RetVal.ToString(), out RetInt);
+            return RetInt;
+        }
+        public decimal ReadDecimal(string Key, string Section = null){
+            StringBuilder RetVal = new StringBuilder(255);
+            NativeMethods.GetPrivateProfileString(Section ?? ExecutableName, Key.ToLower(), "", RetVal, 255, IniPath);
+            decimal RetDec;
+            decimal.TryParse(RetVal.ToString(), out RetDec);
+            return RetDec;
         }
         public Point ReadPoint(string Key, string Section = null) {
-            var RetVal = new StringBuilder(255);
-            NativeMethods.GetPrivateProfileString(Section, Key, "", RetVal, 255, Path);
+            StringBuilder RetVal = new StringBuilder(255);
+            NativeMethods.GetPrivateProfileString(Section, Key, "", RetVal, 255, IniPath);
             string[] Value = RetVal.ToString().Split(',');
-            if (Value.Length == 2) {
-                int Temp;
-                Point OutputPoint = new Point();
-                if (int.TryParse(Value[0], out Temp)) {
-                    OutputPoint.X = Temp;
-                }
-                else {
-                    OutputPoint.X = 0;
-                }
-                if (int.TryParse(Value[1], out Temp)) {
-                    OutputPoint.Y = Temp;
-                }
-                else {
-                    OutputPoint.Y = 0;
-                }
-                return OutputPoint;
-            }
-            else {
-                return new Point(0, 0);
+            switch (Value.Length) {
+                case 2:
+                    int OutX;
+                    int OutY;
+                    int.TryParse(Value[0], out OutX);
+                    int.TryParse(Value[1], out OutY);
+                    return new Point(OutX, OutY);
+
+                default:
+                    return new Point(0, 0);
             }
         }
         public Size ReadSize(string Key, string Section = null) {
-            var RetVal = new StringBuilder(255);
-            NativeMethods.GetPrivateProfileString(Section, Key, "", RetVal, 255, Path);
+            StringBuilder RetVal = new StringBuilder(255);
+            NativeMethods.GetPrivateProfileString(Section, Key, "", RetVal, 255, IniPath);
             string[] Value = RetVal.ToString().Split(',');
-            if (Value.Length == 2) {
-                int Temp;
-                Size OutputPoint = new Size();
-                if (int.TryParse(Value[0], out Temp)) {
-                    OutputPoint.Width = Temp;
-                }
-                else {
-                    OutputPoint.Width = 0;
-                }
-                if (int.TryParse(Value[1], out Temp)) {
-                    OutputPoint.Height = Temp;
-                }
-                else {
-                    OutputPoint.Height = 0;
-                }
-                return OutputPoint;
-            }
-            else {
-                return new Size(0, 0);
-            }
-        }
-
-        public void WriteString(string Key, string Value, string Section = null) {
-            NativeMethods.WritePrivateProfileString(Section ?? EXE, Key, Value, Path);
-        }
-        public void WriteBool(string Key, bool Value, string Section = null) {
-            switch (Value) {
-                case true:
-                    NativeMethods.WritePrivateProfileString(Section ?? EXE, Key, "True", Path);
-                    break;
+            switch (Value.Length) {
+                case 2:
+                    int OutW;
+                    int OutH;
+                    int.TryParse(Value[0], out OutW);
+                    int.TryParse(Value[1], out OutH);
+                    return new Size(OutW, OutH);
 
                 default:
-                    NativeMethods.WritePrivateProfileString(Section ?? EXE, Key, "False", Path);
-                    break;
+                    return new Size(0, 0);
             }
         }
-        public void WriteInt(string Key, int Value, string Section = null) {
-            NativeMethods.WritePrivateProfileString(Section ?? EXE, Key, Value.ToString(), Path);
+
+        public void Write(string Key, string Value, string Section = null) {
+            NativeMethods.WritePrivateProfileString(Section ?? ExecutableName, Key, Value, IniPath);
         }
-        public void WritePoint(string Key, Point Value, string Section = null) {
-            NativeMethods.WritePrivateProfileString(Section, Key, Value.X + "," + Value.Y, Path);
+        public void Write(string Key, bool Value, string Section = null) {
+            NativeMethods.WritePrivateProfileString(Section ?? ExecutableName, Key, Value ? "True" : "False", IniPath);
         }
-        public void WriteSize(string Key, Size Value, string Section = null) {
-            NativeMethods.WritePrivateProfileString(Section, Key, Value.Width + "," + Value.Height, Path);
+        public void Write(string Key, int Value, string Section = null) {
+            NativeMethods.WritePrivateProfileString(Section ?? ExecutableName, Key, Value.ToString(), IniPath);
+        }
+        public void Write(string Key, Point Value, string Section = null) {
+            NativeMethods.WritePrivateProfileString(Section, Key, Value.X + "," + Value.Y, IniPath);
+        }
+        public void Write(string Key, Size Value, string Section = null) {
+            NativeMethods.WritePrivateProfileString(Section, Key, Value.Width + "," + Value.Height, IniPath);
         }
 
         public void DeleteKey(string Key, string Section = null) {
-            WriteString(Key, null, Section ?? EXE);
+            //Write(Key, null, Section ?? ExecutableName);
+            NativeMethods.WritePrivateProfileString(Section ?? ExecutableName, Key, null, IniPath);
         }
         public void DeleteSection(string Section = null) {
-            WriteString(null, null, Section ?? EXE);
+            //Write(null, null, Section ?? ExecutableName);
+            NativeMethods.WritePrivateProfileString(Section ?? ExecutableName, null, null, IniPath);
         }
 
         public bool KeyExists(string Key, string Section = null) {

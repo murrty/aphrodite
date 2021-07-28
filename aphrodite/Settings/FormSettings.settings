@@ -5,62 +5,35 @@
     <Setting Name="frmMain_Location" Type="System.Drawing.Point" Scope="User">
       <Value Profile="(Default)">-32000, -32000</Value>
     </Setting>
-    <Setting Name="frmMain_numTagsPageLimit" Type="System.Decimal" Scope="User">
-      <Value Profile="(Default)">0</Value>
+    <Setting Name="frmBlacklist_Location" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">-32000, -32000</Value>
     </Setting>
-    <Setting Name="frmMain_numTagsImageLimit" Type="System.Decimal" Scope="User">
-      <Value Profile="(Default)">0</Value>
+    <Setting Name="frmImageDownloader_Location" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">-32000, -32000</Value>
     </Setting>
-    <Setting Name="frmMain_chkTagsUseMinimumScore" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+    <Setting Name="frmLog_Location" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">-32000, -32000</Value>
     </Setting>
-    <Setting Name="frmMain_chkTagsUseScoreAsTag" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+    <Setting Name="frmLog_Size" Type="System.Drawing.Size" Scope="User">
+      <Value Profile="(Default)">-32000, -32000</Value>
     </Setting>
-    <Setting Name="frmMain_numTagsMinimumScore" Type="System.Decimal" Scope="User">
-      <Value Profile="(Default)">0</Value>
+    <Setting Name="frmPoolDownloader_Location" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">-32000, -32000</Value>
     </Setting>
-    <Setting Name="frmMain_chkTagsDownloadExplicit" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+    <Setting Name="frmPoolWishlist_Location" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">-32000, -32000</Value>
     </Setting>
-    <Setting Name="frmMain_chkTagsDownloadQuestionable" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+    <Setting Name="frmRedownloader_Location" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">-32000, -32000</Value>
     </Setting>
-    <Setting Name="frmMain_chkTagsDownloadSafe" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+    <Setting Name="frmSettings_Location" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">-32000, -32000</Value>
     </Setting>
-    <Setting Name="frmMain_chkTagsSeparateRatings" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+    <Setting Name="frmTagDownloader_Location" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">-32000, -32000</Value>
     </Setting>
-    <Setting Name="frmMain_chkTagsOpenAfterDownload" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="frmMain_chkTagSeparateNonImages" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="frmMain_chkPoolOpenAfter" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="frmMain_chkPoolMergeBlacklisted" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="frmMain_chkImageSeparateRatings" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="frmMain_chkImageSeparateBlacklisted" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="frmMain_chkImageSeparateArtists" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="frmMain_chkImageSeparateNonImages" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="frmMain_chkImageUseForm" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="frmMain_chkImageOpenAfter" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+    <Setting Name="frmUndesiredTags_Location" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">-32000, -32000</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -2,17 +2,20 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="aphrodite.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="currentVersion" Type="System.Decimal" Scope="Application">
-      <Value Profile="(Default)">2.2</Value>
+    <Setting Name="CurrentVersion" Type="System.Decimal" Scope="Application">
+      <Value Profile="(Default)">2.21</Value>
     </Setting>
-    <Setting Name="debugDate" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">2021-04-08</Value>
+    <Setting Name="DebugDate" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">2021-04-11</Value>
     </Setting>
-    <Setting Name="IsBetaVersion" Type="System.Boolean" Scope="User">
+    <Setting Name="IsBetaVersion" Type="System.Boolean" Scope="Application">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="BetaVersion" Type="System.String" Scope="User">
-      <Value Profile="(Default)">2.3-pre-1</Value>
+    <Setting Name="BetaVersion" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">2.3-pre1</Value>
+    </Setting>
+    <Setting Name="SkippedVersion" Type="System.Decimal" Scope="User">
+      <Value Profile="(Default)">-1</Value>
     </Setting>
   </Settings>
 </SettingsFile>

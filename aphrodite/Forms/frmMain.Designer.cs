@@ -24,27 +24,40 @@
         /// </summary>
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.tabMain = new System.Windows.Forms.TabControl();
             this.tabTags = new System.Windows.Forms.TabPage();
+            this.lbTagsSeparator = new System.Windows.Forms.Label();
+            this.lbTagsLimitsHint = new System.Windows.Forms.Label();
+            this.rbTagsOtherSettings = new System.Windows.Forms.RadioButton();
+            this.rbTagsRatings = new System.Windows.Forms.RadioButton();
+            this.rbTagsLimits = new System.Windows.Forms.RadioButton();
+            this.rbTagsMinimumFavorites = new System.Windows.Forms.RadioButton();
+            this.rbTagsMinimumScore = new System.Windows.Forms.RadioButton();
+            this.btnDownloadTags = new aphrodite.Controls.ExtendedButton();
+            this.lbAwoo = new System.Windows.Forms.Label();
+            this.txtTags = new aphrodite.Controls.ExtendedTextBox();
+            this.panelTagsOtherSettings = new System.Windows.Forms.Panel();
             this.chkTagsOpenAfterDownload = new System.Windows.Forms.CheckBox();
+            this.chkTagsDownloadInUploadOrder = new System.Windows.Forms.CheckBox();
             this.chkTagSeparateNonImages = new System.Windows.Forms.CheckBox();
-            this.gbtPageLimit = new System.Windows.Forms.GroupBox();
-            this.numTagsPageLimit = new System.Windows.Forms.NumericUpDown();
-            this.gbtRatings = new System.Windows.Forms.GroupBox();
-            this.chkTagsSeparateRatings = new System.Windows.Forms.CheckBox();
-            this.chkTagsDownloadExplicit = new System.Windows.Forms.CheckBox();
+            this.panelTagsRatings = new System.Windows.Forms.Panel();
             this.chkTagsDownloadQuestionable = new System.Windows.Forms.CheckBox();
             this.chkTagsDownloadSafe = new System.Windows.Forms.CheckBox();
-            this.gbtImageLimit = new System.Windows.Forms.GroupBox();
+            this.chkTagsSeparateRatings = new System.Windows.Forms.CheckBox();
+            this.chkTagsDownloadExplicit = new System.Windows.Forms.CheckBox();
+            this.panelTagsLimits = new System.Windows.Forms.Panel();
+            this.lbTagsImageLimit = new System.Windows.Forms.Label();
+            this.lbTagsPageLimit = new System.Windows.Forms.Label();
             this.numTagsImageLimit = new System.Windows.Forms.NumericUpDown();
-            this.btnDownloadTags = new aphrodite.Controls.ExtendedButton();
-            this.txtTags = new aphrodite.Controls.ExtendedTextBox();
-            this.gbtScore = new System.Windows.Forms.GroupBox();
-            this.chkTagsUseScoreAsTag = new System.Windows.Forms.CheckBox();
-            this.chkTagsUseMinimumScore = new System.Windows.Forms.CheckBox();
+            this.numTagsPageLimit = new System.Windows.Forms.NumericUpDown();
+            this.panelTagsMinimumFavorites = new System.Windows.Forms.Panel();
+            this.chkTagsMinimumFavoritesAsTag = new System.Windows.Forms.CheckBox();
+            this.numTagsMinimumFavorites = new System.Windows.Forms.NumericUpDown();
+            this.panelTagsMinimumScore = new System.Windows.Forms.Panel();
+            this.chkTagsMinimumScoreAsTag = new System.Windows.Forms.CheckBox();
             this.numTagsMinimumScore = new System.Windows.Forms.NumericUpDown();
-            this.lbAwoo = new System.Windows.Forms.Label();
-            this.chkTagsDownloadInUploadOrder = new System.Windows.Forms.CheckBox();
+            this.chkTagsUseMinimumScore = new System.Windows.Forms.CheckBox();
             this.tabPools = new System.Windows.Forms.TabPage();
             this.chkPoolDownloadBlacklistedImages = new System.Windows.Forms.CheckBox();
             this.chkPoolMergeBlacklisted = new System.Windows.Forms.CheckBox();
@@ -77,12 +90,14 @@
             this.TouchingTips = new System.Windows.Forms.ToolTip(this.components);
             this.tabMain.SuspendLayout();
             this.tabTags.SuspendLayout();
-            this.gbtPageLimit.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numTagsPageLimit)).BeginInit();
-            this.gbtRatings.SuspendLayout();
-            this.gbtImageLimit.SuspendLayout();
+            this.panelTagsOtherSettings.SuspendLayout();
+            this.panelTagsRatings.SuspendLayout();
+            this.panelTagsLimits.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numTagsImageLimit)).BeginInit();
-            this.gbtScore.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numTagsPageLimit)).BeginInit();
+            this.panelTagsMinimumFavorites.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numTagsMinimumFavorites)).BeginInit();
+            this.panelTagsMinimumScore.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numTagsMinimumScore)).BeginInit();
             this.tabPools.SuspendLayout();
             this.tabImages.SuspendLayout();
@@ -105,16 +120,21 @@
             // 
             // tabTags
             // 
-            this.tabTags.Controls.Add(this.chkTagsOpenAfterDownload);
-            this.tabTags.Controls.Add(this.chkTagSeparateNonImages);
-            this.tabTags.Controls.Add(this.gbtPageLimit);
-            this.tabTags.Controls.Add(this.gbtRatings);
-            this.tabTags.Controls.Add(this.gbtImageLimit);
+            this.tabTags.Controls.Add(this.lbTagsSeparator);
+            this.tabTags.Controls.Add(this.lbTagsLimitsHint);
+            this.tabTags.Controls.Add(this.rbTagsOtherSettings);
+            this.tabTags.Controls.Add(this.rbTagsRatings);
+            this.tabTags.Controls.Add(this.rbTagsLimits);
+            this.tabTags.Controls.Add(this.rbTagsMinimumFavorites);
+            this.tabTags.Controls.Add(this.rbTagsMinimumScore);
             this.tabTags.Controls.Add(this.btnDownloadTags);
-            this.tabTags.Controls.Add(this.txtTags);
-            this.tabTags.Controls.Add(this.gbtScore);
             this.tabTags.Controls.Add(this.lbAwoo);
-            this.tabTags.Controls.Add(this.chkTagsDownloadInUploadOrder);
+            this.tabTags.Controls.Add(this.txtTags);
+            this.tabTags.Controls.Add(this.panelTagsOtherSettings);
+            this.tabTags.Controls.Add(this.panelTagsRatings);
+            this.tabTags.Controls.Add(this.panelTagsLimits);
+            this.tabTags.Controls.Add(this.panelTagsMinimumFavorites);
+            this.tabTags.Controls.Add(this.panelTagsMinimumScore);
             this.tabTags.Location = new System.Drawing.Point(4, 22);
             this.tabTags.Name = "tabTags";
             this.tabTags.Padding = new System.Windows.Forms.Padding(3);
@@ -123,158 +143,117 @@
             this.tabTags.Text = "Tag(s)";
             this.tabTags.UseVisualStyleBackColor = true;
             // 
-            // chkTagsOpenAfterDownload
+            // lbTagsSeparator
             // 
-            this.chkTagsOpenAfterDownload.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.chkTagsOpenAfterDownload.AutoSize = true;
-            this.chkTagsOpenAfterDownload.Location = new System.Drawing.Point(6, 145);
-            this.chkTagsOpenAfterDownload.Name = "chkTagsOpenAfterDownload";
-            this.chkTagsOpenAfterDownload.Size = new System.Drawing.Size(154, 17);
-            this.chkTagsOpenAfterDownload.TabIndex = 9;
-            this.chkTagsOpenAfterDownload.Text = "Open after downloading";
-            this.TouchingTips.SetToolTip(this.chkTagsOpenAfterDownload, "Opens the folder after download is finished");
-            this.chkTagsOpenAfterDownload.UseVisualStyleBackColor = true;
+            this.lbTagsSeparator.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.lbTagsSeparator.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.lbTagsSeparator.Location = new System.Drawing.Point(124, 39);
+            this.lbTagsSeparator.Name = "lbTagsSeparator";
+            this.lbTagsSeparator.Size = new System.Drawing.Size(2, 133);
+            this.lbTagsSeparator.TabIndex = 7;
+            this.lbTagsSeparator.Text = "hey";
             // 
-            // chkTagSeparateNonImages
+            // lbTagsLimitsHint
             // 
-            this.chkTagSeparateNonImages.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.chkTagSeparateNonImages.AutoSize = true;
-            this.chkTagSeparateNonImages.Checked = true;
-            this.chkTagSeparateNonImages.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkTagSeparateNonImages.Location = new System.Drawing.Point(163, 156);
-            this.chkTagSeparateNonImages.Name = "chkTagSeparateNonImages";
-            this.chkTagSeparateNonImages.Size = new System.Drawing.Size(134, 17);
-            this.chkTagSeparateNonImages.TabIndex = 6;
-            this.chkTagSeparateNonImages.Text = "Separate non-images";
-            this.TouchingTips.SetToolTip(this.chkTagSeparateNonImages, "Separates files that are not images (jpg, png, bmg...) to a separate folder");
-            this.chkTagSeparateNonImages.UseVisualStyleBackColor = true;
+            this.lbTagsLimitsHint.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.lbTagsLimitsHint.Location = new System.Drawing.Point(126, 0);
+            this.lbTagsLimitsHint.Name = "lbTagsLimitsHint";
+            this.lbTagsLimitsHint.Size = new System.Drawing.Size(178, 21);
+            this.lbTagsLimitsHint.TabIndex = 17;
+            this.lbTagsLimitsHint.Text = "0 = off";
+            this.lbTagsLimitsHint.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lbTagsLimitsHint.Visible = false;
             // 
-            // gbtPageLimit
+            // rbTagsOtherSettings
             // 
-            this.gbtPageLimit.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.gbtPageLimit.Controls.Add(this.numTagsPageLimit);
-            this.gbtPageLimit.Location = new System.Drawing.Point(9, 36);
-            this.gbtPageLimit.Name = "gbtPageLimit";
-            this.gbtPageLimit.Size = new System.Drawing.Size(136, 46);
-            this.gbtPageLimit.TabIndex = 2;
-            this.gbtPageLimit.TabStop = false;
-            this.gbtPageLimit.Text = "Page limit (0 = off)";
+            this.rbTagsOtherSettings.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.rbTagsOtherSettings.Appearance = System.Windows.Forms.Appearance.Button;
+            this.rbTagsOtherSettings.Location = new System.Drawing.Point(9, 152);
+            this.rbTagsOtherSettings.Name = "rbTagsOtherSettings";
+            this.rbTagsOtherSettings.Size = new System.Drawing.Size(110, 23);
+            this.rbTagsOtherSettings.TabIndex = 6;
+            this.rbTagsOtherSettings.TabStop = true;
+            this.rbTagsOtherSettings.Text = "Other settings";
+            this.rbTagsOtherSettings.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.rbTagsOtherSettings.UseVisualStyleBackColor = true;
+            this.rbTagsOtherSettings.CheckedChanged += new System.EventHandler(this.rbTagsOtherSettings_CheckedChanged);
             // 
-            // numTagsPageLimit
+            // rbTagsRatings
             // 
-            this.numTagsPageLimit.Location = new System.Drawing.Point(37, 19);
-            this.numTagsPageLimit.Maximum = new decimal(new int[] {
-            9999999,
-            0,
-            0,
-            0});
-            this.numTagsPageLimit.Name = "numTagsPageLimit";
-            this.numTagsPageLimit.Size = new System.Drawing.Size(63, 22);
-            this.numTagsPageLimit.TabIndex = 1;
-            this.numTagsPageLimit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.TouchingTips.SetToolTip(this.numTagsPageLimit, "The amount of pages that will be downloaded (320 images per page)");
+            this.rbTagsRatings.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.rbTagsRatings.Appearance = System.Windows.Forms.Appearance.Button;
+            this.rbTagsRatings.Location = new System.Drawing.Point(9, 123);
+            this.rbTagsRatings.Name = "rbTagsRatings";
+            this.rbTagsRatings.Size = new System.Drawing.Size(110, 23);
+            this.rbTagsRatings.TabIndex = 5;
+            this.rbTagsRatings.TabStop = true;
+            this.rbTagsRatings.Text = "Ratings";
+            this.rbTagsRatings.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.rbTagsRatings.UseVisualStyleBackColor = true;
+            this.rbTagsRatings.CheckedChanged += new System.EventHandler(this.rbTagsRatings_CheckedChanged);
             // 
-            // gbtRatings
+            // rbTagsLimits
             // 
-            this.gbtRatings.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.gbtRatings.Controls.Add(this.chkTagsSeparateRatings);
-            this.gbtRatings.Controls.Add(this.chkTagsDownloadExplicit);
-            this.gbtRatings.Controls.Add(this.chkTagsDownloadQuestionable);
-            this.gbtRatings.Controls.Add(this.chkTagsDownloadSafe);
-            this.gbtRatings.Location = new System.Drawing.Point(159, 102);
-            this.gbtRatings.Name = "gbtRatings";
-            this.gbtRatings.Size = new System.Drawing.Size(136, 51);
-            this.gbtRatings.TabIndex = 5;
-            this.gbtRatings.TabStop = false;
-            this.gbtRatings.Text = "Ratings to download";
+            this.rbTagsLimits.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.rbTagsLimits.Appearance = System.Windows.Forms.Appearance.Button;
+            this.rbTagsLimits.Location = new System.Drawing.Point(9, 94);
+            this.rbTagsLimits.Name = "rbTagsLimits";
+            this.rbTagsLimits.Size = new System.Drawing.Size(110, 23);
+            this.rbTagsLimits.TabIndex = 4;
+            this.rbTagsLimits.TabStop = true;
+            this.rbTagsLimits.Text = "Page/Image limits";
+            this.rbTagsLimits.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.rbTagsLimits.UseVisualStyleBackColor = true;
+            this.rbTagsLimits.CheckedChanged += new System.EventHandler(this.rbTagsLimits_CheckedChanged);
             // 
-            // chkTagsSeparateRatings
+            // rbTagsMinimumFavorites
             // 
-            this.chkTagsSeparateRatings.AutoSize = true;
-            this.chkTagsSeparateRatings.Checked = true;
-            this.chkTagsSeparateRatings.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkTagsSeparateRatings.Location = new System.Drawing.Point(16, 31);
-            this.chkTagsSeparateRatings.Name = "chkTagsSeparateRatings";
-            this.chkTagsSeparateRatings.Size = new System.Drawing.Size(109, 17);
-            this.chkTagsSeparateRatings.TabIndex = 4;
-            this.chkTagsSeparateRatings.Text = "Separate ratings";
-            this.TouchingTips.SetToolTip(this.chkTagsSeparateRatings, "Separates ratings into different folders");
-            this.chkTagsSeparateRatings.UseVisualStyleBackColor = true;
+            this.rbTagsMinimumFavorites.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.rbTagsMinimumFavorites.Appearance = System.Windows.Forms.Appearance.Button;
+            this.rbTagsMinimumFavorites.Location = new System.Drawing.Point(9, 65);
+            this.rbTagsMinimumFavorites.Name = "rbTagsMinimumFavorites";
+            this.rbTagsMinimumFavorites.Size = new System.Drawing.Size(110, 23);
+            this.rbTagsMinimumFavorites.TabIndex = 3;
+            this.rbTagsMinimumFavorites.TabStop = true;
+            this.rbTagsMinimumFavorites.Text = "Minimum favorites";
+            this.rbTagsMinimumFavorites.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.rbTagsMinimumFavorites.UseVisualStyleBackColor = true;
+            this.rbTagsMinimumFavorites.CheckedChanged += new System.EventHandler(this.rbTagsMinimumFavorites_CheckedChanged);
             // 
-            // chkTagsDownloadExplicit
+            // rbTagsMinimumScore
             // 
-            this.chkTagsDownloadExplicit.AutoSize = true;
-            this.chkTagsDownloadExplicit.Checked = true;
-            this.chkTagsDownloadExplicit.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkTagsDownloadExplicit.Location = new System.Drawing.Point(15, 14);
-            this.chkTagsDownloadExplicit.Name = "chkTagsDownloadExplicit";
-            this.chkTagsDownloadExplicit.Size = new System.Drawing.Size(31, 17);
-            this.chkTagsDownloadExplicit.TabIndex = 1;
-            this.chkTagsDownloadExplicit.Text = "E";
-            this.TouchingTips.SetToolTip(this.chkTagsDownloadExplicit, "Download images rated Explicit");
-            this.chkTagsDownloadExplicit.UseVisualStyleBackColor = true;
-            // 
-            // chkTagsDownloadQuestionable
-            // 
-            this.chkTagsDownloadQuestionable.AutoSize = true;
-            this.chkTagsDownloadQuestionable.Checked = true;
-            this.chkTagsDownloadQuestionable.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkTagsDownloadQuestionable.Location = new System.Drawing.Point(53, 14);
-            this.chkTagsDownloadQuestionable.Name = "chkTagsDownloadQuestionable";
-            this.chkTagsDownloadQuestionable.Size = new System.Drawing.Size(33, 17);
-            this.chkTagsDownloadQuestionable.TabIndex = 2;
-            this.chkTagsDownloadQuestionable.Text = "Q";
-            this.TouchingTips.SetToolTip(this.chkTagsDownloadQuestionable, "Download images rated Questionable");
-            this.chkTagsDownloadQuestionable.UseVisualStyleBackColor = true;
-            // 
-            // chkTagsDownloadSafe
-            // 
-            this.chkTagsDownloadSafe.AutoSize = true;
-            this.chkTagsDownloadSafe.Checked = true;
-            this.chkTagsDownloadSafe.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkTagsDownloadSafe.Location = new System.Drawing.Point(92, 14);
-            this.chkTagsDownloadSafe.Name = "chkTagsDownloadSafe";
-            this.chkTagsDownloadSafe.Size = new System.Drawing.Size(31, 17);
-            this.chkTagsDownloadSafe.TabIndex = 3;
-            this.chkTagsDownloadSafe.Text = "S";
-            this.TouchingTips.SetToolTip(this.chkTagsDownloadSafe, "Download images rated Safe");
-            this.chkTagsDownloadSafe.UseVisualStyleBackColor = true;
-            // 
-            // gbtImageLimit
-            // 
-            this.gbtImageLimit.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.gbtImageLimit.Controls.Add(this.numTagsImageLimit);
-            this.gbtImageLimit.Location = new System.Drawing.Point(9, 88);
-            this.gbtImageLimit.Name = "gbtImageLimit";
-            this.gbtImageLimit.Size = new System.Drawing.Size(138, 51);
-            this.gbtImageLimit.TabIndex = 4;
-            this.gbtImageLimit.TabStop = false;
-            this.gbtImageLimit.Text = "Image limit (0 = off)";
-            // 
-            // numTagsImageLimit
-            // 
-            this.numTagsImageLimit.Location = new System.Drawing.Point(29, 21);
-            this.numTagsImageLimit.Maximum = new decimal(new int[] {
-            9999999,
-            0,
-            0,
-            0});
-            this.numTagsImageLimit.Name = "numTagsImageLimit";
-            this.numTagsImageLimit.Size = new System.Drawing.Size(81, 22);
-            this.numTagsImageLimit.TabIndex = 1;
-            this.numTagsImageLimit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.TouchingTips.SetToolTip(this.numTagsImageLimit, "Limits downloads to a certain amount of images");
+            this.rbTagsMinimumScore.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.rbTagsMinimumScore.Appearance = System.Windows.Forms.Appearance.Button;
+            this.rbTagsMinimumScore.Location = new System.Drawing.Point(9, 36);
+            this.rbTagsMinimumScore.Name = "rbTagsMinimumScore";
+            this.rbTagsMinimumScore.Size = new System.Drawing.Size(110, 23);
+            this.rbTagsMinimumScore.TabIndex = 2;
+            this.rbTagsMinimumScore.TabStop = true;
+            this.rbTagsMinimumScore.Text = "Minimum score";
+            this.rbTagsMinimumScore.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.rbTagsMinimumScore.UseVisualStyleBackColor = true;
+            this.rbTagsMinimumScore.CheckedChanged += new System.EventHandler(this.rbTagsMinimumScore_CheckedChanged);
             // 
             // btnDownloadTags
             // 
-            this.btnDownloadTags.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.btnDownloadTags.Location = new System.Drawing.Point(112, 182);
+            this.btnDownloadTags.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.btnDownloadTags.Location = new System.Drawing.Point(112, 180);
             this.btnDownloadTags.Name = "btnDownloadTags";
-            this.btnDownloadTags.Size = new System.Drawing.Size(81, 23);
-            this.btnDownloadTags.TabIndex = 8;
+            this.btnDownloadTags.Size = new System.Drawing.Size(80, 23);
+            this.btnDownloadTags.TabIndex = 14;
             this.btnDownloadTags.Text = "Download";
             this.btnDownloadTags.UseVisualStyleBackColor = true;
             this.btnDownloadTags.Click += new System.EventHandler(this.btnDownloadTags_Click);
+            // 
+            // lbAwoo
+            // 
+            this.lbAwoo.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.lbAwoo.AutoSize = true;
+            this.lbAwoo.Location = new System.Drawing.Point(124, 170);
+            this.lbAwoo.Name = "lbAwoo";
+            this.lbAwoo.Size = new System.Drawing.Size(57, 13);
+            this.lbAwoo.TabIndex = 13;
+            this.lbAwoo.Text = "awooooo";
             // 
             // txtTags
             // 
@@ -300,51 +279,265 @@
             this.txtTags.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtTags_KeyDown);
             this.txtTags.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtTags_KeyPress);
             // 
-            // gbtScore
+            // panelTagsOtherSettings
             // 
-            this.gbtScore.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.gbtScore.Controls.Add(this.chkTagsUseScoreAsTag);
-            this.gbtScore.Controls.Add(this.chkTagsUseMinimumScore);
-            this.gbtScore.Controls.Add(this.numTagsMinimumScore);
-            this.gbtScore.Location = new System.Drawing.Point(160, 36);
-            this.gbtScore.Name = "gbtScore";
-            this.gbtScore.Size = new System.Drawing.Size(136, 65);
-            this.gbtScore.TabIndex = 3;
-            this.gbtScore.TabStop = false;
-            this.gbtScore.Text = "Score minimum";
+            this.panelTagsOtherSettings.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.panelTagsOtherSettings.Controls.Add(this.chkTagsOpenAfterDownload);
+            this.panelTagsOtherSettings.Controls.Add(this.chkTagsDownloadInUploadOrder);
+            this.panelTagsOtherSettings.Controls.Add(this.chkTagSeparateNonImages);
+            this.panelTagsOtherSettings.Location = new System.Drawing.Point(118, 36);
+            this.panelTagsOtherSettings.Name = "panelTagsOtherSettings";
+            this.panelTagsOtherSettings.Size = new System.Drawing.Size(180, 140);
+            this.panelTagsOtherSettings.TabIndex = 12;
+            this.panelTagsOtherSettings.Visible = false;
             // 
-            // chkTagsUseScoreAsTag
+            // chkTagsOpenAfterDownload
             // 
-            this.chkTagsUseScoreAsTag.AutoSize = true;
-            this.chkTagsUseScoreAsTag.Checked = true;
-            this.chkTagsUseScoreAsTag.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkTagsUseScoreAsTag.Enabled = false;
-            this.chkTagsUseScoreAsTag.Location = new System.Drawing.Point(74, 18);
-            this.chkTagsUseScoreAsTag.Name = "chkTagsUseScoreAsTag";
-            this.chkTagsUseScoreAsTag.Size = new System.Drawing.Size(57, 17);
-            this.chkTagsUseScoreAsTag.TabIndex = 2;
-            this.chkTagsUseScoreAsTag.Text = "As tag";
-            this.TouchingTips.SetToolTip(this.chkTagsUseScoreAsTag, "If checked, uses the score minimum as a tag (ex: \"gay score:>25\").\r\nThis widly in" +
-        "creases the images that will be downloaded.\r\nOnly used if there are 5 or less ta" +
-        "gs being queried");
-            this.chkTagsUseScoreAsTag.UseVisualStyleBackColor = true;
+            this.chkTagsOpenAfterDownload.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.chkTagsOpenAfterDownload.AutoSize = true;
+            this.chkTagsOpenAfterDownload.Location = new System.Drawing.Point(14, 39);
+            this.chkTagsOpenAfterDownload.Name = "chkTagsOpenAfterDownload";
+            this.chkTagsOpenAfterDownload.Size = new System.Drawing.Size(154, 17);
+            this.chkTagsOpenAfterDownload.TabIndex = 9;
+            this.chkTagsOpenAfterDownload.Text = "Open after downloading";
+            this.TouchingTips.SetToolTip(this.chkTagsOpenAfterDownload, "Opens the folder after download is finished");
+            this.chkTagsOpenAfterDownload.UseVisualStyleBackColor = true;
             // 
-            // chkTagsUseMinimumScore
+            // chkTagsDownloadInUploadOrder
             // 
-            this.chkTagsUseMinimumScore.AutoSize = true;
-            this.chkTagsUseMinimumScore.Location = new System.Drawing.Point(12, 18);
-            this.chkTagsUseMinimumScore.Name = "chkTagsUseMinimumScore";
-            this.chkTagsUseMinimumScore.Size = new System.Drawing.Size(60, 17);
-            this.chkTagsUseMinimumScore.TabIndex = 1;
-            this.chkTagsUseMinimumScore.Text = "Enable";
-            this.TouchingTips.SetToolTip(this.chkTagsUseMinimumScore, "Only downloads images with a score equal to or greater than provided");
-            this.chkTagsUseMinimumScore.UseVisualStyleBackColor = true;
-            this.chkTagsUseMinimumScore.CheckedChanged += new System.EventHandler(this.chkTagsUseMinimumScore_CheckedChanged);
+            this.chkTagsDownloadInUploadOrder.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.chkTagsDownloadInUploadOrder.AutoSize = true;
+            this.chkTagsDownloadInUploadOrder.Location = new System.Drawing.Point(14, 85);
+            this.chkTagsDownloadInUploadOrder.Name = "chkTagsDownloadInUploadOrder";
+            this.chkTagsDownloadInUploadOrder.Size = new System.Drawing.Size(168, 17);
+            this.chkTagsDownloadInUploadOrder.TabIndex = 10;
+            this.chkTagsDownloadInUploadOrder.Text = "Download newest to oldest";
+            this.TouchingTips.SetToolTip(this.chkTagsDownloadInUploadOrder, "Download tags in order of newest to oldest");
+            this.chkTagsDownloadInUploadOrder.UseVisualStyleBackColor = true;
+            // 
+            // chkTagSeparateNonImages
+            // 
+            this.chkTagSeparateNonImages.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.chkTagSeparateNonImages.AutoSize = true;
+            this.chkTagSeparateNonImages.Checked = true;
+            this.chkTagSeparateNonImages.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkTagSeparateNonImages.Location = new System.Drawing.Point(14, 62);
+            this.chkTagSeparateNonImages.Name = "chkTagSeparateNonImages";
+            this.chkTagSeparateNonImages.Size = new System.Drawing.Size(134, 17);
+            this.chkTagSeparateNonImages.TabIndex = 6;
+            this.chkTagSeparateNonImages.Text = "Separate non-images";
+            this.TouchingTips.SetToolTip(this.chkTagSeparateNonImages, "Separates files that are not images (gif, webm, swf...) to a separate folder");
+            this.chkTagSeparateNonImages.UseVisualStyleBackColor = true;
+            // 
+            // panelTagsRatings
+            // 
+            this.panelTagsRatings.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.panelTagsRatings.Controls.Add(this.chkTagsDownloadQuestionable);
+            this.panelTagsRatings.Controls.Add(this.chkTagsDownloadSafe);
+            this.panelTagsRatings.Controls.Add(this.chkTagsSeparateRatings);
+            this.panelTagsRatings.Controls.Add(this.chkTagsDownloadExplicit);
+            this.panelTagsRatings.Location = new System.Drawing.Point(118, 36);
+            this.panelTagsRatings.Name = "panelTagsRatings";
+            this.panelTagsRatings.Size = new System.Drawing.Size(180, 140);
+            this.panelTagsRatings.TabIndex = 11;
+            this.panelTagsRatings.Visible = false;
+            // 
+            // chkTagsDownloadQuestionable
+            // 
+            this.chkTagsDownloadQuestionable.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.chkTagsDownloadQuestionable.AutoSize = true;
+            this.chkTagsDownloadQuestionable.Checked = true;
+            this.chkTagsDownloadQuestionable.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkTagsDownloadQuestionable.Location = new System.Drawing.Point(33, 46);
+            this.chkTagsDownloadQuestionable.Name = "chkTagsDownloadQuestionable";
+            this.chkTagsDownloadQuestionable.Size = new System.Drawing.Size(144, 17);
+            this.chkTagsDownloadQuestionable.TabIndex = 6;
+            this.chkTagsDownloadQuestionable.Text = "Save Questionable files";
+            this.TouchingTips.SetToolTip(this.chkTagsDownloadQuestionable, "Download images rated Questionable");
+            this.chkTagsDownloadQuestionable.UseVisualStyleBackColor = true;
+            // 
+            // chkTagsDownloadSafe
+            // 
+            this.chkTagsDownloadSafe.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.chkTagsDownloadSafe.AutoSize = true;
+            this.chkTagsDownloadSafe.Checked = true;
+            this.chkTagsDownloadSafe.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkTagsDownloadSafe.Location = new System.Drawing.Point(33, 69);
+            this.chkTagsDownloadSafe.Name = "chkTagsDownloadSafe";
+            this.chkTagsDownloadSafe.Size = new System.Drawing.Size(97, 17);
+            this.chkTagsDownloadSafe.TabIndex = 7;
+            this.chkTagsDownloadSafe.Text = "Save Safe files";
+            this.TouchingTips.SetToolTip(this.chkTagsDownloadSafe, "Download images rated Safe");
+            this.chkTagsDownloadSafe.UseVisualStyleBackColor = true;
+            // 
+            // chkTagsSeparateRatings
+            // 
+            this.chkTagsSeparateRatings.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.chkTagsSeparateRatings.AutoSize = true;
+            this.chkTagsSeparateRatings.Checked = true;
+            this.chkTagsSeparateRatings.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkTagsSeparateRatings.Location = new System.Drawing.Point(33, 104);
+            this.chkTagsSeparateRatings.Name = "chkTagsSeparateRatings";
+            this.chkTagsSeparateRatings.Size = new System.Drawing.Size(109, 17);
+            this.chkTagsSeparateRatings.TabIndex = 8;
+            this.chkTagsSeparateRatings.Text = "Separate ratings";
+            this.TouchingTips.SetToolTip(this.chkTagsSeparateRatings, "Separates ratings into different folders");
+            this.chkTagsSeparateRatings.UseVisualStyleBackColor = true;
+            // 
+            // chkTagsDownloadExplicit
+            // 
+            this.chkTagsDownloadExplicit.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.chkTagsDownloadExplicit.AutoSize = true;
+            this.chkTagsDownloadExplicit.Checked = true;
+            this.chkTagsDownloadExplicit.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkTagsDownloadExplicit.Location = new System.Drawing.Point(33, 23);
+            this.chkTagsDownloadExplicit.Name = "chkTagsDownloadExplicit";
+            this.chkTagsDownloadExplicit.Size = new System.Drawing.Size(111, 17);
+            this.chkTagsDownloadExplicit.TabIndex = 5;
+            this.chkTagsDownloadExplicit.Text = "Save Explicit files";
+            this.TouchingTips.SetToolTip(this.chkTagsDownloadExplicit, "Download images rated Explicit");
+            this.chkTagsDownloadExplicit.UseVisualStyleBackColor = true;
+            // 
+            // panelTagsLimits
+            // 
+            this.panelTagsLimits.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.panelTagsLimits.Controls.Add(this.lbTagsImageLimit);
+            this.panelTagsLimits.Controls.Add(this.lbTagsPageLimit);
+            this.panelTagsLimits.Controls.Add(this.numTagsImageLimit);
+            this.panelTagsLimits.Controls.Add(this.numTagsPageLimit);
+            this.panelTagsLimits.Location = new System.Drawing.Point(118, 36);
+            this.panelTagsLimits.Name = "panelTagsLimits";
+            this.panelTagsLimits.Size = new System.Drawing.Size(180, 140);
+            this.panelTagsLimits.TabIndex = 10;
+            this.panelTagsLimits.Visible = false;
+            // 
+            // lbTagsImageLimit
+            // 
+            this.lbTagsImageLimit.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.lbTagsImageLimit.Location = new System.Drawing.Point(14, 90);
+            this.lbTagsImageLimit.Name = "lbTagsImageLimit";
+            this.lbTagsImageLimit.Size = new System.Drawing.Size(65, 20);
+            this.lbTagsImageLimit.TabIndex = 5;
+            this.lbTagsImageLimit.Text = "Image limit";
+            this.lbTagsImageLimit.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // lbTagsPageLimit
+            // 
+            this.lbTagsPageLimit.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.lbTagsPageLimit.Location = new System.Drawing.Point(14, 50);
+            this.lbTagsPageLimit.Name = "lbTagsPageLimit";
+            this.lbTagsPageLimit.Size = new System.Drawing.Size(65, 20);
+            this.lbTagsPageLimit.TabIndex = 4;
+            this.lbTagsPageLimit.Text = "Page limit";
+            this.lbTagsPageLimit.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // numTagsImageLimit
+            // 
+            this.numTagsImageLimit.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.numTagsImageLimit.Location = new System.Drawing.Point(85, 90);
+            this.numTagsImageLimit.Maximum = new decimal(new int[] {
+            9999999,
+            0,
+            0,
+            0});
+            this.numTagsImageLimit.Name = "numTagsImageLimit";
+            this.numTagsImageLimit.Size = new System.Drawing.Size(80, 22);
+            this.numTagsImageLimit.TabIndex = 1;
+            this.numTagsImageLimit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TouchingTips.SetToolTip(this.numTagsImageLimit, "Limits downloads to a certain amount of images");
+            // 
+            // numTagsPageLimit
+            // 
+            this.numTagsPageLimit.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.numTagsPageLimit.Location = new System.Drawing.Point(85, 50);
+            this.numTagsPageLimit.Maximum = new decimal(new int[] {
+            9999999,
+            0,
+            0,
+            0});
+            this.numTagsPageLimit.Name = "numTagsPageLimit";
+            this.numTagsPageLimit.Size = new System.Drawing.Size(80, 22);
+            this.numTagsPageLimit.TabIndex = 1;
+            this.numTagsPageLimit.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TouchingTips.SetToolTip(this.numTagsPageLimit, "The amount of pages that will be downloaded (320 images per page)");
+            // 
+            // panelTagsMinimumFavorites
+            // 
+            this.panelTagsMinimumFavorites.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.panelTagsMinimumFavorites.Controls.Add(this.chkTagsMinimumFavoritesAsTag);
+            this.panelTagsMinimumFavorites.Controls.Add(this.numTagsMinimumFavorites);
+            this.panelTagsMinimumFavorites.Location = new System.Drawing.Point(118, 36);
+            this.panelTagsMinimumFavorites.Name = "panelTagsMinimumFavorites";
+            this.panelTagsMinimumFavorites.Size = new System.Drawing.Size(180, 140);
+            this.panelTagsMinimumFavorites.TabIndex = 9;
+            this.panelTagsMinimumFavorites.Visible = false;
+            // 
+            // chkTagsMinimumFavoritesAsTag
+            // 
+            this.chkTagsMinimumFavoritesAsTag.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.chkTagsMinimumFavoritesAsTag.AutoSize = true;
+            this.chkTagsMinimumFavoritesAsTag.Checked = true;
+            this.chkTagsMinimumFavoritesAsTag.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkTagsMinimumFavoritesAsTag.Location = new System.Drawing.Point(66, 95);
+            this.chkTagsMinimumFavoritesAsTag.Name = "chkTagsMinimumFavoritesAsTag";
+            this.chkTagsMinimumFavoritesAsTag.Size = new System.Drawing.Size(57, 17);
+            this.chkTagsMinimumFavoritesAsTag.TabIndex = 4;
+            this.chkTagsMinimumFavoritesAsTag.Text = "As tag";
+            this.TouchingTips.SetToolTip(this.chkTagsMinimumFavoritesAsTag, resources.GetString("chkTagsMinimumFavoritesAsTag.ToolTip"));
+            this.chkTagsMinimumFavoritesAsTag.UseVisualStyleBackColor = true;
+            // 
+            // numTagsMinimumFavorites
+            // 
+            this.numTagsMinimumFavorites.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.numTagsMinimumFavorites.Location = new System.Drawing.Point(63, 66);
+            this.numTagsMinimumFavorites.Maximum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            0});
+            this.numTagsMinimumFavorites.Minimum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            -2147483648});
+            this.numTagsMinimumFavorites.Name = "numTagsMinimumFavorites";
+            this.numTagsMinimumFavorites.Size = new System.Drawing.Size(63, 22);
+            this.numTagsMinimumFavorites.TabIndex = 5;
+            this.numTagsMinimumFavorites.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.TouchingTips.SetToolTip(this.numTagsMinimumFavorites, "The minimum favorites count that will be downloaded");
+            // 
+            // panelTagsMinimumScore
+            // 
+            this.panelTagsMinimumScore.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.panelTagsMinimumScore.Controls.Add(this.chkTagsMinimumScoreAsTag);
+            this.panelTagsMinimumScore.Controls.Add(this.numTagsMinimumScore);
+            this.panelTagsMinimumScore.Controls.Add(this.chkTagsUseMinimumScore);
+            this.panelTagsMinimumScore.Location = new System.Drawing.Point(118, 36);
+            this.panelTagsMinimumScore.Name = "panelTagsMinimumScore";
+            this.panelTagsMinimumScore.Size = new System.Drawing.Size(180, 140);
+            this.panelTagsMinimumScore.TabIndex = 8;
+            this.panelTagsMinimumScore.Visible = false;
+            // 
+            // chkTagsMinimumScoreAsTag
+            // 
+            this.chkTagsMinimumScoreAsTag.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.chkTagsMinimumScoreAsTag.AutoSize = true;
+            this.chkTagsMinimumScoreAsTag.Checked = true;
+            this.chkTagsMinimumScoreAsTag.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkTagsMinimumScoreAsTag.Enabled = false;
+            this.chkTagsMinimumScoreAsTag.Location = new System.Drawing.Point(66, 95);
+            this.chkTagsMinimumScoreAsTag.Name = "chkTagsMinimumScoreAsTag";
+            this.chkTagsMinimumScoreAsTag.Size = new System.Drawing.Size(57, 17);
+            this.chkTagsMinimumScoreAsTag.TabIndex = 2;
+            this.chkTagsMinimumScoreAsTag.Text = "As tag";
+            this.TouchingTips.SetToolTip(this.chkTagsMinimumScoreAsTag, resources.GetString("chkTagsMinimumScoreAsTag.ToolTip"));
+            this.chkTagsMinimumScoreAsTag.UseVisualStyleBackColor = true;
             // 
             // numTagsMinimumScore
             // 
+            this.numTagsMinimumScore.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.numTagsMinimumScore.Enabled = false;
-            this.numTagsMinimumScore.Location = new System.Drawing.Point(37, 39);
+            this.numTagsMinimumScore.Location = new System.Drawing.Point(63, 66);
             this.numTagsMinimumScore.Maximum = new decimal(new int[] {
             99999,
             0,
@@ -359,28 +552,21 @@
             this.numTagsMinimumScore.Size = new System.Drawing.Size(63, 22);
             this.numTagsMinimumScore.TabIndex = 3;
             this.numTagsMinimumScore.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.TouchingTips.SetToolTip(this.numTagsMinimumScore, "The minimum score required");
+            this.TouchingTips.SetToolTip(this.numTagsMinimumScore, "The minimum score that will be downloaded");
             // 
-            // lbAwoo
+            // chkTagsUseMinimumScore
             // 
-            this.lbAwoo.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.lbAwoo.AutoSize = true;
-            this.lbAwoo.Location = new System.Drawing.Point(124, 172);
-            this.lbAwoo.Name = "lbAwoo";
-            this.lbAwoo.Size = new System.Drawing.Size(57, 13);
-            this.lbAwoo.TabIndex = 7;
-            this.lbAwoo.Text = "awooooo";
-            // 
-            // chkTagsDownloadInUploadOrder
-            // 
-            this.chkTagsDownloadInUploadOrder.AutoSize = true;
-            this.chkTagsDownloadInUploadOrder.Location = new System.Drawing.Point(6, 168);
-            this.chkTagsDownloadInUploadOrder.Name = "chkTagsDownloadInUploadOrder";
-            this.chkTagsDownloadInUploadOrder.Size = new System.Drawing.Size(123, 17);
-            this.chkTagsDownloadInUploadOrder.TabIndex = 10;
-            this.chkTagsDownloadInUploadOrder.Text = "Download in order";
-            this.TouchingTips.SetToolTip(this.chkTagsDownloadInUploadOrder, "Download tags in order of newest to oldest");
-            this.chkTagsDownloadInUploadOrder.UseVisualStyleBackColor = true;
+            this.chkTagsUseMinimumScore.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.chkTagsUseMinimumScore.AutoSize = true;
+            this.chkTagsUseMinimumScore.Location = new System.Drawing.Point(28, 33);
+            this.chkTagsUseMinimumScore.Name = "chkTagsUseMinimumScore";
+            this.chkTagsUseMinimumScore.Size = new System.Drawing.Size(140, 17);
+            this.chkTagsUseMinimumScore.TabIndex = 1;
+            this.chkTagsUseMinimumScore.Text = "Enable minimum score";
+            this.TouchingTips.SetToolTip(this.chkTagsUseMinimumScore, "Only downloads images with a score equal to or greater than provided\r\nThis option" +
+        " is required because scores can be in the negatives");
+            this.chkTagsUseMinimumScore.UseVisualStyleBackColor = true;
+            this.chkTagsUseMinimumScore.CheckedChanged += new System.EventHandler(this.chkTagsUseMinimumScore_CheckedChanged);
             // 
             // tabPools
             // 
@@ -400,13 +586,14 @@
             // 
             // chkPoolDownloadBlacklistedImages
             // 
+            this.chkPoolDownloadBlacklistedImages.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.chkPoolDownloadBlacklistedImages.AutoSize = true;
             this.chkPoolDownloadBlacklistedImages.Checked = true;
             this.chkPoolDownloadBlacklistedImages.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkPoolDownloadBlacklistedImages.Location = new System.Drawing.Point(64, 105);
+            this.chkPoolDownloadBlacklistedImages.Location = new System.Drawing.Point(64, 108);
             this.chkPoolDownloadBlacklistedImages.Name = "chkPoolDownloadBlacklistedImages";
             this.chkPoolDownloadBlacklistedImages.Size = new System.Drawing.Size(176, 17);
-            this.chkPoolDownloadBlacklistedImages.TabIndex = 6;
+            this.chkPoolDownloadBlacklistedImages.TabIndex = 4;
             this.chkPoolDownloadBlacklistedImages.Text = "Download blacklisted images";
             this.chkPoolDownloadBlacklistedImages.UseVisualStyleBackColor = true;
             // 
@@ -414,7 +601,7 @@
             // 
             this.chkPoolMergeBlacklisted.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.chkPoolMergeBlacklisted.AutoSize = true;
-            this.chkPoolMergeBlacklisted.Location = new System.Drawing.Point(60, 128);
+            this.chkPoolMergeBlacklisted.Location = new System.Drawing.Point(60, 131);
             this.chkPoolMergeBlacklisted.Name = "chkPoolMergeBlacklisted";
             this.chkPoolMergeBlacklisted.Size = new System.Drawing.Size(184, 17);
             this.chkPoolMergeBlacklisted.TabIndex = 5;
@@ -427,7 +614,7 @@
             this.chkPoolMergeGraylisted.AutoSize = true;
             this.chkPoolMergeGraylisted.Checked = true;
             this.chkPoolMergeGraylisted.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkPoolMergeGraylisted.Location = new System.Drawing.Point(63, 82);
+            this.chkPoolMergeGraylisted.Location = new System.Drawing.Point(63, 85);
             this.chkPoolMergeGraylisted.Name = "chkPoolMergeGraylisted";
             this.chkPoolMergeGraylisted.Size = new System.Drawing.Size(179, 17);
             this.chkPoolMergeGraylisted.TabIndex = 3;
@@ -438,7 +625,7 @@
             // 
             this.chkPoolOpenAfter.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.chkPoolOpenAfter.AutoSize = true;
-            this.chkPoolOpenAfter.Location = new System.Drawing.Point(75, 59);
+            this.chkPoolOpenAfter.Location = new System.Drawing.Point(75, 62);
             this.chkPoolOpenAfter.Name = "chkPoolOpenAfter";
             this.chkPoolOpenAfter.Size = new System.Drawing.Size(154, 17);
             this.chkPoolOpenAfter.TabIndex = 2;
@@ -460,9 +647,9 @@
             this.txtPoolId.ButtonText = "X";
             this.txtPoolId.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.txtPoolId.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtPoolId.Location = new System.Drawing.Point(102, 26);
+            this.txtPoolId.Location = new System.Drawing.Point(97, 19);
             this.txtPoolId.Name = "txtPoolId";
-            this.txtPoolId.Size = new System.Drawing.Size(100, 20);
+            this.txtPoolId.Size = new System.Drawing.Size(110, 20);
             this.txtPoolId.TabIndex = 1;
             this.txtPoolId.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.txtPoolId.TextHint = "Pool ID...";
@@ -473,10 +660,10 @@
             // btnDownloadPool
             // 
             this.btnDownloadPool.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.btnDownloadPool.Location = new System.Drawing.Point(112, 156);
+            this.btnDownloadPool.Location = new System.Drawing.Point(112, 169);
             this.btnDownloadPool.Name = "btnDownloadPool";
             this.btnDownloadPool.Size = new System.Drawing.Size(80, 23);
-            this.btnDownloadPool.TabIndex = 4;
+            this.btnDownloadPool.TabIndex = 6;
             this.btnDownloadPool.Text = "Download";
             this.btnDownloadPool.UseVisualStyleBackColor = true;
             this.btnDownloadPool.Click += new System.EventHandler(this.btnDownloadPool_Click);
@@ -506,10 +693,10 @@
             this.chkImageSeparateBlacklisted.AutoSize = true;
             this.chkImageSeparateBlacklisted.Checked = true;
             this.chkImageSeparateBlacklisted.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkImageSeparateBlacklisted.Location = new System.Drawing.Point(153, 64);
+            this.chkImageSeparateBlacklisted.Location = new System.Drawing.Point(153, 62);
             this.chkImageSeparateBlacklisted.Name = "chkImageSeparateBlacklisted";
             this.chkImageSeparateBlacklisted.Size = new System.Drawing.Size(128, 17);
-            this.chkImageSeparateBlacklisted.TabIndex = 11;
+            this.chkImageSeparateBlacklisted.TabIndex = 3;
             this.chkImageSeparateBlacklisted.Text = "Separate blacklisted";
             this.chkImageSeparateBlacklisted.UseVisualStyleBackColor = true;
             // 
@@ -517,10 +704,10 @@
             // 
             this.chkImageOpenAfter.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.chkImageOpenAfter.AutoSize = true;
-            this.chkImageOpenAfter.Location = new System.Drawing.Point(75, 133);
+            this.chkImageOpenAfter.Location = new System.Drawing.Point(75, 131);
             this.chkImageOpenAfter.Name = "chkImageOpenAfter";
             this.chkImageOpenAfter.Size = new System.Drawing.Size(154, 17);
-            this.chkImageOpenAfter.TabIndex = 10;
+            this.chkImageOpenAfter.TabIndex = 8;
             this.chkImageOpenAfter.Text = "Open after downloading";
             this.TouchingTips.SetToolTip(this.chkImageOpenAfter, "Opens the folder after download is finished");
             this.chkImageOpenAfter.UseVisualStyleBackColor = true;
@@ -531,7 +718,7 @@
             this.chkImageSeparateNonImages.AutoSize = true;
             this.chkImageSeparateNonImages.Checked = true;
             this.chkImageSeparateNonImages.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkImageSeparateNonImages.Location = new System.Drawing.Point(143, 87);
+            this.chkImageSeparateNonImages.Location = new System.Drawing.Point(143, 85);
             this.chkImageSeparateNonImages.Name = "chkImageSeparateNonImages";
             this.chkImageSeparateNonImages.Size = new System.Drawing.Size(134, 17);
             this.chkImageSeparateNonImages.TabIndex = 5;
@@ -543,10 +730,10 @@
             // 
             this.chkImageSeparateArtists.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.chkImageSeparateArtists.AutoSize = true;
-            this.chkImageSeparateArtists.Location = new System.Drawing.Point(15, 110);
+            this.chkImageSeparateArtists.Location = new System.Drawing.Point(15, 108);
             this.chkImageSeparateArtists.Name = "chkImageSeparateArtists";
             this.chkImageSeparateArtists.Size = new System.Drawing.Size(104, 17);
-            this.chkImageSeparateArtists.TabIndex = 4;
+            this.chkImageSeparateArtists.TabIndex = 6;
             this.chkImageSeparateArtists.Text = "Separate artists";
             this.chkImageSeparateArtists.UseVisualStyleBackColor = true;
             // 
@@ -554,10 +741,10 @@
             // 
             this.chkImageUseForm.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.chkImageUseForm.AutoSize = true;
-            this.chkImageUseForm.Location = new System.Drawing.Point(125, 110);
+            this.chkImageUseForm.Location = new System.Drawing.Point(125, 108);
             this.chkImageUseForm.Name = "chkImageUseForm";
             this.chkImageUseForm.Size = new System.Drawing.Size(164, 17);
-            this.chkImageUseForm.TabIndex = 6;
+            this.chkImageUseForm.TabIndex = 7;
             this.chkImageUseForm.Text = "Use form to show progress";
             this.chkImageUseForm.UseVisualStyleBackColor = true;
             // 
@@ -567,10 +754,10 @@
             this.chkImageSeparateGraylisted.AutoSize = true;
             this.chkImageSeparateGraylisted.Checked = true;
             this.chkImageSeparateGraylisted.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkImageSeparateGraylisted.Location = new System.Drawing.Point(24, 64);
+            this.chkImageSeparateGraylisted.Location = new System.Drawing.Point(24, 62);
             this.chkImageSeparateGraylisted.Name = "chkImageSeparateGraylisted";
             this.chkImageSeparateGraylisted.Size = new System.Drawing.Size(123, 17);
-            this.chkImageSeparateGraylisted.TabIndex = 3;
+            this.chkImageSeparateGraylisted.TabIndex = 2;
             this.chkImageSeparateGraylisted.Text = "Separate graylisted";
             this.chkImageSeparateGraylisted.UseVisualStyleBackColor = true;
             // 
@@ -580,10 +767,10 @@
             this.chkImageSeparateRatings.AutoSize = true;
             this.chkImageSeparateRatings.Checked = true;
             this.chkImageSeparateRatings.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkImageSeparateRatings.Location = new System.Drawing.Point(28, 87);
+            this.chkImageSeparateRatings.Location = new System.Drawing.Point(28, 85);
             this.chkImageSeparateRatings.Name = "chkImageSeparateRatings";
             this.chkImageSeparateRatings.Size = new System.Drawing.Size(109, 17);
-            this.chkImageSeparateRatings.TabIndex = 2;
+            this.chkImageSeparateRatings.TabIndex = 4;
             this.chkImageSeparateRatings.Text = "Separate ratings";
             this.chkImageSeparateRatings.UseVisualStyleBackColor = true;
             // 
@@ -613,10 +800,10 @@
             // btnDownloadImage
             // 
             this.btnDownloadImage.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.btnDownloadImage.Location = new System.Drawing.Point(112, 168);
+            this.btnDownloadImage.Location = new System.Drawing.Point(112, 169);
             this.btnDownloadImage.Name = "btnDownloadImage";
-            this.btnDownloadImage.Size = new System.Drawing.Size(81, 23);
-            this.btnDownloadImage.TabIndex = 7;
+            this.btnDownloadImage.Size = new System.Drawing.Size(80, 23);
+            this.btnDownloadImage.TabIndex = 9;
             this.btnDownloadImage.Text = "Download";
             this.btnDownloadImage.UseVisualStyleBackColor = true;
             this.btnDownloadImage.Click += new System.EventHandler(this.btnDownloadImage_Click);
@@ -718,8 +905,9 @@
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = global::aphrodite.Properties.Resources.Brad;
             this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(330, 295);
             this.Menu = this.toolMenu;
-            this.MinimumSize = new System.Drawing.Size(290, 274);
+            this.MinimumSize = new System.Drawing.Size(330, 295);
             this.Name = "frmMain";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -730,14 +918,18 @@
             this.tabMain.ResumeLayout(false);
             this.tabTags.ResumeLayout(false);
             this.tabTags.PerformLayout();
-            this.gbtPageLimit.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.numTagsPageLimit)).EndInit();
-            this.gbtRatings.ResumeLayout(false);
-            this.gbtRatings.PerformLayout();
-            this.gbtImageLimit.ResumeLayout(false);
+            this.panelTagsOtherSettings.ResumeLayout(false);
+            this.panelTagsOtherSettings.PerformLayout();
+            this.panelTagsRatings.ResumeLayout(false);
+            this.panelTagsRatings.PerformLayout();
+            this.panelTagsLimits.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.numTagsImageLimit)).EndInit();
-            this.gbtScore.ResumeLayout(false);
-            this.gbtScore.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numTagsPageLimit)).EndInit();
+            this.panelTagsMinimumFavorites.ResumeLayout(false);
+            this.panelTagsMinimumFavorites.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numTagsMinimumFavorites)).EndInit();
+            this.panelTagsMinimumScore.ResumeLayout(false);
+            this.panelTagsMinimumScore.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numTagsMinimumScore)).EndInit();
             this.tabPools.ResumeLayout(false);
             this.tabPools.PerformLayout();
@@ -759,9 +951,6 @@
         private System.Windows.Forms.MenuItem mAbout;
         private System.Windows.Forms.MenuItem mBlacklist;
         private Controls.ExtendedButton btnDownloadTags;
-        private System.Windows.Forms.CheckBox chkTagsDownloadSafe;
-        private System.Windows.Forms.CheckBox chkTagsDownloadQuestionable;
-        private System.Windows.Forms.CheckBox chkTagsDownloadExplicit;
         private System.Windows.Forms.NumericUpDown numTagsImageLimit;
         private System.Windows.Forms.CheckBox chkTagsUseMinimumScore;
         private System.Windows.Forms.NumericUpDown numTagsMinimumScore;
@@ -773,15 +962,10 @@
         private System.Windows.Forms.MenuItem mWishlist;
         private System.Windows.Forms.MenuItem mRedownloader;
         private System.Windows.Forms.MenuItem mReverseSearch;
-        private System.Windows.Forms.GroupBox gbtScore;
-        private System.Windows.Forms.GroupBox gbtRatings;
-        private System.Windows.Forms.GroupBox gbtImageLimit;
-        private System.Windows.Forms.GroupBox gbtPageLimit;
         private System.Windows.Forms.NumericUpDown numTagsPageLimit;
         private System.Windows.Forms.Label lbAwoo;
-        private System.Windows.Forms.CheckBox chkTagsUseScoreAsTag;
+        private System.Windows.Forms.CheckBox chkTagsMinimumScoreAsTag;
         private System.Windows.Forms.ToolTip TouchingTips;
-        private System.Windows.Forms.CheckBox chkTagsSeparateRatings;
         private System.Windows.Forms.TabPage tabPortable;
         private System.Windows.Forms.Label lbPortable;
         private System.Windows.Forms.TabPage tabImages;
@@ -802,6 +986,26 @@
         private System.Windows.Forms.CheckBox chkPoolDownloadBlacklistedImages;
         private System.Windows.Forms.CheckBox chkImageSeparateBlacklisted;
         private System.Windows.Forms.CheckBox chkTagsDownloadInUploadOrder;
+        private System.Windows.Forms.Panel panelTagsMinimumScore;
+        private System.Windows.Forms.Panel panelTagsMinimumFavorites;
+        private System.Windows.Forms.CheckBox chkTagsMinimumFavoritesAsTag;
+        private System.Windows.Forms.NumericUpDown numTagsMinimumFavorites;
+        private System.Windows.Forms.Panel panelTagsLimits;
+        private System.Windows.Forms.Label lbTagsImageLimit;
+        private System.Windows.Forms.Label lbTagsPageLimit;
+        private System.Windows.Forms.Panel panelTagsRatings;
+        private System.Windows.Forms.CheckBox chkTagsDownloadQuestionable;
+        private System.Windows.Forms.CheckBox chkTagsDownloadSafe;
+        private System.Windows.Forms.CheckBox chkTagsSeparateRatings;
+        private System.Windows.Forms.CheckBox chkTagsDownloadExplicit;
+        private System.Windows.Forms.Panel panelTagsOtherSettings;
+        private System.Windows.Forms.Label lbTagsLimitsHint;
+        private System.Windows.Forms.RadioButton rbTagsOtherSettings;
+        private System.Windows.Forms.RadioButton rbTagsRatings;
+        private System.Windows.Forms.RadioButton rbTagsLimits;
+        private System.Windows.Forms.RadioButton rbTagsMinimumFavorites;
+        private System.Windows.Forms.RadioButton rbTagsMinimumScore;
+        private System.Windows.Forms.Label lbTagsSeparator;
     }
 }
 

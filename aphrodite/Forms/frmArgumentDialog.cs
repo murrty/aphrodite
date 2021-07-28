@@ -31,6 +31,7 @@ namespace aphrodite {
             txtArguments.Text = Arguments;
             AppendedArgument = Arguments;
             txtArguments.Refresh();
+            this.TopMost = Config.Settings.Initialization.ArgumentFormTopMost;
         }
 
         private void txtArguments_ButtonClick(object sender, EventArgs e) {

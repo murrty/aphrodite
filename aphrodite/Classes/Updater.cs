@@ -11,7 +11,7 @@ namespace aphrodite {
 
         public static bool CheckForUpdate(bool DisableSkipVerison = false) {
             try {
-                string xml = apiTools.GetJsonToXml(githubJSON);
+                string xml = apiTools.DownloadJsonToXml(githubJSON);
                 XmlDocument doc = new XmlDocument();
                 doc.LoadXml(xml);
                 XmlNodeList xmlTag = doc.DocumentElement.SelectNodes("/root/tag_name");

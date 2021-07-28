@@ -292,6 +292,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="Addons\omni-e621.xpi" />
     <None Include="Settings\FormSettings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>FormSettings.Designer.cs</LastGenOutput>
@@ -328,10 +329,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\aphrodite.images.user.js" />
-    <Content Include="Resources\aphrodite.user.js" />
+    <Content Include="Addons\aphrodite.images.user.js" />
+    <Content Include="Addons\aphrodite.user.js" />
     <Content Include="Resources\Brad.ico" />
     <Content Include="Resources\Brad.png" />
+    <Content Include="Resources\FakeUpdate.txt" />
     <Content Include="Resources\Icon32.png" />
     <Content Include="TextFile1.txt" />
     <Content Include="TextFile2.txt" />

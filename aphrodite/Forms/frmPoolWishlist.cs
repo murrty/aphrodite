@@ -17,7 +17,6 @@ namespace aphrodite {
             }
             lPoolLink.Text = string.Empty;
         }
-
         private void frmPoolWishlist_Load(object sender, EventArgs e) {
             lPoolLink.Text = string.Empty;
             if (!string.IsNullOrWhiteSpace(Config.Settings.Pools.wishlist) && !string.IsNullOrWhiteSpace(Config.Settings.Pools.wishlistNames)) {
@@ -25,10 +24,18 @@ namespace aphrodite {
                 PoolURLS.AddRange(Config.Settings.Pools.wishlist.Split('|'));
                 listWishlistItems.Items.AddRange(PoolNames.ToArray());
             }
+            if (Config.Settings.FormSettings.frmPoolWishlist_Location.X == -32000 || Config.Settings.FormSettings.frmPoolWishlist_Location.Y == -32000) {
+                this.StartPosition = FormStartPosition.CenterScreen;
+            }
+            else {
+                this.Location = Config.Settings.FormSettings.frmPoolWishlist_Location;
+            }
         }
-
         private void frmPoolWishlist_FormClosing(object sender, FormClosingEventArgs e) {
             Config.Config_Pools.SaveWishlist(PoolNames, PoolURLS);
+            if (Config.Settings.FormSettings.frmPoolWishlist_Location != this.Location) {
+                Config.Settings.FormSettings.frmPoolWishlist_Location = this.Location;
+            }
         }
 
         private void btnAddUpdate_Click(object sender, EventArgs e) {
@@ -55,7 +62,6 @@ namespace aphrodite {
                 System.Media.SystemSounds.Hand.Play();
             }
         }
-
         private void btnRemove_Click(object sender, EventArgs e) {
             int indx = listWishlistItems.SelectedIndex;
             if (indx > -1) {
@@ -70,7 +76,6 @@ namespace aphrodite {
                 }
             }
         }
-
         private void btnDownload_Click(object sender, EventArgs e) {
             if (apiTools.IsValidPoolLink(PoolURLS[listWishlistItems.SelectedIndex])) {            
                 Downloader.Arguments.DownloadPool(apiTools.GetPoolOrPostId(PoolURLS[listWishlistItems.SelectedIndex]));
@@ -95,7 +100,6 @@ namespace aphrodite {
                 lPoolLink.Text = string.Empty;
             }
         }
-
         private void chkUpdate_CheckedChanged(object sender, EventArgs e) {
             if (chkUpdate.Checked) {
                 btnAddUpdate.Text = "Update";
@@ -111,7 +115,6 @@ namespace aphrodite {
                 txtURL.Clear();
             }
         }
-
         private void lPoolLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
             if (e.Button == System.Windows.Forms.MouseButtons.Left) { 
                 Process.Start(PoolURLS[listWishlistItems.SelectedIndex]);
@@ -120,19 +123,16 @@ namespace aphrodite {
                 menuWishlist.Show(lPoolLink, new System.Drawing.Point(0, lPoolLink.Height - 2));
             }
         }
-
         private void mOpenPoolInBrowser_Click(object sender, EventArgs e) {
             if (apiTools.IsValidPoolLink(PoolURLS[listWishlistItems.SelectedIndex])) {
                 Process.Start(PoolURLS[listWishlistItems.SelectedIndex]);
             }
         }
-
         private void mCopyPoolLink_Click(object sender, EventArgs e) {
             if (apiTools.IsValidPoolLink(PoolURLS[listWishlistItems.SelectedIndex])) {
                 Clipboard.SetText(PoolURLS[listWishlistItems.SelectedIndex]);
             }
         }
-
         private void mCopyPoolId_Click(object sender, EventArgs e) {
             if (apiTools.IsValidPoolLink(PoolURLS[listWishlistItems.SelectedIndex])) {
                 Clipboard.SetText(apiTools.GetPoolOrPostId(PoolURLS[listWishlistItems.SelectedIndex]));

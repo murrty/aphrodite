@@ -1,22 +1,21 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.Serialization.Json;
 using System.Text;
-using System.Threading;
 using System.Xml;
 using System.Xml.Linq;
 
 namespace aphrodite {
+
     class apiTools {
         public static readonly string EmptyXML = "<root type=\"array\"></root>";
         public static readonly string[] BadChars = { "\\", "/", ":", "*", "?", "\"", "<", ">", "|" };
         public static readonly string[] ReplacementChars = new string[] { "%5C", "%2F", "%3A", "%2A", "%3F", "%22", "%3C", "%3E", "%7C" };
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
-        public static string GetJsonToXml(string JsonURL) {
+        public static string DownloadJsonToXml(string JsonURL) {
             try {
                 string JSONOutput = null;
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
@@ -26,14 +25,7 @@ namespace aphrodite {
                 using (var Response = (HttpWebResponse)Request.GetResponse())
                 using (var ResponseStream = Response.GetResponseStream())
                 using (var Reader = new StreamReader(ResponseStream)) {
-                    string JSONString = Reader.ReadToEnd();
-                    byte[] JSONBytes = Encoding.UTF8.GetBytes(JSONString);
-                    using (var MemoryStream = new MemoryStream(JSONBytes)) {
-                        var Quotas = new XmlDictionaryReaderQuotas();
-                        var JSONReader = JsonReaderWriterFactory.CreateJsonReader(MemoryStream, Quotas);
-                        var XMLJSON = XDocument.Load(JSONReader);
-                        JSONOutput = XMLJSON.ToString();
-                    }
+                    JSONOutput = ConvertJsonToXml(Reader.ReadToEnd());
                 }
 
                 if (JSONOutput != null && JSONOutput != EmptyXML) {
@@ -45,6 +37,16 @@ namespace aphrodite {
             catch {
                 throw;
             }
+        }
+
+        public static string ConvertJsonToXml(string Json) {
+            XDocument XMLJSON = XDocument.Load(
+                JsonReaderWriterFactory.CreateJsonReader(
+                    new MemoryStream(Encoding.UTF8.GetBytes(Json)),
+                    new XmlDictionaryReaderQuotas()
+                )
+            );
+            return XMLJSON.ToString();
         }
 
         public static bool IsXmlDead(string xml) {

@@ -31,13 +31,14 @@
             this.lbExceptionHeader = new System.Windows.Forms.Label();
             this.lbDate = new System.Windows.Forms.Label();
             this.pnLower = new System.Windows.Forms.Panel();
+            this.btnExceptionRetry = new System.Windows.Forms.Button();
             this.pnLower.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnExceptionGithub
             // 
             this.btnExceptionGithub.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnExceptionGithub.Location = new System.Drawing.Point(294, 226);
+            this.btnExceptionGithub.Location = new System.Drawing.Point(213, 8);
             this.btnExceptionGithub.Name = "btnExceptionGithub";
             this.btnExceptionGithub.Size = new System.Drawing.Size(85, 24);
             this.btnExceptionGithub.TabIndex = 10;
@@ -102,7 +103,7 @@
             // lbDate
             // 
             this.lbDate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbDate.Location = new System.Drawing.Point(175, 7);
+            this.lbDate.Location = new System.Drawing.Point(94, 7);
             this.lbDate.Name = "lbDate";
             this.lbDate.Size = new System.Drawing.Size(113, 24);
             this.lbDate.TabIndex = 12;
@@ -112,6 +113,8 @@
             // pnLower
             // 
             this.pnLower.BackColor = System.Drawing.SystemColors.Menu;
+            this.pnLower.Controls.Add(this.btnExceptionRetry);
+            this.pnLower.Controls.Add(this.btnExceptionGithub);
             this.pnLower.Controls.Add(this.lbDate);
             this.pnLower.Controls.Add(this.lbVersion);
             this.pnLower.Controls.Add(this.btnExceptionOk);
@@ -121,12 +124,22 @@
             this.pnLower.Size = new System.Drawing.Size(472, 42);
             this.pnLower.TabIndex = 13;
             // 
+            // btnExceptionRetry
+            // 
+            this.btnExceptionRetry.Enabled = false;
+            this.btnExceptionRetry.Location = new System.Drawing.Point(304, 8);
+            this.btnExceptionRetry.Name = "btnExceptionRetry";
+            this.btnExceptionRetry.Size = new System.Drawing.Size(75, 23);
+            this.btnExceptionRetry.TabIndex = 13;
+            this.btnExceptionRetry.Text = "Try Agaiwn";
+            this.btnExceptionRetry.UseVisualStyleBackColor = true;
+            this.btnExceptionRetry.Click += new System.EventHandler(this.btnExceptionRetry_Click);
+            // 
             // frmException
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(472, 261);
-            this.Controls.Add(this.btnExceptionGithub);
             this.Controls.Add(this.rtbExceptionDetails);
             this.Controls.Add(this.lbExceptionDescription);
             this.Controls.Add(this.lbExceptionHeader);
@@ -158,5 +171,6 @@
         private System.Windows.Forms.Label lbExceptionHeader;
         private System.Windows.Forms.Label lbDate;
         private System.Windows.Forms.Panel pnLower;
+        private System.Windows.Forms.Button btnExceptionRetry;
     }
 }

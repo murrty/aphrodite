@@ -149,7 +149,18 @@ namespace aphrodite {
         }
         
         private void frmTagRedownloader_Load(object sender, EventArgs e) {
+            if (Config.Settings.FormSettings.frmRedownloader_Location.X == -32000 || Config.Settings.FormSettings.frmRedownloader_Location.Y == -32000) {
+                this.StartPosition = FormStartPosition.CenterScreen;
+            }
+            else {
+                this.Location = Config.Settings.FormSettings.frmRedownloader_Location;
+            }
             loadDownloads();
+        }
+        private void frmRedownloader_FormClosing(object sender, FormClosingEventArgs e) {
+            if (Config.Settings.FormSettings.frmRedownloader_Location != this.Location) {
+                Config.Settings.FormSettings.frmRedownloader_Location = this.Location;
+            }
         }
 
         private void btnRedownload_Click(object sender, EventArgs e) {

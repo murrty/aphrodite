@@ -37,229 +37,121 @@ namespace aphrodite.Settings {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public decimal frmMain_numTagsPageLimit {
+        [global::System.Configuration.DefaultSettingValueAttribute("-32000, -32000")]
+        public global::System.Drawing.Point frmBlacklist_Location {
             get {
-                return ((decimal)(this["frmMain_numTagsPageLimit"]));
+                return ((global::System.Drawing.Point)(this["frmBlacklist_Location"]));
             }
             set {
-                this["frmMain_numTagsPageLimit"] = value;
+                this["frmBlacklist_Location"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public decimal frmMain_numTagsImageLimit {
+        [global::System.Configuration.DefaultSettingValueAttribute("-32000, -32000")]
+        public global::System.Drawing.Point frmImageDownloader_Location {
             get {
-                return ((decimal)(this["frmMain_numTagsImageLimit"]));
+                return ((global::System.Drawing.Point)(this["frmImageDownloader_Location"]));
             }
             set {
-                this["frmMain_numTagsImageLimit"] = value;
+                this["frmImageDownloader_Location"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool frmMain_chkTagsUseMinimumScore {
+        [global::System.Configuration.DefaultSettingValueAttribute("-32000, -32000")]
+        public global::System.Drawing.Point frmLog_Location {
             get {
-                return ((bool)(this["frmMain_chkTagsUseMinimumScore"]));
+                return ((global::System.Drawing.Point)(this["frmLog_Location"]));
             }
             set {
-                this["frmMain_chkTagsUseMinimumScore"] = value;
+                this["frmLog_Location"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool frmMain_chkTagsUseScoreAsTag {
+        [global::System.Configuration.DefaultSettingValueAttribute("-32000, -32000")]
+        public global::System.Drawing.Size frmLog_Size {
             get {
-                return ((bool)(this["frmMain_chkTagsUseScoreAsTag"]));
+                return ((global::System.Drawing.Size)(this["frmLog_Size"]));
             }
             set {
-                this["frmMain_chkTagsUseScoreAsTag"] = value;
+                this["frmLog_Size"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public decimal frmMain_numTagsMinimumScore {
+        [global::System.Configuration.DefaultSettingValueAttribute("-32000, -32000")]
+        public global::System.Drawing.Point frmPoolDownloader_Location {
             get {
-                return ((decimal)(this["frmMain_numTagsMinimumScore"]));
+                return ((global::System.Drawing.Point)(this["frmPoolDownloader_Location"]));
             }
             set {
-                this["frmMain_numTagsMinimumScore"] = value;
+                this["frmPoolDownloader_Location"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool frmMain_chkTagsDownloadExplicit {
+        [global::System.Configuration.DefaultSettingValueAttribute("-32000, -32000")]
+        public global::System.Drawing.Point frmPoolWishlist_Location {
             get {
-                return ((bool)(this["frmMain_chkTagsDownloadExplicit"]));
+                return ((global::System.Drawing.Point)(this["frmPoolWishlist_Location"]));
             }
             set {
-                this["frmMain_chkTagsDownloadExplicit"] = value;
+                this["frmPoolWishlist_Location"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool frmMain_chkTagsDownloadQuestionable {
+        [global::System.Configuration.DefaultSettingValueAttribute("-32000, -32000")]
+        public global::System.Drawing.Point frmRedownloader_Location {
             get {
-                return ((bool)(this["frmMain_chkTagsDownloadQuestionable"]));
+                return ((global::System.Drawing.Point)(this["frmRedownloader_Location"]));
             }
             set {
-                this["frmMain_chkTagsDownloadQuestionable"] = value;
+                this["frmRedownloader_Location"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool frmMain_chkTagsDownloadSafe {
+        [global::System.Configuration.DefaultSettingValueAttribute("-32000, -32000")]
+        public global::System.Drawing.Point frmSettings_Location {
             get {
-                return ((bool)(this["frmMain_chkTagsDownloadSafe"]));
+                return ((global::System.Drawing.Point)(this["frmSettings_Location"]));
             }
             set {
-                this["frmMain_chkTagsDownloadSafe"] = value;
+                this["frmSettings_Location"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool frmMain_chkTagsSeparateRatings {
+        [global::System.Configuration.DefaultSettingValueAttribute("-32000, -32000")]
+        public global::System.Drawing.Point frmTagDownloader_Location {
             get {
-                return ((bool)(this["frmMain_chkTagsSeparateRatings"]));
+                return ((global::System.Drawing.Point)(this["frmTagDownloader_Location"]));
             }
             set {
-                this["frmMain_chkTagsSeparateRatings"] = value;
+                this["frmTagDownloader_Location"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool frmMain_chkTagsOpenAfterDownload {
+        [global::System.Configuration.DefaultSettingValueAttribute("-32000, -32000")]
+        public global::System.Drawing.Point frmUndesiredTags_Location {
             get {
-                return ((bool)(this["frmMain_chkTagsOpenAfterDownload"]));
+                return ((global::System.Drawing.Point)(this["frmUndesiredTags_Location"]));
             }
             set {
-                this["frmMain_chkTagsOpenAfterDownload"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool frmMain_chkTagSeparateNonImages {
-            get {
-                return ((bool)(this["frmMain_chkTagSeparateNonImages"]));
-            }
-            set {
-                this["frmMain_chkTagSeparateNonImages"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool frmMain_chkPoolOpenAfter {
-            get {
-                return ((bool)(this["frmMain_chkPoolOpenAfter"]));
-            }
-            set {
-                this["frmMain_chkPoolOpenAfter"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool frmMain_chkPoolMergeBlacklisted {
-            get {
-                return ((bool)(this["frmMain_chkPoolMergeBlacklisted"]));
-            }
-            set {
-                this["frmMain_chkPoolMergeBlacklisted"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool frmMain_chkImageSeparateRatings {
-            get {
-                return ((bool)(this["frmMain_chkImageSeparateRatings"]));
-            }
-            set {
-                this["frmMain_chkImageSeparateRatings"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool frmMain_chkImageSeparateBlacklisted {
-            get {
-                return ((bool)(this["frmMain_chkImageSeparateBlacklisted"]));
-            }
-            set {
-                this["frmMain_chkImageSeparateBlacklisted"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool frmMain_chkImageSeparateArtists {
-            get {
-                return ((bool)(this["frmMain_chkImageSeparateArtists"]));
-            }
-            set {
-                this["frmMain_chkImageSeparateArtists"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool frmMain_chkImageSeparateNonImages {
-            get {
-                return ((bool)(this["frmMain_chkImageSeparateNonImages"]));
-            }
-            set {
-                this["frmMain_chkImageSeparateNonImages"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool frmMain_chkImageUseForm {
-            get {
-                return ((bool)(this["frmMain_chkImageUseForm"]));
-            }
-            set {
-                this["frmMain_chkImageUseForm"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool frmMain_chkImageOpenAfter {
-            get {
-                return ((bool)(this["frmMain_chkImageOpenAfter"]));
-            }
-            set {
-                this["frmMain_chkImageOpenAfter"] = value;
+                this["frmUndesiredTags_Location"] = value;
             }
         }
     }

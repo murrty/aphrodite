@@ -60,6 +60,8 @@ namespace aphrodite {
         private int BlacklistQuestionableExistCount = 0; // Will be the count of how many questionable blacklisted files already exist.
         private int BlacklistSafeExistCount = 0;         // Will be the count of how many safe blacklisted files already exist.
 
+        private int TotalToDownload = 0;
+        private int TotalThatExist = 0;
         private int TotalFilesParsed = 0;                     // Will be the count of how many files that were parsed.
         private int CleanSkippedCount = 0;
         private int GraylistSkippedCount = 0;                  // Will be the count of how many graylisted files that will be skipped.
@@ -80,39 +82,41 @@ namespace aphrodite {
                 this.DialogResult = DialogResult.No;
                 return;
             }
-            else if (DownloadInfo.ImageLimit == 0 && DownloadInfo.PageLimit == 0) {
-                if (MessageBox.Show("Downloading won't be limited. This may take a long while or even blacklist you. Continue anyway?", "aphrodite", MessageBoxButtons.YesNo) == DialogResult.No) {
-                    this.Opacity = 0;
-                    this.DialogResult = DialogResult.No;
-                    return;
-                }
-            }
 
             if (string.IsNullOrWhiteSpace(DownloadInfo.FileNameSchema)) {
                 DownloadInfo.FileNameSchema = "%md5%";
             }
 
-            tmrTitle.Start();
             txtTags.Text = DownloadInfo.Tags.Replace("%25-2F", "/");
 
-            lbBlacklist.Text = "No file counts.\nWaiting for first json parse.";
-
-            string minScore = "Minimum score: disabled";
-            string imgLim = "Image limit: disabled";
-            string pageLim = "Page limit: disabled";
+            string minScore = "Minimum score disabled";
+            string minFavs = "Minimum favorites disabled";
+            string imgLim = "Image limit disabled";
+            string pageLim = "Page limit disabled";
+            string ratingBuffer = "Ratings: ";
 
             int tagCount = DownloadInfo.Tags.Split(' ').Length;
 
-            if (tagCount == 6 && DownloadInfo.MinimumScoreAsTag) {
-                DownloadInfo.MinimumScoreAsTag = false;
+            if (DownloadInfo.FavoriteCount > 0) {
+                minFavs = "Minimum favorites: " + DownloadInfo.FavoriteCount;
+                if (tagCount == 6 && DownloadInfo.FavoriteCountAsTag) {
+                    DownloadInfo.FavoriteCountAsTag = false;
+                }
+                else {
+                    minFavs += " (as tag)";
+                    tagCount++;
+                }
             }
 
             if (DownloadInfo.UseMinimumScore) {
-                minScore = "Minimum score: " + DownloadInfo.MinimumScore.ToString();
-            }
-
-            if (DownloadInfo.MinimumScoreAsTag) {
-                minScore += " (as tag)";
+                minScore = "Minimum score: " + DownloadInfo.MinimumScore;
+                if (tagCount == 6 && DownloadInfo.MinimumScoreAsTag) {
+                    DownloadInfo.MinimumScoreAsTag = false;
+                }
+                else {
+                    minScore += " (as tag)";
+                    tagCount++;
+                }
             }
 
             if (DownloadInfo.ImageLimit > 0) {
@@ -123,7 +127,6 @@ namespace aphrodite {
                 pageLim = "Page limit: " + DownloadInfo.PageLimit.ToString() + " pages";
             }
 
-            string ratingBuffer = "\nRatings: ";
             if (DownloadInfo.SaveExplicit) {
                 ratingBuffer += "e";
             }
@@ -137,19 +140,33 @@ namespace aphrodite {
                 if (ratingBuffer.EndsWith("e") || ratingBuffer.EndsWith("q")) {
                     ratingBuffer += ", ";
                 }
-
                 ratingBuffer += "s";
             }
 
             if (DownloadInfo.SeparateRatings) {
                 ratingBuffer += " (separating)";
             }
+            if (DownloadInfo.SeparateNonImages) {
+                ratingBuffer += " (separating non-images)";
+            }
 
-            lbLimits.Text = minScore + "\r\n" + imgLim + "\r\n" + pageLim + ratingBuffer;
+            lbLimits.Text = minScore + "\r\n" + minFavs + "\r\n" + imgLim + "\r\n" + pageLim + "\r\n" + ratingBuffer;
+
+            if (Config.Settings.FormSettings.frmTagDownloader_Location.X == -32000 || Config.Settings.FormSettings.frmTagDownloader_Location.Y == -32000) {
+                this.StartPosition = FormStartPosition.CenterScreen;
+            }
+            else {
+                this.Location = Config.Settings.FormSettings.frmTagDownloader_Location;
+            }
+
+            tmrTitle.Start();
             StartDownload();
-            this.CenterToScreen();
         }
         private void frmDownload_FormClosing(object sender, FormClosingEventArgs e) {
+            if (Config.Settings.FormSettings.frmTagDownloader_Location != this.Location) {
+                Config.Settings.FormSettings.frmTagDownloader_Location = this.Location;
+            }
+
             switch (CurrentStatus) {
                 case DownloadStatus.Finished:
                 case DownloadStatus.Errored:
@@ -186,7 +203,12 @@ namespace aphrodite {
                 Thread.CurrentThread.IsBackground = true;
                 DownloadPosts();
             });
-
+            if (DownloadInfo.FromUrl) {
+                DownloadThread.Name = "page download " + DownloadInfo.PageNumber + " for " + DownloadInfo.Tags;
+            }
+            else {
+                DownloadThread.Name = "tag download " + DownloadInfo.Tags;
+            }
             DownloadThread.Start();
             tmrTitle.Start();
         }
@@ -195,6 +217,7 @@ namespace aphrodite {
             Program.Log(LogAction.WriteToLog, "Tag download for \"" + DownloadInfo.Tags + "\" finished.");
             tmrTitle.Stop();
             pbDownloadStatus.Style = ProgressBarStyle.Blocks;
+            lbPercentage.Text = "0mb / 0mb";
             if (DownloadInfo.OpenAfter) {
                 Process.Start(DownloadInfo.DownloadPath);
             }
@@ -291,9 +314,11 @@ namespace aphrodite {
             string GraylistInfoBuffer = string.Empty;
             string BlacklistInfoBuffer = string.Empty;      // The buffer for the 'tag.blacklisted.nfo' file that will be created.
 
+            byte[] ApiData;
             string CurrentXml = string.Empty;               // The XML string.
             int CurrentPage = 1;                            // Will be the count of the pages parsed.
             bool ImageLimitReached = false;                    // Determines if the maximum files have been parsed.
+            object[] Counts;
 
             // SeparateRatings disabled \\
             List<string> CleanedURLs = new List<string>();             // The URLs that will be downloaded (if separateRatings = false).
@@ -401,6 +426,11 @@ namespace aphrodite {
                 }
 
                 // Add the minimum score to the search tags (if applicable).
+                if (DownloadInfo.FavoriteCount > 0) {
+                    if (DownloadInfo.Tags.Split(' ').Length < 6 && DownloadInfo.FavoriteCountAsTag) {
+                        DownloadInfo.Tags += " favcount:>" + (DownloadInfo.FavoriteCount - 1);
+                    }
+                }
                 if (DownloadInfo.UseMinimumScore) {
                     if (DownloadInfo.Tags.Split(' ').Length < 6 && DownloadInfo.MinimumScoreAsTag) {
                         DownloadInfo.Tags += " score:>" + (DownloadInfo.MinimumScore - 1);
@@ -433,6 +463,8 @@ namespace aphrodite {
                 XmlNodeList xmlDeleted;
 
                 for (int ApiPage = 0; ApiPage < CurrentPage; ApiPage++) {
+
+                    #region Page download + xml elements
                     if (DownloadInfo.PageLimit > 0 && CurrentPage > DownloadInfo.PageLimit) {
                         this.Invoke((Action)delegate() {
                             Program.Log(LogAction.WriteToLog, "PageLimit reached, breaking parse loop.");
@@ -452,13 +484,22 @@ namespace aphrodite {
                     else {
                         CurrentUrl = string.Format(PageURL, DownloadInfo.Tags, CurrentPage);
                     }
-                    CurrentXml = apiTools.GetJsonToXml(CurrentUrl);
-                    if (apiTools.IsXmlDead(CurrentXml)) {
-                        if (ApiPage < 1) {
-                            throw new ApiReturnedNullOrEmptyException();
-                        }
-                        else {
-                            break;
+
+                    using (DownloadClient = new Controls.ExtendedWebClient()) {
+                        DownloadClient.Proxy = WebRequest.GetSystemWebProxy();
+                        DownloadClient.Headers.Add("user-agent", Program.UserAgent);
+                        DownloadClient.Method = "GET";
+
+                        ApiData = DownloadClient.DownloadData(CurrentUrl);
+                        CurrentXml = apiTools.ConvertJsonToXml(Encoding.UTF8.GetString(ApiData));
+
+                        if (apiTools.IsXmlDead(CurrentXml)) {
+                            if (ApiPage < 1) {
+                                throw new ApiReturnedNullOrEmptyException();
+                            }
+                            else {
+                                break;
+                            }
                         }
                     }
 
@@ -486,6 +527,7 @@ namespace aphrodite {
                     xmlDescription = doc.DocumentElement.SelectNodes("/root/posts/item/description");
                     xmlExt = doc.DocumentElement.SelectNodes("/root/posts/item/file/ext");
                     xmlDeleted = doc.DocumentElement.SelectNodes("/root/posts/item/flags/deleted");
+                    #endregion
 
                     if (xmlID.Count > 0) {
                         this.Invoke((Action)delegate() {
@@ -511,10 +553,12 @@ namespace aphrodite {
                             string FoundGraylistedTags = string.Empty;          // The buffer for the tags that are graylisted.
                             string ReadTags = string.Empty;                     // The buffer for the tags for the .nfo
 
+                            #region skip ratings & below minimums
                             switch (xmlRating[CurrentPost].InnerText.ToLower()) {
                                 case "e": case "explicit":
                                     switch (DownloadInfo.SaveExplicit) {
                                         case false:
+                                            TotalFilesParsed++;
                                             continue;
                                     }
                                     rating = "Explicit";
@@ -523,6 +567,7 @@ namespace aphrodite {
                                 case "q": case "questionable":
                                     switch (DownloadInfo.SaveQuestionable) {
                                         case false:
+                                            TotalFilesParsed++;
                                             continue;
                                     }
                                     rating = "Questionable";
@@ -531,6 +576,7 @@ namespace aphrodite {
                                 case "s": case "safe":
                                     switch (DownloadInfo.SaveSafe) {
                                         case false:
+                                            TotalFilesParsed++;
                                             continue;
                                     }
                                     rating = "Safe";
@@ -541,7 +587,20 @@ namespace aphrodite {
                                     break;
                             }
 
-                            #region Tag parsing + filtering
+                            switch (DownloadInfo.FavoriteCount > 0 && Int32.Parse(xmlFavCount[CurrentPost].InnerText) < DownloadInfo.FavoriteCount) {
+                                case true:
+                                    TotalFilesParsed++;
+                                    continue;
+                            }
+
+                            switch (DownloadInfo.UseMinimumScore && Int32.Parse(xmlScore[CurrentPost].InnerText) < DownloadInfo.MinimumScore) {
+                                case true:
+                                    TotalFilesParsed++;
+                                    continue;
+                            }
+                            #endregion
+
+                            #region Tag parsing + blacklist/graylist filtering
                             // Create new tag list to merge all the tag groups into one.
                             ReadTags += "\r\n          General: [ ";
                             switch (xmlTagsGeneral[CurrentPost].ChildNodes.Count > 0) {
@@ -715,22 +774,6 @@ namespace aphrodite {
                                     TotalFilesParsed++;
                                     continue;
                             }
-                            switch (DownloadInfo.UseMinimumScore && Int32.Parse(xmlScore[CurrentPost].InnerText) < DownloadInfo.MinimumScore) {
-                                case true:
-                                    TotalFilesParsed++;
-                                    if (PostIsBlacklisted) {
-                                        BlacklistSkippedCount++;
-                                        continue;
-                                    }
-                                    else if (PostIsGraylisted) {
-                                        GraylistSkippedCount++;
-                                        continue;
-                                    }
-                                    else {
-                                        CleanSkippedCount++;
-                                        continue;
-                                    }
-                            }
                             #endregion
 
                             #region file name + e621 global blacklist fix
@@ -865,8 +908,8 @@ namespace aphrodite {
                             string NewPath = DownloadInfo.DownloadPath;
 
                             switch (xmlRating[CurrentPost].InnerText.ToLower()) {
-                                case "e":
-                                case "explicit":
+                                #region Explicit
+                                case "e": case "explicit":
                                     if (DownloadInfo.SeparateRatings) {
                                         NewPath += "\\explicit";
                                     }
@@ -895,8 +938,10 @@ namespace aphrodite {
                                     }
 
                                     NewPath += "\\" + NewFileName;
+                                    TotalFilesParsed++;
 
                                     if (File.Exists(NewPath)) {
+                                        TotalThatExist++;
                                         if (PostIsBlacklisted) {
                                             BlacklistExplicitExistCount++;
                                             BlacklistTotalExistCount++;
@@ -932,15 +977,18 @@ namespace aphrodite {
 
                                             BlacklistExplicitCount++;
                                             BlacklistTotalCount++;
-                                            if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
-                                                BlacklistedExplicitURLs.Add(NewUrl);
-                                                BlacklistedExplicitFileNames.Add(NewFileName);
-                                                BlacklistedExplicitFilePaths.Add(NewPath);
-                                            }
-                                            else {
-                                                BlacklistedURLs.Add(NewUrl);
-                                                BlacklistedFileNames.Add(NewFileName);
-                                                BlacklistedFilePaths.Add(NewPath);
+                                            if (DownloadInfo.SaveBlacklistedFiles) {
+                                                TotalToDownload++;
+                                                if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                    BlacklistedExplicitURLs.Add(NewUrl);
+                                                    BlacklistedExplicitFileNames.Add(NewFileName);
+                                                    BlacklistedExplicitFilePaths.Add(NewPath);
+                                                }
+                                                else {
+                                                    BlacklistedURLs.Add(NewUrl);
+                                                    BlacklistedFileNames.Add(NewFileName);
+                                                    BlacklistedFilePaths.Add(NewPath);
+                                                }
                                             }
                                         }
                                         else if (PostIsGraylisted) {
@@ -963,16 +1011,19 @@ namespace aphrodite {
 
                                             GraylistExplicitCount++;
                                             GraylistTotalCount++;
-                                            if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
-                                                GraylistedExplicitURLs.Add(NewUrl);
-                                                GraylistedExplicitFileNames.Add(NewFileName);
-                                                GraylistedExplicitFilePaths.Add(NewPath);
-                                            }
-                                            else {
-                                                GraylistedURLs.Add(NewUrl);
-                                                GraylistedFileNames.Add(NewFileName);
-                                                GraylistedFilePaths.Add(NewPath);
+                                            if (DownloadInfo.SaveGraylistedFiles) {
+                                                TotalToDownload++;
+                                                if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                    GraylistedExplicitURLs.Add(NewUrl);
+                                                    GraylistedExplicitFileNames.Add(NewFileName);
+                                                    GraylistedExplicitFilePaths.Add(NewPath);
+                                                }
+                                                else {
+                                                    GraylistedURLs.Add(NewUrl);
+                                                    GraylistedFileNames.Add(NewFileName);
+                                                    GraylistedFilePaths.Add(NewPath);
 
+                                                }
                                             }
                                         }
                                         else {
@@ -994,6 +1045,7 @@ namespace aphrodite {
                                             }
                                             CleanExplicitCount++;
                                             CleanTotalCount++;
+                                            TotalToDownload++;
                                             if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
                                                 CleanedExplicitURLs.Add(NewUrl);
                                                 CleanedExplicitFileNames.Add(NewFileName);
@@ -1007,9 +1059,10 @@ namespace aphrodite {
                                         }
                                     }
                                     break;
+                                #endregion
 
-                                case "q":
-                                case "questionable":
+                                #region questionable
+                                case "q": case "questionable":
                                     if (DownloadInfo.SeparateRatings) {
                                         NewPath += "\\questionable";
                                     }
@@ -1038,8 +1091,10 @@ namespace aphrodite {
                                     }
 
                                     NewPath += "\\" + NewFileName;
+                                    TotalFilesParsed++;
 
                                     if (File.Exists(NewPath)) {
+                                        TotalThatExist++;
                                         if (PostIsBlacklisted) {
                                             BlacklistQuestionableExistCount++;
                                             BlacklistTotalExistCount++;
@@ -1074,15 +1129,18 @@ namespace aphrodite {
                                             }
                                             BlacklistQuestionableCount++;
                                             BlacklistTotalCount++;
-                                            if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
-                                                BlacklistedQuestionableURLs.Add(NewUrl);
-                                                BlacklistedQuestionableFileNames.Add(NewFileName);
-                                                BlacklistedQuestionableFilePaths.Add(NewPath);
-                                            }
-                                            else {
-                                                BlacklistedURLs.Add(NewUrl);
-                                                BlacklistedFileNames.Add(NewFileName);
-                                                BlacklistedFilePaths.Add(NewPath);
+                                            if (DownloadInfo.SaveBlacklistedFiles) {
+                                                TotalToDownload++;
+                                                if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                    BlacklistedQuestionableURLs.Add(NewUrl);
+                                                    BlacklistedQuestionableFileNames.Add(NewFileName);
+                                                    BlacklistedQuestionableFilePaths.Add(NewPath);
+                                                }
+                                                else {
+                                                    BlacklistedURLs.Add(NewUrl);
+                                                    BlacklistedFileNames.Add(NewFileName);
+                                                    BlacklistedFilePaths.Add(NewPath);
+                                                }
                                             }
                                         }
                                         else if (PostIsGraylisted) {
@@ -1104,15 +1162,18 @@ namespace aphrodite {
                                             }
                                             GraylistQuestionableCount++;
                                             GraylistTotalCount++;
-                                            if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
-                                                GraylistedQuestionableURLs.Add(NewUrl);
-                                                GraylistedQuestionableFileNames.Add(NewFileName);
-                                                GraylistedQuestionableFilePaths.Add(NewPath);
-                                            }
-                                            else {
-                                                GraylistedURLs.Add(NewUrl);
-                                                GraylistedFileNames.Add(NewFileName);
-                                                GraylistedFilePaths.Add(NewPath);
+                                            if (DownloadInfo.SaveGraylistedFiles) {
+                                                TotalToDownload++;
+                                                if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                    GraylistedQuestionableURLs.Add(NewUrl);
+                                                    GraylistedQuestionableFileNames.Add(NewFileName);
+                                                    GraylistedQuestionableFilePaths.Add(NewPath);
+                                                }
+                                                else {
+                                                    GraylistedURLs.Add(NewUrl);
+                                                    GraylistedFileNames.Add(NewFileName);
+                                                    GraylistedFilePaths.Add(NewPath);
+                                                }
                                             }
                                         }
                                         else {
@@ -1134,6 +1195,7 @@ namespace aphrodite {
                                             }
                                             CleanQuestionableCount++;
                                             CleanTotalCount++;
+                                            TotalToDownload++;
                                             if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
                                                 CleanedQuestionableURLs.Add(NewUrl);
                                                 CleanedQuestionableFileNames.Add(NewFileName);
@@ -1147,12 +1209,14 @@ namespace aphrodite {
                                         }
                                     }
                                     break;
+                                #endregion
 
-                                case "s":
-                                case "safe":
+                                #region safe
+                                case "s": case "safe":
                                     if (DownloadInfo.SeparateRatings) {
                                         NewPath += "\\safe";
                                     }
+
                                     if (PostIsBlacklisted) {
                                         NewPath += "\\blacklisted";
                                     }
@@ -1178,9 +1242,15 @@ namespace aphrodite {
                                     }
 
                                     NewPath += "\\" + NewFileName;
+                                    TotalFilesParsed++;
+
 
                                     if (File.Exists(NewPath)) {
+                                        TotalThatExist++;
                                         if (PostIsBlacklisted) {
+                                            this.Invoke((Action)delegate() {
+                                                Program.Log(LogAction.WriteToLog, "blacklisted exists " + NewPath);
+                                            });
                                             BlacklistSafeExistCount++;
                                             BlacklistTotalExistCount++;
                                         }
@@ -1196,6 +1266,9 @@ namespace aphrodite {
                                     }
                                     else {
                                         if (PostIsBlacklisted) {
+                                            this.Invoke((Action)delegate() {
+                                                Program.Log(LogAction.WriteToLog, "blacklisted does not exist " + NewPath);
+                                            });
                                             if (DownloadInfo.SeparateNonImages) {
                                                 switch (xmlExt[CurrentPost].InnerText.ToLower()) {
                                                     case "gif":
@@ -1215,15 +1288,18 @@ namespace aphrodite {
                                             BlacklistSafeCount++;
                                             BlacklistTotalCount++;
                                             if (DownloadInfo.SaveBlacklistedFiles) {
-                                                if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
-                                                    BlacklistedSafeURLs.Add(NewUrl);
-                                                    BlacklistedSafeFileNames.Add(NewFileName);
-                                                    BlacklistedSafeFilePaths.Add(NewPath);
-                                                }
-                                                else {
-                                                    BlacklistedURLs.Add(NewUrl);
-                                                    BlacklistedFileNames.Add(NewFileName);
-                                                    BlacklistedFilePaths.Add(NewPath);
+                                                TotalToDownload++;
+                                                if (DownloadInfo.SaveBlacklistedFiles) {
+                                                    if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                        BlacklistedSafeURLs.Add(NewUrl);
+                                                        BlacklistedSafeFileNames.Add(NewFileName);
+                                                        BlacklistedSafeFilePaths.Add(NewPath);
+                                                    }
+                                                    else {
+                                                        BlacklistedURLs.Add(NewUrl);
+                                                        BlacklistedFileNames.Add(NewFileName);
+                                                        BlacklistedFilePaths.Add(NewPath);
+                                                    }
                                                 }
                                             }
                                         }
@@ -1247,15 +1323,18 @@ namespace aphrodite {
                                             GraylistSafeCount++;
                                             GraylistTotalCount++;
                                             if (DownloadInfo.SaveGraylistedFiles) {
-                                                if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
-                                                    GraylistedSafeURLs.Add(NewUrl);
-                                                    GraylistedSafeFileNames.Add(NewFileName);
-                                                    GraylistedSafeFilePaths.Add(NewPath);
-                                                }
-                                                else {
-                                                    GraylistedURLs.Add(NewUrl);
-                                                    GraylistedFileNames.Add(NewFileName);
-                                                    GraylistedFilePaths.Add(NewPath);
+                                                TotalToDownload++;
+                                                if (DownloadInfo.SaveGraylistedFiles) {
+                                                    if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                        GraylistedSafeURLs.Add(NewUrl);
+                                                        GraylistedSafeFileNames.Add(NewFileName);
+                                                        GraylistedSafeFilePaths.Add(NewPath);
+                                                    }
+                                                    else {
+                                                        GraylistedURLs.Add(NewUrl);
+                                                        GraylistedFileNames.Add(NewFileName);
+                                                        GraylistedFilePaths.Add(NewPath);
+                                                    }
                                                 }
                                             }
                                         }
@@ -1278,6 +1357,7 @@ namespace aphrodite {
                                             }
                                             CleanSafeCount++;
                                             CleanTotalCount++;
+                                            TotalToDownload++;
                                             if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
                                                 CleanedSafeURLs.Add(NewUrl);
                                                 CleanedSafeFileNames.Add(NewFileName);
@@ -1291,6 +1371,8 @@ namespace aphrodite {
                                         }
                                     }
                                     break;
+                                #endregion
+
                             }
                             #endregion
                         }
@@ -1300,42 +1382,45 @@ namespace aphrodite {
                             string labelBuffer = "";
 
                             //if (DownloadInfo.SeparateRatings) {
-                            object[] Counts = new object[] {
+                            Counts = new object[] {
                                     CleanTotalCount, CleanExplicitCount, CleanQuestionableCount, CleanSafeCount,
                                     GraylistTotalCount, GraylistExplicitCount, GraylistQuestionableCount, GraylistSafeCount,
                                     BlacklistTotalCount, BlacklistExplicitCount, BlacklistQuestionableCount, BlacklistSafeCount,
-                                    (CleanTotalCount + GraylistTotalCount + BlacklistTotalCount),
+                                    TotalToDownload,
 
                                     CleanTotalExistCount, CleanExplicitExistCount, CleanQuestionableExistCount, CleanSafeExistCount,
                                     GraylistTotalExistCount, GraylistExplicitExistCount, GraylistQuestionableExistCount, GraylistSafeExistCount,
                                     BlacklistTotalExistCount, BlacklistExplicitExistCount, BlacklistQuestionableExistCount, BlacklistSafeExistCount,
-                                    (CleanTotalExistCount + GraylistTotalExistCount + BlacklistTotalExistCount),
+                                    TotalThatExist,
 
-                                    (CleanTotalCount + CleanTotalExistCount + GraylistTotalCount + GraylistTotalExistCount + BlacklistTotalCount + BlacklistTotalExistCount)
+                                    TotalFilesParsed
                             };
 
-                            labelBuffer = string.Format("files: {0} ( {1} E | {2} Q | {3} S )\r\n" +
-                                                        "not saving graylisted tags, skipped: {4}\r\n" + //"graylisted: {4} ( {5} E | {6} Q | {7} S )\r\n" +
-                                                        "not saving blacklisted tags, skipped: {8}\r\n" +//"blacklisted: {8} ( {9} E | {10} Q | {11} S )\r\n" +
-                                                        "total to download: {12}\r\n\r\n" +
+                            labelBuffer = "files: {0} ( {1} E | {2} Q | {3} S )\r\n" +
+                                          "{GRAYLIST_NEW_COUNT}\r\n" +
+                                          "{BLACKLIST_NEW_COUNT}\r\n" +
+                                          "total to download: {12}\r\n\r\n" +
 
-                                                        "files that exist: {13} ( {14} E | {15} Q | {16} S )\r\n" +
-                                                        "not saving graylisted tags\r\n" +
-                                                        "not saving blacklisted tags\r\n" +
-                                                        "total exist: {25}\r\n\r\n"+
-                                                        
-                                                        "total parsed: {26}", Counts);
+                                          "files that exist: {13} ( {14} E | {15} Q | {16} S )\r\n" +
+                                          "{GRAYLIST_EXIST_COUNT}\r\n" +
+                                          "{BLACKLIST_EXIST_COUNT}\r\n" +
+                                          "total exist: {25}\r\n\r\n" +
 
-                            if (DownloadInfo.SaveGraylistedFiles) {
-                                labelBuffer = labelBuffer
-                                    .Replace("not saving graylisted tags, skipped {4}", "graylisted: {4} ( {5} E | {6} Q | {7} S )")
-                                    .Replace("not saving graylisted tags", "graylisted that exist: {17} ( {18} E | {19} Q | {20} S )");
-                            }
-                            if (DownloadInfo.SaveBlacklistedFiles) {
-                                labelBuffer = labelBuffer
-                                    .Replace("not saving blacklisted tags, skipped {8}", "blacklisted: {8} ( {9} E | {10} Q | {11} S )")
-                                    .Replace("not saving blacklitsed tags", "blacklisted that exist: {21} ( {22} E | {23} Q | {24} S )");
-                            }
+                                          "total parsed: {26}";
+
+                            labelBuffer = labelBuffer
+                                .Replace( "{GRAYLIST_NEW_COUNT}",
+                                DownloadInfo.SaveGraylistedFiles ? "graylisted: {4} ( {5} E | {6} Q | {7} S )" : "not saving graylisted tags, skipped: {4}")
+
+                                .Replace("{GRAYLIST_EXIST_COUNT}",
+                                DownloadInfo.SaveGraylistedFiles ? "graylisted that exist: {17} ( {18} E | {19} Q | {20} S )" : "not saving graylisted tags")
+
+                                .Replace("{BLACKLIST_NEW_COUNT}",
+                                DownloadInfo.SaveBlacklistedFiles ? "blacklisted: {8} ( {9} E | {10} Q | {11} S )" : "not saving blacklisted tags, skipped: {8}")
+
+                                .Replace("{BLACKLIST_EXIST_COUNT}",
+                                DownloadInfo.SaveBlacklistedFiles ? "blacklisted that exist: {21} ( {22} E | {23} Q | {24} S )" : "not saving blacklisted tags"
+                            );
 
                             lbBlacklist.Text = string.Format(labelBuffer, Counts);
                         });
@@ -1355,8 +1440,10 @@ namespace aphrodite {
 
                 }
 
-                if (CleanedURLs.Count == 0 && CleanedSafeURLs.Count == 0 && CleanedQuestionableURLs.Count == 0 && CleanedExplicitURLs.Count == 0 &&
-                    GraylistedSafeURLs.Count == 0 && GraylistedQuestionableURLs.Count == 0 && GraylistedExplicitURLs.Count == 0) {
+                if (
+                    //CleanedURLs.Count == 0 && CleanedSafeURLs.Count == 0 && CleanedQuestionableURLs.Count == 0 && CleanedExplicitURLs.Count == 0 && GraylistedURLs.Count == 0 && GraylistedSafeURLs.Count == 0 && GraylistedQuestionableURLs.Count == 0 && GraylistedExplicitURLs.Count == 0 && BlacklistedURLs.Count == 0 && BlacklistedSafeURLs.Count == 0 && BlacklistedQuestionableURLs.Count == 0 && BlacklistedSafeURLs.Count == 0
+                    TotalToDownload == 0
+                ) {
                     throw new NoFilesToDownloadException();
                 }
                 #endregion
@@ -1628,6 +1715,7 @@ namespace aphrodite {
                 #region download the images
                 // Start the download
                 using (DownloadClient = new Controls.ExtendedWebClient()) {
+
                     #region DownloadProgressChanged
                     DownloadClient.DownloadProgressChanged += (s, e) => {
                         this.Invoke((Action)delegate() {
@@ -1639,7 +1727,7 @@ namespace aphrodite {
                                     break;
                             }
                             lbPercentage.Text = e.ProgressPercentage.ToString() + "%";
-                            lbBytes.Text = (e.BytesReceived / 1024) + " kb / " + (e.TotalBytesToReceive / 1024) + " kb";
+                            lbBytes.Text = ((decimal)(e.BytesReceived / 1024) / 1024).ToString("0.00") + "mb / " + ((decimal)(e.TotalBytesToReceive / 1024) / 1024).ToString("0.00") + "mb";
                         });
                     };
                     #endregion
@@ -1663,6 +1751,8 @@ namespace aphrodite {
 
                     #region download
                     if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+
+                        #region clean
                         if (CleanedExplicitURLs.Count > 0) {
                             this.Invoke((Action)delegate() {
                                 Program.Log(LogAction.WriteToLog, "Downloading explicit files.");
@@ -1707,7 +1797,9 @@ namespace aphrodite {
                                 }
                             }
                         }
+                        #endregion
 
+                        #region graylist
                         if (DownloadInfo.SaveGraylistedFiles) {
                             if (GraylistedExplicitURLs.Count > 0) {
                                 this.Invoke((Action)delegate() {
@@ -1754,7 +1846,9 @@ namespace aphrodite {
                                 }
                             }
                         }
+                        #endregion
 
+                        #region blacklist
                         if (DownloadInfo.SaveBlacklistedFiles) {
                             if (BlacklistedExplicitURLs.Count > 0) {
                                 this.Invoke((Action)delegate() {
@@ -1793,6 +1887,7 @@ namespace aphrodite {
                                 for (int CurrentFile = 0; CurrentFile < BlacklistedSafeURLs.Count; CurrentFile++) {
                                     if (!string.IsNullOrEmpty(BlacklistedSafeURLs[CurrentFile])) {
                                         this.Invoke((Action)delegate {
+                                            Program.Log(LogAction.WriteToLog, BlacklistedSafeFilePaths[CurrentFile]);
                                             lbFile.Text = "Downloading blacklisted (s) file " + (CurrentFile + 1) + " of " + (BlacklistSafeCount);
                                             status.Text = "Downloading " + BlacklistedSafeFileNames[CurrentFile];
                                         });
@@ -1800,6 +1895,8 @@ namespace aphrodite {
                                     }
                                 }
                             }
+                            #endregion
+
                         }
                     }
                     else {

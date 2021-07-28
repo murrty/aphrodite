@@ -20,7 +20,7 @@ namespace aphrodite {
         private Controls.ExtendedWebClient DownloadClient;
         private DownloadStatus CurrentStatus = DownloadStatus.Waiting;
 
-        private string CurrentURL;
+        private string CurrentUrl;
 
         private int CleanPageExplicitCount = 0;
         private int CleanPageQuestionableCount = 0;
@@ -51,6 +51,8 @@ namespace aphrodite {
         int BlacklistQuestionableExistingFiles = 0;
         int BlacklistSafeExistingFiles = 0;
         int BlacklistExistingTotalFiles = 0;
+
+        int TotalToDownload = 0;
         #endregion
 
         #region Form
@@ -64,6 +66,13 @@ namespace aphrodite {
             if (string.IsNullOrWhiteSpace(DownloadInfo.FileNameSchema)) {
                 DownloadInfo.FileNameSchema = "%poolname%_%page%";
             }
+
+            if (Config.Settings.FormSettings.frmPoolDownloader_Location.X == -32000 || Config.Settings.FormSettings.frmPoolDownloader_Location.Y == -32000) {
+                this.StartPosition = FormStartPosition.CenterScreen;
+            }
+            else {
+                this.Location = Config.Settings.FormSettings.frmPoolDownloader_Location;
+            }
         }
         private void frmDownload_Shown(object sender, EventArgs e) {
             tmrTitle.Start();
@@ -76,6 +85,10 @@ namespace aphrodite {
                     e.Cancel = true;
                     return;
                 }
+            }
+
+            if (Config.Settings.FormSettings.frmPoolDownloader_Location != this.Location) {
+                Config.Settings.FormSettings.frmPoolDownloader_Location = this.Location;
             }
             tmrTitle.Stop();
             this.Dispose();
@@ -207,11 +220,14 @@ namespace aphrodite {
             // New variables for the API parse
             string poolJson = string.Format("https://e621.net/pools/{0}.json", DownloadInfo.PoolId);
             string poolJsonPage = string.Format("https://e621.net/posts.json?tags=pool:{0}+order:id&limit=320&page=", DownloadInfo.PoolId);
+            byte[] ApiData;
+            string CurrentXml;
 
             List<string> URLs = new List<string>();
             List<string> FileNames = new List<string>();
             List<string> FilePaths = new List<string>();
             List<string> PostIDs = new List<string>();
+            object[] Counts;
             string poolName = string.Empty;
             string poolDescription;
             string poolInfo = string.Empty;
@@ -234,15 +250,24 @@ namespace aphrodite {
                     Program.Log(LogAction.WriteToLog, "Downloading pool information. (frmPoolDownloader.cs)");
                     status.Text = "Getting pool information...";
                 });
-                CurrentURL = poolJson;
-                string postXML = apiTools.GetJsonToXml(poolJson);
+                CurrentUrl = poolJson;
+
+                using (DownloadClient = new Controls.ExtendedWebClient()) {
+                    DownloadClient.Proxy = WebRequest.GetSystemWebProxy();
+                    DownloadClient.Headers.Add("user-agent", Program.UserAgent);
+                    DownloadClient.Method = "GET";
+
+                    ApiData = DownloadClient.DownloadData(CurrentUrl);
+                    CurrentXml = apiTools.ConvertJsonToXml(Encoding.UTF8.GetString(ApiData));
+
+                    if (apiTools.IsXmlDead(CurrentXml)) {
+                        throw new ApiReturnedNullOrEmptyException("API is null or empty");
+                    }
+                }
 
                 // Check the XML.
-                if (apiTools.IsXmlDead(postXML)) {
-                    throw new ApiReturnedNullOrEmptyException("API is null or empty");
-                }
                 XmlDocument xmlDoc = new XmlDocument();
-                xmlDoc.LoadXml(postXML);
+                xmlDoc.LoadXml(CurrentXml);
                 XmlNodeList xmlName = xmlDoc.DocumentElement.SelectNodes("/root/name");
                 XmlNodeList xmlPoolDescription = xmlDoc.DocumentElement.SelectNodes("/root/description");
                 XmlNodeList xmlCount = xmlDoc.DocumentElement.SelectNodes("/root/post_count");
@@ -313,13 +338,28 @@ namespace aphrodite {
                 XmlNodeList xmlDeleted;
                 // Begin ripping the rest of the pool Json.
                 for (int ApiPage = 1; ApiPage < TotalPagesToParse + 1; ApiPage++) {
-                    CurrentURL = poolJsonPage;
-                    postXML = apiTools.GetJsonToXml(poolJsonPage + ApiPage);
-                    if (apiTools.IsXmlDead(postXML)) {
-                        break;
+
+                    #region page download + xml elements
+                    CurrentUrl = poolJsonPage + ApiPage;
+
+                    using (DownloadClient = new Controls.ExtendedWebClient()) {
+                        DownloadClient.Proxy = WebRequest.GetSystemWebProxy();
+                        DownloadClient.Headers.Add("user-agent", Program.UserAgent);
+                        DownloadClient.Method = "GET";
+
+                        ApiData = DownloadClient.DownloadData(CurrentUrl);
+                        CurrentXml = apiTools.ConvertJsonToXml(Encoding.UTF8.GetString(ApiData));
+
+                        if (apiTools.IsXmlDead(CurrentXml)) {
+                            if (ApiPage == 1) {
+                                throw new ApiReturnedNullOrEmptyException();
+                            }
+                            break;
+                        }
                     }
+
                     xmlDoc = new XmlDocument();
-                    xmlDoc.LoadXml(postXML);
+                    xmlDoc.LoadXml(CurrentXml);
 
                     xmlID = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/id");
                     xmlMD5 = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/file/md5");
@@ -342,6 +382,7 @@ namespace aphrodite {
                     xmlDescription = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/description");
                     xmlExt = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/file/ext");
                     xmlDeleted = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/flags/deleted");
+                    #endregion
 
                     for (int CurrentPost = 0; CurrentPost < xmlID.Count; CurrentPost++) {
                         bool isGraylisted = false;
@@ -352,6 +393,7 @@ namespace aphrodite {
                         string ReadTags = string.Empty;
                         string tagsMetadata = string.Empty;
                         currentPage++;
+
 
                         // first check for the null url (e621's hard blacklist for users with no accounts)
                         string fileUrl = xmlURL[CurrentPost].InnerText;
@@ -512,13 +554,14 @@ namespace aphrodite {
                             if (DownloadInfo.Blacklist.Length > 0) {
                                 for (int k = 0; k < DownloadInfo.Blacklist.Length; k++) {
                                     if (PostTags[j] == DownloadInfo.Blacklist[k]) {
-                                        foundBlacklistedTags += " " + DownloadInfo.Blacklist[k];
+                                        foundBlacklistedTags += DownloadInfo.Blacklist[k] + ", ";
                                         isBlacklisted = true;
                                         hasBlacklistedFiles = true;
                                     }
                                 }
                             }
                         }
+                        foundBlacklistedTags = "[ " + foundBlacklistedTags.Trim(' ').TrimEnd(',') + " ]";
                         #endregion
 
                         #region File name fiddling
@@ -586,21 +629,19 @@ namespace aphrodite {
                                 poolDescription = "\n                    \"" + xmlDescription[CurrentPost].InnerText + "\"";
                             }
 
-                            string InfoBuffer = "PAGE: " + fileNamePage + "\r\n" +
-                                            "        MD5: " + xmlMD5[CurrentPost].InnerText + "\r\n" +
-                                            "        URL: https://e621.net/posts/" + xmlID[CurrentPost].InnerText + "\r\n" +
-                                            "        TAGS: " + ReadTags + "\n" +
-                                            "        SCORE: Up " + xmlScoreUp[CurrentPost].InnerText + ", Down " + xmlScoreDown[CurrentPost].InnerText + ", Total " + xmlScore[CurrentPost].InnerText + "\r\n" +
-                                            "        RATING: " + rating + "\r\n" +
-                                            "        DESCRIPITON:" + poolDescription;
+                            string InfoBuffer = "PAGE " + fileNamePage + "\r\n" +
+                                           "        MD5: " + xmlMD5[CurrentPost].InnerText + "\r\n" +
+                                           "        URL: https://e621.net/posts/" + xmlID[CurrentPost].InnerText + "\r\n" +
+                                           "        TAGS: " + ReadTags + "\n" +
+                                           "        SCORE: Up " + xmlScoreUp[CurrentPost].InnerText + ", Down " + xmlScoreDown[CurrentPost].InnerText + ", Total " + xmlScore[CurrentPost].InnerText + "\r\n" +
+                                           "        RATING: " + rating + "\r\n" +
+                                           "        DESCRIPITON:" + poolDescription;
 
                             if (isBlacklisted && DownloadInfo.DownloadBlacklistedPages) {
-                                InfoBuffer = "BLACKLISTED " + InfoBuffer + "\r\n" +
-                                                 "        OFFENDING TAGS: " + foundBlacklistedTags;
+                                InfoBuffer = "BLACKLISTED " + InfoBuffer + "\r\n        OFFENDING TAGS: " + foundBlacklistedTags;
                             }
                             else if (isGraylisted && DownloadInfo.DownloadGraylistedPages) {
-                                InfoBuffer = "GRAYLISTED " + InfoBuffer +
-                                                 "        OFFENDING TAGS: " + foundBlacklistedTags;
+                                InfoBuffer = "GRAYLISTED " + InfoBuffer + "\r\n        OFFENDING TAGS: " + foundBlacklistedTags;
                             }
 
                             poolInfo += "    " + InfoBuffer + "\r\n\r\n";
@@ -629,6 +670,7 @@ namespace aphrodite {
                                     else {
                                         BlacklistPageExplicitCount++;
                                         BlacklistPageTotalCount++;
+                                        TotalToDownload++;
                                     }
                                 }
                                 else if (isGraylisted) {
@@ -641,13 +683,14 @@ namespace aphrodite {
                                     }
 
                                     if (File.Exists(NewPath + "\\" + fileName)) {
-                                        GraylistPageExplicitCount++;
+                                        GraylistExplicitExistingFiles++;
                                         GraylistExistingTotalFiles++;
                                         continue;
                                     }
                                     else {
-                                        GraylistExplicitExistingFiles++;
+                                        GraylistPageExplicitCount++;
                                         GraylistPageTotalCount++;
+                                        TotalToDownload++;
                                     }
                                 }
                                 else {
@@ -659,6 +702,7 @@ namespace aphrodite {
                                     else {
                                         CleanPageExplicitCount++;
                                         CleanPageTotalCount++;
+                                        TotalToDownload++;
                                     }
                                 }
                                 break;
@@ -681,6 +725,7 @@ namespace aphrodite {
                                     else {
                                         BlacklistPageQuestionableCount++;
                                         BlacklistPageTotalCount++;
+                                        TotalToDownload++;
                                     }
                                 }
                                 else if (isGraylisted) {
@@ -693,13 +738,14 @@ namespace aphrodite {
                                     }
 
                                     if (File.Exists(NewPath + "\\" + fileName)) {
-                                        GraylistPageQuestionableCount++;
+                                        GraylistQuestionableExistingFiles++;
                                         GraylistExistingTotalFiles++;
                                         continue;
                                     }
                                     else {
-                                        GraylistQuestionableExistingFiles++;
+                                        GraylistPageQuestionableCount++;
                                         GraylistPageTotalCount++;
+                                        TotalToDownload++;
                                     }
                                 }
                                 else {
@@ -711,6 +757,7 @@ namespace aphrodite {
                                     else {
                                         CleanPageQuestionableCount++;
                                         CleanPageTotalCount++;
+                                        TotalToDownload++;
                                     }
                                 }
                                 break;
@@ -733,6 +780,7 @@ namespace aphrodite {
                                     else {
                                         BlacklistPageSafeCount++;
                                         BlacklistPageTotalCount++;
+                                        TotalToDownload++;
                                     }
                                 }
                                 else if (isGraylisted) {
@@ -745,13 +793,14 @@ namespace aphrodite {
                                     }
 
                                     if (File.Exists(NewPath + "\\" + fileName)) {
-                                        GraylistPageSafeCount++;
+                                        GraylistSafeExistingFiles++;
                                         GraylistExistingTotalFiles++;
                                         continue;
                                     }
                                     else {
-                                        GraylistSafeExistingFiles++;
+                                        GraylistPageSafeCount++;
                                         GraylistPageTotalCount++;
+                                        TotalToDownload++;
                                     }
                                 }
                                 else {
@@ -763,6 +812,7 @@ namespace aphrodite {
                                     else {
                                         CleanPageSafeCount++;
                                         CleanPageTotalCount++;
+                                        TotalToDownload++;
                                     }
                                 }
                                 break;
@@ -776,35 +826,46 @@ namespace aphrodite {
                     }
 
                     #region update totals
-                    this.Invoke((Action)delegate() {
-                        object[] Counts = new object[] {
-                            CleanPageTotalCount, CleanPageExplicitCount, CleanPageQuestionableCount, CleanPageSafeCount,
-                            GraylistPageTotalCount, GraylistPageExplicitCount, GraylistPageQuestionableCount, GraylistPageSafeCount,
-                            BlacklistPageTotalCount, BlacklistPageExplicitCount, BlacklistPageQuestionableCount, BlacklistPageSafeCount,
-                            (CleanPageTotalCount + GraylistPageTotalCount + BlacklistPageTotalCount),
+                    this.Invoke((Action) delegate() {
+                        Counts = new object[] {
+                            CleanPageTotalCount, CleanPageExplicitCount, CleanPageQuestionableCount, CleanPageSafeCount,                                // 0,  1,  2,  3
+                            GraylistPageTotalCount, GraylistPageExplicitCount, GraylistPageQuestionableCount, GraylistPageSafeCount,                    // 4,  5,  6,  7
+                            BlacklistPageTotalCount, BlacklistPageExplicitCount, BlacklistPageQuestionableCount, BlacklistPageSafeCount,                // 8,  9,  10, 11
+                            TotalToDownload,                                                                                                            // 12,
 
-                            CleanExistingTotalFiles, CleanExplicitExistingFiles, CleanQuestionableExistingFiles, CleanSafeExistingFiles,
-                            GraylistExistingTotalFiles, GraylistExplicitExistingFiles, GraylistQuestionableExistingFiles, GraylistSafeExistingFiles,
-                            BlacklistExistingTotalFiles, BlacklistExplicitExistingFiles, BlacklistQuestionableExistingFiles, BlacklistSafeExistingFiles,
-                            (CleanExistingTotalFiles + GraylistExistingTotalFiles + BlacklistExistingTotalFiles)
+                            CleanExistingTotalFiles, CleanExplicitExistingFiles, CleanQuestionableExistingFiles, CleanSafeExistingFiles,                // 13, 14, 15, 16
+                            GraylistExistingTotalFiles, GraylistExplicitExistingFiles, GraylistQuestionableExistingFiles, GraylistSafeExistingFiles,    // 17, 18, 19, 20
+                            BlacklistExistingTotalFiles, BlacklistExplicitExistingFiles, BlacklistQuestionableExistingFiles, BlacklistSafeExistingFiles,// 21, 22, 23, 24
+                            (CleanExistingTotalFiles + GraylistExistingTotalFiles + BlacklistExistingTotalFiles),                                       // 25
+
+                            (CleanPageTotalCount + GraylistPageTotalCount + BlacklistPageTotalCount + CleanExistingTotalFiles + GraylistExistingTotalFiles + BlacklistExistingTotalFiles)                                                                                              // 26
                         };
 
                         string InfoLabelBuffer = "{0} clean pages ( {1} e, {2} q, {3} s )\r\n" +
-                                                 "not saving graylisted pages\r\n" + //"{4} graylisted pages ( {5} e, {6} q, {7} s )\r\n" +
-                                                 "not saving blacklisted pages\r\n" + //"{8} blacklisted pages ( {9} e, {10} q, {11} s )\r\n" +
+                                                 "{GRAYLIST_NEW_COUNT}\r\n" + //"{4} graylisted pages ( {5} e, {6} q, {7} s )\r\n" +
+                                                 "{BLACKLIST_NEW_COUNT}\r\n" + //"{8} blacklisted pages ( {9} e, {10} q, {11} s )\r\n" +
                                                  "{12} total pages\r\n\r\n" +
 
                                                  "{13} clean exist ( {14} e, {15} q, {16} s )\r\n" +
-                                                 "{17} graylisted exist ( {18} e, {19} q, {20} s )\r\n" +
-                                                 "{21} blacklisted exist ( {22} e, {23} q, {24} s )\r\n" +
-                                                 "{25} total exist";
+                                                 "{GRAYLIST_EXIST_COUNT}\r\n" +
+                                                 "{BLACKLIST_EXIST_COUNT}\r\n" +
+                                                 "{25} total exist\r\n\r\n" + 
 
-                        if (DownloadInfo.DownloadGraylistedPages) {
-                            InfoLabelBuffer = InfoLabelBuffer.Replace("not saving graylisted pages", "{4} graylisted pages ( {5} e, {6} q, {7} s )");
-                        }
-                        if (DownloadInfo.DownloadBlacklistedPages) {
-                            InfoLabelBuffer = InfoLabelBuffer.Replace("not saving blacklisted pages", "{8} blacklisted pages ( {9} e, {10} q, {11} s )");
-                        }
+                                                 "{26} pages parsed";
+
+                        InfoLabelBuffer = InfoLabelBuffer
+                            .Replace("{GRAYLIST_NEW_COUNT}",
+                            DownloadInfo.DownloadGraylistedPages ? "{4} graylisted pages ( {5} e, {6} q, {7} s )" : "not saving graylisted pages, skipped {4}")
+
+                            .Replace("{BLACKLIST_NEW_COUNT}",
+                            DownloadInfo.DownloadBlacklistedPages ? "{8} blacklisted pages ( {9} e, {10} q, {11} s )" : "not saving blacklisted pages, skipped {8}")
+
+                            .Replace("{GRAYLIST_EXIST_COUNT}",
+                            DownloadInfo.DownloadGraylistedPages ? "{17} graylisted exist ( {18} e, {19} q, {20} s )" : "not saving graylisted pages")
+
+                            .Replace("{BLACKLIST_EXIST_COUNT}",
+                            DownloadInfo.DownloadBlacklistedPages ? "{21} blacklisted exist ( {22} e, {23} q, {24} s )" : "not saving blacklisted pages"
+                        );
 
                         lbTotal.Text = string.Format(InfoLabelBuffer, Counts);
                     });
@@ -880,10 +941,10 @@ namespace aphrodite {
                     DownloadClient.Method = "GET";
 
                     for (int y = 0; y < URLs.Count; y++) {
-                        CurrentURL = URLs[y].Replace("www.", "");
+                        CurrentUrl = URLs[y].Replace("www.", "");
 
                         if (!File.Exists(FilePaths[y])) {
-                            await DownloadClient.DownloadFileTaskAsync(new Uri(CurrentURL), FilePaths[y]);
+                            await DownloadClient.DownloadFileTaskAsync(new Uri(CurrentUrl), FilePaths[y]);
                         }
                     }
                 }
@@ -892,6 +953,7 @@ namespace aphrodite {
                 this.Invoke((Action)delegate() {
                     Program.Log(LogAction.WriteToLog, "The pool " + DownloadInfo.PoolId + " was downloaded. (frmPoolDownloader.cs)");
                 });
+
                 CurrentStatus = DownloadStatus.Finished;
             }
             #endregion
@@ -937,7 +999,7 @@ namespace aphrodite {
                     pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
                     pbTotalStatus.State = aphrodite.Controls.ProgressBarState.Error;
                 });
-                ErrorLog.ReportWebException(WebE, "frmPoolDownloader.cs", CurrentURL);
+                ErrorLog.ReportWebException(WebE, "frmPoolDownloader.cs", CurrentUrl);
                 CurrentStatus = DownloadStatus.Errored;
             }
             catch (Exception ex) {

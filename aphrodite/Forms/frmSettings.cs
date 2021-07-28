@@ -2,7 +2,6 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace aphrodite {
@@ -29,6 +28,7 @@ namespace aphrodite {
         }
         private void frmSettings_Load(object sender, EventArgs e) {
             loadSettings();
+
             if (Program.UseIni) {
                 tbMain.TabPages.Remove(tabProtocol);
                 tbMain.TabPages.Remove(tabPortable);
@@ -101,6 +101,18 @@ namespace aphrodite {
             if (InstallProtocol) {
                 tbMain.SelectedTab = tabProtocol;
             }
+
+            if (Config.Settings.FormSettings.frmSettings_Location.X == -32000 || Config.Settings.FormSettings.frmSettings_Location.Y == -32000) {
+                this.StartPosition = FormStartPosition.CenterScreen;
+            }
+            else {
+                this.Location = Config.Settings.FormSettings.frmSettings_Location;
+            }
+        }
+        private void frmSettings_FormClosing(object sender, FormClosingEventArgs e) {
+            if (Config.Settings.FormSettings.frmSettings_Location != this.Location) {
+                Config.Settings.FormSettings.frmSettings_Location = this.Location;
+            }
         }
 
         private void saveSettings() {
@@ -120,9 +132,7 @@ namespace aphrodite {
             Config.Settings.General.openAfter = chkOpenAfterDownload.Checked;
             Config.Settings.Initialization.SkipArgumentCheck = chkSkipArgumentCheck.Checked;
             Config.Settings.Initialization.AutoDownloadWithArguments = chkAutoDownloadWithArguments.Checked;
-            //Config.Settings.General.saveMetadata = chkSaveMetadata.Checked;
-            //Config.Settings.General.saveArtistMetadata = chkSaveArtistMetadata.Checked;
-            //Config.Settings.General.saveTagMetadata = chkSaveTagMetadata.Checked;
+            Config.Settings.Initialization.ArgumentFormTopMost = chkArgumentFormTopMost.Checked;
 
           // Tags
             switch (string.IsNullOrWhiteSpace(txtTagSchema.Text)) {
@@ -146,6 +156,8 @@ namespace aphrodite {
             Config.Settings.Tags.separateNonImages = chkTagsSeparateNonImages.Checked;
             Config.Settings.Tags.downloadBlacklisted = chkTagsDownloadBlacklisted.Checked;
             Config.Settings.Tags.DownloadNewestToOldest = chkTagsDownloadNewestToOldest.Checked;
+            Config.Settings.Tags.FavoriteCount = Convert.ToInt32(numTagsFavoriteCount.Value);
+            Config.Settings.Tags.FavoriteCountAsTag = chkTagsFavoriteCountAsTag.Checked;
 
           // Pools
             switch (string.IsNullOrWhiteSpace(txtPoolSchema.Text)) {
@@ -195,9 +207,7 @@ namespace aphrodite {
             chkOpenAfterDownload.Checked = Config.Settings.General.openAfter;
             chkSkipArgumentCheck.Checked = Config.Settings.Initialization.SkipArgumentCheck;
             chkAutoDownloadWithArguments.Checked = Config.Settings.Initialization.AutoDownloadWithArguments;
-            //chkSaveMetadata.Checked = Config.Settings.General.saveMetadata;
-            //chkSaveArtistMetadata.Checked = Config.Settings.General.saveArtistMetadata;
-            //chkSaveTagMetadata.Checked = Config.Settings.General.saveTagMetadata;
+            chkArgumentFormTopMost.Checked = Config.Settings.Initialization.ArgumentFormTopMost;
 
             // Tags
             txtTagSchema.Text = apiTools.ReplaceIllegalCharacters(Config.Settings.Tags.fileNameSchema.ToLower());
@@ -213,6 +223,8 @@ namespace aphrodite {
             chkTagsSeparateNonImages.Checked = Config.Settings.Tags.separateNonImages;
             chkTagsDownloadBlacklisted.Checked = Config.Settings.Tags.downloadBlacklisted;
             chkTagsDownloadNewestToOldest.Checked = Config.Settings.Tags.DownloadNewestToOldest;
+            numTagsFavoriteCount.Value = Convert.ToDecimal(Config.Settings.Tags.FavoriteCount);
+            chkTagsFavoriteCountAsTag.Checked = Config.Settings.Tags.FavoriteCountAsTag;
 
             // Pools
             txtPoolSchema.Text = apiTools.ReplaceIllegalCharacters(Config.Settings.Pools.fileNameSchema.ToLower());
@@ -404,9 +416,11 @@ namespace aphrodite {
         }
 
         private void btnBlacklist_Click(object sender, EventArgs e) {
-            frmBlacklist blackList = new frmBlacklist();
-            if (blackList.ShowDialog() == DialogResult.OK) {
-                Config.Settings.General.Save();
+            using (frmBlacklist Blacklist = new frmBlacklist()) {
+                Blacklist.ShowDialog();
+                if (Config.Settings.FormSettings.frmBlacklist_Location != Blacklist.Location) {
+                    Config.Settings.FormSettings.frmBlacklist_Location = Blacklist.Location;
+                }
             }
         }
 
@@ -586,42 +600,44 @@ namespace aphrodite {
                     break;
             }
             MessageBox.Show("You can use the system-based settings for aphrodite by changing \"useIni\" to \"False\".\r\nAlso, graylist & blacklist have spaces between tags and are separate files, so... keep that in mind.", "aphrodite");
-            string bufferINI = "[aphrodite]\nuseIni=True";
+            string bufferINI = "[aphrodite]\r\nuseIni=True";
             File.WriteAllText(Program.ApplicationPath + "\\graylist.cfg", Config.Settings.General.Graylist);
             File.WriteAllText(Program.ApplicationPath + "\\blacklist.cfg", Config.Settings.General.Blacklist);
 
-            bufferINI += "\n\n[Global]";
-            bufferINI += "\nsaveInfo=" + Config.Settings.General.saveInfo;
-            bufferINI += "\nsaveBlacklisted=" + Config.Settings.General.saveGraylisted;
-            bufferINI += "\nignoreFinish=" + Config.Settings.General.ignoreFinish;
-            bufferINI += "\nopenAfter=" + Config.Settings.General.openAfter;
-            //bufferINI += "\nsaveMetadata=" + Config.Settings.General.saveMetadata;
-            //bufferINI += "\nsaveArtistMetadata=" + Config.Settings.General.saveArtistMetadata;
-            //bufferINI += "\nsaveTagMetadata=" + Config.Settings.General.saveTagMetadata;
+            bufferINI += "\r\n\r\n[Global]";
+            bufferINI += "\r\nsaveInfo=" + Config.Settings.General.saveInfo;
+            bufferINI += "\r\nsaveBlacklisted=" + Config.Settings.General.saveGraylisted;
+            bufferINI += "\r\nignoreFinish=" + Config.Settings.General.ignoreFinish;
+            bufferINI += "\r\nopenAfter=" + Config.Settings.General.openAfter;
+            //bufferINI += "\r\nsaveMetadata=" + Config.Settings.General.saveMetadata;
+            //bufferINI += "\r\nsaveArtistMetadata=" + Config.Settings.General.saveArtistMetadata;
+            //bufferINI += "\r\nsaveTagMetadata=" + Config.Settings.General.saveTagMetadata;
 
-            bufferINI += "\n\n[Tags]";
-            bufferINI += "\nfileNameSchema=" + apiTools.ReplaceIllegalCharacters(Config.Settings.Tags.fileNameSchema);
-            bufferINI += "\nuseMinimumScore=" + Config.Settings.Tags.enableScoreMin;
-            bufferINI += "\nscoreAsTag=" + Config.Settings.Tags.scoreAsTag;
-            bufferINI += "\nscoreMin=" + Config.Settings.Tags.scoreMin;
-            bufferINI += "\nimageLimit=" + Config.Settings.Tags.imageLimit;
-            bufferINI += "\npageLimit=" + Config.Settings.Tags.pageLimit;
-            bufferINI += "\nseparateRatings=" + Config.Settings.Tags.separateRatings;
-            bufferINI += "\nseparateNonImages=" + Config.Settings.Tags.separateNonImages;
-            bufferINI += "\nExplicit=" + Config.Settings.Tags.Explicit;
-            bufferINI += "\nQuestionable=" + Config.Settings.Tags.Questionable;
-            bufferINI += "\nSafe=" + Config.Settings.Tags.Safe;
+            bufferINI += "\r\n\r\n[Tags]";
+            bufferINI += "\r\nfileNameSchema=" + apiTools.ReplaceIllegalCharacters(Config.Settings.Tags.fileNameSchema);
+            bufferINI += "\r\nuseMinimumScore=" + Config.Settings.Tags.enableScoreMin;
+            bufferINI += "\r\nscoreAsTag=" + Config.Settings.Tags.scoreAsTag;
+            bufferINI += "\r\nscoreMin=" + Config.Settings.Tags.scoreMin;
+            bufferINI += "\r\nFavoriteCount=" + Config.Settings.Tags.FavoriteCount;
+            bufferINI += "\r\nFavoriteCountAsTag=" + Config.Settings.Tags.FavoriteCountAsTag;
+            bufferINI += "\r\nimageLimit=" + Config.Settings.Tags.imageLimit;
+            bufferINI += "\r\npageLimit=" + Config.Settings.Tags.pageLimit;
+            bufferINI += "\r\nseparateRatings=" + Config.Settings.Tags.separateRatings;
+            bufferINI += "\r\nseparateNonImages=" + Config.Settings.Tags.separateNonImages;
+            bufferINI += "\r\nExplicit=" + Config.Settings.Tags.Explicit;
+            bufferINI += "\r\nQuestionable=" + Config.Settings.Tags.Questionable;
+            bufferINI += "\r\nSafe=" + Config.Settings.Tags.Safe;
 
-            bufferINI += "\n\n[Pools]";
-            bufferINI += "\nfileNameSchema=" + apiTools.ReplaceIllegalCharacters(Config.Settings.Pools.fileNameSchema);
-            bufferINI += "\nmergeBlacklisted=" + Config.Settings.Pools.mergeGraylisted;
+            bufferINI += "\r\n\n[Pools]";
+            bufferINI += "\r\nfileNameSchema=" + apiTools.ReplaceIllegalCharacters(Config.Settings.Pools.fileNameSchema);
+            bufferINI += "\r\nmergeBlacklisted=" + Config.Settings.Pools.mergeGraylisted;
 
-            bufferINI += "\n\n[Images]";
-            bufferINI += "\nfileNameSchema=" + apiTools.ReplaceIllegalCharacters(Config.Settings.Images.fileNameSchema);
-            bufferINI += "\nseparateRatings=" + Config.Settings.Images.separateRatings;
-            bufferINI += "\nseparateBlacklisted=" + Config.Settings.Images.separateGraylisted;
-            bufferINI += "\nseparateNonImages=" + Config.Settings.Images.separateNonImages;
-            bufferINI += "\nuseForm=" + Config.Settings.Images.useForm;
+            bufferINI += "\r\n\n[Images]";
+            bufferINI += "\r\nfileNameSchema=" + apiTools.ReplaceIllegalCharacters(Config.Settings.Images.fileNameSchema);
+            bufferINI += "\r\nseparateRatings=" + Config.Settings.Images.separateRatings;
+            bufferINI += "\r\nseparateBlacklisted=" + Config.Settings.Images.separateGraylisted;
+            bufferINI += "\r\nseparateNonImages=" + Config.Settings.Images.separateNonImages;
+            bufferINI += "\r\nuseForm=" + Config.Settings.Images.useForm;
 
             bufferINI += "\n\n[Forms]";
             bufferINI += "\nfrmMainLocation=" + Config.Settings.FormSettings.frmMain_Location.X + ", " + Config.Settings.FormSettings.frmMain_Location.Y;
@@ -796,5 +812,6 @@ namespace aphrodite {
                 }
             }
         }
+
     }
 }
