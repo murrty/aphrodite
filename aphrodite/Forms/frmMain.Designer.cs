@@ -75,8 +75,6 @@
             this.chkImageSeparateRatings = new System.Windows.Forms.CheckBox();
             this.txtImageUrl = new aphrodite.Controls.ExtendedTextBox();
             this.btnDownloadImage = new aphrodite.Controls.ExtendedButton();
-            this.tabPortable = new System.Windows.Forms.TabPage();
-            this.lbPortable = new System.Windows.Forms.Label();
             this.toolMenu = new System.Windows.Forms.MainMenu(this.components);
             this.mSettings = new System.Windows.Forms.MenuItem();
             this.mBlacklist = new System.Windows.Forms.MenuItem();
@@ -101,7 +99,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.numTagsMinimumScore)).BeginInit();
             this.tabPools.SuspendLayout();
             this.tabImages.SuspendLayout();
-            this.tabPortable.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabMain
@@ -109,12 +106,11 @@
             this.tabMain.Controls.Add(this.tabTags);
             this.tabMain.Controls.Add(this.tabPools);
             this.tabMain.Controls.Add(this.tabImages);
-            this.tabMain.Controls.Add(this.tabPortable);
             this.tabMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabMain.Location = new System.Drawing.Point(0, 0);
             this.tabMain.Name = "tabMain";
             this.tabMain.SelectedIndex = 0;
-            this.tabMain.Size = new System.Drawing.Size(312, 237);
+            this.tabMain.Size = new System.Drawing.Size(312, 258);
             this.tabMain.TabIndex = 0;
             this.tabMain.SelectedIndexChanged += new System.EventHandler(this.tbMain_SelectedIndexChanged);
             // 
@@ -138,7 +134,7 @@
             this.tabTags.Location = new System.Drawing.Point(4, 22);
             this.tabTags.Name = "tabTags";
             this.tabTags.Padding = new System.Windows.Forms.Padding(3);
-            this.tabTags.Size = new System.Drawing.Size(304, 211);
+            this.tabTags.Size = new System.Drawing.Size(304, 232);
             this.tabTags.TabIndex = 0;
             this.tabTags.Text = "Tag(s)";
             this.tabTags.UseVisualStyleBackColor = true;
@@ -147,7 +143,7 @@
             // 
             this.lbTagsSeparator.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.lbTagsSeparator.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.lbTagsSeparator.Location = new System.Drawing.Point(124, 39);
+            this.lbTagsSeparator.Location = new System.Drawing.Point(124, 50);
             this.lbTagsSeparator.Name = "lbTagsSeparator";
             this.lbTagsSeparator.Size = new System.Drawing.Size(2, 133);
             this.lbTagsSeparator.TabIndex = 7;
@@ -156,7 +152,7 @@
             // lbTagsLimitsHint
             // 
             this.lbTagsLimitsHint.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.lbTagsLimitsHint.Location = new System.Drawing.Point(126, 0);
+            this.lbTagsLimitsHint.Location = new System.Drawing.Point(126, 11);
             this.lbTagsLimitsHint.Name = "lbTagsLimitsHint";
             this.lbTagsLimitsHint.Size = new System.Drawing.Size(178, 21);
             this.lbTagsLimitsHint.TabIndex = 17;
@@ -168,7 +164,7 @@
             // 
             this.rbTagsOtherSettings.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.rbTagsOtherSettings.Appearance = System.Windows.Forms.Appearance.Button;
-            this.rbTagsOtherSettings.Location = new System.Drawing.Point(9, 152);
+            this.rbTagsOtherSettings.Location = new System.Drawing.Point(9, 163);
             this.rbTagsOtherSettings.Name = "rbTagsOtherSettings";
             this.rbTagsOtherSettings.Size = new System.Drawing.Size(110, 23);
             this.rbTagsOtherSettings.TabIndex = 6;
@@ -182,7 +178,7 @@
             // 
             this.rbTagsRatings.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.rbTagsRatings.Appearance = System.Windows.Forms.Appearance.Button;
-            this.rbTagsRatings.Location = new System.Drawing.Point(9, 123);
+            this.rbTagsRatings.Location = new System.Drawing.Point(9, 134);
             this.rbTagsRatings.Name = "rbTagsRatings";
             this.rbTagsRatings.Size = new System.Drawing.Size(110, 23);
             this.rbTagsRatings.TabIndex = 5;
@@ -196,7 +192,7 @@
             // 
             this.rbTagsLimits.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.rbTagsLimits.Appearance = System.Windows.Forms.Appearance.Button;
-            this.rbTagsLimits.Location = new System.Drawing.Point(9, 94);
+            this.rbTagsLimits.Location = new System.Drawing.Point(9, 105);
             this.rbTagsLimits.Name = "rbTagsLimits";
             this.rbTagsLimits.Size = new System.Drawing.Size(110, 23);
             this.rbTagsLimits.TabIndex = 4;
@@ -210,7 +206,7 @@
             // 
             this.rbTagsMinimumFavorites.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.rbTagsMinimumFavorites.Appearance = System.Windows.Forms.Appearance.Button;
-            this.rbTagsMinimumFavorites.Location = new System.Drawing.Point(9, 65);
+            this.rbTagsMinimumFavorites.Location = new System.Drawing.Point(9, 76);
             this.rbTagsMinimumFavorites.Name = "rbTagsMinimumFavorites";
             this.rbTagsMinimumFavorites.Size = new System.Drawing.Size(110, 23);
             this.rbTagsMinimumFavorites.TabIndex = 3;
@@ -224,7 +220,7 @@
             // 
             this.rbTagsMinimumScore.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.rbTagsMinimumScore.Appearance = System.Windows.Forms.Appearance.Button;
-            this.rbTagsMinimumScore.Location = new System.Drawing.Point(9, 36);
+            this.rbTagsMinimumScore.Location = new System.Drawing.Point(9, 47);
             this.rbTagsMinimumScore.Name = "rbTagsMinimumScore";
             this.rbTagsMinimumScore.Size = new System.Drawing.Size(110, 23);
             this.rbTagsMinimumScore.TabIndex = 2;
@@ -237,7 +233,7 @@
             // btnDownloadTags
             // 
             this.btnDownloadTags.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.btnDownloadTags.Location = new System.Drawing.Point(112, 180);
+            this.btnDownloadTags.Location = new System.Drawing.Point(112, 191);
             this.btnDownloadTags.Name = "btnDownloadTags";
             this.btnDownloadTags.Size = new System.Drawing.Size(80, 23);
             this.btnDownloadTags.TabIndex = 14;
@@ -249,7 +245,7 @@
             // 
             this.lbAwoo.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.lbAwoo.AutoSize = true;
-            this.lbAwoo.Location = new System.Drawing.Point(124, 170);
+            this.lbAwoo.Location = new System.Drawing.Point(124, 181);
             this.lbAwoo.Name = "lbAwoo";
             this.lbAwoo.Size = new System.Drawing.Size(57, 13);
             this.lbAwoo.TabIndex = 13;
@@ -268,7 +264,7 @@
             this.txtTags.ButtonText = "X";
             this.txtTags.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.txtTags.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtTags.Location = new System.Drawing.Point(37, 9);
+            this.txtTags.Location = new System.Drawing.Point(37, 20);
             this.txtTags.Name = "txtTags";
             this.txtTags.Size = new System.Drawing.Size(230, 20);
             this.txtTags.TabIndex = 1;
@@ -285,7 +281,7 @@
             this.panelTagsOtherSettings.Controls.Add(this.chkTagsOpenAfterDownload);
             this.panelTagsOtherSettings.Controls.Add(this.chkTagsDownloadInUploadOrder);
             this.panelTagsOtherSettings.Controls.Add(this.chkTagSeparateNonImages);
-            this.panelTagsOtherSettings.Location = new System.Drawing.Point(118, 36);
+            this.panelTagsOtherSettings.Location = new System.Drawing.Point(118, 47);
             this.panelTagsOtherSettings.Name = "panelTagsOtherSettings";
             this.panelTagsOtherSettings.Size = new System.Drawing.Size(180, 140);
             this.panelTagsOtherSettings.TabIndex = 12;
@@ -336,7 +332,7 @@
             this.panelTagsRatings.Controls.Add(this.chkTagsDownloadSafe);
             this.panelTagsRatings.Controls.Add(this.chkTagsSeparateRatings);
             this.panelTagsRatings.Controls.Add(this.chkTagsDownloadExplicit);
-            this.panelTagsRatings.Location = new System.Drawing.Point(118, 36);
+            this.panelTagsRatings.Location = new System.Drawing.Point(118, 47);
             this.panelTagsRatings.Name = "panelTagsRatings";
             this.panelTagsRatings.Size = new System.Drawing.Size(180, 140);
             this.panelTagsRatings.TabIndex = 11;
@@ -405,7 +401,7 @@
             this.panelTagsLimits.Controls.Add(this.lbTagsPageLimit);
             this.panelTagsLimits.Controls.Add(this.numTagsImageLimit);
             this.panelTagsLimits.Controls.Add(this.numTagsPageLimit);
-            this.panelTagsLimits.Location = new System.Drawing.Point(118, 36);
+            this.panelTagsLimits.Location = new System.Drawing.Point(118, 47);
             this.panelTagsLimits.Name = "panelTagsLimits";
             this.panelTagsLimits.Size = new System.Drawing.Size(180, 140);
             this.panelTagsLimits.TabIndex = 10;
@@ -466,7 +462,7 @@
             this.panelTagsMinimumFavorites.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.panelTagsMinimumFavorites.Controls.Add(this.chkTagsMinimumFavoritesAsTag);
             this.panelTagsMinimumFavorites.Controls.Add(this.numTagsMinimumFavorites);
-            this.panelTagsMinimumFavorites.Location = new System.Drawing.Point(118, 36);
+            this.panelTagsMinimumFavorites.Location = new System.Drawing.Point(118, 47);
             this.panelTagsMinimumFavorites.Name = "panelTagsMinimumFavorites";
             this.panelTagsMinimumFavorites.Size = new System.Drawing.Size(180, 140);
             this.panelTagsMinimumFavorites.TabIndex = 9;
@@ -512,7 +508,7 @@
             this.panelTagsMinimumScore.Controls.Add(this.chkTagsMinimumScoreAsTag);
             this.panelTagsMinimumScore.Controls.Add(this.numTagsMinimumScore);
             this.panelTagsMinimumScore.Controls.Add(this.chkTagsUseMinimumScore);
-            this.panelTagsMinimumScore.Location = new System.Drawing.Point(118, 36);
+            this.panelTagsMinimumScore.Location = new System.Drawing.Point(118, 47);
             this.panelTagsMinimumScore.Name = "panelTagsMinimumScore";
             this.panelTagsMinimumScore.Size = new System.Drawing.Size(180, 140);
             this.panelTagsMinimumScore.TabIndex = 8;
@@ -808,27 +804,6 @@
             this.btnDownloadImage.UseVisualStyleBackColor = true;
             this.btnDownloadImage.Click += new System.EventHandler(this.btnDownloadImage_Click);
             // 
-            // tabPortable
-            // 
-            this.tabPortable.Controls.Add(this.lbPortable);
-            this.tabPortable.Location = new System.Drawing.Point(4, 22);
-            this.tabPortable.Name = "tabPortable";
-            this.tabPortable.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPortable.Size = new System.Drawing.Size(304, 211);
-            this.tabPortable.TabIndex = 2;
-            this.tabPortable.Text = "// Portable Mode \\\\";
-            this.tabPortable.UseVisualStyleBackColor = true;
-            // 
-            // lbPortable
-            // 
-            this.lbPortable.AutoSize = true;
-            this.lbPortable.Location = new System.Drawing.Point(14, 56);
-            this.lbPortable.Name = "lbPortable";
-            this.lbPortable.Size = new System.Drawing.Size(278, 65);
-            this.lbPortable.TabIndex = 0;
-            this.lbPortable.Text = "aphrodite.ini will be used to store and read settings.\r\n\r\nChange aphrodite.ini to" +
-    " use system\'s settings.\r\n\r\nor delete it, your call.";
-            // 
             // toolMenu
             // 
             this.toolMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
@@ -900,7 +875,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(312, 237);
+            this.ClientSize = new System.Drawing.Size(312, 258);
             this.Controls.Add(this.tabMain);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = global::aphrodite.Properties.Resources.Brad;
@@ -935,8 +910,6 @@
             this.tabPools.PerformLayout();
             this.tabImages.ResumeLayout(false);
             this.tabImages.PerformLayout();
-            this.tabPortable.ResumeLayout(false);
-            this.tabPortable.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -966,8 +939,6 @@
         private System.Windows.Forms.Label lbAwoo;
         private System.Windows.Forms.CheckBox chkTagsMinimumScoreAsTag;
         private System.Windows.Forms.ToolTip TouchingTips;
-        private System.Windows.Forms.TabPage tabPortable;
-        private System.Windows.Forms.Label lbPortable;
         private System.Windows.Forms.TabPage tabImages;
         private Controls.ExtendedTextBox txtImageUrl;
         private Controls.ExtendedButton btnDownloadImage;

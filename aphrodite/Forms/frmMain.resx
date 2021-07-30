@@ -120,9 +120,6 @@
   <metadata name="TouchingTips.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>120, 17</value>
   </metadata>
-  <metadata name="TouchingTips.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>120, 17</value>
-  </metadata>
   <data name="chkTagsMinimumFavoritesAsTag.ToolTip" xml:space="preserve">
     <value>If checked, uses the favorite count as a tag (ex: "gay favcount:&gt;24" if the minimum is set at 25).
 This widly decreases parsing time, and is recommended if you have less than 6 tags.

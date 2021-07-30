@@ -51,12 +51,8 @@ namespace aphrodite {
                     break;
             }
 
-            if (!Program.UseIni) {
-                tabMain.TabPages.Remove(tabPortable);
-            }
-
-            if (Program.IsDebug) {
-                this.Text += " (debug " + DateTime.Now.Year + "-" + DateTime.Now.Month.ToString("00.##") + "-" + DateTime.Now.Day.ToString("00.##") + ")";
+            if (Program.UseIni) {
+                this.Text += " (ini)";
             }
 
             txtTags.Refresh();
@@ -126,6 +122,14 @@ namespace aphrodite {
         private void mSettings_Click(object sender, EventArgs e) {
             using (frmSettings SettingsForm = new frmSettings()) {
                 SettingsForm.ShowDialog();
+
+
+                if (Program.UseIni) {
+                    this.Text += " (ini)";
+                }
+                else {
+                    this.Text = this.Text.Substring(0, this.Text.Length - 6);
+                }
             }
         }
         private void mBlacklist_Click(object sender, EventArgs e) {
