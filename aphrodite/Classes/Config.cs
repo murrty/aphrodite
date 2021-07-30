@@ -1511,7 +1511,7 @@ namespace aphrodite {
                         if (File.Exists(WishlistFile)) {
                             string WishlistBuffer = File.ReadAllText(WishlistFile);
                             if (!WishlistBuffer.Contains(URL)) {
-                                File.AppendAllText(WishlistFile, Environment.NewLine + URL + "|" + Name);
+                                File.AppendAllText(WishlistFile, Environment.NewLine + URL + "|" + Name.Replace("|", "_"));
                                 System.Media.SystemSounds.Asterisk.Play();
                             }
                             else {
