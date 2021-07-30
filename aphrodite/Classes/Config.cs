@@ -104,10 +104,11 @@ namespace aphrodite {
         }
 
         public void ConvertConfig(bool UseIni) {
-            if (Program.UseIni) {
-                if (!UseIni) {
-                    Program.Ini.Write("useIni", false);
-                }
+            if (Program.UseIni && !UseIni) {
+                Program.Ini.Write("useIni", false);
+            }
+            else if (UseIni) {
+                Program.Ini.Write("useIni", true);
             }
 
             Program.UseIni = UseIni;
@@ -965,7 +966,7 @@ namespace aphrodite {
                             default:
                                 File.WriteAllText(
                                     Program.ApplicationPath + "\\graylist.cfg",
-                                    Graylist.Replace(" ", "_").Replace("\r\n", " ")
+                                    Graylist.Replace(" ", "\r\n")
                                 );
                                 break;
                         }
@@ -978,7 +979,7 @@ namespace aphrodite {
                             default:
                                 File.WriteAllText(
                                     Program.ApplicationPath + "\\blacklist.cfg",
-                                    Blacklist.Replace(" ", "_").Replace("\r\n", " ")
+                                    Blacklist.Replace(" ", "\r\n")
                                 );
                                 break;
                         }
@@ -1470,6 +1471,33 @@ namespace aphrodite {
         public class Config_Pools {
             public static readonly string WishlistFile = Program.ApplicationPath + "\\PoolWishlist.cfg";
 
+            #region Variables
+            public bool mergeGraylisted = true;
+            public string wishlist = string.Empty;
+            public string wishlistNames = string.Empty;
+            public bool addWishlistSilent = false;
+            public string fileNameSchema = "%poolname%_%page%";
+            public bool downloadBlacklisted = true;
+            public bool mergeBlacklisted = false;
+
+            private bool mergeGraylisted_First = true;
+            public string wishlist_First = string.Empty;
+            public string wishlistNames_First = string.Empty;
+            private bool addWishlistSilent_First = false;
+            private string fileNameSchema_First = "%poolname%_%page%";
+            private bool downloadBlacklisted_First = true;
+            private bool mergeBlacklisted_First = false;
+
+            private string[] NamesArray;
+            private string[] URLsArray;
+
+            private string NamesString;
+            private string URLsString;
+
+            private string OutputBuffer = string.Empty;
+            private string[] WishlistBuffer;
+            #endregion
+
             public Config_Pools() {
                 Program.Log(LogAction.WriteToLog, "Initializing Config_Pools");
                 Load();
@@ -1522,7 +1550,7 @@ namespace aphrodite {
                 }
             }
             public static void SaveWishlist(List<string> Names, List<string> URLs) {
-                Program.Log(LogAction.WriteToLog, "Saving pool wishlist");
+                Program.Log(LogAction.WriteToLog, "Updating pool wishlist");
 
                 switch (URLs.Count > 0 && Names.Count > 0 && URLs.Count == Names.Count) {
                     case true:
@@ -1545,33 +1573,6 @@ namespace aphrodite {
                         break;
                 }
             }
-
-            #region Variables
-            public bool mergeGraylisted = true;
-            public string wishlist = string.Empty;
-            public string wishlistNames = string.Empty;
-            public bool addWishlistSilent = false;
-            public string fileNameSchema = "%poolname%_%page%";
-            public bool downloadBlacklisted = true;
-            public bool mergeBlacklisted = false;
-
-            private bool mergeGraylisted_First = true;
-            public string wishlist_First = string.Empty;
-            public string wishlistNames_First = string.Empty;
-            private bool addWishlistSilent_First = false;
-            private string fileNameSchema_First = "%poolname%_%page%";
-            private bool downloadBlacklisted_First = true;
-            private bool mergeBlacklisted_First = false;
-
-            private string[] NamesArray;
-            private string[] URLsArray;
-
-            private string NamesString;
-            private string URLsString;
-
-            private string OutputBuffer = string.Empty;
-            private string[] WishlistBuffer;
-            #endregion
 
             public void Save() {
                 Program.Log(LogAction.WriteToLog, "Attempting to save Config_Pools settings");
@@ -1718,8 +1719,8 @@ namespace aphrodite {
                                 string[] List = File.ReadAllLines(WishlistFile);
                                 if (List.Length > 0) {
                                     for (int i = 0; i < List.Length; i++) {
-                                        wishlistNames += List[i].Split('|')[0] + "|";
-                                        wishlist += List[i].Split('|')[1] + "|";
+                                        wishlist += List[i].Split('|')[0] + "|";
+                                        wishlistNames += List[i].Split('|')[1] + "|";
                                     }
 
                                     wishlistNames = wishlistNames.Trim('|');
@@ -1763,15 +1764,20 @@ namespace aphrodite {
                         Program.Ini.Write("mergeBlacklisted", mergeBlacklisted, "Pools");
                         mergeBlacklisted_First = mergeBlacklisted;
 
-                        NamesArray = wishlistNames.Split('|');
                         URLsArray = wishlist.Split('|');
+                        NamesArray = wishlistNames.Split('|');
                         for (int i = 0; i < URLsArray.Length; i++) {
                             OutputBuffer += URLsArray[i] + "|" + NamesArray[i] + "\r\n";
                         }
+
                         OutputBuffer = OutputBuffer.Trim('\n').Trim('\r');
+
                         File.WriteAllText(WishlistFile, OutputBuffer);
 
+                        URLsArray = new string[] { };
+                        NamesArray = new string[] { };
                         OutputBuffer = string.Empty;
+
                         break;
 
                     case false:
@@ -1784,8 +1790,6 @@ namespace aphrodite {
                         aphrodite.Settings.Pools.Default.mergeBlacklisted = mergeBlacklisted;
 
                         WishlistBuffer = File.ReadAllLines(WishlistFile);
-                        NamesString = string.Empty;
-                        URLsString = string.Empty;
                         for (int i = 0; i < WishlistBuffer.Length; i++) {
                             URLsString += WishlistBuffer[i].Split('|')[0] + "\n";
                             NamesString += WishlistBuffer[i].Split('|')[1] + "\n";
@@ -1793,6 +1797,10 @@ namespace aphrodite {
 
                         aphrodite.Settings.Pools.Default.wishlist = URLsString.Replace("\n", "\r\n");
                         aphrodite.Settings.Pools.Default.wishlistNames = NamesString.Replace("\n", "\r\n");
+
+                        URLsString = string.Empty;
+                        NamesString = string.Empty;
+                        WishlistBuffer = new string[] { };
 
                         aphrodite.Settings.Pools.Default.Save();
                         break;

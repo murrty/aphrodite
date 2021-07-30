@@ -10,7 +10,7 @@ namespace aphrodite {
         public static string githubJSON = "https://api.github.com/repos/murrty/aphrodite/releases/latest";
 
         private static volatile bool UpdateChecked = false;
-        private static volatile decimal CheckedVersion = -1;
+        private static volatile string CheckedVersion = string.Empty;
         private static string CheckedHeader = string.Empty;
         private static string CheckedBody = string.Empty;
 
@@ -22,7 +22,9 @@ namespace aphrodite {
         public static bool CheckForUpdate(bool ForceCheck) {
             try {
                 if (UpdateChecked) {
-                    if (CheckedVersion > Properties.Settings.Default.CurrentVersion) {
+                    decimal CloudVersion = decimal.Parse(CheckedVersion.Replace(".", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), NumberStyles.Any, CultureInfo.InvariantCulture);
+
+                    if (CloudVersion > Properties.Settings.Default.CurrentVersion) {
                         frmUpdateAvailable UpdateDialog = new frmUpdateAvailable();
                         UpdateDialog.NewVersion = CheckedVersion.ToString();
                         UpdateDialog.UpdateHeader = CheckedHeader;
@@ -41,7 +43,6 @@ namespace aphrodite {
                     }
                 }
                 else {
-                    Program.Log(LogAction.WriteToLog, "Checking for updates on github");
                     string xml = apiTools.DownloadJsonToXml(githubJSON);
                     XmlDocument doc = new XmlDocument();
                     doc.LoadXml(xml);
@@ -52,7 +53,7 @@ namespace aphrodite {
                     decimal CloudVersion = decimal.Parse(xmlTag[0].InnerText.Replace(".", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), NumberStyles.Any, CultureInfo.InvariantCulture);
 
                     UpdateChecked = true;
-                    CheckedVersion = CloudVersion;
+                    CheckedVersion = xmlTag[0].InnerText;
 
                     if (CloudVersion > Properties.Settings.Default.CurrentVersion) {
                         // Set the Header and Body into variable (it was already downloaded, might as well)
@@ -60,7 +61,7 @@ namespace aphrodite {
                         CheckedBody = xmlBody[0].InnerText;
 
                         if (!ForceCheck && CloudVersion == Properties.Settings.Default.SkippedVersion) {
-                            Program.Log(LogAction.WriteToLog, "Update v" + CloudVersion + " is available, but this version is being skipped.");
+                            Program.Log(LogAction.WriteToLogWithInvoke, "Update v" + CloudVersion + " is available, but this version is being skipped.");
                             return false;
                         }
 
@@ -76,7 +77,7 @@ namespace aphrodite {
                                 break;
 
                             case DialogResult.Ignore:
-                                Program.Log(LogAction.WriteToLog, "Ignoring update v" + CloudVersion);
+                                Program.Log(LogAction.WriteToLogWithInvoke, "Ignoring update v" + CloudVersion);
                                 Properties.Settings.Default.SkippedVersion = CloudVersion;
                                 Properties.Settings.Default.Save();
                                 break;

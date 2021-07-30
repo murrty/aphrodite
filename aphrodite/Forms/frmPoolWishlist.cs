@@ -8,6 +8,7 @@ namespace aphrodite {
     public partial class frmPoolWishlist : Form {
         List<string>PoolNames = new List<string>();
         List<string>PoolURLS = new List<string>();
+        private bool WishlistUpdated = false;
 
         public frmPoolWishlist(bool AddToWishlist = false, string AddUrl = null, string AddTitle = null) {
             InitializeComponent();
@@ -32,9 +33,19 @@ namespace aphrodite {
             }
         }
         private void frmPoolWishlist_FormClosing(object sender, FormClosingEventArgs e) {
-            Config.Config_Pools.SaveWishlist(PoolNames, PoolURLS);
-            if (Config.Settings.FormSettings.frmPoolWishlist_Location != this.Location) {
-                Config.Settings.FormSettings.frmPoolWishlist_Location = this.Location;
+            if (WishlistUpdated) {
+                switch (MessageBox.Show("Would you like to save the wishlist?", "aphrodite", MessageBoxButtons.YesNoCancel)) {
+                    case DialogResult.Yes:
+                        Config.Config_Pools.SaveWishlist(PoolNames, PoolURLS);
+                        if (Config.Settings.FormSettings.frmPoolWishlist_Location != this.Location) {
+                            Config.Settings.FormSettings.frmPoolWishlist_Location = this.Location;
+                        }
+                        break;
+
+                    case DialogResult.Cancel:
+                        e.Cancel = true;
+                        return;
+                }
             }
         }
 
@@ -57,6 +68,8 @@ namespace aphrodite {
                     txtName.Clear();
                     txtURL.Clear();
                 }
+
+                WishlistUpdated = true;
             }
             else {
                 System.Media.SystemSounds.Hand.Play();
@@ -75,6 +88,7 @@ namespace aphrodite {
                     listWishlistItems.SelectedIndex = indx - 1;
                 }
             }
+            WishlistUpdated = true;
         }
         private void btnDownload_Click(object sender, EventArgs e) {
             if (apiTools.IsValidPoolLink(PoolURLS[listWishlistItems.SelectedIndex])) {            
@@ -137,6 +151,24 @@ namespace aphrodite {
             if (apiTools.IsValidPoolLink(PoolURLS[listWishlistItems.SelectedIndex])) {
                 Clipboard.SetText(apiTools.GetPoolOrPostId(PoolURLS[listWishlistItems.SelectedIndex]));
             }
+        }
+
+        private void btnSave_Click(object sender, EventArgs e) {
+            if (WishlistUpdated) {
+                Program.Log(LogAction.WriteToLog, "Wishlist has been updated, saving new wishlist");
+                Config.Config_Pools.SaveWishlist(PoolNames, PoolURLS);
+                if (Config.Settings.FormSettings.frmPoolWishlist_Location != this.Location) {
+                    Config.Settings.FormSettings.frmPoolWishlist_Location = this.Location;
+                }
+                WishlistUpdated = false;
+            }
+
+            this.Dispose();
+        }
+
+        private void btnCancel_Click(object sender, EventArgs e) {
+            WishlistUpdated = false;
+            this.Dispose();
         }
     }
 }

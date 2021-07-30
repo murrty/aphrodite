@@ -8,7 +8,8 @@ namespace aphrodite {
         InitialWriteToLog = 1,
         EnableLog = 2,
         DisableLog = 3,
-        ShowLog = 4
+        ShowLog = 4,
+        WriteToLogWithInvoke = 5,
     }
 
     public partial class frmLog : Form {
@@ -53,6 +54,22 @@ namespace aphrodite {
                     rtbLog.AppendText(Message);
                     break;
             }
+        }
+        [System.Diagnostics.DebuggerStepThrough]
+        public void AppendWithInvoke(string LogEntry, bool InitialMessage = false) {
+            string Now = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss.fff");
+            System.Diagnostics.Debug.Print(LogEntry);
+
+            string Message = string.Format("[{0}] {1}", Now, LogEntry);
+            switch (InitialMessage) {
+                case false:
+                    Message = Message = "\r\n" + Message;
+                    break;
+            }
+
+            this.Invoke((MethodInvoker)delegate() {
+                rtbLog.AppendText(Message);
+            });
         }
 
         private void frmLog_FormClosing(object sender, FormClosingEventArgs e) {

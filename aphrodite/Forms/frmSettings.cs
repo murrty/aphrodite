@@ -9,17 +9,20 @@ namespace aphrodite {
     // if aphrodite.exe is this one, disable the button, otherwise enable it to move it to the
     // currently running version's directory.
     public partial class frmSettings : Form {
+
         #region Variables
         public bool SwitchTab = false;   // is the form being changed from the userscript?
         public int Tab = 0;              // Used to determine the tab that will be selected on boot.
 
         public bool InstallProtocol = false;       // is installprotocol triggered on startup?
 
-        public bool NoProtocols = true;             // Are there no protocols installed?
-        public bool TagsProtocol = false;           // is the tags protocol installed?
-        public bool PoolsProtocol = false;          // is the pools protocol installed?
-        public bool PoolsWishlistProtocol = false;  // is the poolwl protocol installed?
-        public bool ImagesProtocol = false;         // is the images protocol installed?
+        private bool NoProtocols = true;             // Are there no protocols installed?
+        private bool TagsProtocol = false;           // is the tags protocol installed?
+        private bool PoolsProtocol = false;          // is the pools protocol installed?
+        private bool PoolsWishlistProtocol = false;  // is the poolwl protocol installed?
+        private bool ImagesProtocol = false;         // is the images protocol installed?
+
+        private bool LoadingForm = false;
         #endregion
 
         public frmSettings() {
@@ -27,17 +30,16 @@ namespace aphrodite {
             txtSaveTo.TextHint = Environment.CurrentDirectory;
         }
         private void frmSettings_Load(object sender, EventArgs e) {
+            LoadingForm = true; 
             loadSettings();
 
+            chkEnableIni.Checked = Program.UseIni;
+
             if (Program.UseIni) {
-                tbMain.TabPages.Remove(tabProtocol);
-                tbMain.TabPages.Remove(tabPortable);
                 tbMain.TabPages.Remove(tabImportExport);
             }
-            else {
-                checkProtocols();
-            }
 
+            CheckProtocols();
 
             if (SwitchTab) {
                 switch (Tab) {
@@ -108,6 +110,8 @@ namespace aphrodite {
             else {
                 this.Location = Config.Settings.FormSettings.frmSettings_Location;
             }
+
+            LoadingForm = false;
         }
         private void frmSettings_FormClosing(object sender, FormClosingEventArgs e) {
             if (Config.Settings.FormSettings.frmSettings_Location != this.Location) {
@@ -133,6 +137,7 @@ namespace aphrodite {
             Config.Settings.Initialization.SkipArgumentCheck = chkSkipArgumentCheck.Checked;
             Config.Settings.Initialization.AutoDownloadWithArguments = chkAutoDownloadWithArguments.Checked;
             Config.Settings.Initialization.ArgumentFormTopMost = chkArgumentFormTopMost.Checked;
+            Config.Settings.General.CheckForUpdates = chkCheckForUpdates.Checked;
 
           // Tags
             switch (string.IsNullOrWhiteSpace(txtTagSchema.Text)) {
@@ -208,6 +213,7 @@ namespace aphrodite {
             chkSkipArgumentCheck.Checked = Config.Settings.Initialization.SkipArgumentCheck;
             chkAutoDownloadWithArguments.Checked = Config.Settings.Initialization.AutoDownloadWithArguments;
             chkArgumentFormTopMost.Checked = Config.Settings.Initialization.ArgumentFormTopMost;
+            chkCheckForUpdates.Checked = Config.Settings.General.CheckForUpdates;
 
             // Tags
             txtTagSchema.Text = apiTools.ReplaceIllegalCharacters(Config.Settings.Tags.fileNameSchema.ToLower());
@@ -253,87 +259,67 @@ namespace aphrodite {
                 }
             }
         }
-        private void checkProtocols() {
-            switch (Program.UseIni) {
-                case false:
-                    RegistryKey keyTags = Registry.ClassesRoot.OpenSubKey("tags\\shell\\open\\command", false);
-                    RegistryKey keyPools = Registry.ClassesRoot.OpenSubKey("pools\\shell\\open\\command", false);
-                    RegistryKey keyPoolWl = Registry.ClassesRoot.OpenSubKey("poolwl\\shell\\open\\command", false);
-                    RegistryKey keyImages = Registry.ClassesRoot.OpenSubKey("images\\shell\\open\\command", false);
+        private void CheckProtocols() {
+            RegistryKey TagsKey = Registry.ClassesRoot.OpenSubKey("tags\\shell\\open\\command", false);
+            RegistryKey PoolsKey = Registry.ClassesRoot.OpenSubKey("pools\\shell\\open\\command", false);
+            RegistryKey PoolWishlistKey = Registry.ClassesRoot.OpenSubKey("poolwl\\shell\\open\\command", false);
+            RegistryKey ImagesKey = Registry.ClassesRoot.OpenSubKey("images\\shell\\open\\command", false);
+            string ProtocolValue = "\"" + Environment.CurrentDirectory + "\\" + System.AppDomain.CurrentDomain.FriendlyName + "\" \"%1\"";
 
-                    if (Registry.ClassesRoot.GetValue("tags", "URL Protocol") == null || keyTags == null) {
-                        TagsProtocol = false;
-                    }
-                    else {
-                        TagsProtocol = true;
-                    }
-
-                    if (Registry.ClassesRoot.GetValue("pools", "URL Protocol") == null || keyPools == null) {
-                        PoolsProtocol = false;
-                    }
-                    else {
-                        PoolsProtocol = true;
-                    }
-
-                    if (Registry.ClassesRoot.GetValue("poolwl", "URL Protocol") == null || keyPoolWl == null) {
-                        PoolsWishlistProtocol = false;
-                    }
-                    else {
-                        PoolsWishlistProtocol = true;
-                    }
-
-                    if (Registry.ClassesRoot.GetValue("images", "URL Protocol") == null || keyImages == null) {
-                        ImagesProtocol = false;
-                    }
-                    else {
-                        ImagesProtocol = true;
-                    }
-
-                    if (TagsProtocol == false && PoolsProtocol == false && ImagesProtocol == false) {
-                        NoProtocols = true;
-                    }
-                    else {
-                        NoProtocols = false;
-                    }
-                    break;
+            if (Registry.ClassesRoot.GetValue("tags", "URL Protocol") == null || TagsKey == null) {
+                TagsProtocol = false;
             }
-        }
-        private string createProtocolDir() {
-            switch (Program.UseIni) {
-                case false:
-                    if (!string.IsNullOrWhiteSpace(Config.Settings.General.saveLocation)) {
-                        return Config.Settings.General.saveLocation;
-                    }
-
-                    string directory = Environment.CurrentDirectory;
-                    string filename = AppDomain.CurrentDomain.FriendlyName;
-                    switch (MessageBox.Show("Would you like to specifiy a location to store aphrodite? Select no to use current directory.\n\nThis is required for the plugin to work properly, and is recommended that you select a place that won't be messed with AND have permission to write files to.", "aphrodite", MessageBoxButtons.YesNoCancel)) {
-                        case System.Windows.Forms.DialogResult.Yes:
-                            using (FolderBrowserDialog fbd = new FolderBrowserDialog() { Description = "Select a directory to store aphrodite.exe", SelectedPath = Environment.CurrentDirectory, ShowNewFolderButton = true }) {
-                                if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
-                                    directory = fbd.SelectedPath;
-                                }
-                                else {
-                                    return null;
-                                }
-                            }
-                            break;
-                        case System.Windows.Forms.DialogResult.Cancel:
-                            return null;
-                    }
-
-                    if (directory != Environment.CurrentDirectory) {
-                        if (File.Exists(directory + "\\aphrodite.exe")) {
-                            File.Delete(directory + "\\aphrodite.exe");
-                        }
-                        File.Copy(Program.ApplicationPath + "\\" + filename, directory + "\\aphrodite.exe");
-                    }
-
-                    // Return selected directory
-                    return directory;
+            else {
+                if (TagsKey.GetValue("").ToString() == ProtocolValue) {
+                    TagsProtocol = true;
+                }
+                else {
+                    TagsProtocol = false;
+                }
             }
 
-            return null;
+            if (Registry.ClassesRoot.GetValue("pools", "URL Protocol") == null || PoolsKey == null) {
+                PoolsProtocol = false;
+            }
+            else {
+                if (PoolsKey.GetValue("").ToString() == ProtocolValue) {
+                    PoolsProtocol = true;
+                }
+                else {
+                    PoolsProtocol = false;
+                }
+            }
+
+            if (Registry.ClassesRoot.GetValue("poolwl", "URL Protocol") == null || PoolWishlistKey == null) {
+                PoolsWishlistProtocol = false;
+            }
+            else {
+                if (PoolWishlistKey.GetValue("").ToString() == ProtocolValue) {
+                    PoolsWishlistProtocol = true;
+                }
+                else {
+                    PoolsWishlistProtocol = false;
+                }
+            }
+
+            if (Registry.ClassesRoot.GetValue("images", "URL Protocol") == null || ImagesKey == null) {
+                ImagesProtocol = false;
+            }
+            else {
+                if (ImagesKey.GetValue("").ToString() == ProtocolValue) {
+                    ImagesProtocol = true;
+                }
+                else {
+                    ImagesProtocol = false;
+                }
+            }
+
+            if (TagsProtocol == false && PoolsProtocol == false && ImagesProtocol == false) {
+                NoProtocols = true;
+            }
+            else {
+                NoProtocols = false;
+            }
         }
 
         private void btnBrws_Click(object sender, EventArgs e) {
@@ -428,42 +414,36 @@ namespace aphrodite {
             checkAdmin();
 
             if (NoProtocols) {
-                string protocolDir = createProtocolDir();
-                if (protocolDir == null) {
-                    return;
-                }
-
                 // Create registry keys
                 Registry.ClassesRoot.CreateSubKey("tags");
                 RegistryKey setIdentifier = Registry.ClassesRoot.OpenSubKey("tags", true);
                 setIdentifier.SetValue("URL Protocol", "");
+
                 Registry.ClassesRoot.CreateSubKey("tags\\shell");
                 Registry.ClassesRoot.CreateSubKey("tags\\shell\\open");
                 Registry.ClassesRoot.CreateSubKey("tags\\shell\\open\\command");
                 RegistryKey setProtocol = Registry.ClassesRoot.OpenSubKey("tags\\shell\\open\\command", true);
-                setProtocol.SetValue("", "\"" + protocolDir + "\\aphrodite.exe\" \"%1\"");
-                //Registry.ClassesRoot.CreateSubKey("tags\\DefaultIcon");
-                //RegistryKey setIcon = Registry.ClassesRoot.OpenSubKey("tags\\DefaultIcon", true);
-                //setIcon.SetValue("", "\"" + protocolDir + "\\aphrodite.exe\",1");
+                setProtocol.SetValue("", "\"" + Program.FullApplicationPath + "\" \"%1\"");
+
+                Registry.ClassesRoot.CreateSubKey("tags\\DefaultIcon");
+                RegistryKey setIcon = Registry.ClassesRoot.OpenSubKey("tags\\DefaultIcon", true);
+                setIcon.SetValue("", "\"" + Program.FullApplicationPath + "\"");
             }
             else {
-                string protocolDir = createProtocolDir();
-                if (protocolDir == null) {
-                    return;
-                }
-
                 // Create registry keys
                 Registry.ClassesRoot.CreateSubKey("tags");
                 RegistryKey setIdentifier = Registry.ClassesRoot.OpenSubKey("tags", true);
                 setIdentifier.SetValue("URL Protocol", "");
+
                 Registry.ClassesRoot.CreateSubKey("tags\\shell");
                 Registry.ClassesRoot.CreateSubKey("tags\\shell\\open");
                 Registry.ClassesRoot.CreateSubKey("tags\\shell\\open\\command");
                 RegistryKey setProtocol = Registry.ClassesRoot.OpenSubKey("tags\\shell\\open\\command", true);
-                setProtocol.SetValue("", "\"" + protocolDir + "\\aphrodite.exe\" \"%1\"");
-                //Registry.ClassesRoot.CreateSubKey("tags\\DefaultIcon");
-                //RegistryKey setIcon = Registry.ClassesRoot.OpenSubKey("tags\\DefaultIcon", true);
-                //setIcon.SetValue("", "\"" + protocolDir + "\\aphrodite.exe\",1");
+                setProtocol.SetValue("", "\"" + Program.FullApplicationPath + "\" \"%1\"");
+
+                Registry.ClassesRoot.CreateSubKey("tags\\DefaultIcon");
+                RegistryKey setIcon = Registry.ClassesRoot.OpenSubKey("tags\\DefaultIcon", true);
+                setIcon.SetValue("", "\"" + Program.FullApplicationPath + "\"");
             }
 
             btnProtocolInstallTags.Enabled = false;
@@ -476,11 +456,6 @@ namespace aphrodite {
             checkAdmin();
 
             if (NoProtocols) {
-                string protocolDir = createProtocolDir();
-                if (protocolDir == null) {
-                    return;
-                }
-
                 // Create registry keys
                 Registry.ClassesRoot.CreateSubKey("pools");
                 RegistryKey setIdentifier = Registry.ClassesRoot.OpenSubKey("pools", true);
@@ -489,17 +464,12 @@ namespace aphrodite {
                 Registry.ClassesRoot.CreateSubKey("pools\\shell\\open");
                 Registry.ClassesRoot.CreateSubKey("pools\\shell\\open\\command");
                 RegistryKey setProtocol = Registry.ClassesRoot.OpenSubKey("pools\\shell\\open\\command", true);
-                setProtocol.SetValue("", "\"" + protocolDir + "\\aphrodite.exe\" \"%1\"");
+                setProtocol.SetValue("", "\"" + Program.FullApplicationPath + "\" \"%1\"");
                 //Registry.ClassesRoot.CreateSubKey("pools\\DefaultIcon");
                 //RegistryKey setIcon = Registry.ClassesRoot.OpenSubKey("pools\\DefaultIcon", true);
                 //setIcon.SetValue("", "\"" + protocolDir + "\\aphrodite.exe\",1");
             }
             else {
-                string protocolDir = createProtocolDir();
-                if (protocolDir == null) {
-                    return;
-                }
-
                 if (!PoolsProtocol) {
                     // Create registry keys
                     Registry.ClassesRoot.CreateSubKey("pools");
@@ -509,7 +479,7 @@ namespace aphrodite {
                     Registry.ClassesRoot.CreateSubKey("pools\\shell\\open");
                     Registry.ClassesRoot.CreateSubKey("pools\\shell\\open\\command");
                     RegistryKey setProtocol = Registry.ClassesRoot.OpenSubKey("pools\\shell\\open\\command", true);
-                    setProtocol.SetValue("", "\"" + protocolDir + "\\aphrodite.exe\" \"%1\"");
+                    setProtocol.SetValue("", "\"" + Program.FullApplicationPath + "\" \"%1\"");
                     //Registry.ClassesRoot.CreateSubKey("pools\\DefaultIcon");
                     //RegistryKey setIcon = Registry.ClassesRoot.OpenSubKey("pools\\DefaultIcon", true);
                     //setIcon.SetValue("", "\"" + protocolDir + "\\aphrodite.exe\",1");
@@ -524,7 +494,7 @@ namespace aphrodite {
                     Registry.ClassesRoot.CreateSubKey("poolwl\\shell\\open");
                     Registry.ClassesRoot.CreateSubKey("poolwl\\shell\\open\\command");
                     RegistryKey setProtocol = Registry.ClassesRoot.OpenSubKey("poolwl\\shell\\open\\command", true);
-                    setProtocol.SetValue("", "\"" + protocolDir + "\\aphrodite.exe\" \"%1\"");
+                    setProtocol.SetValue("", "\"" + Program.FullApplicationPath + "\" \"%1\"");
                     //Registry.ClassesRoot.CreateSubKey("poolwl\\DefaultIcon");
                     //RegistryKey setIcon = Registry.ClassesRoot.OpenSubKey("poolwl\\DefaultIcon", true);
                     //setIcon.SetValue("", "\"" + protocolDir + "\\aphrodite.exe\",1");
@@ -542,42 +512,36 @@ namespace aphrodite {
             checkAdmin();
 
             if (NoProtocols) {
-                string protocolDir = createProtocolDir();
-                if (protocolDir == null) {
-                    return;
-                }
-
                 // Create registry keys
                 Registry.ClassesRoot.CreateSubKey("images");
                 RegistryKey setIdentifier = Registry.ClassesRoot.OpenSubKey("images", true);
                 setIdentifier.SetValue("URL Protocol", "");
+                
                 Registry.ClassesRoot.CreateSubKey("images\\shell");
                 Registry.ClassesRoot.CreateSubKey("images\\shell\\open");
                 Registry.ClassesRoot.CreateSubKey("images\\shell\\open\\command");
                 RegistryKey setProtocol = Registry.ClassesRoot.OpenSubKey("images\\shell\\open\\command", true);
-                setProtocol.SetValue("", "\"" + protocolDir + "\\aphrodite.exe\" \"%1\"");
-                //Registry.ClassesRoot.CreateSubKey("images\\DefaultIcon");
-                //RegistryKey setIcon = Registry.ClassesRoot.OpenSubKey("images\\DefaultIcon", true);
-                //setIcon.SetValue("", "\"" + protocolDir + "\\aphrodite.exe\",1");
+                setProtocol.SetValue("", "\"" + Program.FullApplicationPath + "\" \"%1\"");
+                
+                Registry.ClassesRoot.CreateSubKey("images\\DefaultIcon");
+                RegistryKey setIcon = Registry.ClassesRoot.OpenSubKey("images\\DefaultIcon", true);
+                setIcon.SetValue("", "\"" + Program.FullApplicationPath + "\"");
             }
             else {
-                string protocolDir = createProtocolDir();
-                if (protocolDir == null) {
-                    return;
-                }
-
                 // Create registry keys
                 Registry.ClassesRoot.CreateSubKey("images");
                 RegistryKey setIdentifier = Registry.ClassesRoot.OpenSubKey("images", true);
                 setIdentifier.SetValue("URL Protocol", "");
+                
                 Registry.ClassesRoot.CreateSubKey("images\\shell");
                 Registry.ClassesRoot.CreateSubKey("images\\shell\\open");
                 Registry.ClassesRoot.CreateSubKey("images\\shell\\open\\command");
                 RegistryKey setProtocol = Registry.ClassesRoot.OpenSubKey("images\\shell\\open\\command", true);
-                setProtocol.SetValue("", "\"" + protocolDir + "\\aphrodite.exe\" \"%1\"");
-                //Registry.ClassesRoot.CreateSubKey("images\\DefaultIcon");
-                //RegistryKey setIcon = Registry.ClassesRoot.OpenSubKey("images\\DefaultIcon", true);
-                //setIcon.SetValue("", "\"" + protocolDir + "\\aphrodite.exe\",1");
+                setProtocol.SetValue("", "\"" + Program.FullApplicationPath + "\" \"%1\"");
+                
+                Registry.ClassesRoot.CreateSubKey("images\\DefaultIcon");
+                RegistryKey setIcon = Registry.ClassesRoot.OpenSubKey("images\\DefaultIcon", true);
+                setIcon.SetValue("", "\"" + Program.FullApplicationPath + "\"");
             }
 
             btnProtocolInstallImages.Enabled = false;
@@ -594,63 +558,10 @@ namespace aphrodite {
             Process.Start("https://github.com/murrty/aphrodite/raw/master/Resources/aphrodite.images.user.js");
         }
 
-        private void btnExportIni_Click(object sender, EventArgs e) {
-            switch (MessageBox.Show("Do you really want to export settings to an ini file?", "aphrodite", MessageBoxButtons.YesNo)) {
-                case DialogResult.Yes:
-                    break;
-            }
-            MessageBox.Show("You can use the system-based settings for aphrodite by changing \"useIni\" to \"False\".\r\nAlso, graylist & blacklist have spaces between tags and are separate files, so... keep that in mind.", "aphrodite");
-            string bufferINI = "[aphrodite]\r\nuseIni=True";
-            File.WriteAllText(Program.ApplicationPath + "\\graylist.cfg", Config.Settings.General.Graylist);
-            File.WriteAllText(Program.ApplicationPath + "\\blacklist.cfg", Config.Settings.General.Blacklist);
-
-            bufferINI += "\r\n\r\n[Global]";
-            bufferINI += "\r\nsaveInfo=" + Config.Settings.General.saveInfo;
-            bufferINI += "\r\nsaveBlacklisted=" + Config.Settings.General.saveGraylisted;
-            bufferINI += "\r\nignoreFinish=" + Config.Settings.General.ignoreFinish;
-            bufferINI += "\r\nopenAfter=" + Config.Settings.General.openAfter;
-            //bufferINI += "\r\nsaveMetadata=" + Config.Settings.General.saveMetadata;
-            //bufferINI += "\r\nsaveArtistMetadata=" + Config.Settings.General.saveArtistMetadata;
-            //bufferINI += "\r\nsaveTagMetadata=" + Config.Settings.General.saveTagMetadata;
-
-            bufferINI += "\r\n\r\n[Tags]";
-            bufferINI += "\r\nfileNameSchema=" + apiTools.ReplaceIllegalCharacters(Config.Settings.Tags.fileNameSchema);
-            bufferINI += "\r\nuseMinimumScore=" + Config.Settings.Tags.enableScoreMin;
-            bufferINI += "\r\nscoreAsTag=" + Config.Settings.Tags.scoreAsTag;
-            bufferINI += "\r\nscoreMin=" + Config.Settings.Tags.scoreMin;
-            bufferINI += "\r\nFavoriteCount=" + Config.Settings.Tags.FavoriteCount;
-            bufferINI += "\r\nFavoriteCountAsTag=" + Config.Settings.Tags.FavoriteCountAsTag;
-            bufferINI += "\r\nimageLimit=" + Config.Settings.Tags.imageLimit;
-            bufferINI += "\r\npageLimit=" + Config.Settings.Tags.pageLimit;
-            bufferINI += "\r\nseparateRatings=" + Config.Settings.Tags.separateRatings;
-            bufferINI += "\r\nseparateNonImages=" + Config.Settings.Tags.separateNonImages;
-            bufferINI += "\r\nExplicit=" + Config.Settings.Tags.Explicit;
-            bufferINI += "\r\nQuestionable=" + Config.Settings.Tags.Questionable;
-            bufferINI += "\r\nSafe=" + Config.Settings.Tags.Safe;
-
-            bufferINI += "\r\n\n[Pools]";
-            bufferINI += "\r\nfileNameSchema=" + apiTools.ReplaceIllegalCharacters(Config.Settings.Pools.fileNameSchema);
-            bufferINI += "\r\nmergeBlacklisted=" + Config.Settings.Pools.mergeGraylisted;
-
-            bufferINI += "\r\n\n[Images]";
-            bufferINI += "\r\nfileNameSchema=" + apiTools.ReplaceIllegalCharacters(Config.Settings.Images.fileNameSchema);
-            bufferINI += "\r\nseparateRatings=" + Config.Settings.Images.separateRatings;
-            bufferINI += "\r\nseparateBlacklisted=" + Config.Settings.Images.separateGraylisted;
-            bufferINI += "\r\nseparateNonImages=" + Config.Settings.Images.separateNonImages;
-            bufferINI += "\r\nuseForm=" + Config.Settings.Images.useForm;
-
-            bufferINI += "\n\n[Forms]";
-            bufferINI += "\nfrmMainLocation=" + Config.Settings.FormSettings.frmMain_Location.X + ", " + Config.Settings.FormSettings.frmMain_Location.Y;
-
-            File.WriteAllText(Program.ApplicationPath + "\\aphrodite.ini", bufferINI);
-
-            Program.UseIni = true;
-        }
-
         private void btnSchemaUndesiredTags_Click(object sender, EventArgs e) {
-            frmUndesiredTags undesiredTags = new frmUndesiredTags();
-            undesiredTags.ShowDialog();
-            undesiredTags.Dispose();
+            using (frmUndesiredTags UndesiredTagsForm = new frmUndesiredTags()) {
+                UndesiredTagsForm.ShowDialog();
+            }
         }
 
         private void txtTagSchema_KeyPress(object sender, KeyPressEventArgs e) {
@@ -812,6 +723,13 @@ namespace aphrodite {
                 }
             }
         }
+
+        private void chkEnableIni_CheckedChanged(object sender, EventArgs e) {
+            if (!LoadingForm && !chkDontOverwrite.Checked) {
+                Config.Settings.ConvertConfig(chkEnableIni.Checked);
+            }
+        }
+
 
     }
 }

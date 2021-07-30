@@ -170,13 +170,6 @@ the 'images:' protocol uses a separate userscript for... various reasons.</value
 The following characters won't be allowed to be used:
 \    /    :    *    ?    "    &lt;    &gt;    |</value>
   </data>
-  <data name="lbPortable.Text" xml:space="preserve">
-    <value>Aphrodite settings can be saved as an ini file.
-
-Basically, all your current settings can be saved and used elsewhere without having to worry about the settings being different. The way it works is aphrodite will check for "aphridte.ini", and if one exists it will use that over system settings. You can specify to use the ini in the ini file. Values not in the ini will have defaults used
-
-Click the button below to export your settings to "aphrodite.ini" in the same directory as aphrodite.</value>
-  </data>
   <data name="txtImageSchema.ToolTip" xml:space="preserve">
     <value>The schema used for the file name.
 %md5%             = the MD5 of the file
@@ -215,5 +208,12 @@ Click the button below to export your settings to "aphrodite.ini" in the same di
 %fav_count%   = the amount of favorites the post has
 %score%          = the score of the post
 %author%        = the user who submitted the post to e621</value>
+  </data>
+  <data name="lbPortable.Text" xml:space="preserve">
+    <value>Aphrodite settings can be saved as an ini file.
+
+Basically, all your current settings can be saved and used elsewhere without having to worry about the settings being different. The way it works is aphrodite will check for "aphridte.ini", and if one exists it will use that over system settings. You can specify to use the ini in the ini file. Values not in the ini will have defaults used
+
+You can enable/disable the setting here. It will force-save the current settings, so don't spam it.</value>
   </data>
 </root>

@@ -56,7 +56,7 @@ namespace aphrodite {
             }
 
             if (Program.IsDebug) {
-                this.Text += " (debug " + Properties.Settings.Default.DebugDate + ")";
+                this.Text += " (debug " + DateTime.Now.Year + "-" + DateTime.Now.Month.ToString("00.##") + "-" + DateTime.Now.Day.ToString("00.##") + ")";
             }
 
             txtTags.Refresh();
@@ -64,7 +64,9 @@ namespace aphrodite {
             txtImageUrl.Refresh();
         }
         private void frmMain_Load(object sender, EventArgs e) {
-            UpdateCheckThread.Start();
+            if (Config.Settings.General.CheckForUpdates) {
+                UpdateCheckThread.Start();
+            }
 
             if (string.IsNullOrWhiteSpace(Config.Settings.General.saveLocation)) {
                 Config.Settings.General.saveLocation = Environment.CurrentDirectory;

@@ -27,12 +27,16 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmSettings));
             this.tbMain = new System.Windows.Forms.TabControl();
             this.tabGeneral = new System.Windows.Forms.TabPage();
+            this.chkCheckForUpdates = new System.Windows.Forms.CheckBox();
+            this.chkArgumentFormTopMost = new System.Windows.Forms.CheckBox();
             this.chkAutoDownloadWithArguments = new System.Windows.Forms.CheckBox();
             this.chkSkipArgumentCheck = new System.Windows.Forms.CheckBox();
             this.chkIgnoreFinish = new System.Windows.Forms.CheckBox();
             this.chkSaveGraylistedImages = new System.Windows.Forms.CheckBox();
             this.chkOpenAfterDownload = new System.Windows.Forms.CheckBox();
             this.chkSaveInfoFiles = new System.Windows.Forms.CheckBox();
+            this.btnBrowseForSaveTo = new aphrodite.Controls.ExtendedButton();
+            this.txtSaveTo = new aphrodite.Controls.ExtendedTextBox();
             this.lbSaveTo = new System.Windows.Forms.Label();
             this.tabTags = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -76,11 +80,18 @@
             this.lbImagesHeader = new System.Windows.Forms.Label();
             this.tabMisc = new System.Windows.Forms.TabPage();
             this.chkUseSessionId = new System.Windows.Forms.CheckBox();
+            this.txtSessionId = new aphrodite.Controls.ExtendedTextBox();
             this.lbSessionId = new System.Windows.Forms.Label();
             this.tabProtocol = new System.Windows.Forms.TabPage();
             this.lbProtocolsSeparator = new System.Windows.Forms.Label();
             this.lbProtocols = new System.Windows.Forms.Label();
+            this.btnProtocolImagesUserscript = new aphrodite.Controls.ExtendedButton();
+            this.btnProtocolUserscript = new aphrodite.Controls.ExtendedButton();
+            this.btnProtocolInstallTags = new aphrodite.Controls.ExtendedButton();
+            this.btnProtocolInstallPools = new aphrodite.Controls.ExtendedButton();
+            this.btnProtocolInstallImages = new aphrodite.Controls.ExtendedButton();
             this.tabSchemas = new System.Windows.Forms.TabPage();
+            this.btnSchemaUndesiredTags = new aphrodite.Controls.ExtendedButton();
             this.lbImageExt = new System.Windows.Forms.Label();
             this.lbPoolExt = new System.Windows.Forms.Label();
             this.lbTagExt = new System.Windows.Forms.Label();
@@ -88,7 +99,10 @@
             this.lbSchemaParam = new System.Windows.Forms.Label();
             this.lblTagSchema = new System.Windows.Forms.Label();
             this.lbPoolSchema = new System.Windows.Forms.Label();
+            this.txtImageSchema = new aphrodite.Controls.ExtendedTextBox();
+            this.txtTagSchema = new aphrodite.Controls.ExtendedTextBox();
             this.lbImageSchema = new System.Windows.Forms.Label();
+            this.txtPoolSchema = new aphrodite.Controls.ExtendedTextBox();
             this.tabImportExport = new System.Windows.Forms.TabPage();
             this.chkOverwriteOnImport = new System.Windows.Forms.CheckBox();
             this.btnImportUndesiredTags = new System.Windows.Forms.Button();
@@ -98,26 +112,14 @@
             this.btnImportGraylist = new System.Windows.Forms.Button();
             this.btnExportGraylist = new System.Windows.Forms.Button();
             this.tabPortable = new System.Windows.Forms.TabPage();
+            this.chkEnableIni = new System.Windows.Forms.CheckBox();
             this.lbPortable = new System.Windows.Forms.Label();
             this.JustTheTips = new System.Windows.Forms.ToolTip(this.components);
-            this.pnControls = new System.Windows.Forms.Panel();
-            this.btnBrowseForSaveTo = new aphrodite.Controls.ExtendedButton();
-            this.txtSaveTo = new aphrodite.Controls.ExtendedTextBox();
-            this.txtSessionId = new aphrodite.Controls.ExtendedTextBox();
-            this.btnProtocolImagesUserscript = new aphrodite.Controls.ExtendedButton();
-            this.btnProtocolUserscript = new aphrodite.Controls.ExtendedButton();
-            this.btnProtocolInstallTags = new aphrodite.Controls.ExtendedButton();
-            this.btnProtocolInstallPools = new aphrodite.Controls.ExtendedButton();
-            this.btnProtocolInstallImages = new aphrodite.Controls.ExtendedButton();
-            this.btnSchemaUndesiredTags = new aphrodite.Controls.ExtendedButton();
-            this.txtImageSchema = new aphrodite.Controls.ExtendedTextBox();
-            this.txtTagSchema = new aphrodite.Controls.ExtendedTextBox();
-            this.txtPoolSchema = new aphrodite.Controls.ExtendedTextBox();
-            this.btnPortableExportIni = new aphrodite.Controls.ExtendedButton();
             this.btnBlacklist = new aphrodite.Controls.ExtendedButton();
             this.btnSave = new aphrodite.Controls.ExtendedButton();
             this.btnCancel = new aphrodite.Controls.ExtendedButton();
-            this.chkArgumentFormTopMost = new System.Windows.Forms.CheckBox();
+            this.pnControls = new System.Windows.Forms.Panel();
+            this.chkDontOverwrite = new System.Windows.Forms.CheckBox();
             this.tbMain.SuspendLayout();
             this.tabGeneral.SuspendLayout();
             this.tabTags.SuspendLayout();
@@ -161,6 +163,7 @@
             // 
             // tabGeneral
             // 
+            this.tabGeneral.Controls.Add(this.chkCheckForUpdates);
             this.tabGeneral.Controls.Add(this.chkArgumentFormTopMost);
             this.tabGeneral.Controls.Add(this.chkAutoDownloadWithArguments);
             this.tabGeneral.Controls.Add(this.chkSkipArgumentCheck);
@@ -178,6 +181,30 @@
             this.tabGeneral.TabIndex = 0;
             this.tabGeneral.Text = "General";
             this.tabGeneral.UseVisualStyleBackColor = true;
+            // 
+            // chkCheckForUpdates
+            // 
+            this.chkCheckForUpdates.AutoSize = true;
+            this.chkCheckForUpdates.Location = new System.Drawing.Point(112, 160);
+            this.chkCheckForUpdates.Name = "chkCheckForUpdates";
+            this.chkCheckForUpdates.Size = new System.Drawing.Size(176, 17);
+            this.chkCheckForUpdates.TabIndex = 21;
+            this.chkCheckForUpdates.Text = "Check for updates on startup";
+            this.JustTheTips.SetToolTip(this.chkCheckForUpdates, "Checks for new version updates everytime the program starts up");
+            this.chkCheckForUpdates.UseVisualStyleBackColor = true;
+            // 
+            // chkArgumentFormTopMost
+            // 
+            this.chkArgumentFormTopMost.AutoSize = true;
+            this.chkArgumentFormTopMost.Checked = true;
+            this.chkArgumentFormTopMost.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkArgumentFormTopMost.Location = new System.Drawing.Point(175, 91);
+            this.chkArgumentFormTopMost.Name = "chkArgumentFormTopMost";
+            this.chkArgumentFormTopMost.Size = new System.Drawing.Size(153, 17);
+            this.chkArgumentFormTopMost.TabIndex = 20;
+            this.chkArgumentFormTopMost.Text = "Argument form top-most";
+            this.JustTheTips.SetToolTip(this.chkArgumentFormTopMost, "The argument form will appear above most windows, when shown");
+            this.chkArgumentFormTopMost.UseVisualStyleBackColor = true;
             // 
             // chkAutoDownloadWithArguments
             // 
@@ -207,7 +234,7 @@
             // chkIgnoreFinish
             // 
             this.chkIgnoreFinish.AutoSize = true;
-            this.chkIgnoreFinish.Location = new System.Drawing.Point(104, 137);
+            this.chkIgnoreFinish.Location = new System.Drawing.Point(177, 114);
             this.chkIgnoreFinish.Name = "chkIgnoreFinish";
             this.chkIgnoreFinish.Size = new System.Drawing.Size(193, 17);
             this.chkIgnoreFinish.TabIndex = 4;
@@ -221,7 +248,7 @@
             this.chkSaveGraylistedImages.AutoSize = true;
             this.chkSaveGraylistedImages.Checked = true;
             this.chkSaveGraylistedImages.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkSaveGraylistedImages.Location = new System.Drawing.Point(130, 114);
+            this.chkSaveGraylistedImages.Location = new System.Drawing.Point(31, 114);
             this.chkSaveGraylistedImages.Name = "chkSaveGraylistedImages";
             this.chkSaveGraylistedImages.Size = new System.Drawing.Size(140, 17);
             this.chkSaveGraylistedImages.TabIndex = 3;
@@ -233,7 +260,7 @@
             // chkOpenAfterDownload
             // 
             this.chkOpenAfterDownload.AutoSize = true;
-            this.chkOpenAfterDownload.Location = new System.Drawing.Point(123, 160);
+            this.chkOpenAfterDownload.Location = new System.Drawing.Point(123, 137);
             this.chkOpenAfterDownload.Name = "chkOpenAfterDownload";
             this.chkOpenAfterDownload.Size = new System.Drawing.Size(154, 17);
             this.chkOpenAfterDownload.TabIndex = 3;
@@ -253,6 +280,36 @@
             this.chkSaveInfoFiles.Text = "Save info files";
             this.JustTheTips.SetToolTip(this.chkSaveInfoFiles, resources.GetString("chkSaveInfoFiles.ToolTip"));
             this.chkSaveInfoFiles.UseVisualStyleBackColor = true;
+            // 
+            // btnBrowseForSaveTo
+            // 
+            this.btnBrowseForSaveTo.Location = new System.Drawing.Point(353, 31);
+            this.btnBrowseForSaveTo.Name = "btnBrowseForSaveTo";
+            this.btnBrowseForSaveTo.Size = new System.Drawing.Size(24, 23);
+            this.btnBrowseForSaveTo.TabIndex = 1;
+            this.btnBrowseForSaveTo.Text = "...";
+            this.JustTheTips.SetToolTip(this.btnBrowseForSaveTo, "Browse for a new directory to save downloads to.\r\n\r\nYou\'ll have the option to mov" +
+        "e existing downloads.");
+            this.btnBrowseForSaveTo.UseVisualStyleBackColor = true;
+            this.btnBrowseForSaveTo.Click += new System.EventHandler(this.btnBrws_Click);
+            // 
+            // txtSaveTo
+            // 
+            this.txtSaveTo.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
+            this.txtSaveTo.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
+            this.txtSaveTo.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtSaveTo.ButtonImageIndex = -1;
+            this.txtSaveTo.ButtonImageKey = "";
+            this.txtSaveTo.ButtonSize = new System.Drawing.Size(22, 21);
+            this.txtSaveTo.ButtonText = "";
+            this.txtSaveTo.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.txtSaveTo.Location = new System.Drawing.Point(24, 32);
+            this.txtSaveTo.Name = "txtSaveTo";
+            this.txtSaveTo.ReadOnly = true;
+            this.txtSaveTo.Size = new System.Drawing.Size(323, 22);
+            this.txtSaveTo.TabIndex = 0;
+            this.txtSaveTo.TextHint = "";
+            this.JustTheTips.SetToolTip(this.txtSaveTo, "The location where pools, tags, and images will be saved to.");
             // 
             // lbSaveTo
             // 
@@ -778,6 +835,23 @@
             this.JustTheTips.SetToolTip(this.chkUseSessionId, "Enables the use of the session id when e621 requires captcha to access");
             this.chkUseSessionId.UseVisualStyleBackColor = true;
             // 
+            // txtSessionId
+            // 
+            this.txtSessionId.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
+            this.txtSessionId.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
+            this.txtSessionId.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtSessionId.ButtonImageIndex = -1;
+            this.txtSessionId.ButtonImageKey = "";
+            this.txtSessionId.ButtonSize = new System.Drawing.Size(22, 21);
+            this.txtSessionId.ButtonText = "";
+            this.txtSessionId.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.txtSessionId.Location = new System.Drawing.Point(9, 25);
+            this.txtSessionId.Name = "txtSessionId";
+            this.txtSessionId.Size = new System.Drawing.Size(383, 22);
+            this.txtSessionId.TabIndex = 18;
+            this.txtSessionId.TextHint = "";
+            this.JustTheTips.SetToolTip(this.txtSessionId, "The \"cf_clearance\" cookie for e621.net to allow site access");
+            // 
             // lbSessionId
             // 
             this.lbSessionId.AutoSize = true;
@@ -822,6 +896,56 @@
             this.lbProtocols.Text = resources.GetString("lbProtocols.Text");
             this.lbProtocols.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
+            // btnProtocolImagesUserscript
+            // 
+            this.btnProtocolImagesUserscript.Location = new System.Drawing.Point(246, 160);
+            this.btnProtocolImagesUserscript.Name = "btnProtocolImagesUserscript";
+            this.btnProtocolImagesUserscript.Size = new System.Drawing.Size(75, 23);
+            this.btnProtocolImagesUserscript.TabIndex = 5;
+            this.btnProtocolImagesUserscript.Text = "Userscript";
+            this.btnProtocolImagesUserscript.UseVisualStyleBackColor = true;
+            this.btnProtocolImagesUserscript.Click += new System.EventHandler(this.btnImagesUserscript_Click);
+            // 
+            // btnProtocolUserscript
+            // 
+            this.btnProtocolUserscript.Location = new System.Drawing.Point(246, 107);
+            this.btnProtocolUserscript.Name = "btnProtocolUserscript";
+            this.btnProtocolUserscript.Size = new System.Drawing.Size(75, 23);
+            this.btnProtocolUserscript.TabIndex = 3;
+            this.btnProtocolUserscript.Text = "Userscript";
+            this.btnProtocolUserscript.UseVisualStyleBackColor = true;
+            this.btnProtocolUserscript.Click += new System.EventHandler(this.btnUserscript_Click);
+            // 
+            // btnProtocolInstallTags
+            // 
+            this.btnProtocolInstallTags.Location = new System.Drawing.Point(89, 95);
+            this.btnProtocolInstallTags.Name = "btnProtocolInstallTags";
+            this.btnProtocolInstallTags.Size = new System.Drawing.Size(151, 23);
+            this.btnProtocolInstallTags.TabIndex = 1;
+            this.btnProtocolInstallTags.Text = "Install tag protocol";
+            this.btnProtocolInstallTags.UseVisualStyleBackColor = true;
+            this.btnProtocolInstallTags.Click += new System.EventHandler(this.btnTagsProtocol_Click);
+            // 
+            // btnProtocolInstallPools
+            // 
+            this.btnProtocolInstallPools.Location = new System.Drawing.Point(89, 120);
+            this.btnProtocolInstallPools.Name = "btnProtocolInstallPools";
+            this.btnProtocolInstallPools.Size = new System.Drawing.Size(151, 23);
+            this.btnProtocolInstallPools.TabIndex = 2;
+            this.btnProtocolInstallPools.Text = "Install pool protocols";
+            this.btnProtocolInstallPools.UseVisualStyleBackColor = true;
+            this.btnProtocolInstallPools.Click += new System.EventHandler(this.btnPoolsProtocol_Click);
+            // 
+            // btnProtocolInstallImages
+            // 
+            this.btnProtocolInstallImages.Location = new System.Drawing.Point(89, 160);
+            this.btnProtocolInstallImages.Name = "btnProtocolInstallImages";
+            this.btnProtocolInstallImages.Size = new System.Drawing.Size(151, 23);
+            this.btnProtocolInstallImages.TabIndex = 4;
+            this.btnProtocolInstallImages.Text = "Install image protocol";
+            this.btnProtocolInstallImages.UseVisualStyleBackColor = true;
+            this.btnProtocolInstallImages.Click += new System.EventHandler(this.btnImagesProtocol_Click);
+            // 
             // tabSchemas
             // 
             this.tabSchemas.Controls.Add(this.btnSchemaUndesiredTags);
@@ -843,6 +967,16 @@
             this.tabSchemas.TabIndex = 6;
             this.tabSchemas.Text = "Schemas";
             this.tabSchemas.UseVisualStyleBackColor = true;
+            // 
+            // btnSchemaUndesiredTags
+            // 
+            this.btnSchemaUndesiredTags.Location = new System.Drawing.Point(272, 80);
+            this.btnSchemaUndesiredTags.Name = "btnSchemaUndesiredTags";
+            this.btnSchemaUndesiredTags.Size = new System.Drawing.Size(104, 23);
+            this.btnSchemaUndesiredTags.TabIndex = 4;
+            this.btnSchemaUndesiredTags.Text = "undesired tags...";
+            this.btnSchemaUndesiredTags.UseVisualStyleBackColor = true;
+            this.btnSchemaUndesiredTags.Click += new System.EventHandler(this.btnSchemaUndesiredTags_Click);
             // 
             // lbImageExt
             // 
@@ -908,6 +1042,44 @@
             this.lbPoolSchema.TabIndex = 22;
             this.lbPoolSchema.Text = "Pools name schema";
             // 
+            // txtImageSchema
+            // 
+            this.txtImageSchema.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
+            this.txtImageSchema.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
+            this.txtImageSchema.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtImageSchema.ButtonImageIndex = -1;
+            this.txtImageSchema.ButtonImageKey = "";
+            this.txtImageSchema.ButtonSize = new System.Drawing.Size(22, 21);
+            this.txtImageSchema.ButtonText = "";
+            this.txtImageSchema.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.txtImageSchema.Location = new System.Drawing.Point(135, 54);
+            this.txtImageSchema.Name = "txtImageSchema";
+            this.txtImageSchema.Size = new System.Drawing.Size(197, 22);
+            this.txtImageSchema.TabIndex = 3;
+            this.txtImageSchema.TextHint = "%artist%_%md5%";
+            this.JustTheTips.SetToolTip(this.txtImageSchema, resources.GetString("txtImageSchema.ToolTip"));
+            this.txtImageSchema.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtImageSchema_KeyDown);
+            this.txtImageSchema.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtImageSchema_KeyPress);
+            // 
+            // txtTagSchema
+            // 
+            this.txtTagSchema.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
+            this.txtTagSchema.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
+            this.txtTagSchema.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtTagSchema.ButtonImageIndex = -1;
+            this.txtTagSchema.ButtonImageKey = "";
+            this.txtTagSchema.ButtonSize = new System.Drawing.Size(22, 21);
+            this.txtTagSchema.ButtonText = "";
+            this.txtTagSchema.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.txtTagSchema.Location = new System.Drawing.Point(135, 6);
+            this.txtTagSchema.Name = "txtTagSchema";
+            this.txtTagSchema.Size = new System.Drawing.Size(197, 22);
+            this.txtTagSchema.TabIndex = 1;
+            this.txtTagSchema.TextHint = "%md5%";
+            this.JustTheTips.SetToolTip(this.txtTagSchema, resources.GetString("txtTagSchema.ToolTip"));
+            this.txtTagSchema.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtTagSchema_KeyDown);
+            this.txtTagSchema.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtTagSchema_KeyPress);
+            // 
             // lbImageSchema
             // 
             this.lbImageSchema.AutoSize = true;
@@ -916,6 +1088,25 @@
             this.lbImageSchema.Size = new System.Drawing.Size(110, 13);
             this.lbImageSchema.TabIndex = 13;
             this.lbImageSchema.Text = "Image name schema";
+            // 
+            // txtPoolSchema
+            // 
+            this.txtPoolSchema.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
+            this.txtPoolSchema.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
+            this.txtPoolSchema.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtPoolSchema.ButtonImageIndex = -1;
+            this.txtPoolSchema.ButtonImageKey = "";
+            this.txtPoolSchema.ButtonSize = new System.Drawing.Size(22, 21);
+            this.txtPoolSchema.ButtonText = "";
+            this.txtPoolSchema.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.txtPoolSchema.Location = new System.Drawing.Point(135, 30);
+            this.txtPoolSchema.Name = "txtPoolSchema";
+            this.txtPoolSchema.Size = new System.Drawing.Size(197, 22);
+            this.txtPoolSchema.TabIndex = 2;
+            this.txtPoolSchema.TextHint = "%poolname%_%page%";
+            this.JustTheTips.SetToolTip(this.txtPoolSchema, resources.GetString("txtPoolSchema.ToolTip"));
+            this.txtPoolSchema.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtPoolSchema_KeyDown);
+            this.txtPoolSchema.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtPoolSchema_KeyPress);
             // 
             // tabImportExport
             // 
@@ -1013,7 +1204,8 @@
             // 
             // tabPortable
             // 
-            this.tabPortable.Controls.Add(this.btnPortableExportIni);
+            this.tabPortable.Controls.Add(this.chkDontOverwrite);
+            this.tabPortable.Controls.Add(this.chkEnableIni);
             this.tabPortable.Controls.Add(this.lbPortable);
             this.tabPortable.Location = new System.Drawing.Point(4, 22);
             this.tabPortable.Name = "tabPortable";
@@ -1023,200 +1215,26 @@
             this.tabPortable.Text = "Portable";
             this.tabPortable.UseVisualStyleBackColor = true;
             // 
+            // chkEnableIni
+            // 
+            this.chkEnableIni.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkEnableIni.Location = new System.Drawing.Point(135, 146);
+            this.chkEnableIni.Name = "chkEnableIni";
+            this.chkEnableIni.Size = new System.Drawing.Size(131, 23);
+            this.chkEnableIni.TabIndex = 1;
+            this.chkEnableIni.Text = "Use portable ini file";
+            this.chkEnableIni.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.chkEnableIni.UseVisualStyleBackColor = true;
+            this.chkEnableIni.CheckedChanged += new System.EventHandler(this.chkEnableIni_CheckedChanged);
+            // 
             // lbPortable
             // 
-            this.lbPortable.Location = new System.Drawing.Point(6, 11);
+            this.lbPortable.Location = new System.Drawing.Point(6, 7);
             this.lbPortable.Name = "lbPortable";
             this.lbPortable.Size = new System.Drawing.Size(388, 133);
             this.lbPortable.TabIndex = 0;
             this.lbPortable.Text = resources.GetString("lbPortable.Text");
             this.lbPortable.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // pnControls
-            // 
-            this.pnControls.BackColor = System.Drawing.SystemColors.Menu;
-            this.pnControls.Controls.Add(this.btnBlacklist);
-            this.pnControls.Controls.Add(this.btnSave);
-            this.pnControls.Controls.Add(this.btnCancel);
-            this.pnControls.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pnControls.Location = new System.Drawing.Point(0, 221);
-            this.pnControls.Name = "pnControls";
-            this.pnControls.Size = new System.Drawing.Size(408, 42);
-            this.pnControls.TabIndex = 11;
-            // 
-            // btnBrowseForSaveTo
-            // 
-            this.btnBrowseForSaveTo.Location = new System.Drawing.Point(353, 31);
-            this.btnBrowseForSaveTo.Name = "btnBrowseForSaveTo";
-            this.btnBrowseForSaveTo.Size = new System.Drawing.Size(24, 23);
-            this.btnBrowseForSaveTo.TabIndex = 1;
-            this.btnBrowseForSaveTo.Text = "...";
-            this.JustTheTips.SetToolTip(this.btnBrowseForSaveTo, "Browse for a new directory to save downloads to.\r\n\r\nYou\'ll have the option to mov" +
-        "e existing downloads.");
-            this.btnBrowseForSaveTo.UseVisualStyleBackColor = true;
-            this.btnBrowseForSaveTo.Click += new System.EventHandler(this.btnBrws_Click);
-            // 
-            // txtSaveTo
-            // 
-            this.txtSaveTo.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
-            this.txtSaveTo.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
-            this.txtSaveTo.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtSaveTo.ButtonImageIndex = -1;
-            this.txtSaveTo.ButtonImageKey = "";
-            this.txtSaveTo.ButtonSize = new System.Drawing.Size(22, 21);
-            this.txtSaveTo.ButtonText = "";
-            this.txtSaveTo.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.txtSaveTo.Location = new System.Drawing.Point(24, 32);
-            this.txtSaveTo.Name = "txtSaveTo";
-            this.txtSaveTo.ReadOnly = true;
-            this.txtSaveTo.Size = new System.Drawing.Size(323, 22);
-            this.txtSaveTo.TabIndex = 0;
-            this.txtSaveTo.TextHint = "";
-            this.JustTheTips.SetToolTip(this.txtSaveTo, "The location where pools, tags, and images will be saved to.");
-            // 
-            // txtSessionId
-            // 
-            this.txtSessionId.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
-            this.txtSessionId.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
-            this.txtSessionId.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtSessionId.ButtonImageIndex = -1;
-            this.txtSessionId.ButtonImageKey = "";
-            this.txtSessionId.ButtonSize = new System.Drawing.Size(22, 21);
-            this.txtSessionId.ButtonText = "";
-            this.txtSessionId.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.txtSessionId.Location = new System.Drawing.Point(9, 25);
-            this.txtSessionId.Name = "txtSessionId";
-            this.txtSessionId.Size = new System.Drawing.Size(383, 22);
-            this.txtSessionId.TabIndex = 18;
-            this.txtSessionId.TextHint = "";
-            this.JustTheTips.SetToolTip(this.txtSessionId, "The \"cf_clearance\" cookie for e621.net to allow site access");
-            // 
-            // btnProtocolImagesUserscript
-            // 
-            this.btnProtocolImagesUserscript.Location = new System.Drawing.Point(246, 160);
-            this.btnProtocolImagesUserscript.Name = "btnProtocolImagesUserscript";
-            this.btnProtocolImagesUserscript.Size = new System.Drawing.Size(75, 23);
-            this.btnProtocolImagesUserscript.TabIndex = 5;
-            this.btnProtocolImagesUserscript.Text = "Userscript";
-            this.btnProtocolImagesUserscript.UseVisualStyleBackColor = true;
-            this.btnProtocolImagesUserscript.Click += new System.EventHandler(this.btnImagesUserscript_Click);
-            // 
-            // btnProtocolUserscript
-            // 
-            this.btnProtocolUserscript.Location = new System.Drawing.Point(246, 107);
-            this.btnProtocolUserscript.Name = "btnProtocolUserscript";
-            this.btnProtocolUserscript.Size = new System.Drawing.Size(75, 23);
-            this.btnProtocolUserscript.TabIndex = 3;
-            this.btnProtocolUserscript.Text = "Userscript";
-            this.btnProtocolUserscript.UseVisualStyleBackColor = true;
-            this.btnProtocolUserscript.Click += new System.EventHandler(this.btnUserscript_Click);
-            // 
-            // btnProtocolInstallTags
-            // 
-            this.btnProtocolInstallTags.Location = new System.Drawing.Point(89, 95);
-            this.btnProtocolInstallTags.Name = "btnProtocolInstallTags";
-            this.btnProtocolInstallTags.Size = new System.Drawing.Size(151, 23);
-            this.btnProtocolInstallTags.TabIndex = 1;
-            this.btnProtocolInstallTags.Text = "Install \'tags:\' protocol";
-            this.btnProtocolInstallTags.UseVisualStyleBackColor = true;
-            this.btnProtocolInstallTags.Click += new System.EventHandler(this.btnTagsProtocol_Click);
-            // 
-            // btnProtocolInstallPools
-            // 
-            this.btnProtocolInstallPools.Location = new System.Drawing.Point(89, 120);
-            this.btnProtocolInstallPools.Name = "btnProtocolInstallPools";
-            this.btnProtocolInstallPools.Size = new System.Drawing.Size(151, 23);
-            this.btnProtocolInstallPools.TabIndex = 2;
-            this.btnProtocolInstallPools.Text = "Install pool protocols";
-            this.btnProtocolInstallPools.UseVisualStyleBackColor = true;
-            this.btnProtocolInstallPools.Click += new System.EventHandler(this.btnPoolsProtocol_Click);
-            // 
-            // btnProtocolInstallImages
-            // 
-            this.btnProtocolInstallImages.Location = new System.Drawing.Point(89, 160);
-            this.btnProtocolInstallImages.Name = "btnProtocolInstallImages";
-            this.btnProtocolInstallImages.Size = new System.Drawing.Size(151, 23);
-            this.btnProtocolInstallImages.TabIndex = 4;
-            this.btnProtocolInstallImages.Text = "Install \'image:\' protocol";
-            this.btnProtocolInstallImages.UseVisualStyleBackColor = true;
-            this.btnProtocolInstallImages.Click += new System.EventHandler(this.btnImagesProtocol_Click);
-            // 
-            // btnSchemaUndesiredTags
-            // 
-            this.btnSchemaUndesiredTags.Location = new System.Drawing.Point(272, 80);
-            this.btnSchemaUndesiredTags.Name = "btnSchemaUndesiredTags";
-            this.btnSchemaUndesiredTags.Size = new System.Drawing.Size(104, 23);
-            this.btnSchemaUndesiredTags.TabIndex = 4;
-            this.btnSchemaUndesiredTags.Text = "undesired tags...";
-            this.btnSchemaUndesiredTags.UseVisualStyleBackColor = true;
-            this.btnSchemaUndesiredTags.Click += new System.EventHandler(this.btnSchemaUndesiredTags_Click);
-            // 
-            // txtImageSchema
-            // 
-            this.txtImageSchema.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
-            this.txtImageSchema.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
-            this.txtImageSchema.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtImageSchema.ButtonImageIndex = -1;
-            this.txtImageSchema.ButtonImageKey = "";
-            this.txtImageSchema.ButtonSize = new System.Drawing.Size(22, 21);
-            this.txtImageSchema.ButtonText = "";
-            this.txtImageSchema.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.txtImageSchema.Location = new System.Drawing.Point(135, 54);
-            this.txtImageSchema.Name = "txtImageSchema";
-            this.txtImageSchema.Size = new System.Drawing.Size(197, 22);
-            this.txtImageSchema.TabIndex = 3;
-            this.txtImageSchema.TextHint = "%artist%_%md5%";
-            this.JustTheTips.SetToolTip(this.txtImageSchema, resources.GetString("txtImageSchema.ToolTip"));
-            this.txtImageSchema.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtImageSchema_KeyDown);
-            this.txtImageSchema.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtImageSchema_KeyPress);
-            // 
-            // txtTagSchema
-            // 
-            this.txtTagSchema.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
-            this.txtTagSchema.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
-            this.txtTagSchema.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtTagSchema.ButtonImageIndex = -1;
-            this.txtTagSchema.ButtonImageKey = "";
-            this.txtTagSchema.ButtonSize = new System.Drawing.Size(22, 21);
-            this.txtTagSchema.ButtonText = "";
-            this.txtTagSchema.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.txtTagSchema.Location = new System.Drawing.Point(135, 6);
-            this.txtTagSchema.Name = "txtTagSchema";
-            this.txtTagSchema.Size = new System.Drawing.Size(197, 22);
-            this.txtTagSchema.TabIndex = 1;
-            this.txtTagSchema.TextHint = "%md5%";
-            this.JustTheTips.SetToolTip(this.txtTagSchema, resources.GetString("txtTagSchema.ToolTip"));
-            this.txtTagSchema.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtTagSchema_KeyDown);
-            this.txtTagSchema.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtTagSchema_KeyPress);
-            // 
-            // txtPoolSchema
-            // 
-            this.txtPoolSchema.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
-            this.txtPoolSchema.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
-            this.txtPoolSchema.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtPoolSchema.ButtonImageIndex = -1;
-            this.txtPoolSchema.ButtonImageKey = "";
-            this.txtPoolSchema.ButtonSize = new System.Drawing.Size(22, 21);
-            this.txtPoolSchema.ButtonText = "";
-            this.txtPoolSchema.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.txtPoolSchema.Location = new System.Drawing.Point(135, 30);
-            this.txtPoolSchema.Name = "txtPoolSchema";
-            this.txtPoolSchema.Size = new System.Drawing.Size(197, 22);
-            this.txtPoolSchema.TabIndex = 2;
-            this.txtPoolSchema.TextHint = "%poolname%_%page%";
-            this.JustTheTips.SetToolTip(this.txtPoolSchema, resources.GetString("txtPoolSchema.ToolTip"));
-            this.txtPoolSchema.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtPoolSchema_KeyDown);
-            this.txtPoolSchema.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtPoolSchema_KeyPress);
-            // 
-            // btnPortableExportIni
-            // 
-            this.btnPortableExportIni.Location = new System.Drawing.Point(162, 156);
-            this.btnPortableExportIni.Name = "btnPortableExportIni";
-            this.btnPortableExportIni.Size = new System.Drawing.Size(86, 24);
-            this.btnPortableExportIni.TabIndex = 1;
-            this.btnPortableExportIni.Text = "Export";
-            this.btnPortableExportIni.UseVisualStyleBackColor = true;
-            this.btnPortableExportIni.Click += new System.EventHandler(this.btnExportIni_Click);
             // 
             // btnBlacklist
             // 
@@ -1251,18 +1269,29 @@
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
-            // chkArgumentFormTopMost
+            // pnControls
             // 
-            this.chkArgumentFormTopMost.AutoSize = true;
-            this.chkArgumentFormTopMost.Checked = true;
-            this.chkArgumentFormTopMost.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkArgumentFormTopMost.Location = new System.Drawing.Point(175, 91);
-            this.chkArgumentFormTopMost.Name = "chkArgumentFormTopMost";
-            this.chkArgumentFormTopMost.Size = new System.Drawing.Size(153, 17);
-            this.chkArgumentFormTopMost.TabIndex = 20;
-            this.chkArgumentFormTopMost.Text = "Argument form top-most";
-            this.JustTheTips.SetToolTip(this.chkArgumentFormTopMost, "The argument form will appear above most windows, when shown");
-            this.chkArgumentFormTopMost.UseVisualStyleBackColor = true;
+            this.pnControls.BackColor = System.Drawing.SystemColors.Menu;
+            this.pnControls.Controls.Add(this.btnBlacklist);
+            this.pnControls.Controls.Add(this.btnSave);
+            this.pnControls.Controls.Add(this.btnCancel);
+            this.pnControls.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.pnControls.Location = new System.Drawing.Point(0, 221);
+            this.pnControls.Name = "pnControls";
+            this.pnControls.Size = new System.Drawing.Size(408, 42);
+            this.pnControls.TabIndex = 11;
+            // 
+            // chkDontOverwrite
+            // 
+            this.chkDontOverwrite.AutoSize = true;
+            this.chkDontOverwrite.Location = new System.Drawing.Point(9, 172);
+            this.chkDontOverwrite.Name = "chkDontOverwrite";
+            this.chkDontOverwrite.Size = new System.Drawing.Size(192, 17);
+            this.chkDontOverwrite.TabIndex = 2;
+            this.chkDontOverwrite.Text = "Don\'t overwrite existing settings";
+            this.JustTheTips.SetToolTip(this.chkDontOverwrite, "Doesn\'t overwrite existing settings, but will ovewrite them when closing the prog" +
+        "ram.");
+            this.chkDontOverwrite.UseVisualStyleBackColor = true;
             // 
             // frmSettings
             // 
@@ -1313,6 +1342,7 @@
             this.tabImportExport.ResumeLayout(false);
             this.tabImportExport.PerformLayout();
             this.tabPortable.ResumeLayout(false);
+            this.tabPortable.PerformLayout();
             this.pnControls.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -1363,7 +1393,6 @@
         private System.Windows.Forms.GroupBox gbTagsRatings;
         private System.Windows.Forms.CheckBox chkTagsIncludeScoreAsTag;
         private System.Windows.Forms.TabPage tabPortable;
-        private Controls.ExtendedButton btnPortableExportIni;
         private System.Windows.Forms.Label lbPortable;
         private System.Windows.Forms.Label lbImageSchema;
         private Controls.ExtendedTextBox txtImageSchema;
@@ -1413,6 +1442,9 @@
         private System.Windows.Forms.Label lbSessionId;
         private System.Windows.Forms.CheckBox chkUseSessionId;
         private System.Windows.Forms.CheckBox chkArgumentFormTopMost;
+        private System.Windows.Forms.CheckBox chkEnableIni;
+        private System.Windows.Forms.CheckBox chkCheckForUpdates;
+        private System.Windows.Forms.CheckBox chkDontOverwrite;
 
     }
 }

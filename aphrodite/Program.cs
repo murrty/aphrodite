@@ -8,7 +8,9 @@ using System.Windows.Forms;
 namespace aphrodite {
     static class Program {
         public static readonly string UserAgent = "aphrodite/" + (Properties.Settings.Default.CurrentVersion) + " (Contact: https://github.com/murrty/aphrodite ... open an issue)";
+        public static volatile string ApplicationName = System.AppDomain.CurrentDomain.FriendlyName;
         public static volatile string ApplicationPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        public static volatile string FullApplicationPath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
         public static volatile bool IsDebug = false;
         public static volatile bool IsAdmin = false;
         public static volatile IniFile Ini = new IniFile(ApplicationPath + "\\aphrodite.ini");
@@ -453,6 +455,23 @@ namespace aphrodite {
                         case true:
                             if (Logger != null) {
                                 Logger.Append(LogMessage);
+                                return true;
+                            }
+                            else {
+                                System.Diagnostics.Debug.Print(LogMessage);
+                            }
+                            break;
+                        case false:
+                            System.Diagnostics.Debug.Print(LogMessage);
+                            break;
+                    }
+                    return false;
+
+                case LogAction.WriteToLogWithInvoke:
+                    switch (LogEnabled) {
+                        case true:
+                            if (Logger != null) {
+                                Logger.AppendWithInvoke(LogMessage);
                                 return true;
                             }
                             else {

@@ -35,12 +35,14 @@
             this.btnAddUpdate = new aphrodite.Controls.ExtendedButton();
             this.txtURL = new aphrodite.Controls.ExtendedTextBox();
             this.listWishlistItems = new aphrodite.Controls.AeroListBox();
+            this.btnSave = new aphrodite.Controls.ExtendedButton();
+            this.btnCancel = new aphrodite.Controls.ExtendedButton();
             this.SuspendLayout();
             // 
             // chkUpdate
             // 
             this.chkUpdate.AutoSize = true;
-            this.chkUpdate.Location = new System.Drawing.Point(12, 262);
+            this.chkUpdate.Location = new System.Drawing.Point(12, 266);
             this.chkUpdate.Name = "chkUpdate";
             this.chkUpdate.Size = new System.Drawing.Size(95, 17);
             this.chkUpdate.TabIndex = 6;
@@ -78,7 +80,7 @@
             this.lPoolLink.AutoSize = true;
             this.lPoolLink.Cursor = System.Windows.Forms.Cursors.Hand;
             this.lPoolLink.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
-            this.lPoolLink.Location = new System.Drawing.Point(12, 188);
+            this.lPoolLink.Location = new System.Drawing.Point(12, 190);
             this.lPoolLink.Name = "lPoolLink";
             this.lPoolLink.Size = new System.Drawing.Size(196, 13);
             this.lPoolLink.TabIndex = 2;
@@ -98,7 +100,7 @@
             this.txtName.ButtonSize = new System.Drawing.Size(22, 21);
             this.txtName.ButtonText = "";
             this.txtName.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.txtName.Location = new System.Drawing.Point(12, 207);
+            this.txtName.Location = new System.Drawing.Point(12, 211);
             this.txtName.Name = "txtName";
             this.txtName.Size = new System.Drawing.Size(286, 22);
             this.txtName.TabIndex = 3;
@@ -106,7 +108,7 @@
             // 
             // btnDownload
             // 
-            this.btnDownload.Location = new System.Drawing.Point(148, 258);
+            this.btnDownload.Location = new System.Drawing.Point(148, 262);
             this.btnDownload.Name = "btnDownload";
             this.btnDownload.Size = new System.Drawing.Size(76, 23);
             this.btnDownload.TabIndex = 7;
@@ -116,17 +118,17 @@
             // 
             // btnRemove
             // 
-            this.btnRemove.Location = new System.Drawing.Point(230, 258);
+            this.btnRemove.Location = new System.Drawing.Point(230, 262);
             this.btnRemove.Name = "btnRemove";
             this.btnRemove.Size = new System.Drawing.Size(68, 23);
             this.btnRemove.TabIndex = 8;
-            this.btnRemove.Text = "Remove selected";
+            this.btnRemove.Text = "Remove";
             this.btnRemove.UseVisualStyleBackColor = true;
             this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
             // 
             // btnAddUpdate
             // 
-            this.btnAddUpdate.Location = new System.Drawing.Point(230, 231);
+            this.btnAddUpdate.Location = new System.Drawing.Point(230, 235);
             this.btnAddUpdate.Name = "btnAddUpdate";
             this.btnAddUpdate.Size = new System.Drawing.Size(68, 23);
             this.btnAddUpdate.TabIndex = 5;
@@ -144,7 +146,7 @@
             this.txtURL.ButtonSize = new System.Drawing.Size(22, 21);
             this.txtURL.ButtonText = "";
             this.txtURL.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.txtURL.Location = new System.Drawing.Point(12, 233);
+            this.txtURL.Location = new System.Drawing.Point(12, 237);
             this.txtURL.Name = "txtURL";
             this.txtURL.Size = new System.Drawing.Size(212, 22);
             this.txtURL.TabIndex = 4;
@@ -159,12 +161,35 @@
             this.listWishlistItems.TabIndex = 1;
             this.listWishlistItems.SelectedIndexChanged += new System.EventHandler(this.lbWish_SelectedIndexChanged);
             // 
+            // btnSave
+            // 
+            this.btnSave.Location = new System.Drawing.Point(230, 298);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(68, 23);
+            this.btnSave.TabIndex = 9;
+            this.btnSave.Text = "Save";
+            this.btnSave.UseVisualStyleBackColor = true;
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            // 
+            // btnCancel
+            // 
+            this.btnCancel.Location = new System.Drawing.Point(156, 298);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Size = new System.Drawing.Size(68, 23);
+            this.btnCancel.TabIndex = 10;
+            this.btnCancel.Text = "Cancel";
+            this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            // 
             // frmPoolWishlist
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSize = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(310, 290);
+            this.ClientSize = new System.Drawing.Size(310, 333);
+            this.Controls.Add(this.btnCancel);
+            this.Controls.Add(this.btnSave);
             this.Controls.Add(this.lPoolLink);
             this.Controls.Add(this.chkUpdate);
             this.Controls.Add(this.txtName);
@@ -176,7 +201,8 @@
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = global::aphrodite.Properties.Resources.Brad;
             this.MaximizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(318, 280);
+            this.MaximumSize = new System.Drawing.Size(328, 370);
+            this.MinimumSize = new System.Drawing.Size(328, 370);
             this.Name = "frmPoolWishlist";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -202,5 +228,7 @@
         private System.Windows.Forms.MenuItem mOpenPoolInBrowser;
         private System.Windows.Forms.MenuItem mCopyPoolLink;
         private System.Windows.Forms.MenuItem mCopyPoolId;
+        private Controls.ExtendedButton btnSave;
+        private Controls.ExtendedButton btnCancel;
     }
 }
