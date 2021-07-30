@@ -9,36 +9,87 @@ namespace aphrodite {
         public static string githubURL = "https://github.com/murrty/aphrodite";
         public static string githubJSON = "https://api.github.com/repos/murrty/aphrodite/releases/latest";
 
-        public static bool CheckForUpdate(bool DisableSkipVerison = false) {
+        private static volatile bool UpdateChecked = false;
+        private static volatile decimal CheckedVersion = -1;
+        private static string CheckedHeader = string.Empty;
+        private static string CheckedBody = string.Empty;
+
+        /// <summary>
+        /// Checks for updates on Github
+        /// </summary>
+        /// <param name="ForceCheck">Determines if the check is being forced (aka, from the About form)</param>
+        /// <returns></returns>
+        public static bool CheckForUpdate(bool ForceCheck) {
             try {
-                string xml = apiTools.DownloadJsonToXml(githubJSON);
-                XmlDocument doc = new XmlDocument();
-                doc.LoadXml(xml);
-                XmlNodeList xmlTag = doc.DocumentElement.SelectNodes("/root/tag_name");
-                XmlNodeList xmlHeader = doc.DocumentElement.SelectNodes("/root/name");
-                XmlNodeList xmlBody = doc.DocumentElement.SelectNodes("/root/body");
+                if (UpdateChecked) {
+                    if (CheckedVersion > Properties.Settings.Default.CurrentVersion) {
+                        frmUpdateAvailable UpdateDialog = new frmUpdateAvailable();
+                        UpdateDialog.NewVersion = CheckedVersion.ToString();
+                        UpdateDialog.UpdateHeader = CheckedHeader;
+                        UpdateDialog.UpdateBody = CheckedBody;
+                        UpdateDialog.BlockSkip = true;
+                        switch (UpdateDialog.ShowDialog()) {
+                            case DialogResult.Yes:
+                                System.Diagnostics.Process.Start("https://github.com/murrty/aphrodite/releases/latest");
+                                break;
+                        }
 
-                decimal CloudVersion = decimal.Parse(xmlTag[0].InnerText.Replace(".", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), NumberStyles.Any, CultureInfo.InvariantCulture);
-
-                if (CloudVersion > Properties.Settings.Default.CurrentVersion) {
-                    frmUpdateAvailable UpdateDialog = new frmUpdateAvailable();
-                    UpdateDialog.NewVersion = CloudVersion.ToString();
-                    UpdateDialog.UpdateHeader = xmlHeader[0].InnerText;
-                    UpdateDialog.UpdateBody = xmlBody[0].InnerText;
-                    UpdateDialog.BlockSkip = DisableSkipVerison;
-                    switch (UpdateDialog.ShowDialog()) {
-                        case DialogResult.Yes:
-                            System.Diagnostics.Process.Start("https://github.com/murrty/aphrodite/releases/latest");
-                            break;
-
-                        case DialogResult.Ignore:
-                            Properties.Settings.Default.SkippedVersion = CloudVersion;
-                            Properties.Settings.Default.Save();
-                            break;
+                        return true;
                     }
-                    return true;
+                    else {
+                        return false;
+                    }
                 }
-                return false;
+                else {
+                    Program.Log(LogAction.WriteToLog, "Checking for updates on github");
+                    string xml = apiTools.DownloadJsonToXml(githubJSON);
+                    XmlDocument doc = new XmlDocument();
+                    doc.LoadXml(xml);
+                    XmlNodeList xmlTag = doc.DocumentElement.SelectNodes("/root/tag_name");
+                    XmlNodeList xmlHeader = doc.DocumentElement.SelectNodes("/root/name");
+                    XmlNodeList xmlBody = doc.DocumentElement.SelectNodes("/root/body");
+
+                    decimal CloudVersion = decimal.Parse(xmlTag[0].InnerText.Replace(".", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator), NumberStyles.Any, CultureInfo.InvariantCulture);
+
+                    UpdateChecked = true;
+                    CheckedVersion = CloudVersion;
+
+                    if (CloudVersion > Properties.Settings.Default.CurrentVersion) {
+                        // Set the Header and Body into variable (it was already downloaded, might as well)
+                        CheckedHeader = xmlHeader[0].InnerText;
+                        CheckedBody = xmlBody[0].InnerText;
+
+                        if (!ForceCheck && CloudVersion == Properties.Settings.Default.SkippedVersion) {
+                            Program.Log(LogAction.WriteToLog, "Update v" + CloudVersion + " is available, but this version is being skipped.");
+                            return false;
+                        }
+
+                        Program.Log(LogAction.WriteToLog, "Update v" + CloudVersion + " is available");
+                        frmUpdateAvailable UpdateDialog = new frmUpdateAvailable();
+                        UpdateDialog.NewVersion = CloudVersion.ToString();
+                        UpdateDialog.UpdateHeader = xmlHeader[0].InnerText;
+                        UpdateDialog.UpdateBody = xmlBody[0].InnerText;
+                        UpdateDialog.BlockSkip = ForceCheck;
+                        switch (UpdateDialog.ShowDialog()) {
+                            case DialogResult.Yes:
+                                System.Diagnostics.Process.Start("https://github.com/murrty/aphrodite/releases/latest");
+                                break;
+
+                            case DialogResult.Ignore:
+                                Program.Log(LogAction.WriteToLog, "Ignoring update v" + CloudVersion);
+                                Properties.Settings.Default.SkippedVersion = CloudVersion;
+                                Properties.Settings.Default.Save();
+                                break;
+                        }
+                        return true;
+                    }
+                    else if (ForceCheck) {
+                        MessageBox.Show("No updates are available at this time.");
+                    }
+
+                    return false;
+                }
+
             }
             catch (Exception ex) {
                 ErrorLog.ReportException(ex, "Updater.cs -> CheckForUpdate");
