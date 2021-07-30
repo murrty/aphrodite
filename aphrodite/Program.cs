@@ -29,8 +29,8 @@ namespace aphrodite {
             SetDebug();
 
             if (!Controls.TaskbarProgress.Windows7OrGreater) {
-                MessageBox.Show("Windows 7 or higher is required to run this application.");
-                Environment.Exit(0);
+                MessageBox.Show("Windows 7 or higher is required to run this application. Sorry.", "aphrodite", MessageBoxButtons.OK);
+                Environment.Exit(1);
             }
             else {
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
@@ -57,7 +57,6 @@ namespace aphrodite {
                         break;
 
                     case false:
-                        Log(LogAction.WriteToLog, "Not running as administrator (bad for protocols, good for everything else)");
                         IsAdmin = false;
                         break;
                 }
@@ -95,35 +94,53 @@ namespace aphrodite {
             for (int ArgIndex = 1; ArgIndex < Environment.GetCommandLineArgs().Length; ArgIndex++) {
                 CurrentArg = Environment.GetCommandLineArgs()[ArgIndex];
 
-                #region "-installprotocol"
-                if (CurrentArg.ToLower().StartsWith("-installprotocol")) { // if the argument is installProtocol
-                    Config.Settings.Load(ConfigType.All);
-                    frmSettings Settings = new frmSettings();
-                    Settings.InstallProtocol = true;
-                    Settings.ShowDialog();
-                    Settings.Dispose();
-                    return true;
-                }
-                #endregion
-
                 #region "-updateprotocol"
-                else if (CurrentArg.ToLower().StartsWith("-updateprotocol")) {
+                if (CurrentArg.ToLower().StartsWith("-updateprotocol")) {
                     if (CurrentArg.ToLower().StartsWith("-updateprotocol:tags")) {
-                        string NewPath = CurrentArg.Split('|')[1];
-
+                        if (Program.IsAdmin) {
+                            if (SystemRegistry.SetRegistryKey(SystemRegistry.KeyName.Tags)) {
+                                Environment.Exit(0);
+                            }
+                            else {
+                                Environment.Exit(1);
+                            }
+                        }
+                        else {
+                            Environment.Exit(1);
+                        }
+                        return true;
                     }
                     else if (CurrentArg.ToLower().StartsWith("-updateprotocol:pools")) {
-                        string NewPath = CurrentArg.Split('|')[1];
-
+                        if (Program.IsAdmin) {
+                            if (SystemRegistry.SetRegistryKey(SystemRegistry.KeyName.BothPools)) {
+                                Environment.Exit(0);
+                            }
+                            else {
+                                Environment.Exit(1);
+                            }
+                        }
+                        else {
+                            Environment.Exit(1);
+                        }
+                        return true;
                     }
                     else if (CurrentArg.ToLower().StartsWith("-updateprotocol:images")) {
-                        string NewPath = CurrentArg.Split('|')[1];
-
+                        if (Program.IsAdmin) {
+                            if (SystemRegistry.SetRegistryKey(SystemRegistry.KeyName.Images)) {
+                                Environment.Exit(0);
+                            }
+                            else {
+                                Environment.Exit(1);
+                            }
+                        }
+                        else {
+                            Environment.Exit(1);
+                        }
+                        return true;
                     }
                     else {
                         return false;
                     }
-                    return true;
                 }
                 #endregion
 

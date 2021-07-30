@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -2043,6 +2044,117 @@ namespace aphrodite {
 
                         break;
                 }
+            }
+        }
+    }
+
+    class SystemRegistry {
+
+        public enum KeyName {
+            Tags,
+            Pools,
+            PoolWl,
+            BothPools,
+            Images
+        }
+
+        private static volatile RegistryKey TagsKey;
+        private static volatile RegistryKey PoolsKey;
+        private static volatile RegistryKey PoolWishlistKey;
+        private static volatile RegistryKey ImagesKey;
+        public static readonly string ProtocolValue = "\"" + Environment.CurrentDirectory + "\\" + System.AppDomain.CurrentDomain.FriendlyName + "\" \"%1\"";
+
+        public static bool CheckRegistryKey(KeyName Name) {
+            switch (Name) {
+                case KeyName.Tags:
+                    TagsKey = Registry.ClassesRoot.OpenSubKey("tags\\shell\\open\\command", false);
+                    if (Registry.ClassesRoot.GetValue("tags", "URL Protocol") != null && TagsKey != null && TagsKey.GetValue("").ToString() == ProtocolValue) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+
+                case KeyName.Pools:
+                    PoolsKey = Registry.ClassesRoot.OpenSubKey("pools\\shell\\open\\command", false);
+                    if (Registry.ClassesRoot.GetValue("pools", "URL Protocol") != null && PoolsKey != null && PoolsKey.GetValue("").ToString() == ProtocolValue) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+
+                case KeyName.PoolWl:
+                    PoolWishlistKey = Registry.ClassesRoot.OpenSubKey("poolwl\\shell\\open\\command", false);
+                    if (Registry.ClassesRoot.GetValue("poolwl", "URL Protocol") != null && PoolWishlistKey != null && PoolWishlistKey.GetValue("").ToString() == ProtocolValue) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+
+                case KeyName.Images:
+                    ImagesKey = Registry.ClassesRoot.OpenSubKey("images\\shell\\open\\command", false);
+                    if (Registry.ClassesRoot.GetValue("images", "URL Protocol") != null && ImagesKey != null && ImagesKey.GetValue("").ToString() == ProtocolValue) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+
+                default: return false;
+            }
+        }
+
+        public static bool SetRegistryKey(KeyName Name) {
+            string ProtocolIdentifier = null;
+
+            switch (Name) {
+                case KeyName.Tags:
+                    ProtocolIdentifier = "tags";
+                    break;
+
+                case KeyName.Pools:
+                    ProtocolIdentifier = "pools";
+                    break;
+
+                case KeyName.PoolWl:
+                    ProtocolIdentifier = "poolwl";
+                    break;
+
+                case KeyName.BothPools:
+                    if (SetRegistryKey(KeyName.Pools) &&
+                        SetRegistryKey(KeyName.PoolWl)) {
+                        return true;
+                    }
+                    else { return false; }
+
+                case KeyName.Images:
+                    ProtocolIdentifier = "images";
+                    break;
+
+                default: return false;
+
+            }
+
+            if (ProtocolIdentifier != null && Program.IsAdmin) {
+                Registry.ClassesRoot.CreateSubKey(ProtocolIdentifier);
+                RegistryKey setIdentifier = Registry.ClassesRoot.OpenSubKey(ProtocolIdentifier, true);
+                setIdentifier.SetValue("URL Protocol", "");
+
+                Registry.ClassesRoot.CreateSubKey(ProtocolIdentifier + "\\shell");
+                Registry.ClassesRoot.CreateSubKey(ProtocolIdentifier + "\\shell\\open");
+                Registry.ClassesRoot.CreateSubKey(ProtocolIdentifier + "\\shell\\open\\command");
+                RegistryKey setProtocol = Registry.ClassesRoot.OpenSubKey(ProtocolIdentifier + "\\shell\\open\\command", true);
+                setProtocol.SetValue("", "\"" + Program.FullApplicationPath + "\" \"%1\"");
+
+                Registry.ClassesRoot.CreateSubKey(ProtocolIdentifier + "\\DefaultIcon");
+                RegistryKey setIcon = Registry.ClassesRoot.OpenSubKey(ProtocolIdentifier + "\\DefaultIcon", true);
+                setIcon.SetValue("", "\"" + Program.FullApplicationPath + "\"");
+                return true;
+            }
+            else {
+                return false;
             }
         }
     }

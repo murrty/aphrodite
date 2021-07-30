@@ -14,8 +14,6 @@ namespace aphrodite {
         public bool SwitchTab = false;   // is the form being changed from the userscript?
         public int Tab = 0;              // Used to determine the tab that will be selected on boot.
 
-        public bool InstallProtocol = false;       // is installprotocol triggered on startup?
-
         private bool NoProtocols = true;             // Are there no protocols installed?
         private bool TagsProtocol = false;           // is the tags protocol installed?
         private bool PoolsProtocol = false;          // is the pools protocol installed?
@@ -98,10 +96,6 @@ namespace aphrodite {
                 if (!Program.IsAdmin) {
                     btnProtocolInstallImages.ShowUACShield = true;
                 }
-            }
-
-            if (InstallProtocol) {
-                tbMain.SelectedTab = tabProtocol;
             }
 
             if (Config.Settings.FormSettings.frmSettings_Location.X == -32000 || Config.Settings.FormSettings.frmSettings_Location.Y == -32000) {
@@ -260,58 +254,32 @@ namespace aphrodite {
             }
         }
         private void CheckProtocols() {
-            RegistryKey TagsKey = Registry.ClassesRoot.OpenSubKey("tags\\shell\\open\\command", false);
-            RegistryKey PoolsKey = Registry.ClassesRoot.OpenSubKey("pools\\shell\\open\\command", false);
-            RegistryKey PoolWishlistKey = Registry.ClassesRoot.OpenSubKey("poolwl\\shell\\open\\command", false);
-            RegistryKey ImagesKey = Registry.ClassesRoot.OpenSubKey("images\\shell\\open\\command", false);
-            string ProtocolValue = "\"" + Environment.CurrentDirectory + "\\" + System.AppDomain.CurrentDomain.FriendlyName + "\" \"%1\"";
-
-            if (Registry.ClassesRoot.GetValue("tags", "URL Protocol") == null || TagsKey == null) {
+            if (SystemRegistry.CheckRegistryKey(SystemRegistry.KeyName.Tags)) {
+                TagsProtocol = true;
+            }
+            else {
                 TagsProtocol = false;
             }
-            else {
-                if (TagsKey.GetValue("").ToString() == ProtocolValue) {
-                    TagsProtocol = true;
-                }
-                else {
-                    TagsProtocol = false;
-                }
-            }
 
-            if (Registry.ClassesRoot.GetValue("pools", "URL Protocol") == null || PoolsKey == null) {
+            if (SystemRegistry.CheckRegistryKey(SystemRegistry.KeyName.Pools)) {
+                PoolsProtocol = true;
+            }
+            else {
                 PoolsProtocol = false;
             }
-            else {
-                if (PoolsKey.GetValue("").ToString() == ProtocolValue) {
-                    PoolsProtocol = true;
-                }
-                else {
-                    PoolsProtocol = false;
-                }
-            }
 
-            if (Registry.ClassesRoot.GetValue("poolwl", "URL Protocol") == null || PoolWishlistKey == null) {
+            if (SystemRegistry.CheckRegistryKey(SystemRegistry.KeyName.PoolWl)) {
+                PoolsWishlistProtocol = true;
+            }
+            else {
                 PoolsWishlistProtocol = false;
             }
-            else {
-                if (PoolWishlistKey.GetValue("").ToString() == ProtocolValue) {
-                    PoolsWishlistProtocol = true;
-                }
-                else {
-                    PoolsWishlistProtocol = false;
-                }
-            }
 
-            if (Registry.ClassesRoot.GetValue("images", "URL Protocol") == null || ImagesKey == null) {
-                ImagesProtocol = false;
+            if (SystemRegistry.CheckRegistryKey(SystemRegistry.KeyName.Images)) {
+                ImagesProtocol = true;
             }
             else {
-                if (ImagesKey.GetValue("").ToString() == ProtocolValue) {
-                    ImagesProtocol = true;
-                }
-                else {
-                    ImagesProtocol = false;
-                }
+                ImagesProtocol = false;
             }
 
             if (TagsProtocol == false && PoolsProtocol == false && ImagesProtocol == false) {
@@ -319,6 +287,40 @@ namespace aphrodite {
             }
             else {
                 NoProtocols = false;
+            }
+        }
+        private bool InstallProtocol(SystemRegistry.KeyName Name) {
+            Process ProtocolProcess = new Process() {
+                StartInfo = new ProcessStartInfo() {
+                    FileName = Program.FullApplicationPath,
+                    WorkingDirectory = Program.ApplicationPath,
+                    Verb = "runas"
+                }
+            };
+
+            switch (Name) {
+                case SystemRegistry.KeyName.Tags:
+                    ProtocolProcess.StartInfo.Arguments = "-updateprotocol:tags";
+                    break;
+
+                case SystemRegistry.KeyName.Pools: case SystemRegistry.KeyName.PoolWl: case SystemRegistry.KeyName.BothPools:
+                    ProtocolProcess.StartInfo.Arguments = "-updateprotocol:pools";
+                    break;
+
+                case SystemRegistry.KeyName.Images:
+                    ProtocolProcess.StartInfo.Arguments = "-updateprotocol:images";
+                    break;
+
+            }
+
+            ProtocolProcess.Start();
+            ProtocolProcess.WaitForExit();
+
+            if (ProtocolProcess.ExitCode == 0) {
+                return true;
+            }
+            else {
+                return false;
             }
         }
 
@@ -411,144 +413,44 @@ namespace aphrodite {
         }
 
         private void btnTagsProtocol_Click(object sender, EventArgs e) {
-            checkAdmin();
+            if (InstallProtocol(SystemRegistry.KeyName.Tags)) {
+                btnProtocolInstallTags.Enabled = false;
+                btnProtocolInstallTags.Text = "tags protocol installed";
+                btnProtocolInstallTags.ShowUACShield = false;
 
-            if (NoProtocols) {
-                // Create registry keys
-                Registry.ClassesRoot.CreateSubKey("tags");
-                RegistryKey setIdentifier = Registry.ClassesRoot.OpenSubKey("tags", true);
-                setIdentifier.SetValue("URL Protocol", "");
-
-                Registry.ClassesRoot.CreateSubKey("tags\\shell");
-                Registry.ClassesRoot.CreateSubKey("tags\\shell\\open");
-                Registry.ClassesRoot.CreateSubKey("tags\\shell\\open\\command");
-                RegistryKey setProtocol = Registry.ClassesRoot.OpenSubKey("tags\\shell\\open\\command", true);
-                setProtocol.SetValue("", "\"" + Program.FullApplicationPath + "\" \"%1\"");
-
-                Registry.ClassesRoot.CreateSubKey("tags\\DefaultIcon");
-                RegistryKey setIcon = Registry.ClassesRoot.OpenSubKey("tags\\DefaultIcon", true);
-                setIcon.SetValue("", "\"" + Program.FullApplicationPath + "\"");
+                TagsProtocol = true;
+                NoProtocols = false;
             }
             else {
-                // Create registry keys
-                Registry.ClassesRoot.CreateSubKey("tags");
-                RegistryKey setIdentifier = Registry.ClassesRoot.OpenSubKey("tags", true);
-                setIdentifier.SetValue("URL Protocol", "");
-
-                Registry.ClassesRoot.CreateSubKey("tags\\shell");
-                Registry.ClassesRoot.CreateSubKey("tags\\shell\\open");
-                Registry.ClassesRoot.CreateSubKey("tags\\shell\\open\\command");
-                RegistryKey setProtocol = Registry.ClassesRoot.OpenSubKey("tags\\shell\\open\\command", true);
-                setProtocol.SetValue("", "\"" + Program.FullApplicationPath + "\" \"%1\"");
-
-                Registry.ClassesRoot.CreateSubKey("tags\\DefaultIcon");
-                RegistryKey setIcon = Registry.ClassesRoot.OpenSubKey("tags\\DefaultIcon", true);
-                setIcon.SetValue("", "\"" + Program.FullApplicationPath + "\"");
+                MessageBox.Show("Failed to install protocol");
             }
-
-            btnProtocolInstallTags.Enabled = false;
-            btnProtocolInstallTags.Text = "tags protocol installed";
-
-            TagsProtocol = true;
-            NoProtocols = false;
         }
         private void btnPoolsProtocol_Click(object sender, EventArgs e) {
-            checkAdmin();
+            if (InstallProtocol(SystemRegistry.KeyName.BothPools)) {
+                btnProtocolInstallPools.Enabled = false;
+                btnProtocolInstallPools.Text = "pools protocols installed";
+                btnProtocolInstallPools.ShowUACShield = false;
 
-            if (NoProtocols) {
-                // Create registry keys
-                Registry.ClassesRoot.CreateSubKey("pools");
-                RegistryKey setIdentifier = Registry.ClassesRoot.OpenSubKey("pools", true);
-                setIdentifier.SetValue("URL Protocol", "");
-                Registry.ClassesRoot.CreateSubKey("pools\\shell");
-                Registry.ClassesRoot.CreateSubKey("pools\\shell\\open");
-                Registry.ClassesRoot.CreateSubKey("pools\\shell\\open\\command");
-                RegistryKey setProtocol = Registry.ClassesRoot.OpenSubKey("pools\\shell\\open\\command", true);
-                setProtocol.SetValue("", "\"" + Program.FullApplicationPath + "\" \"%1\"");
-                //Registry.ClassesRoot.CreateSubKey("pools\\DefaultIcon");
-                //RegistryKey setIcon = Registry.ClassesRoot.OpenSubKey("pools\\DefaultIcon", true);
-                //setIcon.SetValue("", "\"" + protocolDir + "\\aphrodite.exe\",1");
+                PoolsProtocol = true;
+                PoolsWishlistProtocol = true;
+                NoProtocols = false;
             }
             else {
-                if (!PoolsProtocol) {
-                    // Create registry keys
-                    Registry.ClassesRoot.CreateSubKey("pools");
-                    RegistryKey setIdentifier = Registry.ClassesRoot.OpenSubKey("pools", true);
-                    setIdentifier.SetValue("URL Protocol", "");
-                    Registry.ClassesRoot.CreateSubKey("pools\\shell");
-                    Registry.ClassesRoot.CreateSubKey("pools\\shell\\open");
-                    Registry.ClassesRoot.CreateSubKey("pools\\shell\\open\\command");
-                    RegistryKey setProtocol = Registry.ClassesRoot.OpenSubKey("pools\\shell\\open\\command", true);
-                    setProtocol.SetValue("", "\"" + Program.FullApplicationPath + "\" \"%1\"");
-                    //Registry.ClassesRoot.CreateSubKey("pools\\DefaultIcon");
-                    //RegistryKey setIcon = Registry.ClassesRoot.OpenSubKey("pools\\DefaultIcon", true);
-                    //setIcon.SetValue("", "\"" + protocolDir + "\\aphrodite.exe\",1");
-                }
-
-                if (!PoolsWishlistProtocol) {
-                    // wishlist keys
-                    Registry.ClassesRoot.CreateSubKey("poolwl");
-                    RegistryKey setIdentifier = Registry.ClassesRoot.OpenSubKey("poolwl", true);
-                    setIdentifier.SetValue("URL Protocol", "");
-                    Registry.ClassesRoot.CreateSubKey("poolwl\\shell");
-                    Registry.ClassesRoot.CreateSubKey("poolwl\\shell\\open");
-                    Registry.ClassesRoot.CreateSubKey("poolwl\\shell\\open\\command");
-                    RegistryKey setProtocol = Registry.ClassesRoot.OpenSubKey("poolwl\\shell\\open\\command", true);
-                    setProtocol.SetValue("", "\"" + Program.FullApplicationPath + "\" \"%1\"");
-                    //Registry.ClassesRoot.CreateSubKey("poolwl\\DefaultIcon");
-                    //RegistryKey setIcon = Registry.ClassesRoot.OpenSubKey("poolwl\\DefaultIcon", true);
-                    //setIcon.SetValue("", "\"" + protocolDir + "\\aphrodite.exe\",1");
-                }
+                MessageBox.Show("Failed to install protocol");
             }
-
-            btnProtocolInstallPools.Enabled = false;
-            btnProtocolInstallPools.Text = "pools protocols installed";
-
-            PoolsProtocol = true;
-            PoolsWishlistProtocol = true;
-            NoProtocols = false;
         }
         private void btnImagesProtocol_Click(object sender, EventArgs e) {
-            checkAdmin();
+            if (InstallProtocol(SystemRegistry.KeyName.Images)) {
+                btnProtocolInstallImages.Enabled = false;
+                btnProtocolInstallImages.Text = "images protocol installed";
+                btnProtocolInstallImages.ShowUACShield = false;
 
-            if (NoProtocols) {
-                // Create registry keys
-                Registry.ClassesRoot.CreateSubKey("images");
-                RegistryKey setIdentifier = Registry.ClassesRoot.OpenSubKey("images", true);
-                setIdentifier.SetValue("URL Protocol", "");
-                
-                Registry.ClassesRoot.CreateSubKey("images\\shell");
-                Registry.ClassesRoot.CreateSubKey("images\\shell\\open");
-                Registry.ClassesRoot.CreateSubKey("images\\shell\\open\\command");
-                RegistryKey setProtocol = Registry.ClassesRoot.OpenSubKey("images\\shell\\open\\command", true);
-                setProtocol.SetValue("", "\"" + Program.FullApplicationPath + "\" \"%1\"");
-                
-                Registry.ClassesRoot.CreateSubKey("images\\DefaultIcon");
-                RegistryKey setIcon = Registry.ClassesRoot.OpenSubKey("images\\DefaultIcon", true);
-                setIcon.SetValue("", "\"" + Program.FullApplicationPath + "\"");
+                ImagesProtocol = true;
+                NoProtocols = false;
             }
             else {
-                // Create registry keys
-                Registry.ClassesRoot.CreateSubKey("images");
-                RegistryKey setIdentifier = Registry.ClassesRoot.OpenSubKey("images", true);
-                setIdentifier.SetValue("URL Protocol", "");
-                
-                Registry.ClassesRoot.CreateSubKey("images\\shell");
-                Registry.ClassesRoot.CreateSubKey("images\\shell\\open");
-                Registry.ClassesRoot.CreateSubKey("images\\shell\\open\\command");
-                RegistryKey setProtocol = Registry.ClassesRoot.OpenSubKey("images\\shell\\open\\command", true);
-                setProtocol.SetValue("", "\"" + Program.FullApplicationPath + "\" \"%1\"");
-                
-                Registry.ClassesRoot.CreateSubKey("images\\DefaultIcon");
-                RegistryKey setIcon = Registry.ClassesRoot.OpenSubKey("images\\DefaultIcon", true);
-                setIcon.SetValue("", "\"" + Program.FullApplicationPath + "\"");
+                MessageBox.Show("Failed to install protocol");
             }
-
-            btnProtocolInstallImages.Enabled = false;
-            btnProtocolInstallImages.Text = "images protocol installed";
-
-            ImagesProtocol = true;
-            NoProtocols = false;
         }
 
         private void btnUserscript_Click(object sender, EventArgs e) {
@@ -729,7 +631,6 @@ namespace aphrodite {
                 Config.Settings.ConvertConfig(chkEnableIni.Checked);
             }
         }
-
 
     }
 }
