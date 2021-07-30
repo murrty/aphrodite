@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace aphrodite {
@@ -11,6 +12,8 @@ namespace aphrodite {
         frmAbout About;
         frmPoolWishlist PoolWishlist;
         frmRedownloader Redownloader;
+
+        Thread UpdateCheckThread;
         // Valid protocols:
         //                  'pools:'
         //                  'tags:'
@@ -20,6 +23,13 @@ namespace aphrodite {
         #region Form
         public frmMain(string Argument = null, DownloadType Type = DownloadType.None) {
             InitializeComponent();
+
+            UpdateCheckThread = new Thread(() => {
+                try {
+                    Updater.CheckForUpdate(false);
+                } catch { } // if something happens, who cares.
+            });
+            UpdateCheckThread.Name = "Update checker thread";
 
             switch (Type) {
                 case DownloadType.Tags:
@@ -54,6 +64,8 @@ namespace aphrodite {
             txtImageUrl.Refresh();
         }
         private void frmMain_Load(object sender, EventArgs e) {
+            UpdateCheckThread.Start();
+
             if (string.IsNullOrWhiteSpace(Config.Settings.General.saveLocation)) {
                 Config.Settings.General.saveLocation = Environment.CurrentDirectory;
             }
@@ -82,6 +94,10 @@ namespace aphrodite {
             txtTags.Focus();
         }
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e) {
+            if (UpdateCheckThread != null && UpdateCheckThread.IsAlive) {
+                UpdateCheckThread.Abort();
+            }
+            
             this.Opacity = 0;
 
             if (this.WindowState != FormWindowState.Normal) {
@@ -106,8 +122,9 @@ namespace aphrodite {
         }
 
         private void mSettings_Click(object sender, EventArgs e) {
-            frmSettings settings = new frmSettings();
-            settings.ShowDialog();
+            using (frmSettings SettingsForm = new frmSettings()) {
+                SettingsForm.ShowDialog();
+            }
         }
         private void mBlacklist_Click(object sender, EventArgs e) {
             using (frmBlacklist Blacklist = new frmBlacklist()) {
@@ -119,7 +136,7 @@ namespace aphrodite {
             Process.Start("https://e621.net/iqdb_queries");
         }
         private void mWishlist_Click(object sender, EventArgs e) {
-            if (PoolWishlist == null) {
+            if (PoolWishlist == null || PoolWishlist.IsDisposed) {
                 PoolWishlist = new frmPoolWishlist();
                 PoolWishlist.Show();
             }
@@ -131,7 +148,7 @@ namespace aphrodite {
             }
         }
         private void mRedownloader_Click(object sender, EventArgs e) {
-            if (Redownloader == null) {
+            if (Redownloader == null || Redownloader.IsDisposed) {
                 Redownloader = new frmRedownloader();
                 Redownloader.Show();
             }
@@ -147,7 +164,7 @@ namespace aphrodite {
         }
 
         private void mAbout_Click(object sender, EventArgs e) {
-            if (About == null) {
+            if (About == null || About.IsDisposed) {
                 About = new frmAbout();
                 About.Show();
             }
