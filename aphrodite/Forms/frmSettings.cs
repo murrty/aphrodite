@@ -290,37 +290,47 @@ namespace aphrodite {
             }
         }
         private bool InstallProtocol(SystemRegistry.KeyName Name) {
-            Process ProtocolProcess = new Process() {
-                StartInfo = new ProcessStartInfo() {
-                    FileName = Program.FullApplicationPath,
-                    WorkingDirectory = Program.ApplicationPath,
-                    Verb = "runas"
+            if (Program.IsAdmin) {
+                if (SystemRegistry.SetRegistryKey(Name)) {
+                    return true;
                 }
-            };
-
-            switch (Name) {
-                case SystemRegistry.KeyName.Tags:
-                    ProtocolProcess.StartInfo.Arguments = "-updateprotocol:tags";
-                    break;
-
-                case SystemRegistry.KeyName.Pools: case SystemRegistry.KeyName.PoolWl: case SystemRegistry.KeyName.BothPools:
-                    ProtocolProcess.StartInfo.Arguments = "-updateprotocol:pools";
-                    break;
-
-                case SystemRegistry.KeyName.Images:
-                    ProtocolProcess.StartInfo.Arguments = "-updateprotocol:images";
-                    break;
-
-            }
-
-            ProtocolProcess.Start();
-            ProtocolProcess.WaitForExit();
-
-            if (ProtocolProcess.ExitCode == 0) {
-                return true;
+                else {
+                    return false;
+                }
             }
             else {
-                return false;
+                Process ProtocolProcess = new Process() {
+                    StartInfo = new ProcessStartInfo() {
+                        FileName = Program.FullApplicationPath,
+                        WorkingDirectory = Program.ApplicationPath,
+                        Verb = "runas"
+                    }
+                };
+
+                switch (Name) {
+                    case SystemRegistry.KeyName.Tags:
+                        ProtocolProcess.StartInfo.Arguments = "-updateprotocol:tags";
+                        break;
+
+                    case SystemRegistry.KeyName.Pools: case SystemRegistry.KeyName.PoolWl: case SystemRegistry.KeyName.BothPools:
+                        ProtocolProcess.StartInfo.Arguments = "-updateprotocol:pools";
+                        break;
+
+                    case SystemRegistry.KeyName.Images:
+                        ProtocolProcess.StartInfo.Arguments = "-updateprotocol:images";
+                        break;
+
+                }
+
+                ProtocolProcess.Start();
+                ProtocolProcess.WaitForExit();
+
+                if (ProtocolProcess.ExitCode == 0) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
             }
         }
 
@@ -414,9 +424,9 @@ namespace aphrodite {
 
         private void btnTagsProtocol_Click(object sender, EventArgs e) {
             if (InstallProtocol(SystemRegistry.KeyName.Tags)) {
+                btnProtocolInstallTags.ShowUACShield = false;
                 btnProtocolInstallTags.Enabled = false;
                 btnProtocolInstallTags.Text = "tags protocol installed";
-                btnProtocolInstallTags.ShowUACShield = false;
 
                 TagsProtocol = true;
                 NoProtocols = false;
@@ -427,9 +437,9 @@ namespace aphrodite {
         }
         private void btnPoolsProtocol_Click(object sender, EventArgs e) {
             if (InstallProtocol(SystemRegistry.KeyName.BothPools)) {
+                btnProtocolInstallPools.ShowUACShield = false;
                 btnProtocolInstallPools.Enabled = false;
                 btnProtocolInstallPools.Text = "pools protocols installed";
-                btnProtocolInstallPools.ShowUACShield = false;
 
                 PoolsProtocol = true;
                 PoolsWishlistProtocol = true;
@@ -441,9 +451,9 @@ namespace aphrodite {
         }
         private void btnImagesProtocol_Click(object sender, EventArgs e) {
             if (InstallProtocol(SystemRegistry.KeyName.Images)) {
+                btnProtocolInstallImages.ShowUACShield = false;
                 btnProtocolInstallImages.Enabled = false;
                 btnProtocolInstallImages.Text = "images protocol installed";
-                btnProtocolInstallImages.ShowUACShield = false;
 
                 ImagesProtocol = true;
                 NoProtocols = false;
