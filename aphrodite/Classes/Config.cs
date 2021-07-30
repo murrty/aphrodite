@@ -103,6 +103,22 @@ namespace aphrodite {
             }
         }
 
+        public void ConvertConfig(bool UseIni) {
+            if (Program.UseIni) {
+                if (!UseIni) {
+                    Program.Ini.Write("useIni", false);
+                }
+            }
+
+            Program.UseIni = UseIni;
+            Initialization.ForceSave();
+            FormSettings.ForceSave();
+            General.ForceSave();
+            Tags.ForceSave();
+            Pools.ForceSave();
+            Images.ForceSave();
+        }
+
         public class Config_Initialization {
             public Config_Initialization() {
                 Program.Log(LogAction.WriteToLog, "Initializing Config_Initialization (ironic)");
@@ -250,6 +266,35 @@ namespace aphrodite {
                         AutoDownloadWithArguments = aphrodite.Settings.General.Default.AutoDownloadWithArguments;
                         ArgumentFormTopMost = aphrodite.Settings.General.Default.ArgumentFormTopMost;
                         break;
+                }
+            }
+
+            public void ForceSave() {
+                Program.Log(LogAction.WriteToLog, "Force saving Config_Initialization settings");
+
+                switch (Program.UseIni) {
+                    case true:
+                        Program.Ini.Write("firstTime", firstTime, "General");
+                        firstTime_First = firstTime;
+
+                        Program.Ini.Write("SkipArgumentCheck", SkipArgumentCheck, "General");
+                        SkipArgumentCheck_First = SkipArgumentCheck;
+
+                        Program.Ini.Write("AutoDownloadWithArguments", AutoDownloadWithArguments, "General");
+                        AutoDownloadWithArguments_First = AutoDownloadWithArguments;
+
+                        Program.Ini.Write("ArgumentFormTopMost", ArgumentFormTopMost, "General");
+                        ArgumentFormTopMost_First = ArgumentFormTopMost;
+                        break;
+
+                    case false: {
+                            aphrodite.Settings.General.Default.firstTime = firstTime;
+                            aphrodite.Settings.General.Default.SkipArgumentCheck = SkipArgumentCheck;
+                            aphrodite.Settings.General.Default.AutoDownloadWithArguments = AutoDownloadWithArguments;
+                            aphrodite.Settings.General.Default.ArgumentFormTopMost = ArgumentFormTopMost;
+                            aphrodite.Settings.General.Default.Save();
+                            break;
+                        }
                 }
             }
         }
@@ -553,6 +598,64 @@ namespace aphrodite {
                         break;
                 }
             }
+
+            public void ForceSave() {
+                Program.Log(LogAction.WriteToLog, "Force saving Config_FormSettings settings");
+
+                switch (Program.UseIni) {
+                    case true:
+                        Program.Ini.Write("frmBlacklist_Location", frmBlacklist_Location, "FormSettings");
+                        frmBlacklist_Location_First = frmBlacklist_Location;
+
+                        Program.Ini.Write("frmImageDownloader_Location", frmImageDownloader_Location, "FormSettings");
+                        frmImageDownloader_Location_First = frmImageDownloader_Location;
+
+                        Program.Ini.Write("frmLog_Location", frmLog_Location, "FormSettings");
+                        frmLog_Location_First = frmLog_Location;
+
+                        Program.Ini.Write("frmLog_Size", frmLog_Size, "FormSettings");
+                        frmLog_Size_First = frmLog_Size;
+
+                        Program.Ini.Write("frmMain_Location", frmMain_Location, "FormSettings");
+                        frmMain_Location_First = frmMain_Location;
+
+                        Program.Ini.Write("frmPoolDownloader_Location", frmPoolDownloader_Location, "FormSettings");
+                        frmPoolDownloader_Location_First = frmPoolDownloader_Location;
+
+                        Program.Ini.Write("frmPoolWishlist_Location", frmPoolWishlist_Location, "FormSettings");
+                        frmPoolWishlist_Location_First = frmPoolWishlist_Location;
+
+                        Program.Ini.Write("frmRedownloader_Location", frmRedownloader_Location, "FormSettings");
+                        frmRedownloader_Location_First = frmRedownloader_Location;
+
+                        Program.Ini.Write("frmSettings_Location", frmSettings_Location, "FormSettings");
+                        frmSettings_Location_First = frmSettings_Location;
+
+                        Program.Ini.Write("frmTagDownloader_Location", frmTagDownloader_Location, "FormSettings");
+                        frmTagDownloader_Location_First = frmTagDownloader_Location;
+
+                        Program.Ini.Write("frmUndesiredTags_Location", frmUndesiredTags_Location, "FormSettings");
+                        frmUndesiredTags_Location_First = frmUndesiredTags_Location;
+                        break;
+
+                    case false: {
+                            aphrodite.Settings.FormSettings.Default.frmBlacklist_Location = frmBlacklist_Location;
+                            aphrodite.Settings.FormSettings.Default.frmImageDownloader_Location = frmImageDownloader_Location;
+                            aphrodite.Settings.FormSettings.Default.frmLog_Location = frmLog_Location;
+                            aphrodite.Settings.FormSettings.Default.frmLog_Size = frmLog_Size;
+                            aphrodite.Settings.FormSettings.Default.frmMain_Location = frmMain_Location;
+                            aphrodite.Settings.FormSettings.Default.frmPoolDownloader_Location = frmPoolDownloader_Location;
+                            aphrodite.Settings.FormSettings.Default.frmPoolWishlist_Location = frmPoolWishlist_Location;
+                            aphrodite.Settings.FormSettings.Default.frmRedownloader_Location = frmRedownloader_Location;
+                            aphrodite.Settings.FormSettings.Default.frmSettings_Location = frmSettings_Location;
+                            aphrodite.Settings.FormSettings.Default.frmTagDownloader_Location = frmTagDownloader_Location;
+                            aphrodite.Settings.FormSettings.Default.frmUndesiredTags_Location = frmUndesiredTags_Location;
+                            aphrodite.Settings.FormSettings.Default.Save();
+
+                            break;
+                        }
+                }
+            }
         }
 
         public class Config_General {
@@ -574,6 +677,7 @@ namespace aphrodite {
             public string Blacklist = string.Empty;
             public string undesiredTags = string.Empty;
             public bool openAfter = false;
+            public bool CheckForUpdates = false;
 
             private string saveLocation_First = string.Empty;
             private string Graylist_First = string.Empty;
@@ -583,6 +687,7 @@ namespace aphrodite {
             private string Blacklist_First = string.Empty;
             private string undesiredTags_First = string.Empty;
             private bool openAfter_First = false;
+            public bool CheckForUpdates_First = false;
             #endregion
 
             public void Save() {
@@ -666,6 +771,13 @@ namespace aphrodite {
                                 openAfter_First = openAfter;
                                 break;
                         }
+                        switch (CheckForUpdates != CheckForUpdates_First) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "General -> CheckForUpdates changed!");
+                                Program.Ini.Write("CheckForUpdates", CheckForUpdates, "General");
+                                CheckForUpdates_First = CheckForUpdates;
+                                break;
+                        }
                         break;
 
                     case false:
@@ -724,6 +836,13 @@ namespace aphrodite {
                             case true:
                                 Program.Log(LogAction.WriteToLog, "General -> openAfter changed!");
                                 aphrodite.Settings.General.Default.openAfter = openAfter;
+                                Save = true;
+                                break;
+                        }
+                        switch (aphrodite.Settings.General.Default.CheckForUpdates != CheckForUpdates) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "General -> CheckForUpdates changed!");
+                                aphrodite.Settings.General.Default.CheckForUpdates = CheckForUpdates;
                                 Save = true;
                                 break;
                         }
@@ -790,6 +909,12 @@ namespace aphrodite {
                                 openAfter_First = openAfter;
                                 break;
                         }
+                        switch (Program.Ini.KeyExists("CheckForUpdates", "General")) {
+                            case true:
+                                CheckForUpdates = Program.Ini.ReadBool("CheckForUpdates", "General");
+                                CheckForUpdates_First = CheckForUpdates;
+                                break;
+                        }
                         break;
 
                     case false:
@@ -801,6 +926,79 @@ namespace aphrodite {
                         Blacklist = aphrodite.Settings.General.Default.Blacklist;
                         undesiredTags = aphrodite.Settings.General.Default.undesiredTags;
                         openAfter = aphrodite.Settings.General.Default.openAfter;
+                        CheckForUpdates = aphrodite.Settings.General.Default.CheckForUpdates;
+                        break;
+                }
+            }
+
+            public void ForceSave() {
+                Program.Log(LogAction.WriteToLog, "Force saving Config_General settings");
+
+                switch (Program.UseIni) {
+                    case true:
+                        Program.Ini.Write("saveLocation", saveLocation, "General");
+                        saveLocation_First = saveLocation;
+
+                        Program.Ini.Write("saveGraylisted", saveGraylisted, "General");
+                        saveGraylisted_First = saveGraylisted;
+
+                        Program.Ini.Write("saveInfo", saveInfo, "General");
+                        saveInfo_First = saveInfo;
+
+                        Program.Ini.Write("ignoreFinish", ignoreFinish, "General");
+                        ignoreFinish_First = ignoreFinish;
+
+                        Program.Ini.Write("undesiredTags", undesiredTags, "General");
+                        undesiredTags_First = undesiredTags;
+
+                        Program.Ini.Write("openAfter", openAfter, "General");
+                        openAfter_First = openAfter;
+
+                        Program.Ini.Write("CheckForUpdates", CheckForUpdates, "General");
+                        CheckForUpdates_First = CheckForUpdates;
+
+                        switch (Graylist.Length) {
+                            case 0:
+                                File.Delete(Program.ApplicationPath + "\\graylist.cfg");
+                                break;
+
+                            default:
+                                File.WriteAllText(
+                                    Program.ApplicationPath + "\\graylist.cfg",
+                                    Graylist.Replace(" ", "_").Replace("\r\n", " ")
+                                );
+                                break;
+                        }
+
+                        switch (Graylist.Length) {
+                            case 0:
+                                File.Delete(Program.ApplicationPath + "\\blacklist.cfg");
+                                break;
+
+                            default:
+                                File.WriteAllText(
+                                    Program.ApplicationPath + "\\blacklist.cfg",
+                                    Blacklist.Replace(" ", "_").Replace("\r\n", " ")
+                                );
+                                break;
+                        }
+
+                        break;
+
+                    case false:
+                        aphrodite.Settings.General.Default.saveLocation = saveLocation;
+                        aphrodite.Settings.General.Default.saveGraylisted = saveGraylisted;
+                        aphrodite.Settings.General.Default.saveInfo = saveInfo;
+                        aphrodite.Settings.General.Default.ignoreFinish = ignoreFinish;
+                        aphrodite.Settings.General.Default.undesiredTags = undesiredTags;
+                        aphrodite.Settings.General.Default.openAfter = openAfter;
+                        aphrodite.Settings.General.Default.CheckForUpdates = CheckForUpdates;
+
+                        aphrodite.Settings.General.Default.Graylist = Graylist;
+                        aphrodite.Settings.General.Default.Blacklist = Blacklist;
+
+                        aphrodite.Settings.General.Default.Save();
+
                         break;
                 }
             }
@@ -1196,6 +1394,77 @@ namespace aphrodite {
                         break;
                 }
             }
+
+            public void ForceSave() {
+                Program.Log(LogAction.WriteToLog, "Force saving Config_Tags settings");
+                switch (Program.UseIni) {
+                    case true:
+                        Program.Ini.Write("Safe", Safe, "Tags");
+                        Safe_First = Safe;
+
+                        Program.Ini.Write("Questionable", Questionable, "Tags");
+                        Questionable_First = Questionable;
+
+                        Program.Ini.Write("Explicit", Explicit, "Tags");
+                        Explicit_First = Explicit;
+
+                        Program.Ini.Write("separateRatings", separateRatings, "Tags");
+                        separateRatings_First = separateRatings;
+
+                        Program.Ini.Write("separateNonImages", separateNonImages, "Tags");
+                        separateNonImages_First = separateNonImages;
+
+                        Program.Ini.Write("enableScoreMin", enableScoreMin, "Tags");
+                        enableScoreMin_First = enableScoreMin;
+
+                        Program.Ini.Write("scoreAsTag", scoreAsTag, "Tags");
+                        scoreAsTag_First = scoreAsTag;
+
+                        Program.Ini.Write("scoreMin", scoreMin, "Tags");
+                        scoreMin_First = scoreMin;
+
+                        Program.Ini.Write("imageLimit", imageLimit, "Tags");
+                        imageLimit_First = imageLimit;
+
+                        Program.Ini.Write("pageLimit", pageLimit, "Tags");
+                        pageLimit_First = pageLimit;
+
+                        Program.Ini.Write("fileNameSchema", fileNameSchema, "Tags");
+                        fileNameSchema_First = fileNameSchema;
+
+                        Program.Ini.Write("downloadBlacklisted", downloadBlacklisted, "Tags");
+                        downloadBlacklisted_First = downloadBlacklisted;
+
+                        Program.Ini.Write("DownloadNewestToOldest", DownloadNewestToOldest, "Tags");
+                        DownloadNewestToOldest_First = DownloadNewestToOldest;
+
+                        Program.Ini.Write("FavoriteCount", FavoriteCount, "Tags");
+                        FavoriteCount_First = FavoriteCount;
+
+                        Program.Ini.Write("FavoriteCountAsTag", FavoriteCountAsTag, "Tags");
+                        FavoriteCountAsTag_First = FavoriteCountAsTag;
+                        break;
+
+                    case false:
+                        aphrodite.Settings.Tags.Default.Safe = Safe;
+                        aphrodite.Settings.Tags.Default.Questionable = Questionable;
+                        aphrodite.Settings.Tags.Default.Explicit = Explicit;
+                        aphrodite.Settings.Tags.Default.separateRatings = separateRatings;
+                        aphrodite.Settings.Tags.Default.separateNonImages = separateNonImages;
+                        aphrodite.Settings.Tags.Default.enableScoreMin = enableScoreMin;
+                        aphrodite.Settings.Tags.Default.scoreAsTag = scoreAsTag;
+                        aphrodite.Settings.Tags.Default.scoreMin = scoreMin;
+                        aphrodite.Settings.Tags.Default.imageLimit = imageLimit;
+                        aphrodite.Settings.Tags.Default.pageLimit = pageLimit;
+                        aphrodite.Settings.Tags.Default.fileNameSchema = fileNameSchema;
+                        aphrodite.Settings.Tags.Default.downloadBlacklisted = downloadBlacklisted;
+                        aphrodite.Settings.Tags.Default.DownloadNewestToOldest = DownloadNewestToOldest;
+                        aphrodite.Settings.Tags.Default.FavoriteCount = FavoriteCount;
+                        aphrodite.Settings.Tags.Default.FavoriteCountAsTag = FavoriteCountAsTag;
+                        aphrodite.Settings.Tags.Default.Save();
+                        break;
+                }
+            }
         }
 
         public class Config_Pools {
@@ -1246,8 +1515,9 @@ namespace aphrodite {
                     }
                 }
                 else {
-                    frmPoolWishlist WishList = new frmPoolWishlist(true, URL, Name);
-                    WishList.ShowDialog();
+                    using (frmPoolWishlist WishList = new frmPoolWishlist(true, URL, Name)) {
+                        WishList.ShowDialog();
+                    }
                     return;
                 }
             }
@@ -1292,6 +1562,15 @@ namespace aphrodite {
             private string fileNameSchema_First = "%poolname%_%page%";
             private bool downloadBlacklisted_First = true;
             private bool mergeBlacklisted_First = false;
+
+            private string[] NamesArray;
+            private string[] URLsArray;
+
+            private string NamesString;
+            private string URLsString;
+
+            private string OutputBuffer = string.Empty;
+            private string[] WishlistBuffer;
             #endregion
 
             public void Save() {
@@ -1460,6 +1739,62 @@ namespace aphrodite {
                         fileNameSchema = apiTools.ReplaceIllegalCharacters(aphrodite.Settings.Pools.Default.fileNameSchema);
                         downloadBlacklisted = aphrodite.Settings.Pools.Default.downloadBlacklisted;
                         mergeBlacklisted = aphrodite.Settings.Pools.Default.mergeBlacklisted;
+                        break;
+                }
+            }
+
+            public void ForceSave() {
+
+                Program.Log(LogAction.WriteToLog, "Force saving Config_Pools settings");
+                switch (Program.UseIni) {
+                    case true:
+                        Program.Ini.Write("mergeBlacklisted", mergeGraylisted, "Pools");
+                        mergeGraylisted_First = mergeGraylisted;
+
+                        Program.Ini.Write("addWishlistSilent", addWishlistSilent, "Pools");
+                        addWishlistSilent_First = addWishlistSilent;
+
+                        Program.Ini.Write("fileNameSchema", fileNameSchema, "Pools");
+                        fileNameSchema_First = fileNameSchema;
+
+                        Program.Ini.Write("downloadBlacklisted", downloadBlacklisted, "Pools");
+                        downloadBlacklisted_First = downloadBlacklisted;
+
+                        Program.Ini.Write("mergeBlacklisted", mergeBlacklisted, "Pools");
+                        mergeBlacklisted_First = mergeBlacklisted;
+
+                        NamesArray = wishlistNames.Split('|');
+                        URLsArray = wishlist.Split('|');
+                        for (int i = 0; i < URLsArray.Length; i++) {
+                            OutputBuffer += URLsArray[i] + "|" + NamesArray[i] + "\r\n";
+                        }
+                        OutputBuffer = OutputBuffer.Trim('\n').Trim('\r');
+                        File.WriteAllText(WishlistFile, OutputBuffer);
+
+                        OutputBuffer = string.Empty;
+                        break;
+
+                    case false:
+                        aphrodite.Settings.Pools.Default.mergeGraylisted = mergeGraylisted;
+                        aphrodite.Settings.Pools.Default.wishlist = wishlist;
+                        aphrodite.Settings.Pools.Default.wishlistNames = wishlistNames;
+                        aphrodite.Settings.Pools.Default.addWishlistSilent = addWishlistSilent;
+                        aphrodite.Settings.Pools.Default.fileNameSchema = fileNameSchema;
+                        aphrodite.Settings.Pools.Default.downloadBlacklisted = downloadBlacklisted;
+                        aphrodite.Settings.Pools.Default.mergeBlacklisted = mergeBlacklisted;
+
+                        WishlistBuffer = File.ReadAllLines(WishlistFile);
+                        NamesString = string.Empty;
+                        URLsString = string.Empty;
+                        for (int i = 0; i < WishlistBuffer.Length; i++) {
+                            URLsString += WishlistBuffer[i].Split('|')[0] + "\n";
+                            NamesString += WishlistBuffer[i].Split('|')[1] + "\n";
+                        }
+
+                        aphrodite.Settings.Pools.Default.wishlist = URLsString.Replace("\n", "\r\n");
+                        aphrodite.Settings.Pools.Default.wishlistNames = NamesString.Replace("\n", "\r\n");
+
+                        aphrodite.Settings.Pools.Default.Save();
                         break;
                 }
             }
@@ -1667,6 +2002,40 @@ namespace aphrodite {
                         break;
                 }
             }
+
+            public void ForceSave() {
+                Program.Log(LogAction.WriteToLog, "Force saving Config_Images settings");
+                switch (Program.UseIni) {
+                    case true:
+                        Program.Ini.Write("separateRatings", separateRatings, "Images");
+                        separateRatings_First = separateRatings;
+                        Program.Ini.Write("separateBlacklisted", separateGraylisted, "Images");
+                        separateGraylisted_First = separateGraylisted;
+                        Program.Ini.Write("useForm", useForm, "Images");
+                        useForm_First = useForm;
+                        Program.Ini.Write("separateArtists", separateArtists, "Images");
+                        separateArtists_First = separateArtists;
+                        Program.Ini.Write("fileNameSchema", fileNameSchema, "Images");
+                        fileNameSchema_First = fileNameSchema;
+                        Program.Ini.Write("separateNonImages", separateNonImages, "Images");
+                        separateNonImages_First = separateNonImages;
+                        Program.Ini.Write("separateBlacklisted", separateBlacklisted, "Images");
+                        separateBlacklisted_First = separateBlacklisted;
+                        break;
+
+                    case false:
+                        aphrodite.Settings.Images.Default.separateRatings = separateRatings;
+                        aphrodite.Settings.Images.Default.separateGraylisted = separateGraylisted;
+                        aphrodite.Settings.Images.Default.useForm = useForm;
+                        aphrodite.Settings.Images.Default.separateArtists = separateArtists;
+                        aphrodite.Settings.Images.Default.fileNameSchema = fileNameSchema;
+                        aphrodite.Settings.Images.Default.separateNonImages = separateNonImages;
+                        aphrodite.Settings.Images.Default.separateBlacklisted = separateBlacklisted;
+                        aphrodite.Settings.Images.Default.Save();
+
+                        break;
+                }
+            }
         }
     }
 
@@ -1711,7 +2080,7 @@ namespace aphrodite {
             int.TryParse(RetVal.ToString(), out RetInt);
             return RetInt;
         }
-        public decimal ReadDecimal(string Key, string Section = null){
+        public decimal ReadDecimal(string Key, string Section = null) {
             StringBuilder RetVal = new StringBuilder(255);
             NativeMethods.GetPrivateProfileString(Section ?? ExecutableName, Key.ToLower(), "", RetVal, 255, IniPath);
             decimal RetDec;
