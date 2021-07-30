@@ -121,14 +121,17 @@ namespace aphrodite {
 
         private void mSettings_Click(object sender, EventArgs e) {
             using (frmSettings SettingsForm = new frmSettings()) {
-                SettingsForm.ShowDialog();
-
-
-                if (Program.UseIni) {
-                    this.Text += " (ini)";
-                }
-                else {
-                    this.Text = this.Text.Substring(0, this.Text.Length - 6);
+                switch (SettingsForm.ShowDialog()) {
+                    case System.Windows.Forms.DialogResult.OK:
+                        if (Program.UseIni) {
+                            if (!this.Text.EndsWith(" (ini)")) {
+                                this.Text += " (ini)";
+                            }
+                        }
+                        else {
+                            this.Text = this.Text.Substring(0, this.Text.Length - 6);
+                        }
+                        break;
                 }
             }
         }
