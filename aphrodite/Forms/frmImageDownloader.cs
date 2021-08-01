@@ -20,6 +20,7 @@ namespace aphrodite {
         private Thread DownloadThread;                       // The thread for the downloader.
         private Controls.ExtendedWebClient DownloadClient;  // The downloader client.
         private DownloadStatus CurrentStatus = DownloadStatus.Waiting;
+        private int ThrottleCount = 0;
     #endregion
 
     #region Form
@@ -156,7 +157,7 @@ namespace aphrodite {
                 }
             }
         }
-        public async void DownloadImage() {
+        public void DownloadImage() {
             try {
                 this.Invoke((Action) delegate {
                     lbInfo.Text = "Downloading image id " + DownloadInfo.PostId;
@@ -176,26 +177,45 @@ namespace aphrodite {
 
                 // Download file.
                     using (DownloadClient = new Controls.ExtendedWebClient()) {
+
+                        Object SyncLock = new Object();
+
                         DownloadClient.DownloadProgressChanged += (s, e) => {
-                            this.Invoke((Action) delegate {
-                                pbDownloadStatus.Value = e.ProgressPercentage;
-                                pbDownloadStatus.Value++;
-                                pbDownloadStatus.Value--;
-                                lbPercentage.Text = e.ProgressPercentage.ToString() + "%";
-                            });
+                            ThrottleCount++;
+
+                            switch (ThrottleCount % 25) {
+                                case 0:
+                                    this.Invoke((Action) delegate {
+                                        pbDownloadStatus.Value = e.ProgressPercentage;
+                                        pbDownloadStatus.Value++;
+                                        pbDownloadStatus.Value--;
+                                        lbPercentage.Text = e.ProgressPercentage.ToString() + "%";
+                                    });
+
+                                    lbBytes.Text = Shared.GetTransferRate(e.BytesReceived, e.TotalBytesToReceive);
+                                    break;
+                            }
                         };
+
                         DownloadClient.DownloadFileCompleted += (s, e) => {
                             this.Invoke((Action) delegate {
                                 pbDownloadStatus.Value = 100;
                                 lbPercentage.Text = "Done";
                             });
+
+                            lock (e.UserState) {
+                                Monitor.Pulse(e.UserState);
+                            }
                         };
 
                         DownloadClient.Proxy = WebRequest.GetSystemWebProxy();
                         DownloadClient.Headers.Add("User-Agent: " + Program.UserAgent);
                         DownloadClient.Method = "GET";
 
-                        await DownloadClient.DownloadFileTaskAsync(Image.FileUrl, Image.DownloadPath);
+                        lock (SyncLock) {
+                            DownloadClient.DownloadFileTaskAsync(Image.FileUrl, Image.DownloadPath);
+                            Monitor.Wait(SyncLock);
+                        }
                     }
                 }
 

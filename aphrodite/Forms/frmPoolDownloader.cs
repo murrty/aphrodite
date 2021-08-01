@@ -19,6 +19,7 @@ namespace aphrodite {
         private Thread DownloadThread;
         private Controls.ExtendedWebClient DownloadClient;
         private DownloadStatus CurrentStatus = DownloadStatus.Waiting;
+        private int ThrottleCount = 0;
 
         private string CurrentUrl;
 
@@ -214,7 +215,7 @@ namespace aphrodite {
                 }
             }
         }
-        private async void DownloadPool() {
+        private void DownloadPool() {
 
             #region define new variables
             // New variables for the API parse
@@ -916,14 +917,26 @@ namespace aphrodite {
                     Program.Log(LogAction.WriteToLog, "Downloading pool pages. (frmPoolDownloader.cs)");
                 });
                 using (DownloadClient = new Controls.ExtendedWebClient()) {
+
+                    Object SyncLock = new Object();
+
                     DownloadClient.DownloadProgressChanged += (s, e) => {
-                        this.Invoke((Action)delegate() {
-                            if (pbDownloadStatus.Value < 100) {
-                                pbDownloadStatus.Value = e.ProgressPercentage;
-                            }
-                            lbPercentage.Text = e.ProgressPercentage.ToString() + "%";
-                            lbBytes.Text = (e.BytesReceived / 1024) + " kb / " + (e.TotalBytesToReceive / 1024) + " kb";
-                        });
+
+                        ThrottleCount++;
+
+                        switch (ThrottleCount % 25) {
+                            case 0:
+                                this.Invoke((Action)delegate() {
+                                    if (pbDownloadStatus.Value < 100) {
+                                        pbDownloadStatus.Value = e.ProgressPercentage;
+                                    }
+                                    lbPercentage.Text = e.ProgressPercentage + "%";
+
+                                    lbBytes.Text = Shared.GetTransferRate(e.BytesReceived, e.TotalBytesToReceive);
+                                });
+                                break;
+                        }
+
                     };
 
                     DownloadClient.DownloadFileCompleted += (s, e) => {
@@ -934,6 +947,10 @@ namespace aphrodite {
                             if (pbTotalStatus.Value != pbTotalStatus.Maximum)
                                 pbTotalStatus.Value++;
                         });
+
+                        lock (e.UserState) {
+                            Monitor.Pulse(e.UserState);
+                        }
                     };
 
                     DownloadClient.Proxy = WebRequest.GetSystemWebProxy();
@@ -944,7 +961,10 @@ namespace aphrodite {
                         CurrentUrl = URLs[y].Replace("www.", "");
 
                         if (!File.Exists(FilePaths[y])) {
-                            await DownloadClient.DownloadFileTaskAsync(new Uri(CurrentUrl), FilePaths[y]);
+                            lock (SyncLock) {
+                                DownloadClient.DownloadFileAsync(new Uri(CurrentUrl), FilePaths[y], SyncLock);
+                                Monitor.Wait(SyncLock);
+                            }
                         }
                     }
                 }

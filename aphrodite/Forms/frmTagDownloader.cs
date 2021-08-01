@@ -32,6 +32,7 @@ namespace aphrodite {
         private Thread DownloadThread;                      // New thread for the downloader.
         private Controls.ExtendedWebClient DownloadClient;  // The downloader client.
         private DownloadStatus CurrentStatus = DownloadStatus.Waiting;
+        private int ThrottleCount = 0;                  // Used to prevent the UI Thread from getting bombarded.
 
         private int CleanTotalCount = 0;                // Will be the count of how many files that are set for download.
         private int CleanExplicitCount = 0;             // Will be the count of how many explicit files that are set for download.
@@ -268,11 +269,11 @@ namespace aphrodite {
                         break;
 
                     case DownloadStatus.Aborted:
-                        lbFile.Text = "Download canceled";
+                        lbFile.Text = "Download cancelled";
                         pbDownloadStatus.State = aphrodite.Controls.ProgressBarState.Error;
-                        lbPercentage.Text = "Canceled";
-                        this.Text = "Download canceled";
-                        status.Text = "Download has canceled";
+                        lbPercentage.Text = "Cancelled";
+                        this.Text = "Download cancelled";
+                        status.Text = "Download has cancelled";
                         break;
 
                     case DownloadStatus.NothingToDownload:
@@ -306,7 +307,7 @@ namespace aphrodite {
             }
         }
 
-        private async void DownloadPosts() {
+        private void DownloadPosts() {
 
             #region Download variables
             string CurrentUrl = string.Empty;               // The URL being accessed, changes per API call/File download.
@@ -1710,19 +1711,30 @@ namespace aphrodite {
                 // Start the download
                 using (DownloadClient = new Controls.ExtendedWebClient()) {
 
+                    Object SyncLock = new Object();
+
                     #region DownloadProgressChanged
                     DownloadClient.DownloadProgressChanged += (s, e) => {
-                        this.Invoke((Action)delegate() {
-                            pbDownloadStatus.Value = e.ProgressPercentage;
-                            switch (e.ProgressPercentage > 0) {
-                                case true:
-                                    pbDownloadStatus.Value--;
-                                    pbDownloadStatus.Value++;
-                                    break;
-                            }
-                            lbPercentage.Text = e.ProgressPercentage.ToString() + "%";
-                            lbBytes.Text = ((decimal)(e.BytesReceived / 1024) / 1024).ToString("0.00") + "mb / " + ((decimal)(e.TotalBytesToReceive / 1024) / 1024).ToString("0.00") + "mb";
-                        });
+
+                        ThrottleCount++;
+
+                        switch (ThrottleCount % 25) {
+                            case 0:
+                                this.Invoke((Action)delegate() {
+                                    pbDownloadStatus.Value = e.ProgressPercentage;
+                                    switch (e.ProgressPercentage > 0) {
+                                        case true:
+                                            pbDownloadStatus.Value--;
+                                            pbDownloadStatus.Value++;
+                                            break;
+                                    }
+                                    lbPercentage.Text = e.ProgressPercentage.ToString() + "%";
+
+                                    lbBytes.Text = Shared.GetTransferRate(e.BytesReceived, e.TotalBytesToReceive);
+                                });
+                                break;
+                        }
+
                     };
                     #endregion
 
@@ -1736,6 +1748,10 @@ namespace aphrodite {
                                 pbTotalStatus.Value++;
                             }
                         });
+
+                        lock (e.UserState) {
+                            Monitor.Pulse(e.UserState);
+                        }
                     };
                     #endregion
 
@@ -1757,7 +1773,10 @@ namespace aphrodite {
                                         lbFile.Text = "Downloading explicit file " + (CurrentFile + 1) + " of " + (CleanExplicitCount);
                                         status.Text = "Downloading " + CleanedExplicitFileNames[CurrentFile];
                                     });
-                                    await DownloadClient.DownloadFileTaskAsync(new Uri(CleanedExplicitURLs[CurrentFile]), CleanedExplicitFilePaths[CurrentFile]);
+                                    lock (SyncLock) {
+                                        DownloadClient.DownloadFileAsync(new Uri(CleanedExplicitURLs[CurrentFile]), CleanedExplicitFilePaths[CurrentFile], SyncLock);
+                                        Monitor.Wait(SyncLock);
+                                    }
                                 }
                             }
                         }
@@ -1772,7 +1791,10 @@ namespace aphrodite {
                                         lbFile.Text = "Downloading questionable file " + (CurrentFile + 1) + " of " + (CleanQuestionableCount);
                                         status.Text = "Downloading " + CleanedQuestionableFileNames[CurrentFile];
                                     });
-                                    await DownloadClient.DownloadFileTaskAsync(new Uri(CleanedQuestionableURLs[CurrentFile]), CleanedQuestionableFilePaths[CurrentFile]);
+                                    lock (SyncLock) {
+                                        DownloadClient.DownloadFileAsync(new Uri(CleanedQuestionableURLs[CurrentFile]), CleanedQuestionableFilePaths[CurrentFile], SyncLock);
+                                        Monitor.Wait(SyncLock);
+                                    }
                                 }
                             }
                         }
@@ -1787,7 +1809,10 @@ namespace aphrodite {
                                         lbFile.Text = "Downloading safe file " + (CurrentFile + 1) + " of " + (CleanSafeCount);
                                         status.Text = "Downloading " + CleanedSafeFileNames[CurrentFile];
                                     });
-                                    await DownloadClient.DownloadFileTaskAsync(new Uri(CleanedSafeURLs[CurrentFile]), CleanedSafeFilePaths[CurrentFile]);
+                                    lock (SyncLock) {
+                                        DownloadClient.DownloadFileAsync(new Uri(CleanedSafeURLs[CurrentFile]), CleanedSafeFilePaths[CurrentFile], SyncLock);
+                                        Monitor.Wait(SyncLock);
+                                    }
                                 }
                             }
                         }
@@ -1805,7 +1830,10 @@ namespace aphrodite {
                                             lbFile.Text = "Downloading graylisted (e) file " + (CurrentFile + 1) + " of " + (GraylistExplicitCount);
                                             status.Text = "Downloading " + GraylistedExplicitFileNames[CurrentFile];
                                         });
-                                        await DownloadClient.DownloadFileTaskAsync(new Uri(GraylistedExplicitURLs[CurrentFile]), GraylistedExplicitFilePaths[CurrentFile]);
+                                        lock (SyncLock) {
+                                            DownloadClient.DownloadFileAsync(new Uri(GraylistedExplicitURLs[CurrentFile]), GraylistedExplicitFilePaths[CurrentFile], SyncLock);
+                                            Monitor.Wait(SyncLock);
+                                        }
                                     }
                                 }
                             }
@@ -1820,7 +1848,10 @@ namespace aphrodite {
                                             lbFile.Text = "Downloading graylisted (q) file " + (CurrentFile + 1) + " of " + (GraylistQuestionableCount);
                                             status.Text = "Downloading " + GraylistedQuestionableFileNames[CurrentFile];
                                         });
-                                        await DownloadClient.DownloadFileTaskAsync(new Uri(GraylistedQuestionableURLs[CurrentFile]), GraylistedQuestionableFilePaths[CurrentFile]);
+                                        lock (SyncLock) {
+                                            DownloadClient.DownloadFileAsync(new Uri(GraylistedQuestionableURLs[CurrentFile]), GraylistedQuestionableFilePaths[CurrentFile], SyncLock);
+                                            Monitor.Wait(SyncLock);
+                                        }
                                     }
                                 }
                             }
@@ -1835,7 +1866,10 @@ namespace aphrodite {
                                             lbFile.Text = "Downloading graylisted (s) file " + (CurrentFile + 1) + " of " + (GraylistSafeCount);
                                             status.Text = "Downloading " + GraylistedSafeFileNames[CurrentFile];
                                         });
-                                        await DownloadClient.DownloadFileTaskAsync(new Uri(GraylistedSafeURLs[CurrentFile]), GraylistedSafeFilePaths[CurrentFile]);
+                                        lock (SyncLock) {
+                                            DownloadClient.DownloadFileAsync(new Uri(GraylistedSafeURLs[CurrentFile]), GraylistedSafeFilePaths[CurrentFile], SyncLock);
+                                            Monitor.Wait(SyncLock);
+                                        }
                                     }
                                 }
                             }
@@ -1854,7 +1888,10 @@ namespace aphrodite {
                                             lbFile.Text = "Downloading blacklisted (e) file " + (CurrentFile + 1) + " of " + (BlacklistExplicitCount);
                                             status.Text = "Downloading " + BlacklistedExplicitFileNames[CurrentFile];
                                         });
-                                        await DownloadClient.DownloadFileTaskAsync(new Uri(BlacklistedExplicitURLs[CurrentFile]), BlacklistedExplicitFilePaths[CurrentFile]);
+                                        lock (SyncLock) {
+                                            DownloadClient.DownloadFileAsync(new Uri(BlacklistedExplicitURLs[CurrentFile]), BlacklistedExplicitFilePaths[CurrentFile], SyncLock);
+                                            Monitor.Wait(SyncLock);
+                                        }
                                     }
                                 }
                             }
@@ -1869,7 +1906,10 @@ namespace aphrodite {
                                             lbFile.Text = "Downloading blacklisted (q) file " + (CurrentFile + 1) + " of " + (BlacklistQuestionableCount);
                                             status.Text = "Downloading " + BlacklistedQuestionableFileNames[CurrentFile];
                                         });
-                                        await DownloadClient.DownloadFileTaskAsync(new Uri(BlacklistedQuestionableURLs[CurrentFile]), BlacklistedQuestionableFilePaths[CurrentFile]);
+                                        lock (SyncLock) {
+                                            DownloadClient.DownloadFileAsync(new Uri(BlacklistedQuestionableURLs[CurrentFile]), BlacklistedQuestionableFilePaths[CurrentFile], SyncLock);
+                                            Monitor.Wait(SyncLock);
+                                        }
                                     }
                                 }
                             }
@@ -1884,7 +1924,10 @@ namespace aphrodite {
                                             lbFile.Text = "Downloading blacklisted (s) file " + (CurrentFile + 1) + " of " + (BlacklistSafeCount);
                                             status.Text = "Downloading " + BlacklistedSafeFileNames[CurrentFile];
                                         });
-                                        await DownloadClient.DownloadFileTaskAsync(new Uri(BlacklistedSafeURLs[CurrentFile]), BlacklistedSafeFilePaths[CurrentFile]);
+                                        lock (SyncLock) {
+                                            DownloadClient.DownloadFileAsync(new Uri(BlacklistedSafeURLs[CurrentFile]), BlacklistedSafeFilePaths[CurrentFile], SyncLock);
+                                            Monitor.Wait(SyncLock);
+                                        }
                                     }
                                 }
                             }
@@ -1903,7 +1946,10 @@ namespace aphrodite {
                                         lbFile.Text = "Downloading file " + (CurrentFile + 1) + " of " + (CleanTotalCount);
                                         status.Text = "Downloading " + CleanedFileNames[CurrentFile];
                                     });
-                                    await DownloadClient.DownloadFileTaskAsync(new Uri(CleanedURLs[CurrentFile]), CleanedFilePaths[CurrentFile]);
+                                    lock (SyncLock) {
+                                        DownloadClient.DownloadFileAsync(new Uri(CleanedURLs[CurrentFile]), CleanedFilePaths[CurrentFile], SyncLock);
+                                        Monitor.Wait(SyncLock);
+                                    }
                                 }
                             }
                         }
@@ -1918,7 +1964,10 @@ namespace aphrodite {
                                         lbFile.Text = "Downloading explicit file " + (CurrentFile + 1) + " of " + (GraylistTotalCount);
                                         status.Text = "Downloading " + GraylistedFileNames[CurrentFile];
                                     });
-                                    await DownloadClient.DownloadFileTaskAsync(new Uri(GraylistedURLs[CurrentFile]), GraylistedFilePaths[CurrentFile]);
+                                    lock (SyncLock) {
+                                        DownloadClient.DownloadFileAsync(new Uri(GraylistedURLs[CurrentFile]), GraylistedFilePaths[CurrentFile], SyncLock);
+                                        Monitor.Wait(SyncLock);
+                                    }
                                 }
                             }
                         }
@@ -1933,7 +1982,10 @@ namespace aphrodite {
                                         lbFile.Text = "Downloading explicit file " + (CurrentFile + 1) + " of " + (BlacklistTotalCount);
                                         status.Text = "Downloading " + BlacklistedFileNames[CurrentFile];
                                     });
-                                    await DownloadClient.DownloadFileTaskAsync(new Uri(BlacklistedURLs[CurrentFile]), BlacklistedFilePaths[CurrentFile]);
+                                    lock (SyncLock) {
+                                        DownloadClient.DownloadFileAsync(new Uri(BlacklistedURLs[CurrentFile]), BlacklistedFilePaths[CurrentFile], SyncLock);
+                                        Monitor.Wait(SyncLock);
+                                    }
                                 }
                             }
                         }

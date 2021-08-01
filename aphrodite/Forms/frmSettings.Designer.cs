@@ -112,6 +112,7 @@
             this.btnImportGraylist = new System.Windows.Forms.Button();
             this.btnExportGraylist = new System.Windows.Forms.Button();
             this.tabPortable = new System.Windows.Forms.TabPage();
+            this.chkDontOverwrite = new System.Windows.Forms.CheckBox();
             this.chkEnableIni = new System.Windows.Forms.CheckBox();
             this.lbPortable = new System.Windows.Forms.Label();
             this.JustTheTips = new System.Windows.Forms.ToolTip(this.components);
@@ -119,7 +120,6 @@
             this.btnSave = new aphrodite.Controls.ExtendedButton();
             this.btnCancel = new aphrodite.Controls.ExtendedButton();
             this.pnControls = new System.Windows.Forms.Panel();
-            this.chkDontOverwrite = new System.Windows.Forms.CheckBox();
             this.tbMain.SuspendLayout();
             this.tabGeneral.SuspendLayout();
             this.tabTags.SuspendLayout();
@@ -1215,6 +1215,19 @@
             this.tabPortable.Text = "Portable";
             this.tabPortable.UseVisualStyleBackColor = true;
             // 
+            // chkDontOverwrite
+            // 
+            this.chkDontOverwrite.AutoSize = true;
+            this.chkDontOverwrite.Location = new System.Drawing.Point(9, 172);
+            this.chkDontOverwrite.Name = "chkDontOverwrite";
+            this.chkDontOverwrite.Size = new System.Drawing.Size(192, 17);
+            this.chkDontOverwrite.TabIndex = 2;
+            this.chkDontOverwrite.Text = "Don\'t overwrite existing settings";
+            this.JustTheTips.SetToolTip(this.chkDontOverwrite, "Doesn\'t overwrite existing settings, but will ovewrite them when closing the prog" +
+        "ram.");
+            this.chkDontOverwrite.UseVisualStyleBackColor = true;
+            this.chkDontOverwrite.Visible = false;
+            // 
             // chkEnableIni
             // 
             this.chkEnableIni.Appearance = System.Windows.Forms.Appearance.Button;
@@ -1280,18 +1293,6 @@
             this.pnControls.Name = "pnControls";
             this.pnControls.Size = new System.Drawing.Size(408, 42);
             this.pnControls.TabIndex = 11;
-            // 
-            // chkDontOverwrite
-            // 
-            this.chkDontOverwrite.AutoSize = true;
-            this.chkDontOverwrite.Location = new System.Drawing.Point(9, 172);
-            this.chkDontOverwrite.Name = "chkDontOverwrite";
-            this.chkDontOverwrite.Size = new System.Drawing.Size(192, 17);
-            this.chkDontOverwrite.TabIndex = 2;
-            this.chkDontOverwrite.Text = "Don\'t overwrite existing settings";
-            this.JustTheTips.SetToolTip(this.chkDontOverwrite, "Doesn\'t overwrite existing settings, but will ovewrite them when closing the prog" +
-        "ram.");
-            this.chkDontOverwrite.UseVisualStyleBackColor = true;
             // 
             // frmSettings
             // 

@@ -66,21 +66,22 @@ namespace aphrodite {
                         }
 
                         Program.Log(LogAction.WriteToLog, "Update v" + CloudVersion + " is available");
-                        frmUpdateAvailable UpdateDialog = new frmUpdateAvailable();
-                        UpdateDialog.NewVersion = CloudVersion.ToString();
-                        UpdateDialog.UpdateHeader = xmlHeader[0].InnerText;
-                        UpdateDialog.UpdateBody = xmlBody[0].InnerText;
-                        UpdateDialog.BlockSkip = ForceCheck;
-                        switch (UpdateDialog.ShowDialog()) {
-                            case DialogResult.Yes:
-                                System.Diagnostics.Process.Start("https://github.com/murrty/aphrodite/releases/latest");
-                                break;
+                        using (frmUpdateAvailable UpdateDialog = new frmUpdateAvailable()) {
+                            UpdateDialog.NewVersion = CloudVersion.ToString();
+                            UpdateDialog.UpdateHeader = xmlHeader[0].InnerText;
+                            UpdateDialog.UpdateBody = xmlBody[0].InnerText;
+                            UpdateDialog.BlockSkip = ForceCheck;
+                            switch (UpdateDialog.ShowDialog()) {
+                                case DialogResult.Yes:
+                                    System.Diagnostics.Process.Start("https://github.com/murrty/aphrodite/releases/latest");
+                                    break;
 
-                            case DialogResult.Ignore:
-                                Program.Log(LogAction.WriteToLogWithInvoke, "Ignoring update v" + CloudVersion);
-                                Properties.Settings.Default.SkippedVersion = CloudVersion;
-                                Properties.Settings.Default.Save();
-                                break;
+                                case DialogResult.Ignore:
+                                    Program.Log(LogAction.WriteToLogWithInvoke, "Ignoring update v" + CloudVersion);
+                                    Config.Settings.Initialization.SkippedVersion = CloudVersion;
+                                    Config.Settings.Save(ConfigType.Initialization);
+                                    break;
+                            }
                         }
                         return true;
                     }

@@ -352,4 +352,26 @@ namespace aphrodite {
         }
     }
 
+    /// <summary>
+    /// Commonly used logic that's used multiple times, condensed into one place.
+    /// </summary>
+    class Shared {
+        public static string GetTransferRate(long BytesRecieved, long BytesToRecieve) {
+            switch (BytesToRecieve < 1048576m) {
+                case true:
+                    return
+                        (BytesRecieved / 1024f).ToString("#0.00") + "kb / " +
+                        (BytesToRecieve / 1024f).ToString("#0.00") + "kb";
+
+                case false:
+                    return
+                        ((BytesRecieved / 1024f) / 1024f).ToString("#0.00") + "mb / " +
+                        ((BytesToRecieve / 1024f) / 1024f).ToString("#0.00") + "mb";
+
+                default:
+                    return "0b / 0b";
+            }
+        }
+    }
+
 }
