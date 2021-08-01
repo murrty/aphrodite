@@ -108,7 +108,7 @@ namespace aphrodite {
             if (Program.UseIni && !UseIni) {
                 Program.Ini.Write("useIni", false);
             }
-            else if (UseIni) {
+            else {
                 Program.Ini.Write("useIni", true);
             }
 
@@ -131,11 +131,13 @@ namespace aphrodite {
             public bool SkipArgumentCheck = false;
             public bool AutoDownloadWithArguments = true;
             public bool ArgumentFormTopMost = true;
+            public decimal SkippedVersion = -1;
 
             private bool firstTime_First = true;
             private bool SkipArgumentCheck_First = false;
             private bool AutoDownloadWithArguments_First = true;
             private bool ArgumentFormTopMost_First = true;
+            private decimal SkippedVersion_First = -1;
 
             public void Save() {
                 Program.Log(LogAction.WriteToLog, "Attempting to save Config_Initialization settings");
@@ -173,6 +175,14 @@ namespace aphrodite {
                                 ArgumentFormTopMost_First = ArgumentFormTopMost;
                                 break;
                         }
+
+                        switch (SkippedVersion != SkippedVersion_First) {
+                            case true:
+                                Program.Log(LogAction.WriteToLog, "SkippedVersion changed!");
+                                Program.Ini.Write("SkippedVersion", SkippedVersion);
+                                SkippedVersion_First = SkippedVersion;
+                                break;
+                        }
                         break;
 
                     case false: {
@@ -206,10 +216,18 @@ namespace aphrodite {
                                     break;
                             }
 
+                            switch (aphrodite.Properties.Settings.Default.SkippedVersion != SkippedVersion) {
+                                case true:
+                                    aphrodite.Properties.Settings.Default.SkippedVersion = SkippedVersion;
+                                    Save = true;
+                                    break;
+                            }
+
                             switch (Save) {
                                 case true:
                                     Program.Log(LogAction.WriteToLog, "Saving Initialization");
                                     aphrodite.Settings.General.Default.Save();
+                                    aphrodite.Properties.Settings.Default.Save();
                                     break;
                             }
                             break;
@@ -260,6 +278,16 @@ namespace aphrodite {
                             case false:
                                 break;
                         }
+
+                        switch (Program.Ini.KeyExists("SkippedVersion")) {
+                            case true:
+                                SkippedVersion = Program.Ini.ReadDecimal("SkippedVersion");
+                                SkippedVersion_First = SkippedVersion;
+                                break;
+
+                            case false:
+                                break;
+                        }
                         break;
 
                     case false:
@@ -267,6 +295,7 @@ namespace aphrodite {
                         SkipArgumentCheck = aphrodite.Settings.General.Default.SkipArgumentCheck;
                         AutoDownloadWithArguments = aphrodite.Settings.General.Default.AutoDownloadWithArguments;
                         ArgumentFormTopMost = aphrodite.Settings.General.Default.ArgumentFormTopMost;
+                        SkippedVersion = aphrodite.Properties.Settings.Default.SkippedVersion;
                         break;
                 }
             }
@@ -287,16 +316,21 @@ namespace aphrodite {
 
                         Program.Ini.Write("ArgumentFormTopMost", ArgumentFormTopMost, "General");
                         ArgumentFormTopMost_First = ArgumentFormTopMost;
+
+                        Program.Ini.Write("SkippedVersion", SkippedVersion);
+                        SkippedVersion_First = SkippedVersion;
                         break;
 
-                    case false: {
-                            aphrodite.Settings.General.Default.firstTime = firstTime;
-                            aphrodite.Settings.General.Default.SkipArgumentCheck = SkipArgumentCheck;
-                            aphrodite.Settings.General.Default.AutoDownloadWithArguments = AutoDownloadWithArguments;
-                            aphrodite.Settings.General.Default.ArgumentFormTopMost = ArgumentFormTopMost;
-                            aphrodite.Settings.General.Default.Save();
-                            break;
-                        }
+                    case false:
+                        aphrodite.Settings.General.Default.firstTime = firstTime;
+                        aphrodite.Settings.General.Default.SkipArgumentCheck = SkipArgumentCheck;
+                        aphrodite.Settings.General.Default.AutoDownloadWithArguments = AutoDownloadWithArguments;
+                        aphrodite.Settings.General.Default.ArgumentFormTopMost = ArgumentFormTopMost;
+                        aphrodite.Settings.General.Default.Save();
+
+                        aphrodite.Properties.Settings.Default.SkippedVersion = SkippedVersion;
+                        aphrodite.Properties.Settings.Default.Save();
+                        break;
                 }
             }
         }
@@ -875,9 +909,9 @@ namespace aphrodite {
                                 Graylist_First = Graylist;
                                 break;
                         }
-                        switch (Program.Ini.KeyExists("saveBlacklisted", "General")) {
+                        switch (Program.Ini.KeyExists("saveGraylisted", "General")) {
                             case true:
-                                saveGraylisted = Program.Ini.ReadBool("saveBlacklisted", "General");
+                                saveGraylisted = Program.Ini.ReadBool("saveGraylisted", "General");
                                 saveGraylisted_First = saveGraylisted;
                                 break;
                         }
@@ -2179,8 +2213,8 @@ namespace aphrodite {
         }
 
         public string ReadString(string Key, string Section = null) {
-            StringBuilder RetVal = new StringBuilder(255);
-            NativeMethods.GetPrivateProfileString(Section ?? ExecutableName, Key, "", RetVal, 255, IniPath);
+            StringBuilder RetVal = new StringBuilder(65535);
+            NativeMethods.GetPrivateProfileString(Section ?? ExecutableName, Key, "", RetVal, 65535, IniPath);
             return RetVal.ToString();
         }
         public bool ReadBool(string Key, string Section = null) {
@@ -2204,8 +2238,12 @@ namespace aphrodite {
             StringBuilder RetVal = new StringBuilder(255);
             NativeMethods.GetPrivateProfileString(Section ?? ExecutableName, Key.ToLower(), "", RetVal, 255, IniPath);
             decimal RetDec;
-            decimal.TryParse(RetVal.ToString(), out RetDec);
-            return RetDec;
+            if (decimal.TryParse(RetVal.ToString(), out RetDec)) {
+                return RetDec;
+            }
+            else {
+                return -1;
+            }
         }
         public Point ReadPoint(string Key, string Section = null) {
             StringBuilder RetVal = new StringBuilder(255);
@@ -2247,6 +2285,9 @@ namespace aphrodite {
             NativeMethods.WritePrivateProfileString(Section ?? ExecutableName, Key, Value ? "True" : "False", IniPath);
         }
         public void Write(string Key, int Value, string Section = null) {
+            NativeMethods.WritePrivateProfileString(Section ?? ExecutableName, Key, Value.ToString(), IniPath);
+        }
+        public void Write(string Key, decimal Value, string Section = null) {
             NativeMethods.WritePrivateProfileString(Section ?? ExecutableName, Key, Value.ToString(), IniPath);
         }
         public void Write(string Key, Point Value, string Section = null) {
