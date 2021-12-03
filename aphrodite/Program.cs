@@ -370,11 +370,11 @@ namespace aphrodite {
                         return false;
                     }
                     else {
-                        CurrentArg = CurrentArg.Substring(7).Replace("%$|%", " ");
+                        CurrentArg = System.Web.HttpUtility.UrlDecode(CurrentArg.Substring(7)).Replace("%$|%", " ");
                         string[] ArgumentSplit = CurrentArg.Split('|');
                         if (ArgumentSplit.Length == 2) {
                             string url = ArgumentSplit[0];
-                            string title = title = ArgumentSplit[1];
+                            string title = ArgumentSplit[1];
 
                             if (apiTools.IsValidPoolLink(ArgumentSplit[0])) {
                                 title = title
@@ -422,7 +422,7 @@ namespace aphrodite {
             return false;
         }
 
-        [System.Diagnostics.Conditional("DEBUG")]
+        [System.Diagnostics.Conditional("DEBUG"), System.Diagnostics.DebuggerStepThrough]
         static void SetDebug() {
             IsDebug = true;
         }
@@ -536,6 +536,7 @@ namespace aphrodite {
                     return false;
             }
         }
+
         [System.Diagnostics.DebuggerStepThrough]
         public static bool QuickLog(string LogMessage) {
             if (LogEnabled && Logger != null) {
