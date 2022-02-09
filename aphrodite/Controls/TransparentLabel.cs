@@ -1,112 +1,57 @@
-﻿using System.Drawing;
+﻿using System;
+using System.ComponentModel;
+using System.Drawing;
 using System.Windows.Forms;
 
-namespace aphrodite.Controls {
+namespace murrty.controls {
+
+    /// <summary>
+    /// Represents a label that does not render a background, rendering it as standard text.
+    /// </summary>
     [System.Diagnostics.DebuggerStepThrough]
     internal class TransparentLabel : Control {
+
+        #region Fields
         /// <summary>
-        /// Creates a new <see cref="TransparentLabel"/> instance.
+        /// The <see cref="ContentAlignment"/> of the current label.
         /// </summary>
-        public TransparentLabel() {
-            TabStop = false;
-        }
+        private ContentAlignment fContentAlignment = ContentAlignment.MiddleLeft;
+        #endregion
 
+        #region Properties
         /// <summary>
-        /// Gets the creation parameters.
+        /// Gets or sets the font of the text displayed by the control.
         /// </summary>
-        protected override CreateParams CreateParams {
-            get {
-                CreateParams cp = base.CreateParams;
-                cp.ExStyle |= 0x20;
-                return cp;
-            }
-        }
-
-        /// <summary>
-        /// Paints the background.
-        /// </summary>
-        /// <param name="e">E.</param>
-        protected override void OnPaintBackground(PaintEventArgs e) {
-            // do nothing
-        }
-
-        /// <summary>
-        /// Paints the control.
-        /// </summary>
-        /// <param name="e">E.</param>
-        protected override void OnPaint(PaintEventArgs e) {
-            DrawText();
-        }
-
-        protected override void WndProc(ref Message m) {
-            base.WndProc(ref m);
-            if (m.Msg == 0x000F) {
-                DrawText();
-            }
-        }
-
-        private void DrawText() {
-            using (Graphics graphics = CreateGraphics())
-            using (SolidBrush brush = new SolidBrush(ForeColor)) {
-                SizeF size = graphics.MeasureString(Text, Font);
-
-                // first figure out the top
-                float top = 0;
-                switch (textAlign) {
-                    case ContentAlignment.MiddleLeft:
-                    case ContentAlignment.MiddleCenter:
-                    case ContentAlignment.MiddleRight:
-                        top = (Height - size.Height) / 2;
-                        break;
-                    case ContentAlignment.BottomLeft:
-                    case ContentAlignment.BottomCenter:
-                    case ContentAlignment.BottomRight:
-                        top = Height - size.Height;
-                        break;
-                }
-
-                float left = -1;
-                switch (textAlign) {
-                    case ContentAlignment.TopLeft:
-                    case ContentAlignment.MiddleLeft:
-                    case ContentAlignment.BottomLeft:
-                        if (RightToLeft == RightToLeft.Yes)
-                            left = Width - size.Width;
-                        else
-                            left = -1;
-                        break;
-                    case ContentAlignment.TopCenter:
-                    case ContentAlignment.MiddleCenter:
-                    case ContentAlignment.BottomCenter:
-                        left = (Width - size.Width) / 2;
-                        break;
-                    case ContentAlignment.TopRight:
-                    case ContentAlignment.MiddleRight:
-                    case ContentAlignment.BottomRight:
-                        if (RightToLeft == RightToLeft.Yes)
-                            left = -1;
-                        else
-                            left = Width - size.Width;
-                        break;
-                }
-                graphics.DrawString(Text, Font, brush, left, top);
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the text associated with this control.
-        /// </summary>
+        /// <value></value>
         /// <returns>
-        /// The text associated with this control.
+        /// The <see cref="T:System.Drawing.Font"/> to apply to the text displayed by the control. The default is the value of the <see cref="P:System.Windows.Forms.Control.DefaultFont"/> property.
         /// </returns>
-        public override string Text {
+        [Category("Appearance")]
+        [DefaultValue(default(Font))]
+        [Description("The font that the label will use when rendering text.")]
+        public new Font Font {
             get {
-                return base.Text;
+                return base.Font;
             }
             set {
-                base.Text = value;
-                RecreateHandle();
+                base.Font = value;
+                base.RecreateHandle();
             }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the mouse will pass-through the control to any underlying components.
+        /// </summary>
+        /// <value></value>
+        /// <returns>
+        /// Whether the mouse will pass-through the control.
+        /// </returns>
+        [Category("Behavior")]
+        [DefaultValue(false)]
+        [Description("Indicates that the mouse will be passed through the control to any underlying components.")]
+        public bool MousePassthrough {
+            get;
+            set;
         }
 
         /// <summary>
@@ -119,6 +64,9 @@ namespace aphrodite.Controls {
         /// <exception cref="T:System.ComponentModel.InvalidEnumArgumentException">
         /// The assigned value is not one of the <see cref="T:System.Windows.Forms.RightToLeft"/> values.
         /// </exception>
+        [Category("Appearance")]
+        [DefaultValue(false)]
+        [Description("The alignment of the text on the control.")]
         public override RightToLeft RightToLeft {
             get {
                 return base.RightToLeft;
@@ -130,32 +78,158 @@ namespace aphrodite.Controls {
         }
 
         /// <summary>
-        /// Gets or sets the font of the text displayed by the control.
+        /// Gets or sets the text alignment.
         /// </summary>
         /// <value></value>
         /// <returns>
-        /// The <see cref="T:System.Drawing.Font"/> to apply to the text displayed by the control. The default is the value of the <see cref="P:System.Windows.Forms.Control.DefaultFont"/> property.
+        /// The <see cref="T:System.Drawing.ContentAlignment"/> to align the text on the control. The default value is <see cref="F:System.Drawing.ContentAlignment.MiddleLeft"/>.
         /// </returns>
-        public override Font Font {
+        /// <exception cref="T:System.ComponentModel.InvalidEnumArgumentException">
+        /// The assigned value is not one of the <see cref="T:System.Windows.Forms.ContentAlignment"/> values.
+        /// </exception>
+        [Category("Appearance")]
+        [DefaultValue(ContentAlignment.MiddleLeft)]
+        [Description("The alignment of the text on the control.")]
+        public ContentAlignment TextAlign {
             get {
-                return base.Font;
+                return fContentAlignment;
             }
             set {
-                base.Font = value;
-                RecreateHandle();
+                fContentAlignment = value;
+                base.RecreateHandle();
             }
         }
 
-        private ContentAlignment textAlign = ContentAlignment.TopLeft;
         /// <summary>
-        /// Gets or sets the text alignment.
+        /// Gets or sets the text associated with this control.
         /// </summary>
-        public ContentAlignment TextAlign {
-            get { return textAlign; }
+        /// <returns>
+        /// The text associated with this control.
+        /// </returns>
+        [Category("Appearance")]
+        [Description("The alignment of the text on the control.")]
+        public override string Text {
+            get {
+                return base.Text;
+            }
             set {
-                textAlign = value;
+                base.Text = value;
                 RecreateHandle();
             }
         }
+        #endregion
+
+        #region Native Methods
+        /// <summary>
+        /// WindowProc message to tell the control to paint itself.
+        /// </summary>
+        private const int WM_PAINT = 0x000F;
+        /// <summary>
+        /// Param for the control to be transparent-aware.
+        /// </summary>
+        private const int WS_EX_TRANSPARENT = 0x0020;
+
+        /// <summary>
+        /// Sent as a WndProc message to determine where the cursor is.
+        /// </summary>
+        private const int WM_NCHITTEST = 0x0084;
+        /// <summary>
+        /// WM_NCHITTEST result for the cursor hit to be in a different window in the same thread.
+        /// The same message is sent to underlying controls until one of them doesn't respond with it.
+        /// </summary>
+        private const int HTTRANSPARENT = -1;
+        #endregion
+
+        #region Constructor
+        /// <summary>
+        /// Creates a new <see cref="TransparentLabel"/> instance.
+        /// </summary>
+        public TransparentLabel() {
+            TabStop = false;
+        }
+        #endregion
+
+        #region Overrides
+        /// <summary>
+        /// Gets the creation parameters.
+        /// </summary>
+        protected override CreateParams CreateParams {
+            get {
+                CreateParams cp = base.CreateParams;
+                cp.ExStyle |= 0x20;
+                return cp;
+            }
+        }
+
+        protected override void WndProc(ref Message m) {
+            base.WndProc(ref m);
+            switch (m.Msg) {
+                case WM_NCHITTEST: {
+                    if (MousePassthrough) m.Result = (IntPtr)HTTRANSPARENT;
+                    else base.WndProc(ref m);
+                } break;
+
+                case 0x000F: {
+                    DrawText();
+                } break;
+            }
+        }
+
+        /// <summary>
+        /// Paints the control background.
+        /// </summary>
+        /// <param name="e">EventArgs regarding the painting event, not used in this control.</param>
+        protected override void OnPaintBackground(PaintEventArgs e) {
+            if (DesignMode) {
+                e.Graphics.DrawRectangle(Pens.Black, this.Location.X, this.Location.Y, this.Width, this.Height);
+            }
+        }
+
+        /// <summary>
+        /// Paints the control text.
+        /// </summary>
+        /// <param name="e">EventArgs regarding the painting event, not used in this control.</param>
+        protected override void OnPaint(PaintEventArgs e) => DrawText();
+        #endregion
+
+        #region Methods
+        private void DrawText() {
+            using Graphics TextGraphics = CreateGraphics();
+            using SolidBrush TextBrush = new(ForeColor);
+            SizeF size = TextGraphics.MeasureString(Text, Font);
+
+            // first figure out the top
+            float TopMargin = fContentAlignment switch {
+                ContentAlignment.MiddleLeft or
+                ContentAlignment.MiddleCenter or
+                ContentAlignment.MiddleRight => (Height - size.Height) / 2,
+
+                ContentAlignment.BottomLeft or
+                ContentAlignment.BottomCenter or
+                ContentAlignment.BottomRight => (Height - size.Height),
+
+                _=> 0
+            };
+
+            float LeftMargin = fContentAlignment switch {
+                ContentAlignment.TopLeft or
+                ContentAlignment.MiddleLeft or
+                ContentAlignment.BottomLeft => RightToLeft == RightToLeft.Yes ? (Width - size.Width) : -1,
+
+                ContentAlignment.TopCenter or
+                ContentAlignment.MiddleCenter or
+                ContentAlignment.BottomCenter => (Width - size.Width) / 2,
+
+                ContentAlignment.TopRight or
+                ContentAlignment.MiddleRight or
+                ContentAlignment.BottomRight => RightToLeft == RightToLeft.Yes ? -1 : (Width - size.Width),
+
+                _ => 0
+            };
+
+            TextGraphics.DrawString(Text, Font, TextBrush, LeftMargin, TopMargin);
+        }
+        #endregion
+
     }
 }

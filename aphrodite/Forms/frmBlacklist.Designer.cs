@@ -33,8 +33,8 @@
             this.btnSortBlacklist = new murrty.controls.ExtendedButton();
             this.llGraylist = new murrty.controls.ExtendedLinkLabel();
             this.llBlacklist = new murrty.controls.ExtendedLinkLabel();
-            this.lbBlacklist = new aphrodite.Controls.TransparentLabel();
-            this.lbGraylist = new aphrodite.Controls.TransparentLabel();
+            this.lbBlacklist = new murrty.controls.TransparentLabel();
+            this.lbGraylist = new murrty.controls.TransparentLabel();
             this.pnLower.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -155,8 +155,11 @@
             // lbBlacklist
             // 
             this.lbBlacklist.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lbBlacklist.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbBlacklist.Location = new System.Drawing.Point(260, 7);
+            this.lbBlacklist.MousePassthrough = true;
             this.lbBlacklist.Name = "lbBlacklist";
+            this.lbBlacklist.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.lbBlacklist.Size = new System.Drawing.Size(46, 13);
             this.lbBlacklist.TabIndex = 11;
             this.lbBlacklist.TabStop = false;
@@ -165,8 +168,11 @@
             // 
             // lbGraylist
             // 
+            this.lbGraylist.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbGraylist.Location = new System.Drawing.Point(13, 7);
+            this.lbGraylist.MousePassthrough = true;
             this.lbGraylist.Name = "lbGraylist";
+            this.lbGraylist.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.lbGraylist.Size = new System.Drawing.Size(41, 13);
             this.lbGraylist.TabIndex = 10;
             this.lbGraylist.TabStop = false;
@@ -217,7 +223,7 @@
         private System.Windows.Forms.Label lbMutual;
         private murrty.controls.ExtendedLinkLabel llBlacklist;
         private murrty.controls.ExtendedLinkLabel llGraylist;
-        private Controls.TransparentLabel lbGraylist;
-        private Controls.TransparentLabel lbBlacklist;
+        private murrty.controls.TransparentLabel lbGraylist;
+        private murrty.controls.TransparentLabel lbBlacklist;
     }
 }
