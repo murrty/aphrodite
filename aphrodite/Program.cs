@@ -19,7 +19,7 @@ namespace aphrodite {
         /// <summary>
         /// The beta version of the program (if <see cref="IsBetaVersion"/> is true).
         /// </summary>
-        public const string BetaVersion = "2.2-pre1";
+        public const string BetaVersion = "2.3-pre1";
         /// <summary>
         /// The const delay for when threads sleep.
         /// </summary>
