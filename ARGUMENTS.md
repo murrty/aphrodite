@@ -5,19 +5,19 @@ When dealing with arguments that contain spaces in them (such as multiple tags, 
 
 **The following arguments are supported:**
 
-* "t", "-t", "tag", "-tag", "tags", "-tags" <tags>
+* "t", "-t", "tag", "-tag", "tags", "-tags" [tags]
 	* This downloads tags from e621. If you use this argument with "configuresettings", it will open the tags tab on the settings form.
 	* (If the identifier argument is the only one passed, the main form will show with the tags tab activated.)
 
-* "pg", "-pg", "page", "-page" <page>
+* "pg", "-pg", "page", "-page" [page url]
 	* This downloads a specified page from e621. It takes into account page, tags, and image limit. If you use this argument with "configuresettings", it will open the tags tab on the settings form.
 	* (If the identifier argument is the only one passed, the main form will show with the pool tab activated.)
 
-* "p", "-p", "pool", "-pool", "pools", "-pools" <pool url/id>
+* "p", "-p", "pool", "-pool", "pools", "-pools" [pool url/id]
 	* This downloads a pool from e621. If you use this argument with "configuresettings", it will open the pool tab on the settings form.
 	* (If the identifier argument is the only one passed, the main form will show with the images tab activated.)
 
-* "i", "-i", "image", "-image", "images", "-images" <image url/id>
+* "i", "-i", "image", "-image", "images", "-images" [image url/id]
 	* This downloads an image from e621. If you use this argument with "configuresettings", it will open the images tab on the settings form.
 	* (If the identifier argument is the only one passed, the main form will show with the images tab activated.)
 

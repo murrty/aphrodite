@@ -10,7 +10,7 @@ You can also use arguments. Refer to the [arguments readme](https://github.com/m
 # Protocol & Userscript plugin
 Yes, just like everything else, this supports a protocol. "Pools:" and "Tags:" are the ones used. Run the program as admin, click the "Protocol" item at the top of the program and it'll automatically attempt to install it for you.
 
-The userscript plugin is available [(here)](https://github.com/murrty/aphrodite/raw/master/Resources/aphrodite.user.js). There will be buttons on the search page, image page (if it is in a pool), and the pool page.
+The userscript plugin is available [(here)](https://github.com/murrty/aphrodite/raw/master/addons/aphrodite.user.js). There will be buttons on the search page, image page (if it is in a pool), and the pool page.
 
 # Blacklist
 There are 2 blacklists, 1 is a "graylist" so to speak, which will download any files with those tags but will move them to a separate folder titled "blacklist". The other list is a zero-tolerance blacklist which will NOT download any files if they contain any one of the tags added. If you want specific pictures, be sure to include more than one tag and use the rating option to not include explicit images.
