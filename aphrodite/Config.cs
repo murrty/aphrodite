@@ -105,6 +105,7 @@ namespace aphrodite {
         /// Saves all configurations.
         /// </summary>
         public void Save() {
+            Initialization.Save();
             FormSettings.Save();
             General.Save();
             Tags.Save();

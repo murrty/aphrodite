@@ -86,6 +86,7 @@ namespace aphrodite {
                         "Just so you know."
                     );
                     Config.Settings.Initialization.FirstTime = false;
+                    Config.Settings.Initialization.Save();
                 }
                 Config.Settings.FormSettings.Load();
                 Arguments.ParseArguments(args);
