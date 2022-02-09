@@ -127,10 +127,11 @@
             // 
             this.llGraylist.ActiveLinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.llGraylist.AutoSize = true;
+            this.llGraylist.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.llGraylist.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(102)))), ((int)(((byte)(204)))));
-            this.llGraylist.Location = new System.Drawing.Point(53, 7);
+            this.llGraylist.Location = new System.Drawing.Point(51, 3);
             this.llGraylist.Name = "llGraylist";
-            this.llGraylist.Size = new System.Drawing.Size(12, 13);
+            this.llGraylist.Size = new System.Drawing.Size(14, 17);
             this.llGraylist.TabIndex = 9;
             this.llGraylist.TabStop = true;
             this.llGraylist.Text = "?";
@@ -142,10 +143,11 @@
             this.llBlacklist.ActiveLinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.llBlacklist.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.llBlacklist.AutoSize = true;
+            this.llBlacklist.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.llBlacklist.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(102)))), ((int)(((byte)(204)))));
-            this.llBlacklist.Location = new System.Drawing.Point(303, 7);
+            this.llBlacklist.Location = new System.Drawing.Point(302, 3);
             this.llBlacklist.Name = "llBlacklist";
-            this.llBlacklist.Size = new System.Drawing.Size(12, 13);
+            this.llBlacklist.Size = new System.Drawing.Size(14, 17);
             this.llBlacklist.TabIndex = 8;
             this.llBlacklist.TabStop = true;
             this.llBlacklist.Text = "?";
@@ -157,14 +159,12 @@
             this.lbBlacklist.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lbBlacklist.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbBlacklist.Location = new System.Drawing.Point(260, 7);
-            this.lbBlacklist.MousePassthrough = true;
             this.lbBlacklist.Name = "lbBlacklist";
             this.lbBlacklist.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.lbBlacklist.Size = new System.Drawing.Size(46, 13);
             this.lbBlacklist.TabIndex = 11;
             this.lbBlacklist.TabStop = false;
             this.lbBlacklist.Text = "Blacklist";
-            this.lbBlacklist.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
             // lbGraylist
             // 
@@ -177,7 +177,6 @@
             this.lbGraylist.TabIndex = 10;
             this.lbGraylist.TabStop = false;
             this.lbGraylist.Text = "Graylist";
-            this.lbGraylist.TextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
             // frmBlacklist
             // 
@@ -186,15 +185,15 @@
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(502, 323);
-            this.Controls.Add(this.llGraylist);
-            this.Controls.Add(this.llBlacklist);
             this.Controls.Add(this.btnSortBlacklist);
             this.Controls.Add(this.btnSortGraylist);
             this.Controls.Add(this.pnLower);
-            this.Controls.Add(this.lbBlacklist);
             this.Controls.Add(this.lbGraylist);
             this.Controls.Add(this.rtbBlacklist);
             this.Controls.Add(this.rtbGraylist);
+            this.Controls.Add(this.lbBlacklist);
+            this.Controls.Add(this.llGraylist);
+            this.Controls.Add(this.llBlacklist);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = global::aphrodite.Properties.Resources.Brad;
             this.MaximizeBox = false;

@@ -169,7 +169,7 @@ namespace aphrodite {
         public string PageDisplayedImagesCount;
 
         /// <summary>
-        /// Initializes new TagDownloadInfo for downloading specified tags.
+        /// Initializes a new <see cref="TagDownloadInfo"/> for downloading specified tags.
         /// </summary>
         /// <param name="InputTags"></param>
         public TagDownloadInfo(string InputTags, DownloadSite Site = DownloadSite.None) {
@@ -180,6 +180,16 @@ namespace aphrodite {
 
             this.Site = Site;
 
+            BaseTags = InputTags
+                .Replace("%25-2F", "/")
+                .Replace("+", " ")
+                .Replace("%2B", "+")
+                .Replace("%3A", ":")
+                .Replace("%3B", ";")
+                .Replace("%3D", "=")
+                .Replace("%24", "$")
+                .Replace("%40", "@");
+
             Tags = InputTags
                 .Replace("/", "%25-2F")
                 .Replace(" ", "+")
@@ -189,16 +199,6 @@ namespace aphrodite {
                 .Replace("=", "%3D")
                 .Replace("$", "%24")
                 .Replace("@", "%40");
-
-            BaseTags = Tags
-                .Replace("%25-2F", "/")
-                .Replace("+", " ")
-                .Replace("%2B", "+")
-                .Replace("%3A", ":")
-                .Replace("%3B", ";")
-                .Replace("%3D", "=")
-                .Replace("%24", "$")
-                .Replace("%40", "@");
 
             PageUrl = null;
             FromUrl = false;
@@ -233,7 +233,7 @@ namespace aphrodite {
         }
 
         /// <summary>
-        /// Initializes new TagDownloadInfo for downloading a page.
+        /// Initializes a new <see cref="TagDownloadInfo"/> for downloading a page.
         /// </summary>
         /// <param name="InputPage"></param>
         /// <param name="IsPage"></param>
@@ -295,8 +295,25 @@ namespace aphrodite {
                 } break;
             }
 
-            Tags = Tags.Replace("%25-2F", "/").Replace("+", " ");
-            BaseTags = Site == DownloadSite.FurryBooru && Tags.ToLower() == "all" ? "[no tags]" : Tags;
+            BaseTags = Site == DownloadSite.FurryBooru && Tags.ToLower() == "all" ? "[no tags]" :
+                Tags.Replace("%2B", "+")
+                    .Replace("+", " ")
+                    .Replace("%25-2F", "/")
+                    .Replace("%3A", ":")
+                    .Replace("%3B", ";")
+                    .Replace("%3D", "=")
+                    .Replace("%24", "$")
+                    .Replace("%40", "@");
+
+            Tags = Tags
+                .Replace("+", "%2B")
+                .Replace(" ", "+")
+                .Replace("/", "%25-2F")
+                .Replace(":", "%3A")
+                .Replace(";", "%3B")
+                .Replace("=", "%3D")
+                .Replace("$", "%24")
+                .Replace("@", "%40");
 
             DownloadPath += $"{(Site == DownloadSite.FurryBooru ? "\\FurryBooru" : "")}\\Page";
 
@@ -342,8 +359,22 @@ namespace aphrodite {
         /// </summary>
         public string FileNameSchema;
 
+        /// <summary>
+        /// Initializes a new <see cref="PoolDownloadInfo"/> for downloading a pool.
+        /// </summary>
+        /// <param name="RequestedPool">The ID or URL of the pool to download.</param>
         public PoolDownloadInfo(string RequestedPool) {
             if (string.IsNullOrWhiteSpace(RequestedPool)) {
+                Valid = false;
+                return;
+            }
+            if (ApiTools.IsValidPoolLink(RequestedPool)) {
+                PoolId = ApiTools.GetPoolOrPostId(RequestedPool);
+            }
+            else if (ApiTools.IsNumericOnly(RequestedPool)) {
+                PoolId = RequestedPool;
+            }
+            else {
                 Valid = false;
                 return;
             }
@@ -363,15 +394,43 @@ namespace aphrodite {
     /// Class for image downloads, containing instance-related information for that current download.
     /// </summary>
     public class ImageDownloadInfo : DownloadInfo {
+        /// <summary>
+        /// Whether the image downloader should use the form.
+        /// If false, the download will proceed in the background.
+        /// </summary>
         public bool UseForm;
+        /// <summary>
+        /// The URL of the image.
+        /// </summary>
         public string ImageUrl;
+        /// <summary>
+        /// The ID of the post.
+        /// </summary>
         public string PostId;
+        /// <summary>
+        /// The name of the file.
+        /// </summary>
         public string FileName;
 
+        /// <summary>
+        /// Whether to separate ratings into their own folder.
+        /// </summary>
         public bool SeparateRatings;
+        /// <summary>
+        /// Whether to separate graylisted files into their own folder.
+        /// </summary>
         public bool SeparateGraylisted;
+        /// <summary>
+        /// Whether to separate non-image files into their own folder.
+        /// </summary>
         public bool SeparateNonImages;
+        /// <summary>
+        /// Whether to separate files into a folder based on the artist tags.
+        /// </summary>
         public bool SeparateArtists;
+        /// <summary>
+        /// Whether the separate blacklisted files into their own folder.
+        /// </summary>
         public bool SeparateBlacklisted;
 
         /// <summary>
@@ -379,6 +438,10 @@ namespace aphrodite {
         /// </summary>
         public string FileNameSchema;
 
+        /// <summary>
+        /// Initializes a new <see cref="ImageDownloadInfo"/> for downloading single images.
+        /// </summary>
+        /// <param name="Image">The ID or URL of the image to download.</param>
         public ImageDownloadInfo(string Image) {
             if (string.IsNullOrWhiteSpace(Image)) {
                 Valid = false;
@@ -387,10 +450,14 @@ namespace aphrodite {
 
             if (ApiTools.IsValidImageLink(Image)) {
                 ImageUrl = Image;
-                PostId = Image.Substring(Image.IndexOf("e621.net")).Split('/')[2].Split('?')[0];
+                PostId = ApiTools.GetPoolOrPostId(Image); //Image.Substring(Image.IndexOf("e621.net")).Split('/')[2].Split('?')[0];
+            }
+            else if (ApiTools.IsNumericOnly(Image)){
+                PostId = Image;
             }
             else {
-                PostId = Image;
+                Valid = false;
+                return;
             }
 
             DownloadPath += "\\Images";
@@ -574,6 +641,12 @@ namespace aphrodite {
         /// </summary>
         public int PageLimit;
 
+        /// <summary>
+        /// Initializes a new <see cref="InkBunnyDownloadInfo"/> for downloading files off InkBunny.
+        /// </summary>
+        /// <param name="Keywords">The Keywords (or MD5 hash) to search InkBunny with.</param>
+        /// <param name="ArtistGallery">The Artist Username (or ID?) to search InkBunny with.</param>
+        /// <param name="UsersFavorites">The User ID to search InkBunny with.</param>
         public InkBunnyDownloadInfo(string Keywords, string ArtistGallery, string UsersFavorites) {
             if (string.IsNullOrWhiteSpace(Keywords) && string.IsNullOrWhiteSpace(ArtistGallery) && string.IsNullOrWhiteSpace(UsersFavorites)) {
                 this.Valid = false;
@@ -671,6 +744,10 @@ namespace aphrodite {
         /// </summary>
         public int ImageLimit;
 
+        /// <summary>
+        /// Initializes a new <see cref="ImgurDownloadInfo"/> for downloading albums from Imgur.
+        /// </summary>
+        /// <param name="Album">The album ID or URL to download.</param>
         public ImgurDownloadInfo(string Album) {
             if (string.IsNullOrWhiteSpace(Album)) {
                 Valid = false;

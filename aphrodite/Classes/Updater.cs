@@ -8,8 +8,8 @@ namespace aphrodite {
     class Updater {
 
         private const string GithubURL = "https://github.com/murrty/aphrodite";
-        private const string LatestReleaseJSON = "https://api.github.com/repos/murrty/UpdateTestRepo/releases/latest";
-        private const string LatestAllJSON = "https://api.github.com/repos/murrty/UpdateTestRepo/releases";
+        private const string LatestReleaseJSON = "https://api.github.com/repos/murrty/aphrodite/releases/latest";
+        private const string LatestAllJSON = "https://api.github.com/repos/murrty/aphrodite/releases";
 
         /// <summary>
         /// Checks for updates on Github
@@ -87,6 +87,7 @@ namespace aphrodite {
                         XmlNodeList xmlHeader = xmlDoc.DocumentElement.SelectNodes("/root/item/name");
                         XmlNodeList xmlBody = xmlDoc.DocumentElement.SelectNodes("/root/item/body");
                         if (xmlTag.Count > 0) {
+                            Log.Write("API data contains a valid tag_name node.");
                             Git.Data.UpdateChecked = UpdateType.PreRelease;
                             Git.Data.UpdateHeader = xmlHeader[0].InnerText;
                             Git.Data.UpdateBody = xmlBody[0].InnerText;
@@ -110,6 +111,7 @@ namespace aphrodite {
                                     Log.Write($"Update v{Git.Data.UpdatePreReleaseVersion} is available, but this version is being skipped.");
                                     return true;
                                 }
+                                Log.Write($"Update v{Git.Data.UpdatePreReleaseVersion} is available.");
 
                                 ShowUpdateForm(true, ForceCheck);
                                 return true;
@@ -119,7 +121,7 @@ namespace aphrodite {
                             }
                             return false;
                         }
-                        else throw new ApiReturnedNullOrEmptyException("The xmlTag count was 0 and cannot be parsed.");
+                        else throw new ApiReturnedNullOrEmptyException("The xmlTag node count was 0 and cannot be parsed.");
                     }
                     else {
                         Log.Write("Parsing API data for a release...");
@@ -127,6 +129,7 @@ namespace aphrodite {
                         XmlNodeList xmlHeader = xmlDoc.DocumentElement.SelectNodes("/root/name");
                         XmlNodeList xmlBody = xmlDoc.DocumentElement.SelectNodes("/root/body");
                         if (xmlTag.Count > 0) {
+                            Log.Write("API data contains a valid tag_name node.");
                             Git.Data.UpdateChecked = UpdateType.Release;
                             Git.Data.UpdateHeader = xmlHeader[0].InnerText;
                             Git.Data.UpdateBody = xmlBody[0].InnerText;
@@ -154,6 +157,8 @@ namespace aphrodite {
                                     Log.Write($"Update v{Git.Data.UpdateLatestVersion} is available, but this version is being skipped.");
                                     return true;
                                 }
+                                Log.Write($"Update v{Git.Data.UpdateLatestVersion} is available.");
+
                                 ShowUpdateForm(false, ForceCheck);
                                 return true;
                             }
@@ -163,7 +168,7 @@ namespace aphrodite {
                             return false;
 
                         }
-                        else throw new ApiReturnedNullOrEmptyException("The xmlTag count was 0 and cannot be parsed.");
+                        else throw new ApiReturnedNullOrEmptyException("The xmlTag node count was 0 and cannot be parsed.");
                     }
                 }
             }

@@ -54,7 +54,7 @@ namespace murrty.controls {
         #region Native Methods
 
         private const int BCM_FIRST = 0x1600;
-        private const int BCM_SETSHIELD = BCM_FIRST + 0x000C;
+        private const int BCM_SETSHIELD = 0x160C;
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern IntPtr SendMessage(IntPtr hWnd, int wMsg, IntPtr wParam, IntPtr lParam);

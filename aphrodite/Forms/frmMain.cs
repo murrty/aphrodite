@@ -52,7 +52,7 @@ namespace aphrodite {
             txtImageUrl.Refresh();
         }
         private void frmMain_Load(object sender, EventArgs e) {
-            if (Config.Settings.Initialization.CheckForUpdates || Program.IsDebug) {
+            if (Config.Settings.Initialization.CheckForUpdates && !Program.IsDebug) {
                 UpdateCheckThread = new(() => {
                     try {
                         if (Updater.CheckForUpdate(false)) {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace aphrodite {
 
@@ -228,7 +229,7 @@ namespace aphrodite {
                                                 switch (ArgumentDialog.ShowDialog()) {
                                                     case System.Windows.Forms.DialogResult.Yes: {
                                                         ArgumentType = ArgumentType.DownloadPools;
-                                                        ArgumentData = NewArgumentData;
+                                                        ArgumentData = ArgumentDialog.AppendedArgument;
                                                     }
                                                     break;
 
@@ -289,7 +290,7 @@ namespace aphrodite {
                                                 switch (ArgumentDialog.ShowDialog()) {
                                                     case System.Windows.Forms.DialogResult.Yes: {
                                                         ArgumentType = ArgumentType.DownloadImages;
-                                                        ArgumentData = NewArgumentData;
+                                                        ArgumentData = ArgumentDialog.AppendedArgument;
                                                     }
                                                     break;
 
@@ -501,6 +502,9 @@ namespace aphrodite {
                             case "-fb":
                             case "furrybooru":
                             case "-furrybooru": {
+                                ArgumentType = ArgumentType.ShowFurryBooru;
+                                break;
+
                                 if (Arguments.Length > 1) {
                                     switch (Arguments[1].ToLower()) {
                                         case "configuresettings": {
@@ -531,9 +535,76 @@ namespace aphrodite {
                                         } break;
 
                                         default: {
-                                            NewArgumentData = Arguments.Length > 2 ? System.Web.HttpUtility.UrlDecode(string.Join(" ", Arguments, 1, Arguments.Length - 1)) : Arguments[1].Trim('"');
+                                            NewArgumentData = NewArgumentData.Trim('"');
 
+                                            int Index = Array.FindIndex(Arguments, X => X.ToLower() == "keywords" || X.ToLower() == "-keywords");
+                                            string KeywordsTemp = Index > -1 && Arguments.Length >= Index + 1 ? Arguments[Index] : null;
 
+                                            Index = Array.FindIndex(Arguments, X => X.ToLower() == "artist" || X.ToLower() == "-artist");
+                                            string ArtistGalleryTemp = Index > -1 && Arguments.Length >= Index + 1 ? Arguments[Index] : null;
+
+                                            Index = Array.FindIndex(Arguments, X => X.ToLower() == "userfav" || X.ToLower() == "-userfav");
+                                            string UserFavsTemp = Index > -1 && Arguments.Length >= Index + 1 ? Arguments[Index] : null;
+
+                                            if (KeywordsTemp == null && ArtistGalleryTemp == null && UserFavsTemp == null) {
+                                                if (Arguments.Length > 2) {
+                                                    if (Config.Settings.Initialization.AutoDownloadWithArguments) {
+                                                        using frmArgument ArgumentDialog = new(NewArgumentData, DownloadType.InkBunny);
+                                                        switch (ArgumentDialog.ShowDialog()) {
+                                                            case System.Windows.Forms.DialogResult.Yes: {
+                                                                ArgumentType = ArgumentType.DownloadInkBunny;
+                                                                ArgumentData = NewArgumentData;
+                                                            } break;
+
+                                                            case System.Windows.Forms.DialogResult.No: {
+                                                                ArgumentType = ArgumentType.PushInkBunny;
+                                                                ArgumentData = NewArgumentData;
+                                                            } break;
+
+                                                            case System.Windows.Forms.DialogResult.Cancel: {
+                                                                ArgumentType = ArgumentType.CancelledArgumentsDownload;
+                                                                ArgumentData = null;
+                                                            } break;
+                                                        }
+                                                    }
+                                                    else {
+                                                        Log.Write("tags argument has tags, but the program is not configured to auto-download.");
+                                                        ArgumentType = ArgumentType.PushInkBunny;
+                                                        ArgumentData = NewArgumentData;
+                                                    }
+                                                }
+                                                else {
+                                                    ArgumentType = ArgumentType.PushInkBunny;
+                                                    ArgumentData = null;
+                                                }
+                                            }
+                                            else {
+                                                string[] InkBunnyArguments = new string[] { KeywordsTemp, ArtistGalleryTemp, UserFavsTemp };
+                                                if (Config.Settings.Initialization.AutoDownloadWithArguments) {
+                                                    using frmArgument ArgumentDialog = new(NewArgumentData, DownloadType.InkBunny);
+                                                    switch (ArgumentDialog.ShowDialog()) {
+                                                        case System.Windows.Forms.DialogResult.Yes: {
+                                                            ArgumentType = ArgumentType.DownloadInkBunny;
+                                                            ArgumentDataArray = ArgumentDialog.BaseArguments;
+                                                        } break;
+
+                                                        case System.Windows.Forms.DialogResult.No: {
+                                                            ArgumentType = ArgumentType.PushInkBunny;
+                                                            ArgumentDataArray = InkBunnyArguments;
+                                                        } break;
+
+                                                        case System.Windows.Forms.DialogResult.Cancel: {
+                                                            ArgumentType = ArgumentType.CancelledArgumentsDownload;
+                                                            ArgumentData = null;
+                                                        } break;
+                                                    }
+                                                }
+                                                else {
+                                                    Log.Write("tags argument has tags, but the program is not configured to auto-download.");
+                                                    ArgumentType = ArgumentType.PushInkBunny;
+                                                    ArgumentDataArray = InkBunnyArguments;
+                                                }
+                                            }
                                         } break;
                                     }
                                 }
@@ -553,9 +624,45 @@ namespace aphrodite {
                                         } break;
 
                                         default: {
-                                            // Imgur shit here.
                                             NewArgumentData = NewArgumentData.Trim('"');
+                                            if (ApiTools.IsValidImgurLink(NewArgumentData)) {
+                                                NewArgumentData =
+                                                    NewArgumentData
+                                                    .Substring(NewArgumentData.IndexOf("/a/") + 3)
+                                                    .Split('/')[0]
+                                                    .Split('?')[0]
+                                                    .Split('#')[0];
+                                            }
 
+                                            if (ApiTools.IsNumericOnly(NewArgumentData)) {
+                                                if (Config.Settings.Initialization.AutoDownloadWithArguments) {
+                                                    using frmArgument ArgumentDialog = new(NewArgumentData, DownloadType.Imgur);
+                                                    switch (ArgumentDialog.ShowDialog()) {
+                                                        case System.Windows.Forms.DialogResult.Yes: {
+                                                            ArgumentType = ArgumentType.DownloadImgur;
+                                                            ArgumentData = ArgumentDialog.AppendedArgument;
+                                                        }
+                                                        break;
+
+                                                        case System.Windows.Forms.DialogResult.No: {
+                                                            ArgumentType = ArgumentType.PushImgur;
+                                                            ArgumentData = NewArgumentData;
+                                                        }
+                                                        break;
+
+                                                        case System.Windows.Forms.DialogResult.Cancel: {
+                                                            ArgumentType = ArgumentType.CancelledArgumentsDownload;
+                                                            ArgumentData = null;
+                                                        }
+                                                        break;
+                                                    }
+                                                }
+                                                else {
+                                                    Log.Write("tags argument has tags, but the program is not configured to auto-download.");
+                                                    ArgumentType = ArgumentType.PushImgur;
+                                                    ArgumentData = NewArgumentData;
+                                                }
+                                            }
                                         } break;
                                     }
                                 }

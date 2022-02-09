@@ -85,6 +85,7 @@ namespace aphrodite {
             Config.Settings.Initialization.AutoDownloadWithArguments = chkAutoDownloadWithArguments.Checked;
             Config.Settings.Initialization.ArgumentFormTopMost = chkArgumentFormTopMost.Checked;
             Config.Settings.Initialization.CheckForUpdates = chkCheckForUpdates.Checked;
+            Config.Settings.Initialization.CheckForBetaUpdates = chkCheckForBetaUpdates.Checked;
 
           // Tags
             switch (string.IsNullOrWhiteSpace(txtTagSchema.Text)) {
@@ -162,6 +163,7 @@ namespace aphrodite {
             chkAutoDownloadWithArguments.Checked = Config.Settings.Initialization.AutoDownloadWithArguments;
             chkArgumentFormTopMost.Checked = Config.Settings.Initialization.ArgumentFormTopMost;
             chkCheckForUpdates.Checked = Config.Settings.Initialization.CheckForUpdates;
+            chkCheckForBetaUpdates.Checked = Config.Settings.Initialization.CheckForBetaUpdates;
 
             // Tags
             txtTagSchema.Text = ApiTools.ReplaceIllegalCharacters(Config.Settings.Tags.fileNameSchema.ToLower());
@@ -486,5 +488,8 @@ namespace aphrodite {
             }
         }
 
+        private void chkCheckForUpdates_CheckedChanged(Object sender, EventArgs e) {
+            chkCheckForBetaUpdates.Enabled = chkCheckForBetaUpdates.Checked;
+        }
     }
 }

@@ -165,7 +165,7 @@ namespace murrty.controls {
             base.WndProc(ref m);
             switch (m.Msg) {
                 case WM_NCHITTEST: {
-                    if (MousePassthrough) m.Result = (IntPtr)HTTRANSPARENT;
+                    if (MousePassthrough && !DesignMode) m.Result = (IntPtr)HTTRANSPARENT;
                     else base.WndProc(ref m);
                 } break;
 
@@ -181,7 +181,12 @@ namespace murrty.controls {
         /// <param name="e">EventArgs regarding the painting event, not used in this control.</param>
         protected override void OnPaintBackground(PaintEventArgs e) {
             if (DesignMode) {
-                e.Graphics.DrawRectangle(Pens.Black, this.Location.X, this.Location.Y, this.Width, this.Height);
+                ControlPaint.DrawBorder(e.Graphics, ClientRectangle,
+                    Color.Black, 1, ButtonBorderStyle.Dashed,
+                    Color.Black, 1, ButtonBorderStyle.Dashed,
+                    Color.Black, 1, ButtonBorderStyle.Dashed,
+                    Color.Black, 1, ButtonBorderStyle.Dashed
+                );
             }
         }
 
@@ -197,37 +202,37 @@ namespace murrty.controls {
             using Graphics TextGraphics = CreateGraphics();
             using SolidBrush TextBrush = new(ForeColor);
             SizeF size = TextGraphics.MeasureString(Text, Font);
+            TextGraphics.DrawString(
+                Text, Font, TextBrush,
 
-            // first figure out the top
-            float TopMargin = fContentAlignment switch {
-                ContentAlignment.MiddleLeft or
-                ContentAlignment.MiddleCenter or
-                ContentAlignment.MiddleRight => (Height - size.Height) / 2,
+                fContentAlignment switch {
+                    ContentAlignment.TopLeft or
+                    ContentAlignment.MiddleLeft or
+                    ContentAlignment.BottomLeft => RightToLeft == RightToLeft.Yes ? (Width - size.Width) : -1,
 
-                ContentAlignment.BottomLeft or
-                ContentAlignment.BottomCenter or
-                ContentAlignment.BottomRight => (Height - size.Height),
+                    ContentAlignment.TopCenter or
+                    ContentAlignment.MiddleCenter or
+                    ContentAlignment.BottomCenter => (Width - size.Width) / 2,
 
-                _=> 0
-            };
+                    ContentAlignment.TopRight or
+                    ContentAlignment.MiddleRight or
+                    ContentAlignment.BottomRight => RightToLeft == RightToLeft.Yes ? -1 : (Width - size.Width),
 
-            float LeftMargin = fContentAlignment switch {
-                ContentAlignment.TopLeft or
-                ContentAlignment.MiddleLeft or
-                ContentAlignment.BottomLeft => RightToLeft == RightToLeft.Yes ? (Width - size.Width) : -1,
+                    _ => 0
+                },
 
-                ContentAlignment.TopCenter or
-                ContentAlignment.MiddleCenter or
-                ContentAlignment.BottomCenter => (Width - size.Width) / 2,
+                fContentAlignment switch {
+                    ContentAlignment.MiddleLeft or
+                    ContentAlignment.MiddleCenter or
+                    ContentAlignment.MiddleRight => (Height - size.Height) / 2,
 
-                ContentAlignment.TopRight or
-                ContentAlignment.MiddleRight or
-                ContentAlignment.BottomRight => RightToLeft == RightToLeft.Yes ? -1 : (Width - size.Width),
+                    ContentAlignment.TopLeft or
+                    ContentAlignment.TopCenter or
+                    ContentAlignment.TopRight => (Height - size.Height),
 
-                _ => 0
-            };
-
-            TextGraphics.DrawString(Text, Font, TextBrush, LeftMargin, TopMargin);
+                    _ => 0
+                }
+            );
         }
         #endregion
 

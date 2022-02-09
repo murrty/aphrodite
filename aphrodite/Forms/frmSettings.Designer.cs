@@ -117,6 +117,7 @@
             this.btnSave = new murrty.controls.ExtendedButton();
             this.btnCancel = new murrty.controls.ExtendedButton();
             this.pnControls = new System.Windows.Forms.Panel();
+            this.chkCheckForBetaUpdates = new System.Windows.Forms.CheckBox();
             this.tbMain.SuspendLayout();
             this.tabGeneral.SuspendLayout();
             this.tabTags.SuspendLayout();
@@ -160,6 +161,7 @@
             // 
             // tabGeneral
             // 
+            this.tabGeneral.Controls.Add(this.chkCheckForBetaUpdates);
             this.tabGeneral.Controls.Add(this.chkCheckForUpdates);
             this.tabGeneral.Controls.Add(this.chkArgumentFormTopMost);
             this.tabGeneral.Controls.Add(this.chkAutoDownloadWithArguments);
@@ -182,13 +184,14 @@
             // chkCheckForUpdates
             // 
             this.chkCheckForUpdates.AutoSize = true;
-            this.chkCheckForUpdates.Location = new System.Drawing.Point(112, 160);
+            this.chkCheckForUpdates.Location = new System.Drawing.Point(37, 160);
             this.chkCheckForUpdates.Name = "chkCheckForUpdates";
             this.chkCheckForUpdates.Size = new System.Drawing.Size(176, 17);
             this.chkCheckForUpdates.TabIndex = 21;
             this.chkCheckForUpdates.Text = "Check for updates on startup";
             this.JustTheTips.SetToolTip(this.chkCheckForUpdates, "Checks for new version updates everytime the program starts up");
             this.chkCheckForUpdates.UseVisualStyleBackColor = true;
+            this.chkCheckForUpdates.CheckedChanged += new System.EventHandler(this.chkCheckForUpdates_CheckedChanged);
             // 
             // chkArgumentFormTopMost
             // 
@@ -281,7 +284,7 @@
             // btnBrowseForDownloadDirectory
             // 
             this.btnBrowseForDownloadDirectory.Location = new System.Drawing.Point(353, 31);
-            this.btnBrowseForDownloadDirectory.Name = "btnBrowseForSaveTo";
+            this.btnBrowseForDownloadDirectory.Name = "btnBrowseForDownloadDirectory";
             this.btnBrowseForDownloadDirectory.Size = new System.Drawing.Size(24, 23);
             this.btnBrowseForDownloadDirectory.TabIndex = 1;
             this.btnBrowseForDownloadDirectory.Text = "...";
@@ -1258,6 +1261,16 @@
             this.pnControls.Size = new System.Drawing.Size(408, 42);
             this.pnControls.TabIndex = 11;
             // 
+            // chkCheckForBetaUpdates
+            // 
+            this.chkCheckForBetaUpdates.AutoSize = true;
+            this.chkCheckForBetaUpdates.Location = new System.Drawing.Point(219, 160);
+            this.chkCheckForBetaUpdates.Name = "chkCheckForBetaUpdates";
+            this.chkCheckForBetaUpdates.Size = new System.Drawing.Size(145, 17);
+            this.chkCheckForBetaUpdates.TabIndex = 22;
+            this.chkCheckForBetaUpdates.Text = "Check for beta updates";
+            this.chkCheckForBetaUpdates.UseVisualStyleBackColor = true;
+            // 
             // frmSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1408,6 +1421,6 @@
         private System.Windows.Forms.CheckBox chkEnableIni;
         private System.Windows.Forms.CheckBox chkCheckForUpdates;
         private System.Windows.Forms.CheckBox chkDontOverwrite;
-
+        private System.Windows.Forms.CheckBox chkCheckForBetaUpdates;
     }
 }

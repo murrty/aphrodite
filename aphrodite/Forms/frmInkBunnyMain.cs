@@ -67,6 +67,30 @@ namespace aphrodite {
             txtFileNameSchema.Text = Config.Settings.InkBunny.FileNameSchema;
             txtFileNameSchemaMultiPost.Text = Config.Settings.InkBunny.FileNameSchemaMultiPost;
 
+            if (Arguments.ArgumentType == ArgumentType.PushInkBunny) {
+                if (Arguments.ArgumentDataArray != null) {
+                    switch (Arguments.ArgumentDataArray.Length) {
+                        case 1: {
+                            txtSearchKeywordsMD5.Text = Arguments.ArgumentDataArray[0];
+                        } break;
+
+                        case 2: {
+                            txtSearchKeywordsMD5.Text = Arguments.ArgumentDataArray[0];
+                            txtSearchArtistName.Text = Arguments.ArgumentDataArray[1];
+                        } break;
+
+                        case 3: {
+                            txtSearchKeywordsMD5.Text = Arguments.ArgumentDataArray[0];
+                            txtSearchArtistName.Text = Arguments.ArgumentDataArray[1];
+                            txtSearchUsersFavorites.Text = Arguments.ArgumentDataArray[3];
+                        } break;
+                    }
+                }
+                else if (Arguments.ArgumentData != null) {
+                    txtSearchKeywordsMD5.Text = Arguments.ArgumentData;
+                }
+            }
+
             CheckAvailableRatings();
         }
 

@@ -19,6 +19,10 @@ namespace aphrodite {
             get; set;
         }
 
+        public string[] BaseArguments {
+            get; set;
+        }
+
         public frmArgument(string Arguments, DownloadType Type) {
             InitializeComponent();
 
@@ -32,32 +36,79 @@ namespace aphrodite {
                     lbDescription.Text = string.Format(lbDescription.Text, "tags");
                     txtArguments.TextHint = "Tags here...";
                     this.Text = "tags argument check";
-                } break;
+                }
+                break;
                 case DownloadType.Page: {
                     lbDescription.Text = string.Format(lbDescription.Text, "page") + "\n(new uploads may hide older images in the page)";
                     txtArguments.TextHint = "Page here...";
                     this.Text = "page argument check";
-                } break;
+                }
+                break;
                 case DownloadType.Pools: {
                     lbDescription.Text = string.Format(lbDescription.Text, "pool");
                     txtArguments.TextHint = "Pool id here...";
                     this.Text = "pool argument check";
-                } break;
+                }
+                break;
                 case DownloadType.Images: {
                     lbDescription.Text = string.Format(lbDescription.Text, "image");
                     txtArguments.TextHint = "Image id here...";
                     this.Text = "image argument check";
-                } break;
+                }
+                break;
+                case DownloadType.FurryBooru: {
+                    lbDescription.Text = string.Format(lbDescription.Text, "furrybooru");
+                    txtArguments.TextHint = "Image id here...";
+                    this.Text = "furrybooru argument check";
+                }
+                break;
+                case DownloadType.InkBunny: {
+                    lbDescription.Text = string.Format(lbDescription.Text, "inkbunny");
+                    txtArguments.TextHint = "Image id here...";
+                    this.Text = "inkbunny argument check";
+                }
+                break;
+                case DownloadType.Imgur: {
+                    lbDescription.Text = string.Format(lbDescription.Text, "imgur");
+                    txtArguments.TextHint = "Image id here...";
+                    this.Text = "imgur argument check";
+                }
+                break;
                 default: {
                     lbDescription.Text = string.Format(lbDescription.Text, "uninitialized");
                     this.Text = "argument check";
-                } break;
+                }
+                break;
             }
 
             BaseArgument = Arguments ?? "";
             AppendedArgument = BaseArgument;
             txtArguments.Text = Arguments ?? "[CRITICAL: arguments is null]";
             txtArguments.Refresh();
+
+            this.TopMost = Config.Settings.Initialization.ArgumentFormTopMost;
+        }
+
+        public frmArgument(string[] Arguments, DownloadType Type) {
+            InitializeComponent();
+
+            if (Config.ValidPoint(Config.Settings.FormSettings.frmArgument_Location)) {
+                this.StartPosition = FormStartPosition.Manual;
+                this.Location = Config.Settings.FormSettings.frmArgument_Location;
+            }
+
+            switch (Type) {
+                case DownloadType.InkBunny: {
+                    lbDescription.Text = string.Format(lbDescription.Text, "tags");
+                    txtArguments.TextHint = "Tags here...";
+                    this.Text = "tags argument check";
+                    if (Arguments.Length == 3) {
+                        BaseArguments = Arguments;
+                        txtArguments.Text = $"[Keywords=\"{Arguments[0] ?? "none"}\"] [artist=\"{Arguments[1] ?? "none"}\" [userfavs=\"{Arguments[2] ?? "none"}\"]";
+                        txtArguments.Refresh();
+                    }
+                } break;
+            }
 
             this.TopMost = Config.Settings.Initialization.ArgumentFormTopMost;
         }

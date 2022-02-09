@@ -11,15 +11,15 @@ namespace aphrodite {
         /// <summary>
         /// The current release version of the program.
         /// </summary>
-        public const decimal CurrentVersion = 2.22m;
+        public const decimal CurrentVersion = 2.21m;
         /// <summary>
         /// Whether the program is a beta version.
         /// </summary>
-        public const bool IsBetaVersion = false;
+        public const bool IsBetaVersion = true;
         /// <summary>
         /// The beta version of the program (if <see cref="IsBetaVersion"/> is true).
         /// </summary>
-        public const string BetaVersion = "2.3-pre1";
+        public const string BetaVersion = "2.2-pre1";
         /// <summary>
         /// The const delay for when threads sleep.
         /// </summary>
@@ -233,43 +233,37 @@ namespace aphrodite {
                         Config.Settings.Load();
                         Application.Run(new frmRedownloader());
                         Config.Settings.Save();
-                    }
-                    break;
+                    } break;
 
                     case ArgumentType.ShowBlacklist: {
                         Config.Settings.Load();
                         Application.Run(new frmBlacklist());
                         Config.Settings.Save();
-                    }
-                    break;
+                    } break;
 
                     case ArgumentType.ShowPoolWishlist: {
                         PoolWishlist.LoadWishlist();
                         Config.Settings.Pools.Load();
                         Application.Run(new frmPoolWishlist());
-                    }
-                    break;
+                    } break;
 
                     case ArgumentType.ShowFurryBooru: {
                         Config.Settings.Load();
                         Application.Run(new frmFurryBooruMain());
                         Config.Settings.Save();
-                    }
-                    break;
+                    } break;
 
                     case ArgumentType.ShowInkBunny: {
                         Config.Settings.Load();
                         Application.Run(new frmInkBunnyMain());
                         Config.Settings.Save();
-                    }
-                    break;
+                    } break;
 
                     case ArgumentType.ShowImgur: {
                         Config.Settings.Load();
                         Application.Run(new frmImgurMain());
                         Config.Settings.Save();
-                    }
-                    break;
+                    } break;
                     #endregion
 
                     #region Configure settings
@@ -291,16 +285,14 @@ namespace aphrodite {
 
                     // We catch it and do nothing, because it was cancelled.
                     case ArgumentType.CancelledArgumentsDownload: {
-                    }
-                    break;
+                    } break;
 
                     default: {
                         Log.Write("No arguments were passed that didn't require the main form");
                         Config.Settings.Load();
                         Application.Run(new frmMain());
                         Config.Settings.Save();
-                    }
-                    break;
+                    } break;
                 }
                 Log.DisableLogging();
             }
