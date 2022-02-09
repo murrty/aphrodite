@@ -1,119 +1,72 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 
 namespace aphrodite {
-    // theory: read the registry key for the protocol to determine location of aphridite.exe,
-    // if aphrodite.exe is this one, disable the button, otherwise enable it to move it to the
-    // currently running version's directory.
+
     public partial class frmSettings : Form {
 
         #region Variables
-        public bool SwitchTab = false;   // is the form being changed from the userscript?
-        public int Tab = 0;              // Used to determine the tab that will be selected on boot.
-
-        private bool NoProtocols = true;             // Are there no protocols installed?
-        private bool TagsProtocol = false;           // is the tags protocol installed?
-        private bool PoolsProtocol = false;          // is the pools protocol installed?
-        private bool PoolsWishlistProtocol = false;  // is the poolwl protocol installed?
-        private bool ImagesProtocol = false;         // is the images protocol installed?
-
+        private bool ProtocolInstalled = false;
         private bool LoadingForm = false;
         #endregion
 
         public frmSettings() {
             InitializeComponent();
-            txtSaveTo.TextHint = Environment.CurrentDirectory;
         }
+
+        public frmSettings(ArgumentType Type) {
+            InitializeComponent();
+
+            tbMain.SelectedTab = Type switch {
+                ArgumentType.ConfigureTagsSettings => tabTags,
+                ArgumentType.ConfigurePoolsSettings => tabPools,
+                ArgumentType.ConfigureImagesSettings => tabImages,
+                ArgumentType.ConfigureMiscSettings => tabMisc,
+                ArgumentType.ConfigureProtocolSettings => tabProtocol,
+                ArgumentType.ConfigureSchemaSettings => tabSchemas,
+                ArgumentType.ConfigureImportExportSettings => tabImportExport,
+                ArgumentType.ConfigurePortableSettings => tabPortable,
+                _ => tabGeneral,
+            };
+        }
+
         private void frmSettings_Load(object sender, EventArgs e) {
+            if (Config.ValidPoint(Config.Settings.FormSettings.frmSettings_Location)) {
+                this.StartPosition = FormStartPosition.Manual;
+                this.Location = Config.Settings.FormSettings.frmSettings_Location;
+            }
+
             LoadingForm = true; 
-            loadSettings();
+            txtSaveTo.TextHint = Environment.CurrentDirectory;
+            LoadSettings();
 
-            chkEnableIni.Checked = Program.UseIni;
+            chkEnableIni.Checked = Config.Settings.UseIni;
 
-            if (Program.UseIni) {
+            if (Config.Settings.UseIni) {
                 tbMain.TabPages.Remove(tabImportExport);
             }
 
-            CheckProtocols();
+            ProtocolInstalled = SystemRegistry.CheckRegistryKey();
 
-            if (SwitchTab) {
-                switch (Tab) {
-                    case 1:
-                        tbMain.SelectedTab = tabTags;
-                        break;
-                    case 2:
-                        tbMain.SelectedTab = tabPools;
-                        break;
-                    case 3:
-                        tbMain.SelectedTab = tabImages;
-                        break;
-                    case 4:
-                        tbMain.SelectedTab = tabProtocol;
-                        break;
-                    case 5:
-                        tbMain.SelectedTab = tabSchemas;
-                        break;
-                    case 6:
-                        tbMain.SelectedTab = tabImportExport;
-                        break;
-                    case 7:
-                        tbMain.SelectedTab = tabPortable;
-                        break;
-                    default:
-                        tbMain.SelectedTab = tabGeneral;
-                        break;
-                }
-            }
-
-            if (TagsProtocol == true) {
-                btnProtocolInstallTags.Enabled = false;
-                btnProtocolInstallTags.Text = "tags protocol installed";
+            if (ProtocolInstalled) {
+                btnInstallProtocol.Enabled = false;
+                btnInstallProtocol.Text = "protocol installed";
             }
             else {
-                if (!Program.IsAdmin) {
-                    btnProtocolInstallTags.ShowUACShield = true;
-                }
-            }
-
-            if (PoolsProtocol == true && PoolsWishlistProtocol == true) {
-                btnProtocolInstallPools.Enabled = false;
-                btnProtocolInstallPools.Text = "pools protocols installed";
-            }
-            else {
-                if (!Program.IsAdmin) {
-                    btnProtocolInstallPools.ShowUACShield = true;
-                }
-            }
-
-            if (ImagesProtocol == true) {
-                btnProtocolInstallImages.Enabled = false;
-                btnProtocolInstallImages.Text = "images protocol installed";
-            }
-            else {
-                if (!Program.IsAdmin) {
-                    btnProtocolInstallImages.ShowUACShield = true;
-                }
-            }
-
-            if (Config.Settings.FormSettings.frmSettings_Location.X == -32000 || Config.Settings.FormSettings.frmSettings_Location.Y == -32000) {
-                this.StartPosition = FormStartPosition.CenterScreen;
-            }
-            else {
-                this.Location = Config.Settings.FormSettings.frmSettings_Location;
+                btnInstallProtocol.ShowUACShield = !Program.IsAdmin;
             }
 
             LoadingForm = false;
         }
+
         private void frmSettings_FormClosing(object sender, FormClosingEventArgs e) {
-            if (Config.Settings.FormSettings.frmSettings_Location != this.Location) {
-                Config.Settings.FormSettings.frmSettings_Location = this.Location;
-            }
+            Config.Settings.FormSettings.frmSettings_Location = this.Location;
+            Config.Settings.FormSettings.Save();
         }
 
-        private void saveSettings() {
+        private void SaveSettings() {
           // General
             switch (string.IsNullOrWhiteSpace(txtSaveTo.Text)) {
                 case true:
@@ -131,7 +84,7 @@ namespace aphrodite {
             Config.Settings.Initialization.SkipArgumentCheck = chkSkipArgumentCheck.Checked;
             Config.Settings.Initialization.AutoDownloadWithArguments = chkAutoDownloadWithArguments.Checked;
             Config.Settings.Initialization.ArgumentFormTopMost = chkArgumentFormTopMost.Checked;
-            Config.Settings.General.CheckForUpdates = chkCheckForUpdates.Checked;
+            Config.Settings.Initialization.CheckForUpdates = chkCheckForUpdates.Checked;
 
           // Tags
             switch (string.IsNullOrWhiteSpace(txtTagSchema.Text)) {
@@ -140,7 +93,7 @@ namespace aphrodite {
                     break;
 
                 case false:
-                    Config.Settings.Tags.fileNameSchema = apiTools.ReplaceIllegalCharacters(txtTagSchema.Text.ToLower());
+                    Config.Settings.Tags.fileNameSchema = ApiTools.ReplaceIllegalCharacters(txtTagSchema.Text.ToLower());
                     break;
             }
             Config.Settings.Tags.Explicit = chkTagsExplicit.Checked;
@@ -165,7 +118,7 @@ namespace aphrodite {
                     break;
 
                 case false:
-                    Config.Settings.Pools.fileNameSchema = apiTools.ReplaceIllegalCharacters(txtPoolSchema.Text.ToLower());
+                    Config.Settings.Pools.fileNameSchema = ApiTools.ReplaceIllegalCharacters(txtPoolSchema.Text.ToLower());
                     break;
             }
             Config.Settings.Pools.mergeGraylisted = chkPoolsMergeGraylistedImages.Checked;
@@ -180,7 +133,7 @@ namespace aphrodite {
                     break;
 
                 case false:
-                    Config.Settings.Images.fileNameSchema = apiTools.ReplaceIllegalCharacters(txtImageSchema.Text.ToLower());
+                    Config.Settings.Images.fileNameSchema = ApiTools.ReplaceIllegalCharacters(txtImageSchema.Text.ToLower());
                     break;
             }
             Config.Settings.Images.separateRatings = chkImagesSeparateRatings.Checked;
@@ -190,9 +143,10 @@ namespace aphrodite {
             Config.Settings.Images.separateBlacklisted = chkImagesSeparateBlacklisted.Checked;
 
           // Save all
-            Config.Settings.Save(ConfigType.All);
+            Config.Settings.Save();
         }
-        private void loadSettings() {
+
+        private void LoadSettings() {
             // General
             if (string.IsNullOrEmpty(Config.Settings.General.saveLocation)) {
                 txtSaveTo.Text = Environment.CurrentDirectory;
@@ -207,10 +161,10 @@ namespace aphrodite {
             chkSkipArgumentCheck.Checked = Config.Settings.Initialization.SkipArgumentCheck;
             chkAutoDownloadWithArguments.Checked = Config.Settings.Initialization.AutoDownloadWithArguments;
             chkArgumentFormTopMost.Checked = Config.Settings.Initialization.ArgumentFormTopMost;
-            chkCheckForUpdates.Checked = Config.Settings.General.CheckForUpdates;
+            chkCheckForUpdates.Checked = Config.Settings.Initialization.CheckForUpdates;
 
             // Tags
-            txtTagSchema.Text = apiTools.ReplaceIllegalCharacters(Config.Settings.Tags.fileNameSchema.ToLower());
+            txtTagSchema.Text = ApiTools.ReplaceIllegalCharacters(Config.Settings.Tags.fileNameSchema.ToLower());
             chkTagsExplicit.Checked = Config.Settings.Tags.Explicit;
             chkTagsQuestionable.Checked = Config.Settings.Tags.Questionable;
             chkTagsSafe.Checked = Config.Settings.Tags.Safe;
@@ -227,183 +181,111 @@ namespace aphrodite {
             chkTagsFavoriteCountAsTag.Checked = Config.Settings.Tags.FavoriteCountAsTag;
 
             // Pools
-            txtPoolSchema.Text = apiTools.ReplaceIllegalCharacters(Config.Settings.Pools.fileNameSchema.ToLower());
+            txtPoolSchema.Text = ApiTools.ReplaceIllegalCharacters(Config.Settings.Pools.fileNameSchema.ToLower());
             chkPoolsMergeGraylistedImages.Checked = Config.Settings.Pools.mergeGraylisted;
             chkPoolsAddToWishlistSilently.Checked = Config.Settings.Pools.addWishlistSilent;
             chkPoolsDownloadBlacklistedImages.Checked = Config.Settings.Pools.downloadBlacklisted;
             chkPoolsMergeBlacklistedImages.Checked = Config.Settings.Pools.mergeBlacklisted;
 
             // Images
-            txtImageSchema.Text = apiTools.ReplaceIllegalCharacters(Config.Settings.Images.fileNameSchema.ToLower());
+            txtImageSchema.Text = ApiTools.ReplaceIllegalCharacters(Config.Settings.Images.fileNameSchema.ToLower());
             chkImagesSeparateRatings.Checked = Config.Settings.Images.separateRatings;
             chkImagesSeparateGraylisted.Checked = Config.Settings.Images.separateGraylisted;
             chkImagesSeparateArtists.Checked = Config.Settings.Images.separateArtists;
             chkImagesUseForm.Checked = Config.Settings.Images.useForm;
             chkImagesSeparateBlacklisted.Checked = Config.Settings.Images.separateBlacklisted;
-
         }
-        private void checkAdmin() {
-            if (!Program.IsAdmin) {
-                if (MessageBox.Show("This task requires re-running as administrator. Restart elevated?", "aphrodite", MessageBoxButtons.YesNo) == DialogResult.Yes) {
-                    var exeName = Process.GetCurrentProcess().MainModule.FileName;
-                    ProcessStartInfo startInfo = new ProcessStartInfo(exeName);
-                    startInfo.Verb = "runas";
-                    Process.Start(startInfo);
-                    Environment.Exit(0);
-                }
-            }
-        }
-        private void CheckProtocols() {
-            if (SystemRegistry.CheckRegistryKey(SystemRegistry.KeyName.Tags)) {
-                TagsProtocol = true;
-            }
-            else {
-                TagsProtocol = false;
-            }
 
-            if (SystemRegistry.CheckRegistryKey(SystemRegistry.KeyName.Pools)) {
-                PoolsProtocol = true;
-            }
-            else {
-                PoolsProtocol = false;
-            }
-
-            if (SystemRegistry.CheckRegistryKey(SystemRegistry.KeyName.PoolWl)) {
-                PoolsWishlistProtocol = true;
-            }
-            else {
-                PoolsWishlistProtocol = false;
-            }
-
-            if (SystemRegistry.CheckRegistryKey(SystemRegistry.KeyName.Images)) {
-                ImagesProtocol = true;
-            }
-            else {
-                ImagesProtocol = false;
-            }
-
-            if (TagsProtocol == false && PoolsProtocol == false && ImagesProtocol == false) {
-                NoProtocols = true;
-            }
-            else {
-                NoProtocols = false;
-            }
-        }
-        private bool InstallProtocol(SystemRegistry.KeyName Name) {
+        private bool InstallProtocol() {
             if (Program.IsAdmin) {
-                if (SystemRegistry.SetRegistryKey(Name)) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
+                return SystemRegistry.SetRegistryKey();
             }
             else {
-                Process ProtocolProcess = new Process() {
+                Process ProtocolProcess = new() {
                     StartInfo = new ProcessStartInfo() {
+                        Arguments = "-updateprotocol",
                         FileName = Program.FullApplicationPath,
                         WorkingDirectory = Program.ApplicationPath,
                         Verb = "runas"
                     }
                 };
-
-                switch (Name) {
-                    case SystemRegistry.KeyName.Tags:
-                        ProtocolProcess.StartInfo.Arguments = "-updateprotocol:tags";
-                        break;
-
-                    case SystemRegistry.KeyName.Pools: case SystemRegistry.KeyName.PoolWl: case SystemRegistry.KeyName.BothPools:
-                        ProtocolProcess.StartInfo.Arguments = "-updateprotocol:pools";
-                        break;
-
-                    case SystemRegistry.KeyName.Images:
-                        ProtocolProcess.StartInfo.Arguments = "-updateprotocol:images";
-                        break;
-
-                }
-
                 ProtocolProcess.Start();
                 ProtocolProcess.WaitForExit();
-
-                if (ProtocolProcess.ExitCode == 0) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
+                return ProtocolProcess.ExitCode == 0;
             }
         }
 
-        private void btnBrws_Click(object sender, EventArgs e) {
-            using (Ookii.Dialogs.WinForms.VistaFolderBrowserDialog fbd = new Ookii.Dialogs.WinForms.VistaFolderBrowserDialog() { Description = "Select a folder to store downloads...", UseDescriptionForTitle = true }) {
-                if (!string.IsNullOrEmpty(txtSaveTo.Text)) {
-                    fbd.SelectedPath = txtSaveTo.Text;
-                }
+        private void btnBrowseForDownloadDirectory_Click(object sender, EventArgs e) {
+            using BetterFolderBrowserNS.BetterFolderBrowser fbd = new() {
+                Title = "Select a folder to store downloads...",
+                RootFolder = Config.Settings.General.saveLocation,
+                Multiselect = false
+            };
+            if (fbd.ShowDialog() == DialogResult.OK) {
+                if (!string.IsNullOrWhiteSpace(txtSaveTo.Text) && Directory.Exists(txtSaveTo.Text)) {
+                    string MessageDialog = "Would you like to move your current downloads to the new directory?";
+                    string MessageTotalCount = string.Empty;
 
-                if (fbd.ShowDialog() == DialogResult.OK) {
-                    if (!string.IsNullOrWhiteSpace(txtSaveTo.Text) && Directory.Exists(txtSaveTo.Text)) {
-                        string MessageDialog = "Would you like to move your current downloads to the new directory?";
-                        string MessageTotalCount = string.Empty;
+                    if (Directory.Exists(txtSaveTo.Text + "\\Tags")) {
+                        MessageTotalCount += "\r\nYou have " + Directory.GetDirectories(txtSaveTo.Text + "\\Tags", "*", SearchOption.TopDirectoryOnly).Length + " downloaded tags";
+                    }
+                    if (Directory.Exists(txtSaveTo.Text + "\\Pages")) {
+                        MessageTotalCount += "\r\nYou have " + Directory.GetDirectories(txtSaveTo.Text + "\\Pages", "*", SearchOption.TopDirectoryOnly).Length + " downloaded pages";
+                    }
+                    if (Directory.Exists(txtSaveTo.Text + "\\Pools")) {
+                        MessageTotalCount += "\r\nYou have " + Directory.GetDirectories(txtSaveTo.Text + "\\Pools", "*", SearchOption.TopDirectoryOnly).Length + " downloaded pools";
+                    }
+                    if (Directory.Exists(txtSaveTo.Text + "\\Images")) {
+                        int ExplicitCount = 0;
+                        int QuestionableCount = 0;
+                        int SafeCount = 0;
 
-                        if (Directory.Exists(txtSaveTo.Text + "\\Tags")) {
-                            MessageTotalCount += "\r\nYou have " + Directory.GetDirectories(txtSaveTo.Text + "\\Tags", "*", SearchOption.TopDirectoryOnly).Length + " downloaded tags";
+                        if (Directory.Exists(txtSaveTo.Text + "\\Images\\explicit")) {
+                            ExplicitCount += Directory.GetFiles(txtSaveTo.Text + "\\Images\\explicit", "*", SearchOption.TopDirectoryOnly).Length;
                         }
-                        if (Directory.Exists(txtSaveTo.Text + "\\Pages")) {
-                            MessageTotalCount += "\r\nYou have " + Directory.GetDirectories(txtSaveTo.Text + "\\Pages", "*", SearchOption.TopDirectoryOnly).Length + " downloaded pages";
+                        if (Directory.Exists(txtSaveTo.Text + "\\Images\\questionable")) {
+                            QuestionableCount += Directory.GetFiles(txtSaveTo.Text + "\\Images\\questionable", "*", SearchOption.TopDirectoryOnly).Length;
                         }
-                        if (Directory.Exists(txtSaveTo.Text + "\\Pools")) {
-                            MessageTotalCount += "\r\nYou have " + Directory.GetDirectories(txtSaveTo.Text + "\\Pools", "*", SearchOption.TopDirectoryOnly).Length + " downloaded pools";
+                        if (Directory.Exists(txtSaveTo.Text + "\\Images\\safe")) {
+                            SafeCount += Directory.GetFiles(txtSaveTo.Text + "\\Images\\safe", "*", SearchOption.TopDirectoryOnly).Length;
                         }
-                        if (Directory.Exists(txtSaveTo.Text + "\\Images")) {
-                            int ExplicitCount = 0;
-                            int QuestionableCount = 0;
-                            int SafeCount = 0;
-
-                            if (Directory.Exists(txtSaveTo.Text + "\\Images\\explicit")) {
-                                ExplicitCount += Directory.GetFiles(txtSaveTo.Text + "\\Images\\explicit", "*", SearchOption.TopDirectoryOnly).Length;
-                            }
-                            if (Directory.Exists(txtSaveTo.Text + "\\Images\\questionable")) {
-                                QuestionableCount += Directory.GetFiles(txtSaveTo.Text + "\\Images\\questionable", "*", SearchOption.TopDirectoryOnly).Length;
-                            }
-                            if (Directory.Exists(txtSaveTo.Text + "\\Images\\safe")) {
-                                SafeCount += Directory.GetFiles(txtSaveTo.Text + "\\Images\\safe", "*", SearchOption.TopDirectoryOnly).Length;
-                            }
-                            MessageTotalCount += string.Format("\r\nYou have " + (ExplicitCount + QuestionableCount + SafeCount) + " downloaded images\r\n({0} explicit, {1} questionable, {2} safe)", ExplicitCount, QuestionableCount, SafeCount);
-                        }
-
-                        if (!string.IsNullOrWhiteSpace(MessageTotalCount)) {
-                            MessageTotalCount = "\r\n" + MessageTotalCount;
-                        }
-
-                        switch (MessageBox.Show(MessageDialog + MessageTotalCount, "aphrodite", MessageBoxButtons.YesNoCancel)) {
-                            case System.Windows.Forms.DialogResult.Cancel:
-                                return;
-
-                            case System.Windows.Forms.DialogResult.Yes:
-                                if (Directory.Exists(txtSaveTo.Text + "\\Tags")) {
-                                    Directory.Move(txtSaveTo.Text + "\\Tags", fbd.SelectedPath + "\\Tags");
-                                }
-                                if (Directory.Exists(txtSaveTo.Text + "\\Pages")) {
-                                    Directory.Move(txtSaveTo.Text + "\\Pages", fbd.SelectedPath + "\\Pages");
-                                }
-                                if (Directory.Exists(txtSaveTo.Text + "\\Pools")) {
-                                    Directory.Move(txtSaveTo.Text + "\\Pools", fbd.SelectedPath + "\\Pools");
-                                }
-                                if (Directory.Exists(txtSaveTo.Text + "\\Images")) {
-                                    Directory.Move(txtSaveTo.Text + "\\Images", fbd.SelectedPath + "\\Images");
-                                }
-                                break;
-                        }
+                        MessageTotalCount += string.Format("\r\nYou have " + (ExplicitCount + QuestionableCount + SafeCount) + " downloaded images\r\n({0} explicit, {1} questionable, {2} safe)", ExplicitCount, QuestionableCount, SafeCount);
                     }
 
-                    txtSaveTo.Text = fbd.SelectedPath;
+                    if (!string.IsNullOrWhiteSpace(MessageTotalCount)) {
+                        MessageTotalCount = "\r\n" + MessageTotalCount;
+                    }
+
+                    switch (Log.MessageBox(MessageDialog + MessageTotalCount, MessageBoxButtons.YesNoCancel)) {
+                        case DialogResult.Cancel:
+                            return;
+
+                        case DialogResult.Yes:
+                            if (Directory.Exists(txtSaveTo.Text + "\\Tags")) {
+                                Directory.Move(txtSaveTo.Text + "\\Tags", fbd.SelectedPath + "\\Tags");
+                            }
+                            if (Directory.Exists(txtSaveTo.Text + "\\Pages")) {
+                                Directory.Move(txtSaveTo.Text + "\\Pages", fbd.SelectedPath + "\\Pages");
+                            }
+                            if (Directory.Exists(txtSaveTo.Text + "\\Pools")) {
+                                Directory.Move(txtSaveTo.Text + "\\Pools", fbd.SelectedPath + "\\Pools");
+                            }
+                            if (Directory.Exists(txtSaveTo.Text + "\\Images")) {
+                                Directory.Move(txtSaveTo.Text + "\\Images", fbd.SelectedPath + "\\Images");
+                            }
+                            break;
+                    }
                 }
+
+                txtSaveTo.Text = fbd.SelectedPath;
             }
         }
+
         private void btnSave_Click(object sender, EventArgs e) {
-            saveSettings();
+            SaveSettings();
             this.DialogResult = DialogResult.OK;
         }
+
         private void btnCancel_Click(object sender, EventArgs e) {
             this.DialogResult = DialogResult.Cancel;
         }
@@ -414,66 +296,32 @@ namespace aphrodite {
         }
 
         private void btnBlacklist_Click(object sender, EventArgs e) {
-            using (frmBlacklist Blacklist = new frmBlacklist()) {
-                Blacklist.ShowDialog();
-                if (Config.Settings.FormSettings.frmBlacklist_Location != Blacklist.Location) {
-                    Config.Settings.FormSettings.frmBlacklist_Location = Blacklist.Location;
-                }
+            using frmBlacklist Blacklist = new();
+            Blacklist.ShowDialog();
+            if (Config.Settings.FormSettings.frmBlacklist_Location != Blacklist.Location) {
+                Config.Settings.FormSettings.frmBlacklist_Location = Blacklist.Location;
             }
         }
 
-        private void btnTagsProtocol_Click(object sender, EventArgs e) {
-            if (InstallProtocol(SystemRegistry.KeyName.Tags)) {
-                btnProtocolInstallTags.ShowUACShield = false;
-                btnProtocolInstallTags.Enabled = false;
-                btnProtocolInstallTags.Text = "tags protocol installed";
-
-                TagsProtocol = true;
-                NoProtocols = false;
+        private void btnInstallProtocol_Click(object sender, EventArgs e) {
+            if (InstallProtocol()) {
+                btnInstallProtocol.ShowUACShield = false;
+                btnInstallProtocol.Enabled = false;
+                btnInstallProtocol.Text = "protocol installed";
+                ProtocolInstalled = true;
             }
             else {
-                MessageBox.Show("Failed to install protocol");
-            }
-        }
-        private void btnPoolsProtocol_Click(object sender, EventArgs e) {
-            if (InstallProtocol(SystemRegistry.KeyName.BothPools)) {
-                btnProtocolInstallPools.ShowUACShield = false;
-                btnProtocolInstallPools.Enabled = false;
-                btnProtocolInstallPools.Text = "pools protocols installed";
-
-                PoolsProtocol = true;
-                PoolsWishlistProtocol = true;
-                NoProtocols = false;
-            }
-            else {
-                MessageBox.Show("Failed to install protocol");
-            }
-        }
-        private void btnImagesProtocol_Click(object sender, EventArgs e) {
-            if (InstallProtocol(SystemRegistry.KeyName.Images)) {
-                btnProtocolInstallImages.ShowUACShield = false;
-                btnProtocolInstallImages.Enabled = false;
-                btnProtocolInstallImages.Text = "images protocol installed";
-
-                ImagesProtocol = true;
-                NoProtocols = false;
-            }
-            else {
-                MessageBox.Show("Failed to install protocol");
+                Log.MessageBox("Failed to install protocol");
             }
         }
 
         private void btnUserscript_Click(object sender, EventArgs e) {
             Process.Start("https://github.com/murrty/aphrodite/raw/master/Resources/aphrodite.user.js");
         }
-        private void btnImagesUserscript_Click(object sender, EventArgs e) {
-            Process.Start("https://github.com/murrty/aphrodite/raw/master/Resources/aphrodite.images.user.js");
-        }
 
         private void btnSchemaUndesiredTags_Click(object sender, EventArgs e) {
-            using (frmUndesiredTags UndesiredTagsForm = new frmUndesiredTags()) {
-                UndesiredTagsForm.ShowDialog();
-            }
+            using frmUndesiredTags UndesiredTagsForm = new();
+            UndesiredTagsForm.ShowDialog();
         }
 
         private void txtTagSchema_KeyPress(object sender, KeyPressEventArgs e) {
@@ -492,6 +340,7 @@ namespace aphrodite {
                     break;
             }
         }
+
         private void txtPoolSchema_KeyPress(object sender, KeyPressEventArgs e) {
             switch (e.KeyChar) {
                 case (char)92:  // \
@@ -508,6 +357,7 @@ namespace aphrodite {
                     break;
             }
         }
+
         private void txtImageSchema_KeyPress(object sender, KeyPressEventArgs e) {
             switch (e.KeyChar) {
                 case (char)92:  // \
@@ -556,82 +406,76 @@ namespace aphrodite {
         }
 
         private void btnExportGraylist_Click(object sender, EventArgs e) {
-            using (Ookii.Dialogs.WinForms.VistaSaveFileDialog sfd = new Ookii.Dialogs.WinForms.VistaSaveFileDialog()) {
-                sfd.Title = "Save graylist as...";
-                sfd.Filter = "Text File (*.txt)|*.txt|All Files (*.*)|*.*";
-                if (sfd.ShowDialog() == DialogResult.OK) {
-                    File.WriteAllText(sfd.FileName, Config.Settings.General.Graylist.Replace(" ", "\r\n"));
-                }
+            using SaveFileDialog sfd = new();
+            sfd.Title = "Save graylist as...";
+            sfd.Filter = "Text File (*.txt)|*.txt|All Files (*.*)|*.*";
+            if (sfd.ShowDialog() == DialogResult.OK) {
+                File.WriteAllText(sfd.FileName, Config.Settings.General.Graylist.Replace(" ", "\r\n"));
             }
         }
 
         private void btnImportGraylist_Click(object sender, EventArgs e) {
-            using (Ookii.Dialogs.WinForms.VistaOpenFileDialog ofd = new Ookii.Dialogs.WinForms.VistaOpenFileDialog()) {
-                ofd.Title = "Select a file for the graylist...";
-                ofd.Filter = "Text File (*.txt)|*.txt|All Files(*.*)|*.*";
-                ofd.Multiselect = false;
-                if (ofd.ShowDialog() == DialogResult.OK) {
-                    string NewGraylist = File.ReadAllText(ofd.FileName, System.Text.Encoding.Default).Replace("\r\n", "\n").Replace("\n", " ");
-                    if (chkOverwriteOnImport.Checked) {
-                        Config.Settings.General.Graylist = NewGraylist;
-                    }
-                    else {
-                        Config.Settings.General.Graylist += "\r\n" + NewGraylist;
-                    }
+            using OpenFileDialog ofd = new();
+            ofd.Title = "Select a file for the graylist...";
+            ofd.Filter = "Text File (*.txt)|*.txt|All Files(*.*)|*.*";
+            ofd.Multiselect = false;
+            if (ofd.ShowDialog() == DialogResult.OK) {
+                string NewGraylist = File.ReadAllText(ofd.FileName, System.Text.Encoding.Default).Replace("\r\n", "\n").Replace("\n", " ");
+                if (chkOverwriteOnImport.Checked) {
+                    Config.Settings.General.Graylist = NewGraylist;
+                }
+                else {
+                    Config.Settings.General.Graylist += "\r\n" + NewGraylist;
                 }
             }
         }
 
         private void btnExportBlacklist_Click(object sender, EventArgs e) {
-            using (Ookii.Dialogs.WinForms.VistaSaveFileDialog sfd = new Ookii.Dialogs.WinForms.VistaSaveFileDialog()) {
-                sfd.Title = "Save blacklist as...";
-                sfd.Filter = "Text File (*.txt)|*.txt|All Files (*.*)|*.*";
-                if (sfd.ShowDialog() == DialogResult.OK) {
-                    File.WriteAllText(sfd.FileName, Config.Settings.General.Blacklist.Replace(" ", "\r\n"));
-                }
+            using SaveFileDialog sfd = new();
+            sfd.Title = "Save blacklist as...";
+            sfd.Filter = "Text File (*.txt)|*.txt|All Files (*.*)|*.*";
+            if (sfd.ShowDialog() == DialogResult.OK) {
+                File.WriteAllText(sfd.FileName, Config.Settings.General.Blacklist.Replace(" ", "\r\n"));
             }
         }
 
         private void btnImportBlacklist_Click(object sender, EventArgs e) {
-            using (Ookii.Dialogs.WinForms.VistaOpenFileDialog ofd = new Ookii.Dialogs.WinForms.VistaOpenFileDialog()) {
-                ofd.Title = "Select a file for the blacklist...";
-                ofd.Filter = "Text File (*.txt)|*.txt|All Files(*.*)|*.*";
-                ofd.Multiselect = false;
-                if (ofd.ShowDialog() == DialogResult.OK) {
-                    string NewBlacklist = File.ReadAllText(ofd.FileName, System.Text.Encoding.Default).Replace("\r\n", "\n").Replace("\n", " ");
-                    if (chkOverwriteOnImport.Checked) {
-                        Config.Settings.General.Blacklist = NewBlacklist;
-                    }
-                    else {
-                        Config.Settings.General.Blacklist += "\r\n" + NewBlacklist;
-                    }
+            using OpenFileDialog ofd = new();
+            ofd.Title = "Select a file for the blacklist...";
+            ofd.Filter = "Text File (*.txt)|*.txt|All Files(*.*)|*.*";
+            ofd.Multiselect = false;
+            if (ofd.ShowDialog() == DialogResult.OK) {
+                string NewBlacklist = File.ReadAllText(ofd.FileName, System.Text.Encoding.Default).Replace("\r\n", "\n").Replace("\n", " ");
+                if (chkOverwriteOnImport.Checked) {
+                    Config.Settings.General.Blacklist = NewBlacklist;
+                }
+                else {
+                    Config.Settings.General.Blacklist += "\r\n" + NewBlacklist;
                 }
             }
         }
 
         private void btnExportUndesiredTags_Click(object sender, EventArgs e) {
-            using (Ookii.Dialogs.WinForms.VistaSaveFileDialog sfd = new Ookii.Dialogs.WinForms.VistaSaveFileDialog()) {
-                sfd.Title = "Save undesired tags as...";
-                sfd.Filter = "Text File (*.txt)|*.txt|All Files (*.*)|*.*";
-                if (sfd.ShowDialog() == DialogResult.OK) {
-                    File.WriteAllText(sfd.FileName, Config.Settings.General.undesiredTags.Replace(" ", "\r\n"));
-                }
+            using SaveFileDialog sfd = new();
+            sfd.Title = "Save undesired tags as...";
+            sfd.Filter = "Text File (*.txt)|*.txt|All Files (*.*)|*.*";
+            if (sfd.ShowDialog() == DialogResult.OK) {
+                File.WriteAllText(sfd.FileName, Config.Settings.General.undesiredTags.Replace(" ", "\r\n"));
             }
         }
 
         private void btnImportUndesiredTags_Click(object sender, EventArgs e) {
-            using (Ookii.Dialogs.WinForms.VistaOpenFileDialog ofd = new Ookii.Dialogs.WinForms.VistaOpenFileDialog()) {
-                ofd.Title = "Select a file for the undesired tags...";
-                ofd.Filter = "Text File (*.txt)|*.txt|All Files(*.*)|*.*";
-                ofd.Multiselect = false;
-                if (ofd.ShowDialog() == DialogResult.OK) {
-                    string NewUndesiredTags = File.ReadAllText(ofd.FileName, System.Text.Encoding.Default).Replace("\r\n", "\n").Replace("\n", " ");
-                    if (chkOverwriteOnImport.Checked) {
-                        Config.Settings.General.undesiredTags = NewUndesiredTags;
-                    }
-                    else {
-                        Config.Settings.General.undesiredTags += "\r\n" + NewUndesiredTags;
-                    }
+            using OpenFileDialog ofd = new();
+            ofd.Title = "Select a file for the undesired tags...";
+            ofd.Filter = "Text File (*.txt)|*.txt|All Files(*.*)|*.*";
+            ofd.Multiselect = false;
+            if (ofd.ShowDialog() == DialogResult.OK) {
+                string NewUndesiredTags = File.ReadAllText(ofd.FileName, System.Text.Encoding.Default).Replace("\r\n", "\n").Replace("\n", " ");
+                if (chkOverwriteOnImport.Checked) {
+                    Config.Settings.General.undesiredTags = NewUndesiredTags;
+                }
+                else {
+                    Config.Settings.General.undesiredTags += "\r\n" + NewUndesiredTags;
                 }
             }
         }

@@ -12,7 +12,7 @@ namespace aphrodite.Settings {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "12.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.0.3.0")]
     internal sealed partial class Images : global::System.Configuration.ApplicationSettingsBase {
         
         private static Images defaultInstance = ((Images)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Images())));
@@ -73,7 +73,7 @@ namespace aphrodite.Settings {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("%artist%_%md5%")]
+        [global::System.Configuration.DefaultSettingValueAttribute("%artist%_%id%")]
         public string fileNameSchema {
             get {
                 return ((string)(this["fileNameSchema"]));

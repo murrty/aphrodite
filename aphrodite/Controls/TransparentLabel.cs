@@ -2,6 +2,7 @@
 using System.Windows.Forms;
 
 namespace aphrodite.Controls {
+    [System.Diagnostics.DebuggerStepThrough]
     internal class TransparentLabel : Control {
         /// <summary>
         /// Creates a new <see cref="TransparentLabel"/> instance.

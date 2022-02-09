@@ -30,9 +30,9 @@
             this.lbUpdateAvailableUpdateVersion = new System.Windows.Forms.Label();
             this.lbUpdateAvailableHeader = new System.Windows.Forms.Label();
             this.pnLower = new System.Windows.Forms.Panel();
-            this.btnUpdateAvailableOk = new aphrodite.Controls.ExtendedButton();
-            this.btnUpdateAvailableSkip = new aphrodite.Controls.ExtendedButton();
-            this.btnUpdateAvailableUpdate = new aphrodite.Controls.ExtendedButton();
+            this.btnUpdateAvailableOk = new murrty.controls.ExtendedButton();
+            this.btnUpdateAvailableSkip = new murrty.controls.ExtendedButton();
+            this.btnUpdateAvailableUpdate = new murrty.controls.ExtendedButton();
             this.pnLower.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -144,6 +144,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(322, 323);
             this.Controls.Add(this.txtUpdateAvailableName);
             this.Controls.Add(this.lbUpdateAvailableChangelog);
@@ -153,6 +154,7 @@
             this.Controls.Add(this.lbUpdateAvailableHeader);
             this.Controls.Add(this.pnLower);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ForeColor = System.Drawing.SystemColors.ControlText;
             this.Icon = global::aphrodite.Properties.Resources.Brad;
             this.MaximizeBox = false;
             this.MinimumSize = new System.Drawing.Size(340, 360);
@@ -170,9 +172,9 @@
         #endregion
 
         private System.Windows.Forms.TextBox txtUpdateAvailableName;
-        private Controls.ExtendedButton btnUpdateAvailableSkip;
-        private Controls.ExtendedButton btnUpdateAvailableOk;
-        private Controls.ExtendedButton btnUpdateAvailableUpdate;
+        private murrty.controls.ExtendedButton btnUpdateAvailableSkip;
+        private murrty.controls.ExtendedButton btnUpdateAvailableOk;
+        private murrty.controls.ExtendedButton btnUpdateAvailableUpdate;
         private System.Windows.Forms.Label lbUpdateAvailableChangelog;
         private System.Windows.Forms.RichTextBox rtbUpdateAvailableChangelog;
         private System.Windows.Forms.Label lbUpdateAvailableCurrentVersion;

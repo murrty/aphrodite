@@ -28,8 +28,8 @@
             this.lbTags = new aphrodite.Controls.AeroListBox();
             this.tbPools = new System.Windows.Forms.TabPage();
             this.lbPools = new aphrodite.Controls.AeroListBox();
-            this.btnRedownload = new aphrodite.Controls.ExtendedButton();
-            this.btnRenumerate = new aphrodite.Controls.ExtendedButton();
+            this.btnRedownload = new murrty.controls.ExtendedButton();
+            this.btnRenumerate = new murrty.controls.ExtendedButton();
             this.lbDownloadedOn = new System.Windows.Forms.Label();
             this.tcMain.SuspendLayout();
             this.tbTags.SuspendLayout();
@@ -158,8 +158,8 @@
         private System.Windows.Forms.TabPage tbTags;
         private System.Windows.Forms.TabPage tbPools;
         private Controls.AeroListBox lbTags;
-        private Controls.ExtendedButton btnRedownload;
-        private Controls.ExtendedButton btnRenumerate;
+        private murrty.controls.ExtendedButton btnRedownload;
+        private murrty.controls.ExtendedButton btnRenumerate;
         private Controls.AeroListBox lbPools;
         private System.Windows.Forms.Label lbDownloadedOn;
     }

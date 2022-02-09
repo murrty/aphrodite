@@ -12,7 +12,7 @@ namespace aphrodite.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "12.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.0.3.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -20,42 +20,6 @@ namespace aphrodite.Properties {
         public static Settings Default {
             get {
                 return defaultInstance;
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2.21")]
-        public decimal CurrentVersion {
-            get {
-                return ((decimal)(this["CurrentVersion"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2021-04-11")]
-        public string DebugDate {
-            get {
-                return ((string)(this["DebugDate"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool IsBetaVersion {
-            get {
-                return ((bool)(this["IsBetaVersion"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2.3-pre1")]
-        public string BetaVersion {
-            get {
-                return ((string)(this["BetaVersion"]));
             }
         }
         
@@ -68,6 +32,90 @@ namespace aphrodite.Properties {
             }
             set {
                 this["SkippedVersion"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool CheckForUpdates {
+            get {
+                return ((bool)(this["CheckForUpdates"]));
+            }
+            set {
+                this["CheckForUpdates"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool CheckForBetaUpdates {
+            get {
+                return ((bool)(this["CheckForBetaUpdates"]));
+            }
+            set {
+                this["CheckForBetaUpdates"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SkippedBetaVersion {
+            get {
+                return ((string)(this["SkippedBetaVersion"]));
+            }
+            set {
+                this["SkippedBetaVersion"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool FirstTime {
+            get {
+                return ((bool)(this["FirstTime"]));
+            }
+            set {
+                this["FirstTime"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AutoDownloadWithArguments {
+            get {
+                return ((bool)(this["AutoDownloadWithArguments"]));
+            }
+            set {
+                this["AutoDownloadWithArguments"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SkipArgumentCheck {
+            get {
+                return ((bool)(this["SkipArgumentCheck"]));
+            }
+            set {
+                this["SkipArgumentCheck"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ArgumentFormTopMost {
+            get {
+                return ((bool)(this["ArgumentFormTopMost"]));
+            }
+            set {
+                this["ArgumentFormTopMost"] = value;
             }
         }
     }

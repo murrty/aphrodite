@@ -1,14 +1,7 @@
 ﻿namespace aphrodite {
     partial class frmImageDownloader {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing) {
             if (disposing && (components != null)) {
                 components.Dispose();
@@ -18,104 +11,99 @@
 
         #region Windows Form Designer generated code
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent() {
-            this.components = new System.ComponentModel.Container();
-            this.status = new System.Windows.Forms.StatusBar();
-            this.tmrTitle = new System.Windows.Forms.Timer(this.components);
-            this.lbPercentage = new System.Windows.Forms.Label();
-            this.lbInfo = new System.Windows.Forms.Label();
-            this.pbDownloadStatus = new aphrodite.Controls.ExtendedProgressBar();
-            this.lbBytes = new System.Windows.Forms.Label();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmImageDownloader));
+            this.lbTagsHint = new System.Windows.Forms.Label();
+            this.txtPostId = new murrty.controls.ExtendedTextBox();
+            this.sbStatus = new System.Windows.Forms.StatusBar();
+            this.pbDownloadStatus = new murrty.controls.ExtendedProgressBar();
             this.SuspendLayout();
             // 
-            // status
+            // lbTagsHint
             // 
-            this.status.Location = new System.Drawing.Point(0, 101);
-            this.status.Name = "status";
-            this.status.Size = new System.Drawing.Size(282, 22);
-            this.status.SizingGrip = false;
-            this.status.TabIndex = 0;
-            this.status.Text = "Waiting for initial start";
+            this.lbTagsHint.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.lbTagsHint.Location = new System.Drawing.Point(9, 3);
+            this.lbTagsHint.Name = "lbTagsHint";
+            this.lbTagsHint.Size = new System.Drawing.Size(291, 17);
+            this.lbTagsHint.TabIndex = 32;
+            this.lbTagsHint.Text = "downloading image";
+            this.lbTagsHint.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // tmrTitle
+            // txtPostId
             // 
-            this.tmrTitle.Enabled = true;
-            this.tmrTitle.Interval = 1000;
-            this.tmrTitle.Tick += new System.EventHandler(this.tmrTitle_Tick);
+            this.txtPostId.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtPostId.ButtonAlignment = murrty.controls.ButtonAlignment.Left;
+            this.txtPostId.ButtonCursor = System.Windows.Forms.Cursors.Default;
+            this.txtPostId.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtPostId.ButtonImageIndex = -1;
+            this.txtPostId.ButtonImageKey = "";
+            this.txtPostId.ButtonSize = new System.Drawing.Size(22, 21);
+            this.txtPostId.ButtonText = "";
+            this.txtPostId.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.txtPostId.Location = new System.Drawing.Point(12, 24);
+            this.txtPostId.Name = "txtPostId";
+            this.txtPostId.ReadOnly = true;
+            this.txtPostId.Size = new System.Drawing.Size(288, 22);
+            this.txtPostId.TabIndex = 31;
+            this.txtPostId.Text = "this is the image id";
+            this.txtPostId.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.txtPostId.TextHint = "";
             // 
-            // lbPercentage
+            // sbStatus
             // 
-            this.lbPercentage.BackColor = System.Drawing.Color.Transparent;
-            this.lbPercentage.Location = new System.Drawing.Point(121, 74);
-            this.lbPercentage.Name = "lbPercentage";
-            this.lbPercentage.Size = new System.Drawing.Size(41, 14);
-            this.lbPercentage.TabIndex = 6;
-            this.lbPercentage.Text = "0%";
-            this.lbPercentage.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // lbInfo
-            // 
-            this.lbInfo.Location = new System.Drawing.Point(11, 13);
-            this.lbInfo.Name = "lbInfo";
-            this.lbInfo.Size = new System.Drawing.Size(260, 25);
-            this.lbInfo.TabIndex = 7;
-            this.lbInfo.Text = "Waiting for parse";
-            this.lbInfo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.sbStatus.Location = new System.Drawing.Point(0, 81);
+            this.sbStatus.Name = "sbStatus";
+            this.sbStatus.Size = new System.Drawing.Size(312, 22);
+            this.sbStatus.SizingGrip = false;
+            this.sbStatus.TabIndex = 30;
+            this.sbStatus.Text = "waiting for thread to start";
             // 
             // pbDownloadStatus
             // 
-            this.pbDownloadStatus.ContainerControl = this;
-            this.pbDownloadStatus.Location = new System.Drawing.Point(11, 72);
+            this.pbDownloadStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.pbDownloadStatus.ContainerParent = this;
+            this.pbDownloadStatus.FastValueUpdate = true;
+            this.pbDownloadStatus.Location = new System.Drawing.Point(12, 53);
             this.pbDownloadStatus.Name = "pbDownloadStatus";
             this.pbDownloadStatus.ShowInTaskbar = true;
-            this.pbDownloadStatus.Size = new System.Drawing.Size(260, 18);
-            this.pbDownloadStatus.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
-            this.pbDownloadStatus.TabIndex = 8;
-            // 
-            // lbBytes
-            // 
-            this.lbBytes.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbBytes.Location = new System.Drawing.Point(-3, 46);
-            this.lbBytes.Name = "lbBytes";
-            this.lbBytes.Size = new System.Drawing.Size(288, 20);
-            this.lbBytes.TabIndex = 13;
-            this.lbBytes.Text = "0mb / 0mb";
-            this.lbBytes.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.pbDownloadStatus.Size = new System.Drawing.Size(288, 22);
+            this.pbDownloadStatus.State = murrty.controls.ProgressBarState.Normal;
+            this.pbDownloadStatus.Style = System.Windows.Forms.ProgressBarStyle.Blocks;
+            this.pbDownloadStatus.TabIndex = 29;
+            this.pbDownloadStatus.Text = "waiting until api is finished being parsed";
+            this.pbDownloadStatus.TextColor = System.Drawing.SystemColors.WindowText;
+            this.pbDownloadStatus.TextFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             // 
             // frmImageDownloader
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(282, 123);
-            this.Controls.Add(this.lbBytes);
-            this.Controls.Add(this.lbInfo);
-            this.Controls.Add(this.lbPercentage);
-            this.Controls.Add(this.status);
+            this.ClientSize = new System.Drawing.Size(312, 103);
+            this.Controls.Add(this.lbTagsHint);
+            this.Controls.Add(this.txtPostId);
+            this.Controls.Add(this.sbStatus);
             this.Controls.Add(this.pbDownloadStatus);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = global::aphrodite.Properties.Resources.Brad;
-            this.MinimumSize = new System.Drawing.Size(300, 140);
+            this.Location = new System.Drawing.Point(330, 140);
+            this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(330, 140);
             this.Name = "frmImageDownloader";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Downloading image ....";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmImageDownloader_FormClosing);
-            this.Load += new System.EventHandler(this.frmImageDownloader_Load);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmImageDownloaderUpdated_FormClosing);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.StatusBar status;
-        private System.Windows.Forms.Timer tmrTitle;
-        private System.Windows.Forms.Label lbPercentage;
-        private System.Windows.Forms.Label lbInfo;
-        private Controls.ExtendedProgressBar pbDownloadStatus;
-        private System.Windows.Forms.Label lbBytes;
+        private System.Windows.Forms.Label lbTagsHint;
+        private murrty.controls.ExtendedTextBox txtPostId;
+        private System.Windows.Forms.StatusBar sbStatus;
+        private murrty.controls.ExtendedProgressBar pbDownloadStatus;
     }
 }

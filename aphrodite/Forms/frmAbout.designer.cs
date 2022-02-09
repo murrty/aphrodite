@@ -1,14 +1,7 @@
 ﻿namespace aphrodite {
     partial class frmAbout {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing) {
             if(disposing && (components != null)) {
                 components.Dispose();
@@ -18,20 +11,15 @@
 
         #region Windows Form Designer generated code
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
             this.lbVersion = new System.Windows.Forms.Label();
-            this.llbCheckForUpdates = new aphrodite.Controls.LinkLabelHand();
+            this.llbCheckForUpdates = new murrty.controls.ExtendedLinkLabel();
             this.lbHeader = new System.Windows.Forms.Label();
             this.lbBody = new System.Windows.Forms.Label();
             this.pbIcon = new System.Windows.Forms.PictureBox();
             this.tipWoof = new System.Windows.Forms.ToolTip(this.components);
-            this.lnkLicense = new aphrodite.Controls.LinkLabelHand();
             ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).BeginInit();
             this.SuspendLayout();
             // 
@@ -47,14 +35,16 @@
             // 
             // llbCheckForUpdates
             // 
+            this.llbCheckForUpdates.ActiveLinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.llbCheckForUpdates.AutoSize = true;
-            this.llbCheckForUpdates.LinkColor = System.Drawing.Color.Blue;
-            this.llbCheckForUpdates.Location = new System.Drawing.Point(85, 120);
+            this.llbCheckForUpdates.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(102)))), ((int)(((byte)(204)))));
+            this.llbCheckForUpdates.Location = new System.Drawing.Point(83, 121);
             this.llbCheckForUpdates.Name = "llbCheckForUpdates";
-            this.llbCheckForUpdates.Size = new System.Drawing.Size(101, 13);
+            this.llbCheckForUpdates.Size = new System.Drawing.Size(96, 13);
             this.llbCheckForUpdates.TabIndex = 0;
             this.llbCheckForUpdates.TabStop = true;
-            this.llbCheckForUpdates.Text = "Check for updates";
+            this.llbCheckForUpdates.Text = "Check for update";
+            this.llbCheckForUpdates.VisitedLinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(0)))), ((int)(((byte)(128)))));
             this.llbCheckForUpdates.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.llbCheckForUpdates_LinkClicked);
             // 
             // lbHeader
@@ -74,8 +64,8 @@
             this.lbBody.Name = "lbBody";
             this.lbBody.Size = new System.Drawing.Size(238, 79);
             this.lbBody.TabIndex = 3;
-            this.lbBody.Text = "aphrodite by murrty\r\nicon is brad the bread.\r\ncredit to fuz for being fuz\r\ncoded " +
-    "in VisualStudio 2013";
+            this.lbBody.Text = "aphrodite by murrty\r\nicon is brad the bread.\r\ncredit to fuz for being fuz\r\nbuilt " +
+    "with visual studio 2022";
             this.lbBody.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // pbIcon
@@ -92,24 +82,12 @@
             this.tipWoof.SetToolTip(this.pbIcon, "bark bark (rough translation: click me)");
             this.pbIcon.Click += new System.EventHandler(this.pbIcon_Click);
             // 
-            // lnkLicense
-            // 
-            this.lnkLicense.AutoSize = true;
-            this.lnkLicense.Location = new System.Drawing.Point(12, 120);
-            this.lnkLicense.Name = "lnkLicense";
-            this.lnkLicense.Size = new System.Drawing.Size(47, 13);
-            this.lnkLicense.TabIndex = 5;
-            this.lnkLicense.TabStop = true;
-            this.lnkLicense.Text = "licenses";
-            this.lnkLicense.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkLicense_LinkClicked);
-            // 
             // frmAbout
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(262, 143);
-            this.Controls.Add(this.lnkLicense);
             this.Controls.Add(this.lbVersion);
             this.Controls.Add(this.pbIcon);
             this.Controls.Add(this.lbBody);
@@ -135,11 +113,10 @@
         #endregion
 
         private System.Windows.Forms.Label lbVersion;
-        private Controls.LinkLabelHand llbCheckForUpdates;
+        private murrty.controls.ExtendedLinkLabel llbCheckForUpdates;
         private System.Windows.Forms.Label lbHeader;
         private System.Windows.Forms.Label lbBody;
         private System.Windows.Forms.PictureBox pbIcon;
         private System.Windows.Forms.ToolTip tipWoof;
-        private Controls.LinkLabelHand lnkLicense;
     }
 }

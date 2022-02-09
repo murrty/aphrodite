@@ -35,5 +35,32 @@
     <Setting Name="frmUndesiredTags_Location" Type="System.Drawing.Point" Scope="User">
       <Value Profile="(Default)">-32000, -32000</Value>
     </Setting>
+    <Setting Name="frmFurryBooruMain_Location" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">-32000, -32000</Value>
+    </Setting>
+    <Setting Name="frmFurryBooruDownloader_Location" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">-32000, -32000</Value>
+    </Setting>
+    <Setting Name="frmInkBunnyMain_Location" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">-32000, -32000</Value>
+    </Setting>
+    <Setting Name="frmInkBunnyLogin_Location" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">-32000, -32000</Value>
+    </Setting>
+    <Setting Name="frmInkBunnyDownloader_Location" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">-32000, -32000</Value>
+    </Setting>
+    <Setting Name="frmImgurMain_Location" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">-32000, -32000</Value>
+    </Setting>
+    <Setting Name="frmImgurDownloader_Location" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">-32000, -32000</Value>
+    </Setting>
+    <Setting Name="frmImgurLogin_Location" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">-32000, -32000</Value>
+    </Setting>
+    <Setting Name="frmArgument_Location" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">-32000, -32000</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

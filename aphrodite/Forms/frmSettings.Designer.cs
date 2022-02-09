@@ -35,8 +35,8 @@
             this.chkSaveGraylistedImages = new System.Windows.Forms.CheckBox();
             this.chkOpenAfterDownload = new System.Windows.Forms.CheckBox();
             this.chkSaveInfoFiles = new System.Windows.Forms.CheckBox();
-            this.btnBrowseForSaveTo = new aphrodite.Controls.ExtendedButton();
-            this.txtSaveTo = new aphrodite.Controls.ExtendedTextBox();
+            this.btnBrowseForDownloadDirectory = new murrty.controls.ExtendedButton();
+            this.txtSaveTo = new murrty.controls.ExtendedTextBox();
             this.lbSaveTo = new System.Windows.Forms.Label();
             this.tabTags = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -80,18 +80,15 @@
             this.lbImagesHeader = new System.Windows.Forms.Label();
             this.tabMisc = new System.Windows.Forms.TabPage();
             this.chkUseSessionId = new System.Windows.Forms.CheckBox();
-            this.txtSessionId = new aphrodite.Controls.ExtendedTextBox();
+            this.txtSessionId = new murrty.controls.ExtendedTextBox();
             this.lbSessionId = new System.Windows.Forms.Label();
             this.tabProtocol = new System.Windows.Forms.TabPage();
             this.lbProtocolsSeparator = new System.Windows.Forms.Label();
             this.lbProtocols = new System.Windows.Forms.Label();
-            this.btnProtocolImagesUserscript = new aphrodite.Controls.ExtendedButton();
-            this.btnProtocolUserscript = new aphrodite.Controls.ExtendedButton();
-            this.btnProtocolInstallTags = new aphrodite.Controls.ExtendedButton();
-            this.btnProtocolInstallPools = new aphrodite.Controls.ExtendedButton();
-            this.btnProtocolInstallImages = new aphrodite.Controls.ExtendedButton();
+            this.btnProtocolUserscript = new murrty.controls.ExtendedButton();
+            this.btnInstallProtocol = new murrty.controls.ExtendedButton();
             this.tabSchemas = new System.Windows.Forms.TabPage();
-            this.btnSchemaUndesiredTags = new aphrodite.Controls.ExtendedButton();
+            this.btnSchemaUndesiredTags = new murrty.controls.ExtendedButton();
             this.lbImageExt = new System.Windows.Forms.Label();
             this.lbPoolExt = new System.Windows.Forms.Label();
             this.lbTagExt = new System.Windows.Forms.Label();
@@ -99,10 +96,10 @@
             this.lbSchemaParam = new System.Windows.Forms.Label();
             this.lblTagSchema = new System.Windows.Forms.Label();
             this.lbPoolSchema = new System.Windows.Forms.Label();
-            this.txtImageSchema = new aphrodite.Controls.ExtendedTextBox();
-            this.txtTagSchema = new aphrodite.Controls.ExtendedTextBox();
+            this.txtImageSchema = new murrty.controls.ExtendedTextBox();
+            this.txtTagSchema = new murrty.controls.ExtendedTextBox();
             this.lbImageSchema = new System.Windows.Forms.Label();
-            this.txtPoolSchema = new aphrodite.Controls.ExtendedTextBox();
+            this.txtPoolSchema = new murrty.controls.ExtendedTextBox();
             this.tabImportExport = new System.Windows.Forms.TabPage();
             this.chkOverwriteOnImport = new System.Windows.Forms.CheckBox();
             this.btnImportUndesiredTags = new System.Windows.Forms.Button();
@@ -116,9 +113,9 @@
             this.chkEnableIni = new System.Windows.Forms.CheckBox();
             this.lbPortable = new System.Windows.Forms.Label();
             this.JustTheTips = new System.Windows.Forms.ToolTip(this.components);
-            this.btnBlacklist = new aphrodite.Controls.ExtendedButton();
-            this.btnSave = new aphrodite.Controls.ExtendedButton();
-            this.btnCancel = new aphrodite.Controls.ExtendedButton();
+            this.btnBlacklist = new murrty.controls.ExtendedButton();
+            this.btnSave = new murrty.controls.ExtendedButton();
+            this.btnCancel = new murrty.controls.ExtendedButton();
             this.pnControls = new System.Windows.Forms.Panel();
             this.tbMain.SuspendLayout();
             this.tabGeneral.SuspendLayout();
@@ -171,7 +168,7 @@
             this.tabGeneral.Controls.Add(this.chkSaveGraylistedImages);
             this.tabGeneral.Controls.Add(this.chkOpenAfterDownload);
             this.tabGeneral.Controls.Add(this.chkSaveInfoFiles);
-            this.tabGeneral.Controls.Add(this.btnBrowseForSaveTo);
+            this.tabGeneral.Controls.Add(this.btnBrowseForDownloadDirectory);
             this.tabGeneral.Controls.Add(this.txtSaveTo);
             this.tabGeneral.Controls.Add(this.lbSaveTo);
             this.tabGeneral.Location = new System.Drawing.Point(4, 22);
@@ -281,21 +278,21 @@
             this.JustTheTips.SetToolTip(this.chkSaveInfoFiles, resources.GetString("chkSaveInfoFiles.ToolTip"));
             this.chkSaveInfoFiles.UseVisualStyleBackColor = true;
             // 
-            // btnBrowseForSaveTo
+            // btnBrowseForDownloadDirectory
             // 
-            this.btnBrowseForSaveTo.Location = new System.Drawing.Point(353, 31);
-            this.btnBrowseForSaveTo.Name = "btnBrowseForSaveTo";
-            this.btnBrowseForSaveTo.Size = new System.Drawing.Size(24, 23);
-            this.btnBrowseForSaveTo.TabIndex = 1;
-            this.btnBrowseForSaveTo.Text = "...";
-            this.JustTheTips.SetToolTip(this.btnBrowseForSaveTo, "Browse for a new directory to save downloads to.\r\n\r\nYou\'ll have the option to mov" +
+            this.btnBrowseForDownloadDirectory.Location = new System.Drawing.Point(353, 31);
+            this.btnBrowseForDownloadDirectory.Name = "btnBrowseForSaveTo";
+            this.btnBrowseForDownloadDirectory.Size = new System.Drawing.Size(24, 23);
+            this.btnBrowseForDownloadDirectory.TabIndex = 1;
+            this.btnBrowseForDownloadDirectory.Text = "...";
+            this.JustTheTips.SetToolTip(this.btnBrowseForDownloadDirectory, "Browse for a new directory to save downloads to.\r\n\r\nYou\'ll have the option to mov" +
         "e existing downloads.");
-            this.btnBrowseForSaveTo.UseVisualStyleBackColor = true;
-            this.btnBrowseForSaveTo.Click += new System.EventHandler(this.btnBrws_Click);
+            this.btnBrowseForDownloadDirectory.UseVisualStyleBackColor = true;
+            this.btnBrowseForDownloadDirectory.Click += new System.EventHandler(this.btnBrowseForDownloadDirectory_Click);
             // 
             // txtSaveTo
             // 
-            this.txtSaveTo.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
+            this.txtSaveTo.ButtonAlignment = murrty.controls.ButtonAlignment.Left;
             this.txtSaveTo.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
             this.txtSaveTo.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtSaveTo.ButtonImageIndex = -1;
@@ -837,7 +834,7 @@
             // 
             // txtSessionId
             // 
-            this.txtSessionId.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
+            this.txtSessionId.ButtonAlignment = murrty.controls.ButtonAlignment.Left;
             this.txtSessionId.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
             this.txtSessionId.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtSessionId.ButtonImageIndex = -1;
@@ -865,11 +862,8 @@
             // 
             this.tabProtocol.Controls.Add(this.lbProtocolsSeparator);
             this.tabProtocol.Controls.Add(this.lbProtocols);
-            this.tabProtocol.Controls.Add(this.btnProtocolImagesUserscript);
             this.tabProtocol.Controls.Add(this.btnProtocolUserscript);
-            this.tabProtocol.Controls.Add(this.btnProtocolInstallTags);
-            this.tabProtocol.Controls.Add(this.btnProtocolInstallPools);
-            this.tabProtocol.Controls.Add(this.btnProtocolInstallImages);
+            this.tabProtocol.Controls.Add(this.btnInstallProtocol);
             this.tabProtocol.Location = new System.Drawing.Point(4, 22);
             this.tabProtocol.Name = "tabProtocol";
             this.tabProtocol.Padding = new System.Windows.Forms.Padding(3);
@@ -881,7 +875,7 @@
             // lbProtocolsSeparator
             // 
             this.lbProtocolsSeparator.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.lbProtocolsSeparator.Location = new System.Drawing.Point(59, 149);
+            this.lbProtocolsSeparator.Location = new System.Drawing.Point(59, 125);
             this.lbProtocolsSeparator.Name = "lbProtocolsSeparator";
             this.lbProtocolsSeparator.Size = new System.Drawing.Size(292, 2);
             this.lbProtocolsSeparator.TabIndex = 6;
@@ -889,62 +883,32 @@
             // 
             // lbProtocols
             // 
-            this.lbProtocols.Location = new System.Drawing.Point(6, 5);
+            this.lbProtocols.Location = new System.Drawing.Point(6, 30);
             this.lbProtocols.Name = "lbProtocols";
             this.lbProtocols.Size = new System.Drawing.Size(388, 80);
             this.lbProtocols.TabIndex = 3;
             this.lbProtocols.Text = resources.GetString("lbProtocols.Text");
             this.lbProtocols.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
-            // btnProtocolImagesUserscript
-            // 
-            this.btnProtocolImagesUserscript.Location = new System.Drawing.Point(246, 160);
-            this.btnProtocolImagesUserscript.Name = "btnProtocolImagesUserscript";
-            this.btnProtocolImagesUserscript.Size = new System.Drawing.Size(75, 23);
-            this.btnProtocolImagesUserscript.TabIndex = 5;
-            this.btnProtocolImagesUserscript.Text = "Userscript";
-            this.btnProtocolImagesUserscript.UseVisualStyleBackColor = true;
-            this.btnProtocolImagesUserscript.Click += new System.EventHandler(this.btnImagesUserscript_Click);
-            // 
             // btnProtocolUserscript
             // 
-            this.btnProtocolUserscript.Location = new System.Drawing.Point(246, 107);
+            this.btnProtocolUserscript.Location = new System.Drawing.Point(254, 142);
             this.btnProtocolUserscript.Name = "btnProtocolUserscript";
             this.btnProtocolUserscript.Size = new System.Drawing.Size(75, 23);
             this.btnProtocolUserscript.TabIndex = 3;
-            this.btnProtocolUserscript.Text = "Userscript";
+            this.btnProtocolUserscript.Text = "userscript";
             this.btnProtocolUserscript.UseVisualStyleBackColor = true;
             this.btnProtocolUserscript.Click += new System.EventHandler(this.btnUserscript_Click);
             // 
-            // btnProtocolInstallTags
+            // btnInstallProtocol
             // 
-            this.btnProtocolInstallTags.Location = new System.Drawing.Point(89, 95);
-            this.btnProtocolInstallTags.Name = "btnProtocolInstallTags";
-            this.btnProtocolInstallTags.Size = new System.Drawing.Size(151, 23);
-            this.btnProtocolInstallTags.TabIndex = 1;
-            this.btnProtocolInstallTags.Text = "Install tag protocol";
-            this.btnProtocolInstallTags.UseVisualStyleBackColor = true;
-            this.btnProtocolInstallTags.Click += new System.EventHandler(this.btnTagsProtocol_Click);
-            // 
-            // btnProtocolInstallPools
-            // 
-            this.btnProtocolInstallPools.Location = new System.Drawing.Point(89, 120);
-            this.btnProtocolInstallPools.Name = "btnProtocolInstallPools";
-            this.btnProtocolInstallPools.Size = new System.Drawing.Size(151, 23);
-            this.btnProtocolInstallPools.TabIndex = 2;
-            this.btnProtocolInstallPools.Text = "Install pool protocols";
-            this.btnProtocolInstallPools.UseVisualStyleBackColor = true;
-            this.btnProtocolInstallPools.Click += new System.EventHandler(this.btnPoolsProtocol_Click);
-            // 
-            // btnProtocolInstallImages
-            // 
-            this.btnProtocolInstallImages.Location = new System.Drawing.Point(89, 160);
-            this.btnProtocolInstallImages.Name = "btnProtocolInstallImages";
-            this.btnProtocolInstallImages.Size = new System.Drawing.Size(151, 23);
-            this.btnProtocolInstallImages.TabIndex = 4;
-            this.btnProtocolInstallImages.Text = "Install image protocol";
-            this.btnProtocolInstallImages.UseVisualStyleBackColor = true;
-            this.btnProtocolInstallImages.Click += new System.EventHandler(this.btnImagesProtocol_Click);
+            this.btnInstallProtocol.Location = new System.Drawing.Point(72, 142);
+            this.btnInstallProtocol.Name = "btnInstallProtocol";
+            this.btnInstallProtocol.Size = new System.Drawing.Size(176, 23);
+            this.btnInstallProtocol.TabIndex = 1;
+            this.btnInstallProtocol.Text = "install aphrodite protocol";
+            this.btnInstallProtocol.UseVisualStyleBackColor = true;
+            this.btnInstallProtocol.Click += new System.EventHandler(this.btnInstallProtocol_Click);
             // 
             // tabSchemas
             // 
@@ -1044,7 +1008,7 @@
             // 
             // txtImageSchema
             // 
-            this.txtImageSchema.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
+            this.txtImageSchema.ButtonAlignment = murrty.controls.ButtonAlignment.Left;
             this.txtImageSchema.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
             this.txtImageSchema.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtImageSchema.ButtonImageIndex = -1;
@@ -1063,7 +1027,7 @@
             // 
             // txtTagSchema
             // 
-            this.txtTagSchema.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
+            this.txtTagSchema.ButtonAlignment = murrty.controls.ButtonAlignment.Left;
             this.txtTagSchema.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
             this.txtTagSchema.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtTagSchema.ButtonImageIndex = -1;
@@ -1091,7 +1055,7 @@
             // 
             // txtPoolSchema
             // 
-            this.txtPoolSchema.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
+            this.txtPoolSchema.ButtonAlignment = murrty.controls.ButtonAlignment.Left;
             this.txtPoolSchema.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
             this.txtPoolSchema.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtPoolSchema.ButtonImageIndex = -1;
@@ -1299,6 +1263,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(408, 263);
             this.Controls.Add(this.tbMain);
             this.Controls.Add(this.pnControls);
@@ -1351,17 +1316,17 @@
 
         #endregion
 
-        private Controls.ExtendedButton btnCancel;
-        private Controls.ExtendedButton btnSave;
+        private murrty.controls.ExtendedButton btnCancel;
+        private murrty.controls.ExtendedButton btnSave;
         private System.Windows.Forms.TabControl tbMain;
         private System.Windows.Forms.TabPage tabGeneral;
         private System.Windows.Forms.TabPage tabTags;
         private System.Windows.Forms.TabPage tabPools;
-        private Controls.ExtendedButton btnBrowseForSaveTo;
-        private Controls.ExtendedTextBox txtSaveTo;
+        private murrty.controls.ExtendedButton btnBrowseForDownloadDirectory;
+        private murrty.controls.ExtendedTextBox txtSaveTo;
         private System.Windows.Forms.Label lbSaveTo;
         private System.Windows.Forms.CheckBox chkSaveInfoFiles;
-        private Controls.ExtendedButton btnBlacklist;
+        private murrty.controls.ExtendedButton btnBlacklist;
         private System.Windows.Forms.CheckBox chkSaveGraylistedImages;
         private System.Windows.Forms.CheckBox chkTagsSeparateRatings;
         private System.Windows.Forms.CheckBox chkTagsSafe;
@@ -1373,12 +1338,9 @@
         private System.Windows.Forms.CheckBox chkPoolsMergeGraylistedImages;
         private System.Windows.Forms.CheckBox chkOpenAfterDownload;
         private System.Windows.Forms.TabPage tabProtocol;
-        private Controls.ExtendedButton btnProtocolInstallTags;
-        private Controls.ExtendedButton btnProtocolInstallPools;
-        private Controls.ExtendedButton btnProtocolInstallImages;
+        private murrty.controls.ExtendedButton btnInstallProtocol;
         private System.Windows.Forms.Label lbProtocolsSeparator;
-        private Controls.ExtendedButton btnProtocolImagesUserscript;
-        private Controls.ExtendedButton btnProtocolUserscript;
+        private murrty.controls.ExtendedButton btnProtocolUserscript;
         private System.Windows.Forms.Label lbProtocols;
         private System.Windows.Forms.TabPage tabImages;
         private System.Windows.Forms.ToolTip JustTheTips;
@@ -1396,19 +1358,19 @@
         private System.Windows.Forms.TabPage tabPortable;
         private System.Windows.Forms.Label lbPortable;
         private System.Windows.Forms.Label lbImageSchema;
-        private Controls.ExtendedTextBox txtImageSchema;
+        private murrty.controls.ExtendedTextBox txtImageSchema;
         private System.Windows.Forms.CheckBox chkImagesSeparateArtists;
         private System.Windows.Forms.Label lblTagSchema;
-        private Controls.ExtendedTextBox txtTagSchema;
+        private murrty.controls.ExtendedTextBox txtTagSchema;
         private System.Windows.Forms.Label lbPoolSchema;
-        private Controls.ExtendedTextBox txtPoolSchema;
+        private murrty.controls.ExtendedTextBox txtPoolSchema;
         private System.Windows.Forms.TabPage tabSchemas;
         private System.Windows.Forms.Label lbSchemaParam;
         private System.Windows.Forms.RichTextBox rtbParams;
         private System.Windows.Forms.Label lbTagExt;
         private System.Windows.Forms.Label lbImageExt;
         private System.Windows.Forms.Label lbPoolExt;
-        private Controls.ExtendedButton btnSchemaUndesiredTags;
+        private murrty.controls.ExtendedButton btnSchemaUndesiredTags;
         private System.Windows.Forms.CheckBox chkTagsSeparateNonImages;
         private System.Windows.Forms.CheckBox chkImagesSeparateNonImages;
         private System.Windows.Forms.CheckBox chkPoolsMergeBlacklistedImages;
@@ -1439,7 +1401,7 @@
         private System.Windows.Forms.Label lbTagsImages;
         private System.Windows.Forms.Label lbTagsPages;
         private System.Windows.Forms.TabPage tabMisc;
-        private Controls.ExtendedTextBox txtSessionId;
+        private murrty.controls.ExtendedTextBox txtSessionId;
         private System.Windows.Forms.Label lbSessionId;
         private System.Windows.Forms.CheckBox chkUseSessionId;
         private System.Windows.Forms.CheckBox chkArgumentFormTopMost;

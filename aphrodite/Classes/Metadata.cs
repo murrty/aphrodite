@@ -8,11 +8,9 @@ namespace aphrodite {
                 Image openImage = Image.FromFile(file);
                 System.Drawing.Imaging.PropertyItem imageProperty = openImage.PropertyItems[0];
 
-                imageProperty = openImage.PropertyItems[0];
                 SetProperty(ref imageProperty, 315, artistsMetadata);
                 openImage.SetPropertyItem(imageProperty);
 
-                imageProperty = openImage.PropertyItems[0];
                 SetProperty(ref imageProperty, 270, tagsMetadata);
                 openImage.SetPropertyItem(imageProperty);
 

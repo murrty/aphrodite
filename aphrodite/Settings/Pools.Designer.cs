@@ -12,7 +12,7 @@ namespace aphrodite.Settings {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "12.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.0.3.0")]
     internal sealed partial class Pools : global::System.Configuration.ApplicationSettingsBase {
         
         private static Pools defaultInstance = ((Pools)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Pools())));

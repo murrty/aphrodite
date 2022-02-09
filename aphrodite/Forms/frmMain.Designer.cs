@@ -34,9 +34,9 @@
             this.rbTagsLimits = new System.Windows.Forms.RadioButton();
             this.rbTagsMinimumFavorites = new System.Windows.Forms.RadioButton();
             this.rbTagsMinimumScore = new System.Windows.Forms.RadioButton();
-            this.btnDownloadTags = new aphrodite.Controls.ExtendedButton();
+            this.btnDownloadTags = new murrty.controls.ExtendedButton();
             this.lbAwoo = new System.Windows.Forms.Label();
-            this.txtTags = new aphrodite.Controls.ExtendedTextBox();
+            this.txtTags = new murrty.controls.ExtendedTextBox();
             this.panelTagsOtherSettings = new System.Windows.Forms.Panel();
             this.chkTagsOpenAfterDownload = new System.Windows.Forms.CheckBox();
             this.chkTagsDownloadInUploadOrder = new System.Windows.Forms.CheckBox();
@@ -63,8 +63,8 @@
             this.chkPoolMergeBlacklisted = new System.Windows.Forms.CheckBox();
             this.chkPoolMergeGraylisted = new System.Windows.Forms.CheckBox();
             this.chkPoolOpenAfter = new System.Windows.Forms.CheckBox();
-            this.txtPoolId = new aphrodite.Controls.ExtendedTextBox();
-            this.btnDownloadPool = new aphrodite.Controls.ExtendedButton();
+            this.txtPoolId = new murrty.controls.ExtendedTextBox();
+            this.btnDownloadPool = new murrty.controls.ExtendedButton();
             this.tabImages = new System.Windows.Forms.TabPage();
             this.chkImageSeparateBlacklisted = new System.Windows.Forms.CheckBox();
             this.chkImageOpenAfter = new System.Windows.Forms.CheckBox();
@@ -73,8 +73,8 @@
             this.chkImageUseForm = new System.Windows.Forms.CheckBox();
             this.chkImageSeparateGraylisted = new System.Windows.Forms.CheckBox();
             this.chkImageSeparateRatings = new System.Windows.Forms.CheckBox();
-            this.txtImageUrl = new aphrodite.Controls.ExtendedTextBox();
-            this.btnDownloadImage = new aphrodite.Controls.ExtendedButton();
+            this.txtImageUrl = new murrty.controls.ExtendedTextBox();
+            this.btnDownloadImage = new murrty.controls.ExtendedButton();
             this.toolMenu = new System.Windows.Forms.MainMenu(this.components);
             this.mSettings = new System.Windows.Forms.MenuItem();
             this.mBlacklist = new System.Windows.Forms.MenuItem();
@@ -82,9 +82,14 @@
             this.mWishlist = new System.Windows.Forms.MenuItem();
             this.mRedownloader = new System.Windows.Forms.MenuItem();
             this.mReverseSearch = new System.Windows.Forms.MenuItem();
+            this.mOtherDownloaders = new System.Windows.Forms.MenuItem();
+            this.mFurryBooru = new System.Windows.Forms.MenuItem();
+            this.mInkBunny = new System.Windows.Forms.MenuItem();
+            this.mImgurAlbums = new System.Windows.Forms.MenuItem();
             this.mToolsSeparator = new System.Windows.Forms.MenuItem();
             this.mLog = new System.Windows.Forms.MenuItem();
             this.mAbout = new System.Windows.Forms.MenuItem();
+            this.mUpdateAvailable = new System.Windows.Forms.MenuItem();
             this.TouchingTips = new System.Windows.Forms.ToolTip(this.components);
             this.tabMain.SuspendLayout();
             this.tabTags.SuspendLayout();
@@ -110,7 +115,7 @@
             this.tabMain.Location = new System.Drawing.Point(0, 0);
             this.tabMain.Name = "tabMain";
             this.tabMain.SelectedIndex = 0;
-            this.tabMain.Size = new System.Drawing.Size(312, 258);
+            this.tabMain.Size = new System.Drawing.Size(312, 217);
             this.tabMain.TabIndex = 0;
             this.tabMain.SelectedIndexChanged += new System.EventHandler(this.tbMain_SelectedIndexChanged);
             // 
@@ -134,7 +139,7 @@
             this.tabTags.Location = new System.Drawing.Point(4, 22);
             this.tabTags.Name = "tabTags";
             this.tabTags.Padding = new System.Windows.Forms.Padding(3);
-            this.tabTags.Size = new System.Drawing.Size(304, 232);
+            this.tabTags.Size = new System.Drawing.Size(304, 191);
             this.tabTags.TabIndex = 0;
             this.tabTags.Text = "Tag(s)";
             this.tabTags.UseVisualStyleBackColor = true;
@@ -143,7 +148,7 @@
             // 
             this.lbTagsSeparator.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.lbTagsSeparator.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.lbTagsSeparator.Location = new System.Drawing.Point(124, 50);
+            this.lbTagsSeparator.Location = new System.Drawing.Point(124, 29);
             this.lbTagsSeparator.Name = "lbTagsSeparator";
             this.lbTagsSeparator.Size = new System.Drawing.Size(2, 133);
             this.lbTagsSeparator.TabIndex = 7;
@@ -152,7 +157,7 @@
             // lbTagsLimitsHint
             // 
             this.lbTagsLimitsHint.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.lbTagsLimitsHint.Location = new System.Drawing.Point(126, 11);
+            this.lbTagsLimitsHint.Location = new System.Drawing.Point(126, -10);
             this.lbTagsLimitsHint.Name = "lbTagsLimitsHint";
             this.lbTagsLimitsHint.Size = new System.Drawing.Size(178, 21);
             this.lbTagsLimitsHint.TabIndex = 17;
@@ -164,7 +169,7 @@
             // 
             this.rbTagsOtherSettings.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.rbTagsOtherSettings.Appearance = System.Windows.Forms.Appearance.Button;
-            this.rbTagsOtherSettings.Location = new System.Drawing.Point(9, 163);
+            this.rbTagsOtherSettings.Location = new System.Drawing.Point(9, 142);
             this.rbTagsOtherSettings.Name = "rbTagsOtherSettings";
             this.rbTagsOtherSettings.Size = new System.Drawing.Size(110, 23);
             this.rbTagsOtherSettings.TabIndex = 6;
@@ -178,7 +183,7 @@
             // 
             this.rbTagsRatings.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.rbTagsRatings.Appearance = System.Windows.Forms.Appearance.Button;
-            this.rbTagsRatings.Location = new System.Drawing.Point(9, 134);
+            this.rbTagsRatings.Location = new System.Drawing.Point(9, 113);
             this.rbTagsRatings.Name = "rbTagsRatings";
             this.rbTagsRatings.Size = new System.Drawing.Size(110, 23);
             this.rbTagsRatings.TabIndex = 5;
@@ -192,7 +197,7 @@
             // 
             this.rbTagsLimits.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.rbTagsLimits.Appearance = System.Windows.Forms.Appearance.Button;
-            this.rbTagsLimits.Location = new System.Drawing.Point(9, 105);
+            this.rbTagsLimits.Location = new System.Drawing.Point(9, 84);
             this.rbTagsLimits.Name = "rbTagsLimits";
             this.rbTagsLimits.Size = new System.Drawing.Size(110, 23);
             this.rbTagsLimits.TabIndex = 4;
@@ -206,7 +211,7 @@
             // 
             this.rbTagsMinimumFavorites.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.rbTagsMinimumFavorites.Appearance = System.Windows.Forms.Appearance.Button;
-            this.rbTagsMinimumFavorites.Location = new System.Drawing.Point(9, 76);
+            this.rbTagsMinimumFavorites.Location = new System.Drawing.Point(9, 55);
             this.rbTagsMinimumFavorites.Name = "rbTagsMinimumFavorites";
             this.rbTagsMinimumFavorites.Size = new System.Drawing.Size(110, 23);
             this.rbTagsMinimumFavorites.TabIndex = 3;
@@ -220,7 +225,7 @@
             // 
             this.rbTagsMinimumScore.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.rbTagsMinimumScore.Appearance = System.Windows.Forms.Appearance.Button;
-            this.rbTagsMinimumScore.Location = new System.Drawing.Point(9, 47);
+            this.rbTagsMinimumScore.Location = new System.Drawing.Point(9, 26);
             this.rbTagsMinimumScore.Name = "rbTagsMinimumScore";
             this.rbTagsMinimumScore.Size = new System.Drawing.Size(110, 23);
             this.rbTagsMinimumScore.TabIndex = 2;
@@ -233,7 +238,7 @@
             // btnDownloadTags
             // 
             this.btnDownloadTags.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.btnDownloadTags.Location = new System.Drawing.Point(112, 191);
+            this.btnDownloadTags.Location = new System.Drawing.Point(112, 170);
             this.btnDownloadTags.Name = "btnDownloadTags";
             this.btnDownloadTags.Size = new System.Drawing.Size(80, 23);
             this.btnDownloadTags.TabIndex = 14;
@@ -245,7 +250,7 @@
             // 
             this.lbAwoo.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.lbAwoo.AutoSize = true;
-            this.lbAwoo.Location = new System.Drawing.Point(124, 181);
+            this.lbAwoo.Location = new System.Drawing.Point(124, 160);
             this.lbAwoo.Name = "lbAwoo";
             this.lbAwoo.Size = new System.Drawing.Size(57, 13);
             this.lbAwoo.TabIndex = 13;
@@ -254,7 +259,7 @@
             // txtTags
             // 
             this.txtTags.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.txtTags.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
+            this.txtTags.ButtonAlignment = murrty.controls.ButtonAlignment.Left;
             this.txtTags.ButtonCursor = System.Windows.Forms.Cursors.Default;
             this.txtTags.ButtonEnabled = true;
             this.txtTags.ButtonFont = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -264,7 +269,7 @@
             this.txtTags.ButtonText = "X";
             this.txtTags.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.txtTags.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtTags.Location = new System.Drawing.Point(37, 20);
+            this.txtTags.Location = new System.Drawing.Point(37, -1);
             this.txtTags.Name = "txtTags";
             this.txtTags.Size = new System.Drawing.Size(230, 20);
             this.txtTags.TabIndex = 1;
@@ -273,7 +278,6 @@
             this.TouchingTips.SetToolTip(this.txtTags, "The tags that will be downloaded");
             this.txtTags.ButtonClick += new System.EventHandler(this.txtTags_ButtonClick);
             this.txtTags.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtTags_KeyDown);
-            this.txtTags.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtTags_KeyPress);
             // 
             // panelTagsOtherSettings
             // 
@@ -281,7 +285,7 @@
             this.panelTagsOtherSettings.Controls.Add(this.chkTagsOpenAfterDownload);
             this.panelTagsOtherSettings.Controls.Add(this.chkTagsDownloadInUploadOrder);
             this.panelTagsOtherSettings.Controls.Add(this.chkTagSeparateNonImages);
-            this.panelTagsOtherSettings.Location = new System.Drawing.Point(118, 47);
+            this.panelTagsOtherSettings.Location = new System.Drawing.Point(118, 26);
             this.panelTagsOtherSettings.Name = "panelTagsOtherSettings";
             this.panelTagsOtherSettings.Size = new System.Drawing.Size(180, 140);
             this.panelTagsOtherSettings.TabIndex = 12;
@@ -332,7 +336,7 @@
             this.panelTagsRatings.Controls.Add(this.chkTagsDownloadSafe);
             this.panelTagsRatings.Controls.Add(this.chkTagsSeparateRatings);
             this.panelTagsRatings.Controls.Add(this.chkTagsDownloadExplicit);
-            this.panelTagsRatings.Location = new System.Drawing.Point(118, 47);
+            this.panelTagsRatings.Location = new System.Drawing.Point(118, 26);
             this.panelTagsRatings.Name = "panelTagsRatings";
             this.panelTagsRatings.Size = new System.Drawing.Size(180, 140);
             this.panelTagsRatings.TabIndex = 11;
@@ -401,7 +405,7 @@
             this.panelTagsLimits.Controls.Add(this.lbTagsPageLimit);
             this.panelTagsLimits.Controls.Add(this.numTagsImageLimit);
             this.panelTagsLimits.Controls.Add(this.numTagsPageLimit);
-            this.panelTagsLimits.Location = new System.Drawing.Point(118, 47);
+            this.panelTagsLimits.Location = new System.Drawing.Point(118, 26);
             this.panelTagsLimits.Name = "panelTagsLimits";
             this.panelTagsLimits.Size = new System.Drawing.Size(180, 140);
             this.panelTagsLimits.TabIndex = 10;
@@ -462,7 +466,7 @@
             this.panelTagsMinimumFavorites.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.panelTagsMinimumFavorites.Controls.Add(this.chkTagsMinimumFavoritesAsTag);
             this.panelTagsMinimumFavorites.Controls.Add(this.numTagsMinimumFavorites);
-            this.panelTagsMinimumFavorites.Location = new System.Drawing.Point(118, 47);
+            this.panelTagsMinimumFavorites.Location = new System.Drawing.Point(118, 26);
             this.panelTagsMinimumFavorites.Name = "panelTagsMinimumFavorites";
             this.panelTagsMinimumFavorites.Size = new System.Drawing.Size(180, 140);
             this.panelTagsMinimumFavorites.TabIndex = 9;
@@ -508,7 +512,7 @@
             this.panelTagsMinimumScore.Controls.Add(this.chkTagsMinimumScoreAsTag);
             this.panelTagsMinimumScore.Controls.Add(this.numTagsMinimumScore);
             this.panelTagsMinimumScore.Controls.Add(this.chkTagsUseMinimumScore);
-            this.panelTagsMinimumScore.Location = new System.Drawing.Point(118, 47);
+            this.panelTagsMinimumScore.Location = new System.Drawing.Point(118, 26);
             this.panelTagsMinimumScore.Name = "panelTagsMinimumScore";
             this.panelTagsMinimumScore.Size = new System.Drawing.Size(180, 140);
             this.panelTagsMinimumScore.TabIndex = 8;
@@ -575,7 +579,7 @@
             this.tabPools.Location = new System.Drawing.Point(4, 22);
             this.tabPools.Name = "tabPools";
             this.tabPools.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPools.Size = new System.Drawing.Size(304, 211);
+            this.tabPools.Size = new System.Drawing.Size(304, 191);
             this.tabPools.TabIndex = 1;
             this.tabPools.Text = "Pool";
             this.tabPools.UseVisualStyleBackColor = true;
@@ -632,7 +636,7 @@
             // txtPoolId
             // 
             this.txtPoolId.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.txtPoolId.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
+            this.txtPoolId.ButtonAlignment = murrty.controls.ButtonAlignment.Left;
             this.txtPoolId.ButtonCursor = System.Windows.Forms.Cursors.Default;
             this.txtPoolId.ButtonEnabled = true;
             this.txtPoolId.ButtonFont = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -643,7 +647,7 @@
             this.txtPoolId.ButtonText = "X";
             this.txtPoolId.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.txtPoolId.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtPoolId.Location = new System.Drawing.Point(97, 19);
+            this.txtPoolId.Location = new System.Drawing.Point(98, 20);
             this.txtPoolId.Name = "txtPoolId";
             this.txtPoolId.Size = new System.Drawing.Size(110, 20);
             this.txtPoolId.TabIndex = 1;
@@ -678,7 +682,7 @@
             this.tabImages.Location = new System.Drawing.Point(4, 22);
             this.tabImages.Name = "tabImages";
             this.tabImages.Padding = new System.Windows.Forms.Padding(3);
-            this.tabImages.Size = new System.Drawing.Size(304, 211);
+            this.tabImages.Size = new System.Drawing.Size(304, 191);
             this.tabImages.TabIndex = 3;
             this.tabImages.Text = "Image";
             this.tabImages.UseVisualStyleBackColor = true;
@@ -773,7 +777,7 @@
             // txtImageUrl
             // 
             this.txtImageUrl.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.txtImageUrl.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
+            this.txtImageUrl.ButtonAlignment = murrty.controls.ButtonAlignment.Left;
             this.txtImageUrl.ButtonCursor = System.Windows.Forms.Cursors.Default;
             this.txtImageUrl.ButtonEnabled = true;
             this.txtImageUrl.ButtonFont = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -783,7 +787,7 @@
             this.txtImageUrl.ButtonText = "X";
             this.txtImageUrl.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.txtImageUrl.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtImageUrl.Location = new System.Drawing.Point(57, 19);
+            this.txtImageUrl.Location = new System.Drawing.Point(57, 20);
             this.txtImageUrl.Name = "txtImageUrl";
             this.txtImageUrl.Size = new System.Drawing.Size(190, 20);
             this.txtImageUrl.TabIndex = 1;
@@ -810,7 +814,8 @@
             this.mSettings,
             this.mBlacklist,
             this.mTools,
-            this.mAbout});
+            this.mAbout,
+            this.mUpdateAvailable});
             // 
             // mSettings
             // 
@@ -831,6 +836,7 @@
             this.mWishlist,
             this.mRedownloader,
             this.mReverseSearch,
+            this.mOtherDownloaders,
             this.mToolsSeparator,
             this.mLog});
             this.mTools.Text = "tools";
@@ -853,14 +859,41 @@
             this.mReverseSearch.Text = "reverse image search";
             this.mReverseSearch.Click += new System.EventHandler(this.mReverseSearch_Click);
             // 
+            // mOtherDownloaders
+            // 
+            this.mOtherDownloaders.Index = 3;
+            this.mOtherDownloaders.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.mFurryBooru,
+            this.mInkBunny,
+            this.mImgurAlbums});
+            this.mOtherDownloaders.Text = "other downloaders";
+            // 
+            // mFurryBooru
+            // 
+            this.mFurryBooru.Index = 0;
+            this.mFurryBooru.Text = "furry.booru.org";
+            this.mFurryBooru.Click += new System.EventHandler(this.mFurryBooru_Click);
+            // 
+            // mInkBunny
+            // 
+            this.mInkBunny.Index = 1;
+            this.mInkBunny.Text = "inkbunny";
+            this.mInkBunny.Click += new System.EventHandler(this.mInkBunny_Click);
+            // 
+            // mImgurAlbums
+            // 
+            this.mImgurAlbums.Index = 2;
+            this.mImgurAlbums.Text = "imgur albums";
+            this.mImgurAlbums.Click += new System.EventHandler(this.mImgurAlbums_Click);
+            // 
             // mToolsSeparator
             // 
-            this.mToolsSeparator.Index = 3;
+            this.mToolsSeparator.Index = 4;
             this.mToolsSeparator.Text = "-";
             // 
             // mLog
             // 
-            this.mLog.Index = 4;
+            this.mLog.Index = 5;
             this.mLog.Text = "aphrodite log";
             this.mLog.Click += new System.EventHandler(this.mLog_Click);
             // 
@@ -870,12 +903,20 @@
             this.mAbout.Text = "about";
             this.mAbout.Click += new System.EventHandler(this.mAbout_Click);
             // 
+            // mUpdateAvailable
+            // 
+            this.mUpdateAvailable.Enabled = false;
+            this.mUpdateAvailable.Index = 4;
+            this.mUpdateAvailable.Text = "update available";
+            this.mUpdateAvailable.Visible = false;
+            this.mUpdateAvailable.Click += new System.EventHandler(this.mUpdateAvailable_Click);
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(312, 258);
+            this.ClientSize = new System.Drawing.Size(312, 217);
             this.Controls.Add(this.tabMain);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = global::aphrodite.Properties.Resources.Brad;
@@ -923,14 +964,14 @@
         private System.Windows.Forms.MenuItem mSettings;
         private System.Windows.Forms.MenuItem mAbout;
         private System.Windows.Forms.MenuItem mBlacklist;
-        private Controls.ExtendedButton btnDownloadTags;
+        private murrty.controls.ExtendedButton btnDownloadTags;
         private System.Windows.Forms.NumericUpDown numTagsImageLimit;
         private System.Windows.Forms.CheckBox chkTagsUseMinimumScore;
         private System.Windows.Forms.NumericUpDown numTagsMinimumScore;
         private System.Windows.Forms.CheckBox chkPoolMergeGraylisted;
         private System.Windows.Forms.CheckBox chkPoolOpenAfter;
-        private Controls.ExtendedButton btnDownloadPool;
-        private Controls.ExtendedTextBox txtPoolId;
+        private murrty.controls.ExtendedButton btnDownloadPool;
+        private murrty.controls.ExtendedTextBox txtPoolId;
         private System.Windows.Forms.MenuItem mTools;
         private System.Windows.Forms.MenuItem mWishlist;
         private System.Windows.Forms.MenuItem mRedownloader;
@@ -940,8 +981,8 @@
         private System.Windows.Forms.CheckBox chkTagsMinimumScoreAsTag;
         private System.Windows.Forms.ToolTip TouchingTips;
         private System.Windows.Forms.TabPage tabImages;
-        private Controls.ExtendedTextBox txtImageUrl;
-        private Controls.ExtendedButton btnDownloadImage;
+        private murrty.controls.ExtendedTextBox txtImageUrl;
+        private murrty.controls.ExtendedButton btnDownloadImage;
         private System.Windows.Forms.CheckBox chkImageUseForm;
         private System.Windows.Forms.CheckBox chkImageSeparateGraylisted;
         private System.Windows.Forms.CheckBox chkImageSeparateRatings;
@@ -952,7 +993,7 @@
         private System.Windows.Forms.CheckBox chkImageOpenAfter;
         private System.Windows.Forms.MenuItem mToolsSeparator;
         private System.Windows.Forms.MenuItem mLog;
-        private Controls.ExtendedTextBox txtTags;
+        private murrty.controls.ExtendedTextBox txtTags;
         private System.Windows.Forms.CheckBox chkPoolMergeBlacklisted;
         private System.Windows.Forms.CheckBox chkPoolDownloadBlacklistedImages;
         private System.Windows.Forms.CheckBox chkImageSeparateBlacklisted;
@@ -977,6 +1018,11 @@
         private System.Windows.Forms.RadioButton rbTagsMinimumFavorites;
         private System.Windows.Forms.RadioButton rbTagsMinimumScore;
         private System.Windows.Forms.Label lbTagsSeparator;
+        private System.Windows.Forms.MenuItem mOtherDownloaders;
+        private System.Windows.Forms.MenuItem mFurryBooru;
+        private System.Windows.Forms.MenuItem mInkBunny;
+        private System.Windows.Forms.MenuItem mImgurAlbums;
+        private System.Windows.Forms.MenuItem mUpdateAvailable;
     }
 }
 

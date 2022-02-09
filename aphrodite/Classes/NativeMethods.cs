@@ -20,20 +20,21 @@ namespace aphrodite {
         #endregion
 
         #region System Hand Cursor for LinkLabelHand and Other Controls
-        public static IntPtr HAND = (IntPtr)32649;
+        public static IntPtr IDC_HAND = (IntPtr)32649;
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern IntPtr LoadCursor(IntPtr hInstance, IntPtr lpCursorName);
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr SetCursor(IntPtr hCursor);
-        public static readonly Cursor SystemHandCursor = new Cursor(LoadCursor(IntPtr.Zero, HAND));
+        public static readonly IntPtr SystemHand = LoadCursor(IntPtr.Zero, IDC_HAND);
+        public static readonly Cursor SystemHandCursor = new(LoadCursor(IntPtr.Zero, IDC_HAND));
         #endregion
 
         #region Vista Visuals for AeroListBox
-        [DllImport("uxtheme", CharSet = CharSet.Unicode)]
+        [DllImport("uxtheme.dll", CharSet = CharSet.Unicode)]
         public static extern Int32 SetWindowTheme(IntPtr hWnd, String textSubAppName, String textSubIdList);
         #endregion
 
-        #region ExtendedProgressBar State, Button UAC Shield, TextBox Text Margins for ButtonTextBox
+        #region ExtendedProgressBar State, Button UAC Shield, TextBox Text Margins for ButtonTextBox, Auto-Scrolling for ExtendedRichTextBox
         
         #region UAC Shield for Buttons
         public const int BCM_FIRST = 0x1600;

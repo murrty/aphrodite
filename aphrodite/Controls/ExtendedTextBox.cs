@@ -1,28 +1,81 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
-namespace aphrodite.Controls {
+namespace murrty.controls {
 
-    public enum AllowedTextTypes {
+    /// <summary>
+    /// An enumeration of types of characters allowed in the textbox.
+    /// </summary>
+    public enum AllowedCharacters {
+        /// <summary>
+        /// All characters are allowed.
+        /// </summary>
         All,
+        /// <summary>
+        /// Only Upper and lowercase alphabetical letters are allowed.
+        /// </summary>
         AlphabeticalOnly,
+        /// <summary>
+        /// Only numbers are allowed.
+        /// </summary>
         NumericOnly,
+        /// <summary>
+        /// Only letters and numbers are allowed.
+        /// </summary>
         AlphaNumericOnly
     }
 
-    public enum ButtonAlignments {
+    /// <summary>
+    /// An enumeration of the alignments that the button can be aligned to.
+    /// </summary>
+    public enum ButtonAlignment {
+        /// <summary>
+        /// The Button will appear on the left side of the TextBox.
+        /// </summary>
         Left,
-        Right
+        /// <summary>
+        /// The Button will appear on the right side of the TextBox. Default value.
+        /// </summary>
+        Right,
     }
 
     /// <summary>
     /// An extension of Windows.Forms.TextBox to include extra functionality.
     /// </summary>
-    class ExtendedTextBox : TextBox {
+    [System.Diagnostics.DebuggerStepThrough]
+    public class ExtendedTextBox : TextBox {
 
-        private Button btn = new Button() {
+        #region Fields
+
+        /// <summary>
+        /// The text hint.
+        /// </summary>
+        private string _TextHint = string.Empty;
+        /// <summary>
+        /// What kind of text is allowed.
+        /// </summary>
+        private AllowedCharacters _TextType = AllowedCharacters.All;
+        /// <summary>
+        /// If the button is enabled.
+        /// </summary>
+        private bool _ButtonEnabled = false;
+        /// <summary>
+        /// The alignment of the button.
+        /// </summary>
+        private ButtonAlignment _ButtonAlignment = ButtonAlignment.Left;
+        /// <summary>
+        /// If the font should be syncronized across the button and text.
+        /// </summary>
+        private bool _SyncFont = false;
+
+        /// <summary>
+        /// The button that appears inside the textbox.
+        /// </summary>
+        private readonly Button InsetButton = new() {
             Cursor = Cursors.Default,
             Enabled = false,
             TextAlign = ContentAlignment.MiddleCenter,
@@ -30,263 +83,558 @@ namespace aphrodite.Controls {
             Visible = false,
         };
 
-        public ExtendedTextBox() {
-            UpdateButton();
-            this.Controls.Add(btn);
-            this.Refresh();
-        }
-
-        #region Private variables
-        private ButtonAlignments _ButtonAlignment = ButtonAlignments.Left;
-        private string _TextHint = string.Empty;
-        private AllowedTextTypes _TextType = AllowedTextTypes.All;
-        private bool _ButtonEnabled = false;
         #endregion
 
-        #region Methods
-        private void UpdateButton() {
-            btn.Size = new Size(22, this.ClientSize.Height + 3);
-            switch (_ButtonAlignment) {
-                default:
-                    btn.Location = new Point(this.ClientSize.Width - btn.Width, -2);
-                    break;
+        #region Properties
 
-                case ButtonAlignments.Right:
-                    btn.Location = new Point(0, -2);
-                    break;
+        /// <summary>
+        /// Gets or sets the ButtonAlignment of the button.
+        /// </summary>
+        [Category("Appearance")]
+        [DefaultValue(ButtonAlignment.Right)]
+        [Description("The position of the button inside the Text Box.")]
+        public ButtonAlignment ButtonAlignment {
+            get { return _ButtonAlignment; }
+            set {
+                _ButtonAlignment = value;
+                UpdateButton();
+                this.Refresh();
             }
         }
+        
+        /// <summary>
+        /// Gets or sets the cursor of the button.
+        /// </summary>
+        [Category("Appearance")]
+        [Description("The cursor that will appear when hovering over the Button.")]
+        public Cursor ButtonCursor {
+            get { return InsetButton.Cursor; }
+            set { InsetButton.Cursor = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the text font of the button.
+        /// </summary>
+        [Category("Appearance")]
+        [Description("The Font of the text that appears within the Button.")]
+        public Font ButtonFont {
+            get { return InsetButton.Font; }
+            set {
+                InsetButton.Font = value;
+                if (_SyncFont) {
+                    base.Font = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the image in the button.
+        /// </summary>
+        [Category("Appearance")]
+        [DefaultValue(null)]
+        [Description("The Image that appears on the Button.")]
+        public Image ButtonImage {
+            get { return InsetButton.Image; }
+            set { InsetButton.Image = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the image alignment of the buttons' image.
+        /// </summary>
+        [Category("Appearance")]
+        [DefaultValue(ContentAlignment.MiddleCenter)]
+        [Description("The Image Alignment of an Image on the Button.")]
+        public ContentAlignment ButtonImageAlign {
+            get { return InsetButton.ImageAlign; }
+            set { InsetButton.ImageAlign = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the image index of the buttons' image key or image list.
+        /// </summary>
+        [Category("Appearance")]
+        [DefaultValue(null)]
+        [Description("The Image Index of the Image on the Button within the Image List.")]
+        public int ButtonImageIndex {
+            get { return InsetButton.ImageIndex; }
+            set { InsetButton.ImageIndex = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the buttons' image key.
+        /// </summary>
+        [Category("Appearance")]
+        [DefaultValue(null)]
+        [Description("The Image Key of the Image on the Button.")]
+        public string ButtonImageKey {
+            get { return InsetButton.ImageKey; }
+            set { InsetButton.ImageKey = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the buttons' image list.
+        /// </summary>
+        [Category("Appearance")]
+        [DefaultValue(null)]
+        [Description("The Image List for use with the Button.")]
+        public ImageList ButtonImageList {
+            get { return InsetButton.ImageList; }
+            set { InsetButton.ImageList = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the size of the button.
+        /// </summary>
+        [Category("Appearance")]
+        [Description("The Size of the Button.")]
+        public Size ButtonSize {
+            get { return InsetButton.Size; }
+            set { InsetButton.Size = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the text of the button.
+        /// </summary>
+        [Category("Appearance")]
+        [Description("The text that appears on the Button.")]
+        public string ButtonText {
+            get { return InsetButton.Text; }
+            set { InsetButton.Text = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the text alignment of the buttons' text.
+        /// </summary>
+        [Category("Appearance")]
+        [DefaultValue(ContentAlignment.MiddleRight)]
+        [Description("The Alignment of the text on the Button.")]
+        public ContentAlignment ButtonTextAlign {
+            get { return InsetButton.TextAlign; }
+            set { InsetButton.TextAlign = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the bool of whether the button inside the text box is enabled and can be used.
+        /// </summary>
+        [Category("Appearance")]
+        [DefaultValue(false)]
+        [Description("The Button on the TextBox is enabled and usable.")]
+        public bool ButtonEnabled {
+            get { return _ButtonEnabled; }
+            set {
+                InsetButton.Visible = value;
+                InsetButton.Enabled = value;
+                _ButtonEnabled = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the Font of the TextBox.
+        /// </summary>
+        [Category("Appearance")]
+        [Description("The Font of the text that appears within the TextBox.")]
+        public new Font Font {
+            get {
+                return base.Font;
+            }
+            set {
+                base.Font = value;
+                if (_SyncFont) {
+                    InsetButton.Font = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the bool whether the font should be in sync between the TextBox and Button.
+        /// </summary>
+        [Category("Appearance")]
+        [DefaultValue(false)]
+        [Description("Whether the font on the button and text box should be in sync. Text box takes precedent, changing either updates the other.")]
+        public bool SyncronizeFont {
+            get {
+                return _SyncFont;
+            }
+            set {
+                _SyncFont = value;
+                if (value) {
+                    InsetButton.Font = base.Font;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the alignment of the text in the text box.
+        /// </summary>
+        [Category("Appearance")]
+        [DefaultValue(HorizontalAlignment.Left)]
+        [Description("Indicates how the text should be aligned for edit controls.")]
+        [Localizable(true)]
+        public new HorizontalAlignment TextAlign {
+            get { return base.TextAlign; }
+            set {
+                base.TextAlign = value;
+                this.Refresh();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the hint on the TextBox.
+        /// </summary>
+        [Category("Appearance")]
+        [DefaultValue(null)]
+        [Description("The Text that will appear as a hint in the Text Box.")]
+        public string TextHint {
+            get { return _TextHint; }
+            set {
+                _TextHint = value;
+                SendMessage(this.Handle, 0x1501, (IntPtr)1, value);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the allowed characters to be typed in the TextBox.
+        /// </summary>
+        [Category("Appearance")]
+        [DefaultValue(AllowedCharacters.All)]
+        [Description("Determines if the Text Box wil only accept certain kinds of characters.")]
+        public AllowedCharacters TextType {
+            get { return _TextType; }
+            set { _TextType = value; }
+        }
+
+        #endregion
+
+        #region Native Methods
+
+        public const int EM_SETMARGINS = 0xD3;
+        public const int EC_RIGHTMARGIN = 0x2;
+        public const int EC_LEFTMARGIN = 0x1;
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        internal static extern IntPtr SendMessage(IntPtr hWnd, int wMsg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("user32.dll", CharSet = CharSet.Unicode, ThrowOnUnmappableChar = true)]
+        internal static extern IntPtr SendMessage(IntPtr hWnd, int wMsg, IntPtr wParam, string lParam);
+
+        #endregion
+
+        #region Constructor
+
+        public ExtendedTextBox() {
+            UpdateButton();
+            Controls.Add(InsetButton);
+            Refresh();
+        }
+
         #endregion
 
         #region Overrides
-        /// <summary>
-        /// Refreshes the TextBox and realigns the Text to fit with the Button.
-        /// </summary>
+
         public override void Refresh() {
+            base.Refresh();
             switch (_ButtonEnabled) {
                 case true:
                     switch (_ButtonAlignment) {
                         default:
-                            NativeMethods.SendMessage(this.Handle, NativeMethods.EM_SETMARGINS, (IntPtr)NativeMethods.EC_RIGHTMARGIN, (IntPtr)(btn.Width << 16));
+                            SendMessage(Handle, EM_SETMARGINS, (IntPtr)EC_RIGHTMARGIN, (IntPtr)(InsetButton.Width << 16));
                             break;
 
-                        case ButtonAlignments.Right:
-                            NativeMethods.SendMessage(this.Handle, NativeMethods.EM_SETMARGINS, (IntPtr)NativeMethods.EC_LEFTMARGIN, (IntPtr)(btn.Width));
+                        case ButtonAlignment.Right:
+                            SendMessage(Handle, EM_SETMARGINS, (IntPtr)EC_LEFTMARGIN, (IntPtr)(InsetButton.Width));
                             break;
                     }
                     break;
 
                 case false:
-                    NativeMethods.SendMessage(this.Handle, NativeMethods.EM_SETMARGINS, (IntPtr)NativeMethods.EC_LEFTMARGIN, IntPtr.Zero);
-                    NativeMethods.SendMessage(this.Handle, NativeMethods.EM_SETMARGINS, (IntPtr)NativeMethods.EC_RIGHTMARGIN, IntPtr.Zero);
+                    SendMessage(Handle, EM_SETMARGINS, (IntPtr)EC_LEFTMARGIN, IntPtr.Zero);
+                    SendMessage(Handle, EM_SETMARGINS, (IntPtr)EC_RIGHTMARGIN, IntPtr.Zero);
                     break;
             }
-            base.Refresh();
+            if (!string.IsNullOrWhiteSpace(_TextHint)) {
+                SendMessage(this.Handle, 0x1501, (IntPtr)1, _TextHint);
+            }
         }
 
         protected override void OnResize(EventArgs e) {
             UpdateButton();
-            this.Refresh();
+            Refresh();
             base.OnResize(e);
         }
 
-        protected override void OnKeyPress(KeyPressEventArgs e) {
+        //[Obsolete("Find a better way to handle text shortcuts.")]
+        //protected override void OnTextChanged(EventArgs e) {
+        //    base.OnTextChanged(e);
+        //    switch (this._TextType) {
+        //        case AllowedCharacters.AlphabeticalOnly: {
+        //            int cursorPosition = this.SelectionStart;
+        //            this.Text = Regex.Replace(this.Text, "[^a-zA-Z ]", "");
+        //            this.SelectionStart = cursorPosition;
+        //        } break;
 
-            switch (_TextType) {
-                case AllowedTextTypes.AlphabeticalOnly:
-                    switch (e.KeyChar) {
-                        case (char)Keys.Back: case (char)Keys.Space:
-                        case (char)Keys.Return:
-                        case 'a': case 'A': case 'b': case 'B': case 'c': case 'C':
-                        case 'd': case 'D': case 'e': case 'E': case 'f': case 'F':
-                        case 'g': case 'G': case 'h': case 'H': case 'i': case 'I':
-                        case 'j': case 'J': case 'k': case 'K': case 'l': case 'L':
-                        case 'm': case 'M': case 'o': case 'O': case 'p': case 'P':
-                        case 'q': case 'Q': case 'r': case 'R': case 's': case 'S':
-                        case 't': case 'T': case 'u': case 'U': case 'v': case 'V':
-                        case 'w': case 'W': case 'x': case 'X': case 'y': case 'Y':
-                        case 'z': case 'Z':
-                            e.Handled = false;
-                            break;
+        //        case AllowedCharacters.NumericOnly: {
+        //            int cursorPosition = this.SelectionStart;
+        //            this.Text = Regex.Replace(this.Text, "[^0-9 ]", "");
+        //            this.SelectionStart = cursorPosition;
+        //        } break;
 
-                        default:
-                            e.Handled = true;
-                            break;
-                    }
-                    break;
-
-                case AllowedTextTypes.NumericOnly:
-                    switch (e.KeyChar) {
-                        case (char)Keys.Back: case (char)Keys.Space:
-                        case (char)Keys.Return:
-                        case '.': case '0':
-                        case '1': case '2': case '3':
-                        case '4': case '5': case '6':
-                        case '7': case '8': case '9':
-                            e.Handled = false;
-                            break;
-
-                        default:
-                            e.Handled = true;
-                            break;
-                    }
-                    break;
-
-                case AllowedTextTypes.AlphaNumericOnly:
-                    switch (e.KeyChar) {
-                        case (char)Keys.Back: case (char)Keys.Space:
-                        case (char)Keys.Return:
-                        case '.': case '0':
-                        case '1': case '2': case '3':
-                        case '4': case '5': case '6':
-                        case '7': case '8': case '9':
-                        case 'a': case 'A': case 'b': case 'B': case 'c': case 'C':
-                        case 'd': case 'D': case 'e': case 'E': case 'f': case 'F':
-                        case 'g': case 'G': case 'h': case 'H': case 'i': case 'I':
-                        case 'j': case 'J': case 'k': case 'K': case 'l': case 'L':
-                        case 'm': case 'M': case 'o': case 'O': case 'p': case 'P':
-                        case 'q': case 'Q': case 'r': case 'R': case 's': case 'S':
-                        case 't': case 'T': case 'u': case 'U': case 'v': case 'V':
-                        case 'w': case 'W': case 'x': case 'X': case 'y': case 'Y':
-                        case 'z': case 'Z':
-                            e.Handled = false;
-                            break;
-
-                        default:
-                            e.Handled = true;
-                            break;
-                    }
-                    break;
-            }
-
-            base.OnKeyPress(e);
-        }
+        //        case AllowedCharacters.AlphaNumericOnly: {
+        //            int cursorPosition = this.SelectionStart;
+        //            this.Text = Regex.Replace(this.Text, "[^0-9a-zA-Z ]", "");
+        //            this.SelectionStart = cursorPosition;
+        //        } break;
+        //    }
+        //}
 
         protected override void OnKeyDown(KeyEventArgs e) {
-            switch (e.Modifiers == Keys.Control) {
-                case true:
-                    switch (e.KeyCode) {
-                        //case Keys.V:
-                        //    switch (Clipboard.ContainsText()) {
-                        //        case true:
-                        //            e.SuppressKeyPress = true;
-                        //            this.Text = Clipboard.GetText();
-                        //            break;
-                        //    }
-                        //    break;
+            switch (e.KeyCode) {
+                // Backspace can have either Control or Shift key held down,
+                // Shift doesnt' change the behavior, but Control does.
+                case Keys.Back: {
+                    e.Handled = e.Alt;
+                } break;
 
-                        case Keys.A:
-                            e.SuppressKeyPress = true;
-                            this.SelectAll();
-                            break;
+                // Return & Space can have the Shift key held down.
+                // It doesn't change the behavior.
+                case Keys.Return:
+                case Keys.Space: {
+                    e.Handled = e.Control || e.Alt;
+                } break;
+
+                // Catch the modifier keys, so it won't
+                // play the sound if they're pressed.
+                case Keys.Control:
+                case Keys.ControlKey:
+                case Keys.LControlKey:
+                case Keys.RControlKey:
+                case Keys.Alt:
+                case Keys.Menu:
+                case Keys.LMenu:
+                case Keys.RMenu:
+                case Keys.Shift:
+                case Keys.ShiftKey:
+                case Keys.LShiftKey:
+                case Keys.RShiftKey: {
+                } break;
+
+                case Keys.A: case Keys.B: case Keys.C: case Keys.D:
+                case Keys.E: case Keys.F: case Keys.G: case Keys.H:
+                case Keys.I: case Keys.J: case Keys.K: case Keys.L:
+                case Keys.M: case Keys.N: case Keys.O: case Keys.P:
+                case Keys.Q: case Keys.R: case Keys.S: case Keys.T:
+                case Keys.U: case Keys.V: case Keys.W: case Keys.X:
+                case Keys.Y: case Keys.Z: {
+                    switch (_TextType) {
+                        case AllowedCharacters.AlphabeticalOnly:
+                        case AllowedCharacters.AlphaNumericOnly: {
+                            e.SuppressKeyPress = e.Alt || e.Control;
+                            if (e.Control) {
+                                switch (e.KeyCode) {
+                                    case Keys.A: case Keys.C: case Keys.X: {
+                                        e.SuppressKeyPress = false;
+                                    }
+                                    break;
+
+                                    case Keys.V: {
+                                        e.SuppressKeyPress =
+                                            !(Clipboard.ContainsText() &&
+                                            Regex.IsMatch(
+                                                Clipboard.GetText(),
+                                                _TextType switch {
+                                                    AllowedCharacters.AlphabeticalOnly =>
+                                                        "^[a-zA-Z]+$",
+
+                                                    AllowedCharacters.AlphaNumericOnly =>
+                                                        "^[a-zA-Z0-9]+$",
+
+                                                    _ =>
+                                                        throw new ArgumentOutOfRangeException("Ctrl + V was pressed but regex couldn't use a proper TextType.")
+                                                }
+                                            ));
+                                    }
+                                    break;
+                                }
+                            }
+                        } break;
+
+                        case AllowedCharacters.NumericOnly: {
+                            if (e.Control && e.KeyCode == Keys.V) {
+                                e.SuppressKeyPress = Clipboard.ContainsText() && Regex.IsMatch(Clipboard.GetText(), "^[0-9]+$");
+                            }
+                        } break;
+
+                        default: {
+                            e.SuppressKeyPress = _TextType != AllowedCharacters.All;
+                        } break;
                     }
-                    break;
+                } break;
+
+                case Keys.D1: case Keys.D2: case Keys.D3:
+                case Keys.D4: case Keys.D5: case Keys.D6:
+                case Keys.D7: case Keys.D8: case Keys.D9:
+                case Keys.D0: {
+                    switch (_TextType) {
+                        case AllowedCharacters.NumericOnly:
+                        case AllowedCharacters.AlphaNumericOnly: {
+                            e.SuppressKeyPress = e.Shift || e.Alt;
+                        } break;
+
+                        default: {
+                            e.SuppressKeyPress = _TextType != AllowedCharacters.All;
+                        } break;
+                    } break;
+                }
+
+                default: {
+                    e.SuppressKeyPress = _TextType != AllowedCharacters.All;
+                } break;
+
+                #region Old filtering
+                    //switch (_TextType) {
+                    //    case AllowedCharacters.AlphabeticalOnly: {
+                    //        switch (e.KeyCode) {
+                    //            case Keys.A: case Keys.B: case Keys.C: case Keys.D:
+                    //            case Keys.E: case Keys.F: case Keys.G: case Keys.H:
+                    //            case Keys.I: case Keys.J: case Keys.K: case Keys.L:
+                    //            case Keys.M: case Keys.N: case Keys.O: case Keys.P:
+                    //            case Keys.Q: case Keys.R: case Keys.S: case Keys.T:
+                    //            case Keys.U: case Keys.V: case Keys.W: case Keys.X:
+                    //            case Keys.Y: case Keys.Z: {
+                    //                e.SuppressKeyPress = e.Alt || e.Control;
+                    //                if (e.Control) {
+                    //                    switch (e.KeyCode) {
+                    //                        case Keys.A: case Keys.C: case Keys.X: {
+                    //                            e.SuppressKeyPress = false;
+                    //                        } break;
+
+                    //                        case Keys.V: {
+                    //                            if (Clipboard.ContainsText() && Regex.IsMatch(Clipboard.GetText(), "^[a-zA-Z]+$")) {
+                    //                                e.SuppressKeyPress = false;
+                    //                            }
+                    //                        } break;
+                    //                    }
+                    //                }
+                    //            } break;
+
+                    //            default: {
+                    //                e.SuppressKeyPress = true;
+                    //            } break;
+                    //        }
+                    //    } break;
+
+                    //    case AllowedCharacters.NumericOnly: {
+                    //        switch (e.KeyCode) {
+                    //            case Keys.D1: case Keys.D2: case Keys.D3:
+                    //            case Keys.D4: case Keys.D5: case Keys.D6:
+                    //            case Keys.D7: case Keys.D8: case Keys.D9:
+                    //            case Keys.D0: {
+                    //                e.SuppressKeyPress = e.Control || e.Shift || e.Alt;
+                    //            } break;
+
+                    //            case Keys.V: {
+                    //                e.SuppressKeyPress = e.Shift || e.Alt;
+                    //                if (e.Control) {
+                    //                    switch (e.KeyCode) {
+                    //                        case Keys.A: case Keys.C: case Keys.X: {
+                    //                            e.SuppressKeyPress = false;
+                    //                        } break;
+
+                    //                        case Keys.V: {
+                    //                            if (Clipboard.ContainsText() && Regex.IsMatch(Clipboard.GetText(), "^[0-9]+$")) {
+                    //                                e.SuppressKeyPress = false;
+                    //                            }
+                    //                        } break;
+                    //                    }
+                    //                }
+                    //            } break;
+
+                    //            default: {
+                    //                e.SuppressKeyPress = true;
+                    //            } break;
+                    //        }
+                    //    } break;
+
+                    //    case AllowedCharacters.AlphaNumericOnly: {
+                    //        switch (e.KeyCode) {
+                    //            case Keys.A: case Keys.B: case Keys.C: case Keys.D:
+                    //            case Keys.E: case Keys.F: case Keys.G: case Keys.H:
+                    //            case Keys.I: case Keys.J: case Keys.K: case Keys.L:
+                    //            case Keys.M: case Keys.N: case Keys.O: case Keys.P:
+                    //            case Keys.Q: case Keys.R: case Keys.S: case Keys.T:
+                    //            case Keys.U: case Keys.V: case Keys.W: case Keys.X:
+                    //            case Keys.Y: case Keys.Z: {
+                    //                e.SuppressKeyPress = e.Alt || e.Control;
+                    //                if (e.Control) {
+                    //                    switch (e.KeyCode) {
+                    //                        case Keys.A: case Keys.C: case Keys.X: {
+                    //                            e.SuppressKeyPress = false;
+                    //                        } break;
+
+                    //                        case Keys.V: {
+                    //                            if (Clipboard.ContainsText() && Regex.IsMatch(Clipboard.GetText(), "^[a-zA-Z0-9]+$")) {
+                    //                                e.SuppressKeyPress = false;
+                    //                            }
+                    //                        } break;
+                    //                    }
+                    //                }
+                    //            } break;
+
+                    //            case Keys.D1: case Keys.D2: case Keys.D3:
+                    //            case Keys.D4: case Keys.D5: case Keys.D6:
+                    //            case Keys.D7: case Keys.D8: case Keys.D9:
+                    //            case Keys.D0: {
+                    //                e.SuppressKeyPress = e.Control || e.Shift || e.Alt;
+                    //            } break;
+
+                    //            default: {
+                    //                e.SuppressKeyPress = true;
+                    //            } break;
+                    //        }
+                    //    } break;
+
+                    //    case AllowedCharacters.All: {
+                    //        e.SuppressKeyPress = false;
+                    //    } break;
+
+                    //}
+                    #endregion
             }
+
+            e.Handled = e.SuppressKeyPress;
+            if (e.SuppressKeyPress) {
+                System.Media.SystemSounds.Beep.Play();
+            }
+
             base.OnKeyDown(e);
         }
+
         #endregion
 
         #region Events
+
         /// <summary>
         /// Event raised when the Button in the TextBox is clicked.
         /// </summary>
         public event EventHandler ButtonClick {
-            add { btn.Click += value; }
-            remove { btn.Click -= value; }
+            add { InsetButton.Click += value; }
+            remove { InsetButton.Click -= value; }
         }
+
         #endregion
 
-        #region Public Properties
-        [Category("Appearance"), Description("The position of the button inside the Text Box."), DefaultValue(ButtonAlignments.Right)]
-        public ButtonAlignments ButtonAlignment {
-            get { return _ButtonAlignment; }
-            set { _ButtonAlignment = value; UpdateButton(); this.Refresh(); }
+        #region Methods
+
+        /// <summary>
+        /// Updates the button to fix appearance issues when size or alignment changes.
+        /// </summary>
+        private void UpdateButton() {
+            InsetButton.Size = new Size(22, ClientSize.Height + 3);
+            InsetButton.Location = _ButtonAlignment switch {
+                ButtonAlignment.Right => new(0, -2),
+                _ => new(ClientSize.Width - InsetButton.Width, -2),
+            };
         }
 
-        [Category("Appearance"), Description("The cursor that will appear when hovering over the Button.")]
-        public Cursor ButtonCursor {
-            get { return btn.Cursor; }
-            set { btn.Cursor = value; }
-        }
-
-        [Category("Appearance"), Description("The Font of the Text that appears within the Button.")]
-        public Font ButtonFont {
-            get { return btn.Font; }
-            set { btn.Font = value; }
-        }
-
-        [Category("Appearance"), Description("The Image that appears on the Button."), DefaultValue(null)]
-        public Image ButtonImage {
-            get { return btn.Image; }
-            set { btn.Image = value; }
-        }
-
-        [Category("Appearance"), Description("The Image Alignment of an Image on the Button."), DefaultValue(ContentAlignment.MiddleCenter)]
-        public ContentAlignment ButtonImageAlign {
-            get { return btn.ImageAlign; }
-            set { btn.ImageAlign = value; }
-        }
-
-        [Category("Appearance"), Description("The Image Index of the Image on the Button within the Image List."), DefaultValue(null)]
-        public int ButtonImageIndex {
-            get { return btn.ImageIndex; }
-            set { btn.ImageIndex = value; }
-        }
-
-        [Category("Appearance"), Description("The Image Key of the Image on the Button."), DefaultValue(null)]
-        public string ButtonImageKey {
-            get { return btn.ImageKey; }
-            set { btn.ImageKey = value; }
-        }
-
-        [Category("Appearance"), Description("The Image List for use with the Button."), DefaultValue(null)]
-        public ImageList ButtonImageList {
-            get { return btn.ImageList; }
-            set { btn.ImageList = value; }
-        }
-
-        [Category("Appearance"), Description("The Size of the Button.")]
-        public Size ButtonSize {
-            get { return btn.Size; }
-            set { btn.Size = value; }
-        }
-
-        [Category("Appearance"), Description("The Text that appears on the Button.")]
-        public string ButtonText {
-            get { return btn.Text; }
-            set { btn.Text = value; }
-        }
-
-        [Category("Appearance"), Description("The Alignment of the Text on the Button."), DefaultValue(ContentAlignment.MiddleRight)]
-        public ContentAlignment ButtonTextAlign {
-            get { return btn.TextAlign; }
-            set { btn.TextAlign = value; }
-        }
-
-        [Category("Appearance"), Description("The Button on the Text Box is enabled and usable."), DefaultValue(false)]
-        public bool ButtonEnabled {
-            get { return _ButtonEnabled; }
-            set {
-                btn.Visible = value;
-                btn.Enabled = value;
-               _ButtonEnabled = value;
-            }
-        }
-
-        [Category("Appearance"), Description("The Text that will appear as a hint in the Text Box."), DefaultValue(null)]
-        public string TextHint {
-            get { return _TextHint; }
-            set {
-                _TextHint = value;
-                NativeMethods.SendMessage(this.Handle, 0x1501, (IntPtr)1, value);
-            }
-        }
-
-        [Category("Appearance"), Description("Determines if the Text Box wil only accept certain kinds of characters."), DefaultValue(AllowedTextTypes.All)]
-        public AllowedTextTypes TextType {
-            get { return _TextType; }
-            set { _TextType = value; }
-        }
         #endregion
 
     }

@@ -20,9 +20,6 @@
     <Setting Name="Blacklist" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="firstTime" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
     <Setting Name="undesiredTags" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
@@ -36,18 +33,6 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="openAfter" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="SkipArgumentCheck" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="AutoDownloadWithArguments" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="ArgumentFormTopMost" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="CheckForUpdates" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>

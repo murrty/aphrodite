@@ -1,92 +1,91 @@
 ﻿using System;
-using System.Text.RegularExpressions;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace aphrodite {
     public partial class frmBlacklist : Form {
 
+        /// <summary>
+        /// The index of where the selection beings, for modifying the lists programatically.
+        /// </summary>
+        private int SelectionPos;
+        /// <summary>
+        /// A temporary listbox for sorting the lists.
+        /// </summary>
+        private ListBox SortingList;
+
         public frmBlacklist() {
             InitializeComponent();
-        }
 
-        private void frmBlacklist_Load(object sender, EventArgs e) {
-            rtbBlacklist.Text = Config.Settings.General.Graylist.Replace(" ", "\r\n");
-            rtbZTB.Text = Config.Settings.General.Blacklist.Replace(" ", "\r\n");
-
-            if (Program.UseIni) {
-                this.Text += " (editing portable lists)";
-            }
-
-            if (Config.Settings.FormSettings.frmBlacklist_Location.X == -32000 || Config.Settings.FormSettings.frmBlacklist_Location.Y == -32000) {
-                this.StartPosition = FormStartPosition.CenterScreen;
-            }
-            else {
+            if (Config.ValidPoint(Config.Settings.FormSettings.frmBlacklist_Location)) {
+                this.StartPosition = FormStartPosition.Manual;
                 this.Location = Config.Settings.FormSettings.frmBlacklist_Location;
             }
+
+            rtbGraylist.Text = Config.Settings.General.Graylist.Replace(" ", "\r\n");
+            rtbBlacklist.Text = Config.Settings.General.Blacklist.Replace(" ", "\r\n");
+
+            if (Config.Settings.UseIni) {
+                this.Text += " (editing portable lists)";
+            }
         }
 
-        private void rtbBlacklist_TextChanged(object sender, EventArgs e) {
-            var txtSender = (RichTextBox)sender;
-            var curPos = txtSender.SelectionStart;
-            txtSender.Text = Regex.Replace(txtSender.Text, " ", "\r\n");
-            txtSender.SelectionStart = curPos;
-        }
-        private void rtbZTB_TextChanged(object sender, EventArgs e) {
-            var txtSender = (RichTextBox)sender;
-            var curPos = txtSender.SelectionStart;
-            txtSender.Text = Regex.Replace(txtSender.Text, " ", "\r\n");
-            txtSender.SelectionStart = curPos;
+        private void frmBlacklist_FormClosing(Object sender, FormClosingEventArgs e) {
+            Config.Settings.FormSettings.frmBlacklist_Location = this.Location;
         }
 
-        private void btnSort_Click(object sender, EventArgs e) {
-            rtbBlacklist.Text = rtbBlacklist.Text.Replace(" ", "\n");
-            ListBox blacklist = new ListBox();
-            string[] bl;
-            bl = rtbBlacklist.Text.Split('\n');
-            for (int y = 0; y < bl.Length; y++) {
-                blacklist.Items.Add(bl[y]);
-            }
-            blacklist.Sorted = true;
-            rtbBlacklist.Clear();
-            for (int y = 0; y < blacklist.Items.Count; y++) {
-                rtbBlacklist.Text += blacklist.Items[y] + "\n";
-            }
-            rtbBlacklist.Text = rtbBlacklist.Text.TrimEnd('\n');
+        private void List_TextChanged(object sender, EventArgs e) {
+            RichTextBox SentList = (RichTextBox)sender;
+            SelectionPos = SentList.SelectionStart;
+            SentList.Text = SentList.Text.Replace(" ", "\r\n");
+            SentList.SelectionStart = SelectionPos;
         }
-        private void btnSortZTB_Click(object sender, EventArgs e) {
-            rtbZTB.Text = rtbZTB.Text.Replace(" ", "\n");
-            ListBox blacklist = new ListBox();
-            string[] bl;
-            bl = rtbZTB.Text.Split('\n');
-            for (int y = 0; y < bl.Length; y++) {
-                blacklist.Items.Add(bl[y]);
+
+        private void ListSort_Click(object sender, EventArgs e) {
+            RichTextBox SentList;
+            try {
+                SentList =
+                    (Button)sender == btnSortGraylist ? rtbGraylist :
+                    (Button)sender == btnSortBlacklist ? rtbBlacklist :
+                    throw new NullReferenceException("Attempted to sort a list with no valid button sender.");
             }
-            blacklist.Sorted = true;
-            rtbZTB.Clear();
-            for (int y = 0; y < blacklist.Items.Count; y++) {
-                rtbZTB.Text += blacklist.Items[y] + "\n";
+            catch (Exception ex) {
+                Log.ReportException(ex);
+                return;
             }
-            rtbZTB.Text = rtbZTB.Text.TrimEnd('\n');
+
+            SelectionPos = SentList.SelectionStart;
+            SentList.Text = SentList.Text.Replace(" ", "\n").Replace("\r\n", "\n").Trim();
+            while (SentList.Text.Contains("\n\n")) {
+                SentList.Text = SentList.Text.Replace("\n\n", "\n");
+            }
+            (SortingList = new()).Items.AddRange(SentList.Text.Split('\n'));
+            SortingList.Sorted = true;
+            SentList.Text = string.Join("\r\n", SortingList.Items.Cast<string>().ToArray());
+            SentList.SelectionStart = SelectionPos;
+            SentList.Focus();
+            SortingList.Dispose();
+            System.Media.SystemSounds.Asterisk.Play();
         }
 
         private void btnSave_Click(object sender, EventArgs e) {
-            Config.Settings.General.Graylist =
-                rtbBlacklist.Text.Replace(" ", "_").Replace("\r\n", " ").Replace('\n', ' ').Trim(' ');
-            Config.Settings.General.Blacklist =
-                rtbZTB.Text.Replace(" ", "_").Replace("\r\n", " ").Replace('\n', ' ').Trim(' ');
+            Config.Settings.General.Graylist = rtbGraylist.Text.Replace(" ", "_").Replace("\r\n", " ").Replace('\n', ' ').Trim();
+            Config.Settings.General.Blacklist = rtbBlacklist.Text.Replace(" ", "_").Replace("\r\n", " ").Replace('\n', ' ').Trim();
             Config.Settings.General.Save();
             this.DialogResult = DialogResult.OK;
         }
+
         private void btnCancel_Click(object sender, EventArgs e) {
             this.DialogResult = DialogResult.Cancel;
         }
 
         private void llGraylist_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
-            MessageBox.Show("Tags in this category are downloaded into their own separate directory by default. Use this category for tags you might enjoy on a rare occasion.", "aphrodite graylist info", MessageBoxButtons.OK);
+            Log.MessageBox("Tags in this category are downloaded into their own separate directory by default. Use this category for tags you might enjoy on a rare occasion, or just want to be separated out.");
         }
 
         private void llBlacklist_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
-            MessageBox.Show("Tags in this category are not downloaded by default. Use this category for tags you never want to see, no matter what, not even if hell freezes over with semen.", "aphrodite blacklist info", MessageBoxButtons.OK);
+            Log.MessageBox("Tags in this category are not downloaded by default. Use this category for tags you never want to see, no matter what, not even if hell freezes over with semen.");
         }
+
     }
 }

@@ -12,7 +12,7 @@ namespace aphrodite.Settings {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "12.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.0.3.0")]
     internal sealed partial class FormSettings : global::System.Configuration.ApplicationSettingsBase {
         
         private static FormSettings defaultInstance = ((FormSettings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new FormSettings())));
@@ -152,6 +152,114 @@ namespace aphrodite.Settings {
             }
             set {
                 this["frmUndesiredTags_Location"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-32000, -32000")]
+        public global::System.Drawing.Point frmFurryBooruMain_Location {
+            get {
+                return ((global::System.Drawing.Point)(this["frmFurryBooruMain_Location"]));
+            }
+            set {
+                this["frmFurryBooruMain_Location"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-32000, -32000")]
+        public global::System.Drawing.Point frmFurryBooruDownloader_Location {
+            get {
+                return ((global::System.Drawing.Point)(this["frmFurryBooruDownloader_Location"]));
+            }
+            set {
+                this["frmFurryBooruDownloader_Location"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-32000, -32000")]
+        public global::System.Drawing.Point frmInkBunnyMain_Location {
+            get {
+                return ((global::System.Drawing.Point)(this["frmInkBunnyMain_Location"]));
+            }
+            set {
+                this["frmInkBunnyMain_Location"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-32000, -32000")]
+        public global::System.Drawing.Point frmInkBunnyLogin_Location {
+            get {
+                return ((global::System.Drawing.Point)(this["frmInkBunnyLogin_Location"]));
+            }
+            set {
+                this["frmInkBunnyLogin_Location"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-32000, -32000")]
+        public global::System.Drawing.Point frmInkBunnyDownloader_Location {
+            get {
+                return ((global::System.Drawing.Point)(this["frmInkBunnyDownloader_Location"]));
+            }
+            set {
+                this["frmInkBunnyDownloader_Location"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-32000, -32000")]
+        public global::System.Drawing.Point frmImgurMain_Location {
+            get {
+                return ((global::System.Drawing.Point)(this["frmImgurMain_Location"]));
+            }
+            set {
+                this["frmImgurMain_Location"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-32000, -32000")]
+        public global::System.Drawing.Point frmImgurDownloader_Location {
+            get {
+                return ((global::System.Drawing.Point)(this["frmImgurDownloader_Location"]));
+            }
+            set {
+                this["frmImgurDownloader_Location"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-32000, -32000")]
+        public global::System.Drawing.Point frmImgurLogin_Location {
+            get {
+                return ((global::System.Drawing.Point)(this["frmImgurLogin_Location"]));
+            }
+            set {
+                this["frmImgurLogin_Location"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-32000, -32000")]
+        public global::System.Drawing.Point frmArgument_Location {
+            get {
+                return ((global::System.Drawing.Point)(this["frmArgument_Location"]));
+            }
+            set {
+                this["frmArgument_Location"] = value;
             }
         }
     }

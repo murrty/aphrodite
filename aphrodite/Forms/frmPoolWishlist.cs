@@ -6,106 +6,115 @@ using System.Windows.Forms;
 namespace aphrodite {
 
     public partial class frmPoolWishlist : Form {
-        List<string>PoolNames = new List<string>();
-        List<string>PoolURLS = new List<string>();
+        private readonly List<string> PoolNames;
+        private readonly List<string> PoolURLS;
         private bool WishlistUpdated = false;
 
-        public frmPoolWishlist(bool AddToWishlist = false, string AddUrl = null, string AddTitle = null) {
+        public frmPoolWishlist(string NewPoolURL = null, string NewPoolTitle = null) {
             InitializeComponent();
-            if (AddToWishlist) {
-                txtName.Text = AddTitle.Replace('|', '_');
-                txtURL.Text = AddUrl;
-            }
-            lPoolLink.Text = string.Empty;
-        }
-        private void frmPoolWishlist_Load(object sender, EventArgs e) {
-            lPoolLink.Text = string.Empty;
-            if (!string.IsNullOrWhiteSpace(Config.Settings.Pools.wishlist) && !string.IsNullOrWhiteSpace(Config.Settings.Pools.wishlistNames)) {
-                PoolNames.AddRange(Config.Settings.Pools.wishlistNames.Split('|'));
-                PoolURLS.AddRange(Config.Settings.Pools.wishlist.Split('|'));
-                listWishlistItems.Items.AddRange(PoolNames.ToArray());
-            }
-            if (Config.Settings.FormSettings.frmPoolWishlist_Location.X == -32000 || Config.Settings.FormSettings.frmPoolWishlist_Location.Y == -32000) {
-                this.StartPosition = FormStartPosition.CenterScreen;
-            }
-            else {
+
+            if (Config.ValidPoint(Config.Settings.FormSettings.frmPoolWishlist_Location)) {
+                this.StartPosition = FormStartPosition.Manual;
                 this.Location = Config.Settings.FormSettings.frmPoolWishlist_Location;
             }
+
+            txtName.Text = NewPoolTitle.Replace('|', '_') ?? "";
+            txtURL.Text = NewPoolURL ?? "";
+
+            lPoolLink.Text = string.Empty;
+            PoolNames = PoolWishlist.PoolNames.Count > 0 ? new(PoolWishlist.PoolNames) : new();
+            PoolURLS = PoolWishlist.PoolURLs.Count > 0 ? new(PoolWishlist.PoolURLs) : new();
+
+            if (PoolNames.Count == PoolURLS.Count) {
+                if (PoolNames.Count > 0) {
+                    for (int CurrentName = 0; CurrentName < PoolNames.Count; CurrentName++) {
+                        lbWishlistItems.Items.Add(PoolNames[CurrentName]);
+                    }
+                }
+            }
+            else {
+                Log.ReportException(new ArgumentOutOfRangeException("PoolNames and PoolURLS lists do not match in count. Cannot load."));
+            }
         }
+
         private void frmPoolWishlist_FormClosing(object sender, FormClosingEventArgs e) {
             if (WishlistUpdated) {
-                switch (MessageBox.Show("Would you like to save the wishlist?", "aphrodite", MessageBoxButtons.YesNoCancel)) {
-                    case DialogResult.Yes:
-                        Config.Config_Pools.SaveWishlist(PoolNames, PoolURLS);
-                        if (Config.Settings.FormSettings.frmPoolWishlist_Location != this.Location) {
-                            Config.Settings.FormSettings.frmPoolWishlist_Location = this.Location;
-                        }
-                        break;
+                switch (Log.MessageBox("Would you like to save the wishlist?", MessageBoxButtons.YesNoCancel)) {
+                    case DialogResult.Yes: {
+                        PoolWishlist.PoolNames = PoolNames;
+                        PoolWishlist.PoolURLs = PoolURLS;
+                        PoolWishlist.SaveWishlist();
+                        Config.Settings.FormSettings.frmPoolWishlist_Location = this.Location;
+                    } break;
 
-                    case DialogResult.Cancel:
+                    case DialogResult.Cancel: {
                         e.Cancel = true;
-                        return;
+                    } return;
                 }
             }
         }
 
         private void btnAddUpdate_Click(object sender, EventArgs e) {
-            if (string.IsNullOrEmpty(txtURL.Text) || string.IsNullOrEmpty(txtName.Text)) {
+            if (string.IsNullOrEmpty(txtURL.Text)) {
+                txtURL.Focus();
+                System.Media.SystemSounds.Exclamation.Play();
+                return;
+            }
+            if (!ApiTools.IsValidPoolLink(txtURL.Text)) {
+                txtURL.Focus();
+                txtURL.SelectAll();
+                System.Media.SystemSounds.Exclamation.Play();
+                return;
+            }
+            if (string.IsNullOrEmpty(txtName.Text)) {
+                txtName.Focus();
+                System.Media.SystemSounds.Exclamation.Play();
                 return;
             }
 
-            if (apiTools.IsValidPoolLink(txtURL.Text)) {
-                if (chkUpdate.Checked) {
-                    PoolNames[listWishlistItems.SelectedIndex] = txtName.Text;
-                    PoolURLS[listWishlistItems.SelectedIndex] = txtURL.Text;
-                    listWishlistItems.Items[listWishlistItems.SelectedIndex] = txtName.Text;
-                    lPoolLink.Text = txtURL.Text;
-                }
-                else {
-                    PoolURLS.Add(txtURL.Text);
-                    PoolNames.Add(txtName.Text);
-                    listWishlistItems.Items.Add(txtName.Text);
-                    txtName.Clear();
-                    txtURL.Clear();
-                }
-
-                WishlistUpdated = true;
+            if (chkUpdate.Checked) {
+                PoolNames[lbWishlistItems.SelectedIndex] = txtName.Text.Replace("|", "_");
+                PoolURLS[lbWishlistItems.SelectedIndex] = txtURL.Text;
+                lbWishlistItems.Items[lbWishlistItems.SelectedIndex] = txtName.Text.Replace("|", "_");
+                lPoolLink.Text = txtURL.Text;
             }
             else {
-                System.Media.SystemSounds.Hand.Play();
+                PoolURLS.Add(txtURL.Text);
+                PoolNames.Add(txtName.Text.Replace("|", "_"));
+                lbWishlistItems.Items.Add(txtName.Text.Replace("|", "_"));
+                txtName.Clear();
+                txtURL.Clear();
             }
-        }
-        private void btnRemove_Click(object sender, EventArgs e) {
-            int indx = listWishlistItems.SelectedIndex;
-            if (indx > -1) {
-                PoolURLS.RemoveAt(listWishlistItems.SelectedIndex);
-                PoolNames.RemoveAt(listWishlistItems.SelectedIndex);
-                listWishlistItems.Items.RemoveAt(listWishlistItems.SelectedIndex);
-                if (indx == 0 && listWishlistItems.Items.Count > 0) {
-                    listWishlistItems.SelectedIndex = 0;
-                }
-                else {
-                    listWishlistItems.SelectedIndex = indx - 1;
-                }
-            }
+
             WishlistUpdated = true;
         }
+
+        private void btnRemove_Click(object sender, EventArgs e) {
+            int PoolIndex = lbWishlistItems.SelectedIndex;
+            if (PoolIndex > -1) {
+                PoolURLS.RemoveAt(lbWishlistItems.SelectedIndex);
+                PoolNames.RemoveAt(lbWishlistItems.SelectedIndex);
+                lbWishlistItems.Items.RemoveAt(lbWishlistItems.SelectedIndex);
+                lbWishlistItems.SelectedIndex = PoolIndex == 0 && lbWishlistItems.Items.Count > 0 ? 0 : PoolIndex - 1;
+                WishlistUpdated = true;
+            }
+        }
         private void btnDownload_Click(object sender, EventArgs e) {
-            if (apiTools.IsValidPoolLink(PoolURLS[listWishlistItems.SelectedIndex])) {            
-                Downloader.Arguments.DownloadPool(apiTools.GetPoolOrPostId(PoolURLS[listWishlistItems.SelectedIndex]));
+            if (ApiTools.IsValidPoolLink(PoolURLS[lbWishlistItems.SelectedIndex])) {            
+                Downloader.DownloadPool(ApiTools.GetPoolOrPostId(PoolURLS[lbWishlistItems.SelectedIndex]), true);
             }
         }
 
         private void lbWish_SelectedIndexChanged(object sender, EventArgs e) {
-            if (listWishlistItems.SelectedIndex > -1) {
+            if (lbWishlistItems.SelectedIndex > -1) {
                 if (chkUpdate.Checked) {
-                    txtName.Text = PoolNames[listWishlistItems.SelectedIndex];
-                    txtURL.Text = PoolURLS[listWishlistItems.SelectedIndex];
-                    lPoolLink.Text = PoolURLS[listWishlistItems.SelectedIndex];
+                    txtName.Text = PoolNames[lbWishlistItems.SelectedIndex];
+                    txtURL.Text = PoolURLS[lbWishlistItems.SelectedIndex];
+                    lPoolLink.Text = PoolURLS[lbWishlistItems.SelectedIndex];
                     lPoolLink.Visible = true;
                 }
                 else {
-                    lPoolLink.Text = PoolURLS[listWishlistItems.SelectedIndex];
+                    lPoolLink.Text = PoolURLS[lbWishlistItems.SelectedIndex];
                     lPoolLink.Visible = true;
                 }
             }
@@ -114,12 +123,13 @@ namespace aphrodite {
                 lPoolLink.Text = string.Empty;
             }
         }
+
         private void chkUpdate_CheckedChanged(object sender, EventArgs e) {
             if (chkUpdate.Checked) {
                 btnAddUpdate.Text = "Update";
-                if (listWishlistItems.SelectedIndex > -1) {
-                    txtName.Text = PoolNames[listWishlistItems.SelectedIndex];
-                    txtURL.Text = PoolURLS[listWishlistItems.SelectedIndex];
+                if (lbWishlistItems.SelectedIndex > -1) {
+                    txtName.Text = PoolNames[lbWishlistItems.SelectedIndex];
+                    txtURL.Text = PoolURLS[lbWishlistItems.SelectedIndex];
                 }
                 lPoolLink.Visible = false;
             }
@@ -129,37 +139,53 @@ namespace aphrodite {
                 txtURL.Clear();
             }
         }
+
         private void lPoolLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
-            if (e.Button == System.Windows.Forms.MouseButtons.Left) { 
-                Process.Start(PoolURLS[listWishlistItems.SelectedIndex]);
+            if (e.Button == MouseButtons.Left) { 
+                Process.Start(PoolURLS[lbWishlistItems.SelectedIndex]);
             }
-            else if (e.Button == System.Windows.Forms.MouseButtons.Right) {
-                menuWishlist.Show(lPoolLink, new System.Drawing.Point(0, lPoolLink.Height - 2));
+            else if (e.Button == MouseButtons.Right) {
+                cmWishlist.Show(lPoolLink, new System.Drawing.Point(0, lPoolLink.Height - 2));
             }
         }
+
         private void mOpenPoolInBrowser_Click(object sender, EventArgs e) {
-            if (apiTools.IsValidPoolLink(PoolURLS[listWishlistItems.SelectedIndex])) {
-                Process.Start(PoolURLS[listWishlistItems.SelectedIndex]);
+            if (ApiTools.IsValidPoolLink(PoolURLS[lbWishlistItems.SelectedIndex])) {
+                Process.Start(PoolURLS[lbWishlistItems.SelectedIndex]);
+                System.Media.SystemSounds.Asterisk.Play();
+            }
+            else {
+                System.Media.SystemSounds.Exclamation.Play();
             }
         }
+
         private void mCopyPoolLink_Click(object sender, EventArgs e) {
-            if (apiTools.IsValidPoolLink(PoolURLS[listWishlistItems.SelectedIndex])) {
-                Clipboard.SetText(PoolURLS[listWishlistItems.SelectedIndex]);
+            if (ApiTools.IsValidPoolLink(PoolURLS[lbWishlistItems.SelectedIndex])) {
+                Clipboard.SetText(PoolURLS[lbWishlistItems.SelectedIndex]);
+                System.Media.SystemSounds.Asterisk.Play();
+            }
+            else {
+                System.Media.SystemSounds.Exclamation.Play();
             }
         }
+
         private void mCopyPoolId_Click(object sender, EventArgs e) {
-            if (apiTools.IsValidPoolLink(PoolURLS[listWishlistItems.SelectedIndex])) {
-                Clipboard.SetText(apiTools.GetPoolOrPostId(PoolURLS[listWishlistItems.SelectedIndex]));
+            if (ApiTools.IsValidPoolLink(PoolURLS[lbWishlistItems.SelectedIndex])) {
+                Clipboard.SetText(ApiTools.GetPoolOrPostId(PoolURLS[lbWishlistItems.SelectedIndex]));
+                System.Media.SystemSounds.Asterisk.Play();
+            }
+            else {
+                System.Media.SystemSounds.Exclamation.Play();
             }
         }
 
         private void btnSave_Click(object sender, EventArgs e) {
             if (WishlistUpdated) {
-                Program.Log(LogAction.WriteToLog, "Wishlist has been updated, saving new wishlist");
-                Config.Config_Pools.SaveWishlist(PoolNames, PoolURLS);
-                if (Config.Settings.FormSettings.frmPoolWishlist_Location != this.Location) {
-                    Config.Settings.FormSettings.frmPoolWishlist_Location = this.Location;
-                }
+                Log.Write("Wishlist has been updated, saving new wishlist");
+                PoolWishlist.PoolNames = PoolNames;
+                PoolWishlist.PoolURLs = PoolURLS;
+                PoolWishlist.SaveWishlist();
+                Config.Settings.FormSettings.frmPoolWishlist_Location = this.Location;
                 WishlistUpdated = false;
             }
 

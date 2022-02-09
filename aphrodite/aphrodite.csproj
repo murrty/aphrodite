@@ -11,6 +11,9 @@
     <AssemblyName>aphrodite</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <LangVersion>10.0</LangVersion>
+    <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -23,7 +26,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -39,7 +41,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
@@ -58,6 +60,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -69,14 +72,28 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\apiTools.cs" />
+    <Compile Include="Arguments.cs" />
+    <Compile Include="Classes\ApiTools.cs" />
+    <Compile Include="Classes\Cryptography.cs" />
     <Compile Include="Classes\Downloader.cs" />
+    <Compile Include="Classes\DwmComposition.cs" />
     <Compile Include="Classes\Enums.cs" />
-    <Compile Include="Classes\ErrorLog.cs" />
     <Compile Include="Controls\AeroListBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\BetterFolderBrowser.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\BetterFolderBrowser.designer.cs">
+      <DependentUpon>BetterFolderBrowser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ExtendedForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Controls\ExtendedButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ExtendedRichTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\ExtendedTextBox.cs">
@@ -88,21 +105,21 @@
     <Compile Include="Controls\ExtendedWebClient.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Classes\Config.cs" />
+    <Compile Include="Config.cs" />
     <Compile Include="Classes\Metadata.cs" />
     <Compile Include="Classes\NativeMethods.cs" />
     <Compile Include="Classes\Updater.cs" />
-    <Compile Include="Controls\LinkLabelHand.cs">
+    <Compile Include="Controls\ExtendedLinkLabel.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\TransparentLabel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Forms\frmArgumentDialog.cs">
+    <Compile Include="Forms\frmArgument.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\frmArgumentDialog.Designer.cs">
-      <DependentUpon>frmArgumentDialog.cs</DependentUpon>
+    <Compile Include="Forms\frmArgument.Designer.cs">
+      <DependentUpon>frmArgument.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\frmException.cs">
       <SubType>Form</SubType>
@@ -110,11 +127,41 @@
     <Compile Include="Forms\frmException.Designer.cs">
       <DependentUpon>frmException.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\frmLicensing.cs">
+    <Compile Include="Forms\frmFurryBooruMain.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\frmLicensing.Designer.cs">
-      <DependentUpon>frmLicensing.cs</DependentUpon>
+    <Compile Include="Forms\frmFurryBooruMain.Designer.cs">
+      <DependentUpon>frmFurryBooruMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmImageDownloader.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmImageDownloader.Designer.cs">
+      <DependentUpon>frmImageDownloader.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmImgurDownloader.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmImgurDownloader.Designer.cs">
+      <DependentUpon>frmImgurDownloader.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmImgurLogin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmImgurLogin.Designer.cs">
+      <DependentUpon>frmImgurLogin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmInkBunnyDownloader.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmInkBunnyDownloader.Designer.cs">
+      <DependentUpon>frmInkBunnyDownloader.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmInkBunnyLogin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmInkBunnyLogin.Designer.cs">
+      <DependentUpon>frmInkBunnyLogin.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\frmLog.cs">
       <SubType>Form</SubType>
@@ -122,31 +169,38 @@
     <Compile Include="Forms\frmLog.Designer.cs">
       <DependentUpon>frmLog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\frmImgurMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmMainImgur.Designer.cs">
+      <DependentUpon>frmImgurMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmInkBunnyMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmInkBunnyMain.Designer.cs">
+      <DependentUpon>frmInkBunnyMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmPoolDownloader.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmPoolDownloader.Designer.cs">
+      <DependentUpon>frmPoolDownloader.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmTagDownloader.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmTagDownloader.Designer.cs">
+      <DependentUpon>frmTagDownloader.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\frmUpdateAvailable.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\frmUpdateAvailable.Designer.cs">
       <DependentUpon>frmUpdateAvailable.cs</DependentUpon>
     </Compile>
-    <Compile Include="Ookii\Interop\ComDlgResources.cs" />
-    <Compile Include="Ookii\Interop\COMGuids.cs" />
-    <Compile Include="Ookii\Interop\ErrorHelper.cs" />
-    <Compile Include="Ookii\Interop\ShellComInterfaces.cs" />
-    <Compile Include="Ookii\Interop\ShellWrapperDefinitions.cs" />
-    <Compile Include="Ookii\Interop\Win32Resources.cs" />
-    <Compile Include="Ookii\Interop\WindowHandleWrapper.cs" />
-    <Compile Include="Ookii\NativeMethods.cs" />
-    <Compile Include="Ookii\SafeHandles.cs" />
-    <Compile Include="Ookii\VistaFileDialog.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Ookii\VistaFileDialogEvents.cs" />
-    <Compile Include="Ookii\VistaOpenFileDialog.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Ookii\VistaSaveFileDialog.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Log.cs" />
     <Compile Include="Settings\FormSettings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -164,29 +218,11 @@
     <Compile Include="Forms\frmBlacklist.Designer.cs">
       <DependentUpon>frmBlacklist.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\frmImageDownloader.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\frmImageDownloader.Designer.cs">
-      <DependentUpon>frmImageDownloader.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\frmPoolDownloader.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\frmPoolDownloader.Designer.cs">
-      <DependentUpon>frmPoolDownloader.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\frmPoolWishlist.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\frmPoolWishlist.Designer.cs">
       <DependentUpon>frmPoolWishlist.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\frmTagDownloader.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\frmTagDownloader.designer.cs">
-      <DependentUpon>frmTagDownloader.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\frmMain.cs">
       <SubType>Form</SubType>
@@ -217,6 +253,16 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Images.settings</DependentUpon>
     </Compile>
+    <Compile Include="Settings\Imgur.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Imgur.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Settings\InkBunny.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>InkBunny.settings</DependentUpon>
+    </Compile>
     <Compile Include="Settings\Pools.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -234,14 +280,14 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Tags.settings</DependentUpon>
     </Compile>
-    <Compile Include="Ookii\VistaFolderBrowserDialog.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <EmbeddedResource Include="Controls\ExtendedRichTextBox.resx">
+      <DependentUpon>ExtendedRichTextBox.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmAbout.resx">
       <DependentUpon>frmAbout.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\frmArgumentDialog.resx">
-      <DependentUpon>frmArgumentDialog.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\frmArgument.resx">
+      <DependentUpon>frmArgument.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmBlacklist.resx">
       <DependentUpon>frmBlacklist.cs</DependentUpon>
@@ -249,11 +295,29 @@
     <EmbeddedResource Include="Forms\frmException.resx">
       <DependentUpon>frmException.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmFurryBooruMain.resx">
+      <DependentUpon>frmFurryBooruMain.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmImageDownloader.resx">
       <DependentUpon>frmImageDownloader.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\frmLicensing.resx">
-      <DependentUpon>frmLicensing.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\frmImgurDownloader.resx">
+      <DependentUpon>frmImgurDownloader.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmImgurLogin.resx">
+      <DependentUpon>frmImgurLogin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmImgurMain.resx">
+      <DependentUpon>frmImgurMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmInkBunnyDownloader.resx">
+      <DependentUpon>frmInkBunnyDownloader.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmInkBunnyLogin.resx">
+      <DependentUpon>frmInkBunnyLogin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmInkBunnyMain.resx">
+      <DependentUpon>frmInkBunnyMain.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmLog.resx">
       <DependentUpon>frmLog.cs</DependentUpon>
@@ -267,14 +331,14 @@
     <EmbeddedResource Include="Forms\frmSettings.resx">
       <DependentUpon>frmSettings.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\frmTagDownloader.resx">
-      <DependentUpon>frmTagDownloader.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmMain.resx">
       <DependentUpon>frmMain.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmRedownloader.resx">
       <DependentUpon>frmRedownloader.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmTagDownloader.resx">
+      <DependentUpon>frmTagDownloader.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmUndesiredTags.resx">
       <DependentUpon>frmUndesiredTags.cs</DependentUpon>
@@ -292,7 +356,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="Addons\omni-e621.xpi" />
     <None Include="Settings\FormSettings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>FormSettings.Designer.cs</LastGenOutput>
@@ -300,6 +363,14 @@
     <None Include="Settings\Images.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Images.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Settings\Imgur.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Imgur.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Settings\InkBunny.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>InkBunny.Designer.cs</LastGenOutput>
     </None>
     <None Include="Settings\Pools.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -329,14 +400,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Addons\aphrodite.images.user.js" />
-    <Content Include="Addons\aphrodite.user.js" />
     <Content Include="Resources\Brad.ico" />
-    <Content Include="Resources\Brad.png" />
+    <None Include="Resources\BuildDate.txt" />
     <Content Include="Resources\FakeUpdate.txt" />
     <Content Include="Resources\Icon32.png" />
-    <Content Include="TextFile1.txt" />
-    <Content Include="TextFile2.txt" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">
@@ -357,6 +424,9 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>if $(ConfigurationName) == Release "$(SolutionDir)\BuildDateWriter.exe" "$(ProjectDir)\Resources\BuildDate.txt"</PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

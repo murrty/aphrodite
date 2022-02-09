@@ -7,545 +7,307 @@ using System.Windows.Forms;
 
 namespace aphrodite {
     static class Program {
-        public static readonly string UserAgent = "aphrodite/" + (Properties.Settings.Default.CurrentVersion) + " (Contact: https://github.com/murrty/aphrodite ... open an issue)";
-        public static volatile string ApplicationName = System.AppDomain.CurrentDomain.FriendlyName;
-        public static volatile string ApplicationPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        public static volatile string FullApplicationPath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
-        public static volatile bool IsDebug = false;
-        public static volatile bool IsAdmin = false;
-        public static volatile IniFile Ini = new IniFile(ApplicationPath + "\\aphrodite.ini");
-        public static volatile bool UseIni = false;
 
-        private static volatile string PushedArgument = null;
-        private static volatile DownloadType PushedType = DownloadType.None;
-        private static volatile frmLog Logger;
-        private static volatile bool LogEnabled = false;
+        /// <summary>
+        /// The current release version of the program.
+        /// </summary>
+        public const decimal CurrentVersion = 2.22m;
+        /// <summary>
+        /// Whether the program is a beta version.
+        /// </summary>
+        public const bool IsBetaVersion = false;
+        /// <summary>
+        /// The beta version of the program (if <see cref="IsBetaVersion"/> is true).
+        /// </summary>
+        public const string BetaVersion = "2.3-pre1";
+        /// <summary>
+        /// The const delay for when threads sleep.
+        /// </summary>
+        public const int SleepDelay = 100;
+
+        /// <summary>
+        /// The absolute name of the application, with extension.
+        /// </summary>
+        public static readonly string ApplicationName = AppDomain.CurrentDomain.FriendlyName;
+        /// <summary>
+        /// The path of the application.
+        /// </summary>
+        public static readonly string ApplicationPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        /// <summary>
+        /// The absolute path of the application.
+        /// </summary>
+        public static readonly string FullApplicationPath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
+        /// <summary>
+        /// The user agent that the program will use.
+        /// </summary>
+        public static readonly string UserAgent = $"aphrodite/{(IsBetaVersion ? BetaVersion : CurrentVersion)} (https://github.com/murrty/aphrodite)";
+
+        /// <summary>
+        /// Whether the program is debugging.
+        /// </summary>
+        public static bool IsDebug = false;
+        /// <summary>
+        /// Whether the program has ran as administrator.
+        /// </summary>
+        public static bool IsAdmin = false;
 
         [STAThread]
-        static void Main() {
+        static void Main(string[] args) {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            SetDebug();
+#if DEBUG
+            IsDebug = true;
+#endif
 
-            if (!Controls.TaskbarProgress.Windows7OrGreater) {
-                MessageBox.Show("Windows 7 or higher is required to run this application. Sorry.", "aphrodite", MessageBoxButtons.OK);
-                Environment.Exit(1);
-            }
-            else {
+            if (Environment.OSVersion.Version.Major >= 6 || (Environment.OSVersion.Version.Major == 6 && Environment.OSVersion.Version.Minor >= 1)) {
+                Log.InitializeLogging();
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
                 if (Environment.CurrentDirectory != ApplicationPath) {
-                    Log(LogAction.WriteToLog, "Environment.CurrentDirectory is set to \"" + Environment.CurrentDirectory + "\", when it should be \"" + ApplicationPath + "\".");
+                    Log.Write($"Environment.CurrentDirectory is set to \"{Environment.CurrentDirectory}\", when it should be \"{ApplicationPath}\".");
                     Environment.CurrentDirectory = ApplicationPath;
-                    Log(LogAction.WriteToLog, "Set the Environment.CurrentDirectory to the correct one.");
+                    Log.Write("Set the Environment.CurrentDirectory to the correct one.");
                 }
 
-                switch (File.Exists(ApplicationPath + "\\aphrodite.ini") && Ini.KeyExists("useIni") && Ini.ReadBool("useIni")) {
-                    case true:
-                        UseIni = true;
-                        break;
-                }
-
-                Log(LogAction.EnableLog);
                 Config.Settings = new Config();
-
-                switch ((new WindowsPrincipal(WindowsIdentity.GetCurrent())).IsInRole(WindowsBuiltInRole.Administrator)) {
-                    case true:
-                        Log(LogAction.WriteToLog, "Running as administrator. I hope you know what you're doing");
-                        IsAdmin = true;
-                        break;
-
-                    case false:
-                        IsAdmin = false;
-                        break;
+                Config.Settings.Initialize();
+                IsAdmin = new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
+                if (IsAdmin) {
+                    Log.Write("Running as administrator. I hope you know what you're doing");
                 }
 
-                if (Config.Settings.Initialization.firstTime) {
-                    Log(LogAction.WriteToLog, "First time running! Look at my notice");
-                    MessageBox.Show(
+                if (Config.Settings.Initialization.FirstTime && !IsDebug) {
+                    Log.Write("First time running! Look at my notice");
+                    Log.MessageBox(
                         "This is your first time running aphrodite, so read this before continuing:\n\n" +
                         "This program is \"advertised\" as a porn downloader. You don't have to download any 18+ material using it, but it's emphasised on porn.\n" +
                         "As soon as you get access into the program, change the settings and set your prefered file name schema. I don't want to be responsible for any excess files being downloaded.\n\n" +
                         "Just so you know."
                     );
-                    Config.Settings.Initialization.firstTime = false;
-                    Config.Settings.Save(ConfigType.Initialization);
+                    Config.Settings.Initialization.FirstTime = false;
                 }
-                if (!HasArgumentsThatSkipMainForm()) {
-                    Log(LogAction.WriteToLog, "No arguments were passed that didn't require the main form");
-                    Config.Settings.Load(ConfigType.All);
-                    Application.Run(new frmMain(PushedArgument, PushedType));
-                    Log(LogAction.DisableLog);
-                }
-                Config.Settings.FormSettings.Save();
-            }
-        }
+                Config.Settings.FormSettings.Load();
+                Arguments.ParseArguments(args);
+                switch (Arguments.ArgumentType) {
 
-        static bool HasArgumentsThatSkipMainForm() {
-            Log(LogAction.WriteToLog, "Checking arguments");
-            string CurrentArg;
+                    #region Update protocols
+                    case ArgumentType.UpdateProtocol: {
+                        if (IsAdmin && !IsDebug) {
+                            Environment.ExitCode = SystemRegistry.SetRegistryKey() ? 0 : 1;
+                        }
+                        else Environment.ExitCode = 1;
+                    } break;
+                    #endregion
 
-            switch (Environment.GetCommandLineArgs().Length < 1) {
-                case true:
-                    return false;
-            }
+                    #region Downloads
+                    case ArgumentType.DownloadTags: {
+                        Config.Settings.General.Load();
+                        Config.Settings.Tags.Load();
+                        Downloader.DownloadTags(Arguments.ArgumentData, true);
+                        Config.Settings.General.Save();
+                        Config.Settings.Tags.Save();
+                        Config.Settings.FormSettings.Save();
+                    } break;
 
-            for (int ArgIndex = 1; ArgIndex < Environment.GetCommandLineArgs().Length; ArgIndex++) {
-                CurrentArg = Environment.GetCommandLineArgs()[ArgIndex];
+                    case ArgumentType.DownloadPage: {
+                        Config.Settings.General.Load();
+                        Config.Settings.Tags.Load();
+                        Downloader.DownloadPage(Arguments.ArgumentData, true);
+                        Config.Settings.General.Save();
+                        Config.Settings.Tags.Save();
+                        Config.Settings.FormSettings.Save();
+                    } break;
 
-                #region "-updateprotocol"
-                if (CurrentArg.ToLower().StartsWith("-updateprotocol")) {
-                    if (CurrentArg.ToLower().StartsWith("-updateprotocol:tags")) {
-                        if (Program.IsAdmin) {
-                            if (SystemRegistry.SetRegistryKey(SystemRegistry.KeyName.Tags)) {
-                                Environment.Exit(0);
-                            }
-                            else {
-                                Environment.Exit(1);
-                            }
+                    case ArgumentType.DownloadPools: {
+                        Config.Settings.General.Load();
+                        Config.Settings.Pools.Load();
+                        Downloader.DownloadPool(Arguments.ArgumentData, true);
+                        Config.Settings.General.Save();
+                        Config.Settings.Pools.Save();
+                        Config.Settings.FormSettings.Save();
+                    } break;
+
+                    case ArgumentType.DownloadImages: {
+                        Config.Settings.General.Load();
+                        Config.Settings.Images.Load();
+                        Downloader.DownloadImage(Arguments.ArgumentData, true);
+                        Config.Settings.General.Save();
+                        Config.Settings.Images.Save();
+                        Config.Settings.FormSettings.Save();
+                    } break;
+
+                    case ArgumentType.DownloadFurryBooru: {
+                        Config.Settings.General.Load();
+                        Config.Settings.Tags.Load();
+                        Downloader.DownloadFurryBooru(Arguments.ArgumentData, true);
+                        Config.Settings.General.Save();
+                        Config.Settings.Tags.Save();
+                        Config.Settings.FormSettings.Save();
+                    } break;
+
+                    case ArgumentType.DownloadInkBunny: {
+                        if (Arguments.ArgumentData != null && Arguments.ArgumentDataArray.Length >= 3) {
+                            Config.Settings.General.Load();
+                            Config.Settings.InkBunny.Load();
+                            Downloader.DownloadInkbunny(Arguments.ArgumentDataArray[0], Arguments.ArgumentDataArray[1], Arguments.ArgumentDataArray[2], true);
+                            Config.Settings.General.Save();
+                            Config.Settings.InkBunny.Save();
+                            Config.Settings.FormSettings.Save();
+                        }
+                    } break;
+
+                    case ArgumentType.DownloadImgur: {
+                        Config.Settings.General.Load();
+                        Config.Settings.Imgur.Load();
+                        Downloader.DownloadImgurAlbum(Arguments.ArgumentData, true);
+                        Config.Settings.General.Save();
+                        Config.Settings.Imgur.Save();
+                        Config.Settings.FormSettings.Save();
+                    } break;
+                    #endregion
+
+                    #region Push arguments
+                    case ArgumentType.PushTags: {
+                        Config.Settings.Load();
+                        Log.Write("Tags are in the arguments, pushing to the main form.");
+                        Application.Run(new frmMain(DownloadType.Tags, Arguments.ArgumentData));
+                        Config.Settings.Save();
+                    } break;
+
+                    case ArgumentType.PushPools: {
+                        Config.Settings.Load();
+                        Log.Write("A pool is in the arguments, pushing to the main form.");
+                        Application.Run(new frmMain(DownloadType.Pools, Arguments.ArgumentData));
+                        Config.Settings.Save();
+                    } break;
+
+                    case ArgumentType.PushImages: {
+                        Config.Settings.Load();
+                        Log.Write("An image is in the arguments, pushing to the main form.");
+                        Application.Run(new frmMain(DownloadType.Images, Arguments.ArgumentData));
+                        Config.Settings.Save();
+                    } break;
+
+                    case ArgumentType.PushFurryBooru: {
+                        Config.Settings.Load();
+                        Log.Write("FurryBooru tags are in the arguments, pushing to the main form.");
+                        Application.Run(new frmFurryBooruMain(Arguments.ArgumentData));
+                        Config.Settings.Save();
+                    } break;
+
+                    case ArgumentType.PushInkBunny: {
+                        Config.Settings.Load();
+                        Log.Write("InkBunny terms are in the arguments, pushing to the main form.");
+                        Application.Run(new frmInkBunnyMain(DownloadType.InkBunnyKeywords, Arguments.ArgumentData));
+                        Config.Settings.Save();
+                    } break;
+
+                    case ArgumentType.PushImgur: {
+                        Config.Settings.Load();
+                        Log.Write("An imgur album is in the arguments, pushing to the main form.");
+                        Application.Run(new frmImgurMain(Arguments.ArgumentData));
+                        Config.Settings.Save();
+                    } break;
+                    #endregion
+
+                    #region Wishlist
+                    case ArgumentType.AddToPoolWishlist: {
+                        // PoolWishlist does not need to be loaded.
+                        Config.Settings.Pools.Load();
+                        if (Arguments.ArgumentDataArray.Length == 2) {
+                            PoolWishlist.AppendToWishlist(Arguments.ArgumentDataArray[0], Arguments.ArgumentDataArray[1]);
+                        }
+                        else if (Arguments.ArgumentDataArray.Length == 1) {
+                            PoolWishlist.AppendToWishlist(Arguments.ArgumentDataArray[0], "");
                         }
                         else {
-                            Environment.Exit(1);
+                            PoolWishlist.AppendToWishlist(Arguments.ArgumentData, "");
                         }
-                        return true;
+                        Config.Settings.FormSettings.Save();
+                    } break;
+                    #endregion
+
+                    #region Show forms
+                    case ArgumentType.ShowRedownloader: {
+                        Config.Settings.Load();
+                        Application.Run(new frmRedownloader());
+                        Config.Settings.Save();
                     }
-                    else if (CurrentArg.ToLower().StartsWith("-updateprotocol:pools")) {
-                        if (Program.IsAdmin) {
-                            if (SystemRegistry.SetRegistryKey(SystemRegistry.KeyName.BothPools)) {
-                                Environment.Exit(0);
-                            }
-                            else {
-                                Environment.Exit(1);
-                            }
-                        }
-                        else {
-                            Environment.Exit(1);
-                        }
-                        return true;
+                    break;
+
+                    case ArgumentType.ShowBlacklist: {
+                        Config.Settings.Load();
+                        Application.Run(new frmBlacklist());
+                        Config.Settings.Save();
                     }
-                    else if (CurrentArg.ToLower().StartsWith("-updateprotocol:images")) {
-                        if (Program.IsAdmin) {
-                            if (SystemRegistry.SetRegistryKey(SystemRegistry.KeyName.Images)) {
-                                Environment.Exit(0);
-                            }
-                            else {
-                                Environment.Exit(1);
-                            }
-                        }
-                        else {
-                            Environment.Exit(1);
-                        }
-                        return true;
+                    break;
+
+                    case ArgumentType.ShowPoolWishlist: {
+                        PoolWishlist.LoadWishlist();
+                        Config.Settings.Pools.Load();
+                        Application.Run(new frmPoolWishlist());
                     }
-                    else {
-                        return false;
+                    break;
+
+                    case ArgumentType.ShowFurryBooru: {
+                        Config.Settings.Load();
+                        Application.Run(new frmFurryBooruMain());
+                        Config.Settings.Save();
                     }
+                    break;
+
+                    case ArgumentType.ShowInkBunny: {
+                        Config.Settings.Load();
+                        Application.Run(new frmInkBunnyMain());
+                        Config.Settings.Save();
+                    }
+                    break;
+
+                    case ArgumentType.ShowImgur: {
+                        Config.Settings.Load();
+                        Application.Run(new frmImgurMain());
+                        Config.Settings.Save();
+                    }
+                    break;
+                    #endregion
+
+                    #region Configure settings
+                    case ArgumentType.ConfigureSettings:
+                    case ArgumentType.ConfigureTagsSettings:
+                    case ArgumentType.ConfigurePoolsSettings:
+                    case ArgumentType.ConfigureImagesSettings:
+                    case ArgumentType.ConfigureMiscSettings:
+                    case ArgumentType.ConfigureProtocolSettings:
+                    case ArgumentType.ConfigureSchemaSettings:
+                    case ArgumentType.ConfigureImportExportSettings:
+                    case ArgumentType.ConfigurePortableSettings: {
+                        Config.Settings.Load();
+                        using frmSettings Settings = new(Arguments.ArgumentType);
+                        Settings.ShowDialog();
+                        Config.Settings.Save();
+                    } break;
+                    #endregion
+
+                    // We catch it and do nothing, because it was cancelled.
+                    case ArgumentType.CancelledArgumentsDownload: {
+                    }
+                    break;
+
+                    default: {
+                        Log.Write("No arguments were passed that didn't require the main form");
+                        Config.Settings.Load();
+                        Application.Run(new frmMain());
+                        Config.Settings.Save();
+                    }
+                    break;
                 }
-                #endregion
-
-                #region "-settings", "*:configuresettings", "protocol", "-portable", "-schema", "configuresettings"
-                else if (CurrentArg.ToLower().StartsWith("-settings") || CurrentArg.StartsWith("tags:configuresettings") || CurrentArg.StartsWith("pools:configuresettings") || CurrentArg.StartsWith("images:configuresettings") || CurrentArg.StartsWith("-protocol") || CurrentArg.StartsWith("-portable") || CurrentArg.StartsWith("-schema") || CurrentArg.StartsWith("configuresettings")) {
-                    Config.Settings.Load(ConfigType.All);
-
-                    frmSettings Settings = new frmSettings();
-                    Settings.SwitchTab = true;
-
-                    switch (CurrentArg.ToLower()) {
-                        case "-settings":
-                            Settings.Tab = 0;
-                            break;
-                        case "tags:configuresettings":
-                            Settings.Tab = 1;
-                            break;
-                        case "pools:configuresettings":
-                            Settings.Tab = 2;
-                            break;
-                        case "images:configuresettings":
-                            Settings.Tab = 3;
-                            break;
-                        case "-protocol":
-                            Settings.Tab = 4;
-                            break;
-                        case "-portable":
-                            Settings.Tab = 5;
-                            break;
-                        case "-schema":
-                            Settings.Tab = 6;
-                            break;
-                    }
-
-                    Settings.ShowDialog();
-                    Settings.Dispose();
-
-                    return true;
-                }
-                #endregion
-
-                #region "tags:*" (only for pages)
-                else if (CurrentArg.StartsWith("tags:")) {
-                    CurrentArg = CurrentArg.Substring(5).Replace("|", " ");
-                    if (CurrentArg == "start") {
-                        Log(LogAction.WriteToLog, "Using tags: protocol to start aphrodite");
-                        PushedType = DownloadType.Tags;
-                        return false;
-                    }
-                    else {
-                        Log(LogAction.WriteToLog, "Some tags were passed to the program");
-                        bool IsPage = false;
-                        if (apiTools.IsValidPageLink(CurrentArg)) {
-                            IsPage = true;
-                        }
-
-                        if (Config.Settings.Initialization.AutoDownloadWithArguments) {
-                            if (!Config.Settings.Initialization.SkipArgumentCheck) {
-                                using (frmArgumentDialog ArgumentDialog = new frmArgumentDialog(CurrentArg, DownloadType.Tags)) {
-                                    switch (ArgumentDialog.ShowDialog()) {
-                                        case DialogResult.Yes:
-                                            CurrentArg = ArgumentDialog.AppendedArgument;
-                                            Config.Settings.Load(ConfigType.General);
-                                            Config.Settings.Load(ConfigType.Tags);
-                                            Config.Settings.Load(ConfigType.FormSettings);
-
-                                            if (IsPage) {
-                                                Downloader.Arguments.DownloadPage(CurrentArg);
-                                            }
-                                            else {
-                                                Downloader.Arguments.DownloadTags(CurrentArg.Replace("%20", " "));
-                                            }
-                                            return true;
-
-                                        case DialogResult.No:
-                                            CurrentArg = ArgumentDialog.AppendedArgument;
-                                            Log(LogAction.WriteToLog, "Pushing the arguments to the main form");
-                                            PushedArgument = CurrentArg;
-                                            PushedType = DownloadType.Tags;
-                                            return false;
-
-                                        case DialogResult.Cancel:
-                                            return true;
-                                    }
-                                }
-                            }
-
-                            Config.Settings.Load(ConfigType.General);
-                            Config.Settings.Load(ConfigType.Tags);
-                            Config.Settings.Load(ConfigType.FormSettings);
-
-                            if (IsPage) {
-                                Downloader.Arguments.DownloadPage(CurrentArg);
-                            }
-                            else {
-                                Downloader.Arguments.DownloadTags(CurrentArg.Replace("%20", " "));
-                            }
-                        }
-                        else {
-                            Log(LogAction.WriteToLog, "Pushing the arguments to the main form");
-                            PushedArgument = CurrentArg;
-                            PushedType = DownloadType.Tags;
-                            return false;
-                        }
-                    }
-                }
-                #endregion
-
-                #region "pools:"
-                else if (CurrentArg.StartsWith("pools:")) {
-                    CurrentArg = CurrentArg.Substring(6);
-
-                    if (CurrentArg == "start") {
-                        Log(LogAction.WriteToLog, "Using pools: protocol to start aphrodite");
-                        PushedType = DownloadType.Pools;
-                        return false;
-                    }
-                    else {
-                        Log(LogAction.WriteToLog, "A pool was passed to the program");
-                        if (apiTools.IsValidPoolLink(CurrentArg)) {
-                            Log(LogAction.WriteToLog, "It seems like it was a valid pool link.");
-                            CurrentArg = apiTools.GetPoolOrPostId(CurrentArg);
-                        }
-
-                        if (Config.Settings.Initialization.AutoDownloadWithArguments) {
-                            if (!Config.Settings.Initialization.SkipArgumentCheck) {
-                                using (frmArgumentDialog ArgumentDialog = new frmArgumentDialog(CurrentArg, DownloadType.Pools)) {
-                                    switch (ArgumentDialog.ShowDialog()) {
-                                        case DialogResult.Yes:
-                                            CurrentArg = ArgumentDialog.AppendedArgument;
-                                            Config.Settings.Load(ConfigType.General);
-                                            Config.Settings.Load(ConfigType.Pools);
-                                            Config.Settings.Load(ConfigType.FormSettings);
-                                            Downloader.Arguments.DownloadPool(CurrentArg);
-                                            return true;
-
-                                        case DialogResult.No:
-                                            CurrentArg = ArgumentDialog.AppendedArgument;
-                                            Log(LogAction.WriteToLog, "Pushing the arguments to the main form");
-                                            PushedArgument = CurrentArg;
-                                            PushedType = DownloadType.Pools;
-                                            return false;
-
-                                        case DialogResult.Cancel:
-                                            return true;
-                                    }
-                                }
-                            }
-
-                        }
-                        else {
-                            Log(LogAction.WriteToLog, "Pushing the arguments to the main form");
-                            PushedArgument = CurrentArg;
-                            PushedType = DownloadType.Pools;
-                            return false;
-                        }
-                    }
-                }
-                #endregion
-
-                #region "images:"
-                else if (CurrentArg.StartsWith("images:")) {
-                    CurrentArg = CurrentArg.Substring(7);
-                    if (CurrentArg == "start") {
-                        Log(LogAction.WriteToLog, "Using images: protocol to start aphrodite");
-                        PushedType = DownloadType.Images;
-                        return false;
-                    }
-                    else {
-                        Log(LogAction.WriteToLog, "An image was passed to the program");
-                        if (apiTools.IsValidImageLink(CurrentArg)) {
-                            Log(LogAction.WriteToLog, "It seems like it was a valid image link.");
-                            CurrentArg = apiTools.GetPoolOrPostId(CurrentArg);
-                        }
-
-                        if (Config.Settings.Initialization.AutoDownloadWithArguments) {
-                            if (!Config.Settings.Initialization.SkipArgumentCheck) {
-                                using (frmArgumentDialog ArgumentDialog = new frmArgumentDialog(CurrentArg, DownloadType.Images)) {
-                                    switch (ArgumentDialog.ShowDialog()) {
-                                        case DialogResult.Yes:
-                                            CurrentArg = ArgumentDialog.AppendedArgument;
-                                            Config.Settings.Load(ConfigType.General);
-                                            Config.Settings.Load(ConfigType.Images);
-                                            Config.Settings.Load(ConfigType.FormSettings);
-                                            Downloader.Arguments.DownloadImage(CurrentArg);
-                                            return true;
-
-                                        case DialogResult.No:
-                                            CurrentArg = ArgumentDialog.AppendedArgument;
-                                            Log(LogAction.WriteToLog, "Pushing the arguments to the main form");
-                                            PushedArgument = CurrentArg;
-                                            PushedType = DownloadType.Images;
-                                            return false;
-
-                                        case DialogResult.Cancel:
-                                            return true;
-                                    }
-                                }
-                            }
-
-                            Config.Settings.Load(ConfigType.General);
-                            Config.Settings.Load(ConfigType.Images);
-                            Config.Settings.Load(ConfigType.FormSettings);
-                            Downloader.Arguments.DownloadImage(CurrentArg);
-                            return true;
-                        }
-                        else {
-                            Log(LogAction.WriteToLog, "Pushing the arguments to the main form");
-                            PushedArgument = CurrentArg;
-                            PushedType = DownloadType.Images;
-                            return false;
-                        }
-                    }
-                }
-                #endregion
-
-                #region "poolwl:*"
-                else if (CurrentArg.StartsWith("poolwl:")) {
-                    Config.Settings.Load(ConfigType.Pools);
-                    Config.Settings.Load(ConfigType.FormSettings);
-                    if (CurrentArg == "poolwl:showwl") {
-                        frmPoolWishlist WishList = new frmPoolWishlist();
-                        WishList.ShowDialog();
-                    }
-                    else if (CurrentArg == "start") {
-                        Log(LogAction.WriteToLog, "Using poolwl: protocol to start aphrodite");
-                        return false;
-                    }
-                    else {
-                        CurrentArg = System.Web.HttpUtility.UrlDecode(CurrentArg.Substring(7)).Replace("%$|%", " ");
-                        string[] ArgumentSplit = CurrentArg.Split('|');
-                        if (ArgumentSplit.Length == 2) {
-                            string url = ArgumentSplit[0];
-                            string title = ArgumentSplit[1];
-
-                            if (apiTools.IsValidPoolLink(ArgumentSplit[0])) {
-                                title = title
-                                    .Replace("%20", " ")
-                                    .Replace("%22", "\"")
-                                    .Trim(' ');
-
-                                Config.Config_Pools.AppendToWishlist(title, url);
-                            }
-                            else {
-                                System.Media.SystemSounds.Hand.Play();
-                            }
-
-                        }
-                    }
-                    return true;
-                }
-                #endregion
-
-                #region "-redownloader"
-                else if (CurrentArg.ToLower().StartsWith("-redownloader")) {
-                    Config.Settings.Load(ConfigType.All);
-                    frmRedownloader rDownloader = new frmRedownloader();
-                    rDownloader.ShowDialog();
-                    return true;
-                }
-                #endregion
-
-                #region "-blacklist"
-                else if (CurrentArg.ToLower().StartsWith("-blacklist")) {
-                    Config.Settings.Load(ConfigType.General);
-                    Config.Settings.Load(ConfigType.FormSettings);
-                    using (frmBlacklist Blacklist = new frmBlacklist()) {
-                        Blacklist.ShowDialog();
-                        if (Config.Settings.FormSettings.frmBlacklist_Location != Blacklist.Location) {
-                            Config.Settings.FormSettings.frmBlacklist_Location = Blacklist.Location;
-                        }
-                    }
-                    return true;
-                }
-                #endregion
-
-            }
-
-            return false;
-        }
-
-        [System.Diagnostics.Conditional("DEBUG"), System.Diagnostics.DebuggerStepThrough]
-        static void SetDebug() {
-            IsDebug = true;
-        }
-
-        [System.Diagnostics.DebuggerStepThrough]
-        public static bool Log(LogAction Action, string LogMessage = "") {
-            switch (Action) {
-                default:
-                    return false;
-
-                case LogAction.EnableLog:
-                    if (LogEnabled) {
-                        Logger.Append("The log is already enabled");
-                        return false;
-                    }
-                    else {
-                        Logger = new frmLog();
-                        Logger.Append("Log has been enabled", true);
-                        LogEnabled = true;
-                        return true;
-                    }
-
-                case LogAction.DisableLog:
-                    if (LogEnabled) {
-                        System.Diagnostics.Debug.Print("Disabling log");
-
-                        if (Logger.WindowState == FormWindowState.Minimized || Logger.WindowState == FormWindowState.Maximized) {
-                            Logger.Opacity = 0;
-                            Logger.WindowState = FormWindowState.Normal;
-                        }
-
-                        if (Logger.Location != Config.Settings.FormSettings.frmLog_Location) {
-                            Config.Settings.FormSettings.frmLog_Location = Logger.Location;
-                        }
-                        if (Logger.Size != Config.Settings.FormSettings.frmLog_Size) {
-                            Config.Settings.FormSettings.frmLog_Size = Logger.Size;
-                        }
-
-                        Logger.Dispose();
-                        LogEnabled = false;
-                        return true;
-                    }
-                    return false;
-
-                case LogAction.WriteToLog:
-                    switch (LogEnabled) {
-                        case true:
-                            if (Logger != null) {
-                                Logger.Append(LogMessage);
-                                return true;
-                            }
-                            else {
-                                System.Diagnostics.Debug.Print(LogMessage);
-                            }
-                            break;
-                        case false:
-                            System.Diagnostics.Debug.Print(LogMessage);
-                            break;
-                    }
-                    return false;
-
-                case LogAction.WriteToLogWithInvoke:
-                    switch (LogEnabled) {
-                        case true:
-                            if (Logger != null) {
-                                Logger.AppendWithInvoke(LogMessage);
-                                return true;
-                            }
-                            else {
-                                System.Diagnostics.Debug.Print(LogMessage);
-                            }
-                            break;
-                        case false:
-                            System.Diagnostics.Debug.Print(LogMessage);
-                            break;
-                    }
-                    return false;
-
-                case LogAction.InitialWriteToLog:
-                    switch (LogEnabled) {
-                        case true:
-                            switch (Logger == null) {
-                                case false:
-                                    Logger.Append(LogMessage, true);
-                                    return true;
-                                case true:
-                                    System.Diagnostics.Debug.Print(LogMessage);
-                                    break;
-                            }
-                            break;
-                        case false:
-                            System.Diagnostics.Debug.Print(LogMessage);
-                            break;
-                    }
-                    return false;
-
-                case LogAction.ShowLog:
-                    if (LogEnabled && Logger != null) {
-                        if (Logger.IsShown) {
-                            Logger.Append("The log was already shown dingus, activating log");
-                            Logger.Activate();
-                            return true;
-                        }
-                        else {
-                            Logger.Append("Showing log");
-                            Logger.IsShown = true;
-                            Logger.Show();
-                            return true;
-                        }
-                    }
-                    return false;
-            }
-        }
-
-        [System.Diagnostics.DebuggerStepThrough]
-        public static bool QuickLog(string LogMessage) {
-            if (LogEnabled && Logger != null) {
-                Logger.Append(LogMessage);
+                Log.DisableLogging();
             }
             else {
-                System.Diagnostics.Debug.Print(LogMessage);
+                Log.MessageBox("Windows 7 or higher is required to run this application. Sorry.", MessageBoxButtons.OK, MessageBoxIcon.Hand);
+                Environment.ExitCode = 0;
             }
-            return true;
         }
     }
 }

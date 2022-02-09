@@ -30,7 +30,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="fileNameSchema" Type="System.String" Scope="User">
-      <Value Profile="(Default)">%md5%</Value>
+      <Value Profile="(Default)">%id%_%md5%</Value>
     </Setting>
     <Setting Name="separateNonImages" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>

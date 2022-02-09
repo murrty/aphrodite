@@ -15,7 +15,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="fileNameSchema" Type="System.String" Scope="User">
-      <Value Profile="(Default)">%artist%_%md5%</Value>
+      <Value Profile="(Default)">%artist%_%id%</Value>
     </Setting>
     <Setting Name="separateNonImages" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>

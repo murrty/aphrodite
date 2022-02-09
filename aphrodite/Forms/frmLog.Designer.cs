@@ -1,14 +1,7 @@
-﻿namespace aphrodite {
+﻿namespace murrty.forms {
     partial class frmLog {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing) {
             if (disposing && (components != null)) {
                 components.Dispose();
@@ -18,15 +11,11 @@
 
         #region Windows Form Designer generated code
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent() {
-            this.rtbLog = new System.Windows.Forms.RichTextBox();
+            this.rtbLog = new aphrodite.Controls.ExtendedRichTextBox();
             this.panelControls = new System.Windows.Forms.Panel();
-            this.btnClear = new aphrodite.Controls.ExtendedButton();
-            this.btnClose = new aphrodite.Controls.ExtendedButton();
+            this.btnClear = new murrty.controls.ExtendedButton();
+            this.btnClose = new murrty.controls.ExtendedButton();
             this.panelControls.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -36,6 +25,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.rtbLog.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.rtbLog.HideSelection = false;
             this.rtbLog.Location = new System.Drawing.Point(12, 12);
             this.rtbLog.Name = "rtbLog";
             this.rtbLog.ReadOnly = true;
@@ -79,6 +69,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(612, 463);
             this.Controls.Add(this.rtbLog);
             this.Controls.Add(this.panelControls);
@@ -97,10 +88,10 @@
 
         #endregion
 
-        public System.Windows.Forms.RichTextBox rtbLog;
+        public aphrodite.Controls.ExtendedRichTextBox rtbLog;
         private System.Windows.Forms.Panel panelControls;
-        private Controls.ExtendedButton btnClear;
-        private Controls.ExtendedButton btnClose;
+        private murrty.controls.ExtendedButton btnClear;
+        private murrty.controls.ExtendedButton btnClose;
 
     }
 }

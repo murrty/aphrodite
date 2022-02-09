@@ -27,11 +27,11 @@ namespace aphrodite {
 
         private int getPoolID(string nfoLocation) {
             if (!nfoLocation.EndsWith("pool.nfo")) {
-                nfoLocation = nfoLocation + "\\pool.nfo";
+                nfoLocation += "\\pool.nfo";
             }
 
             string poolLine;
-            using (StreamReader sr = new StreamReader(nfoLocation)) {
+            using (StreamReader sr = new(nfoLocation)) {
                 poolLine = sr.ReadLine();
             }
 
@@ -40,19 +40,19 @@ namespace aphrodite {
             else
                 poolLine = poolLine.Replace("POOL: ", "");
 
-            int poolID = -1;
-            Int32.TryParse(poolLine, out poolID);
+            Int32.TryParse(poolLine, out int poolID);
             return poolID;
         }
+
         private string getPoolDownloadOn(string nfoLocation) {
             if (!nfoLocation.EndsWith("pool.nfo")) {
-                nfoLocation = nfoLocation + "\\pool.nfo";
+                nfoLocation += "\\pool.nfo";
 
                 if (!File.Exists(nfoLocation))
                     return "n/a";
             }
             string downloadedOnLine;
-            using (StreamReader sr = new StreamReader(nfoLocation)) {
+            using (StreamReader sr = new(nfoLocation)) {
                 sr.ReadLine();
                 downloadedOnLine = sr.ReadLine();
             }
@@ -66,14 +66,14 @@ namespace aphrodite {
         private string getTags(string nfoLocation) {
             if (!nfoLocation.EndsWith("tags.nfo") && !nfoLocation.EndsWith("tags.blacklisted.nfo")) {
                 if (File.Exists(nfoLocation + "\\tags.nfo"))
-                    nfoLocation = nfoLocation + "\\tags.nfo";
+                    nfoLocation += "\\tags.nfo";
                 else if (File.Exists(nfoLocation + "\\tags.blacklisted.nfo"))
-                    nfoLocation = nfoLocation + "\\tags.blacklisted.nfo";
+                    nfoLocation += "\\tags.blacklisted.nfo";
                 else
                     return null;
             }
             string tagLine;
-            using (StreamReader sr = new StreamReader(nfoLocation)) {
+            using (StreamReader sr = new(nfoLocation)) {
                 tagLine = sr.ReadLine();
             }
             if (!tagLine.StartsWith("TAGS: "))
@@ -81,56 +81,41 @@ namespace aphrodite {
             else
                 return tagLine.Replace("TAGS: ", "");
         }
-        private bool hasMinimumScore(string nfoLocation) {
+
+        private bool hasMinimumScore(string nfoLocation, out string MinimumScore) {
+            MinimumScore = null;
             if (!nfoLocation.EndsWith("tags.nfo") && !nfoLocation.EndsWith("tags.blacklisted.nfo")) {
                 if (File.Exists(nfoLocation + "\\tags.nfo"))
-                    nfoLocation = nfoLocation + "\\tags.nfo";
+                    nfoLocation += "\\tags.nfo";
                 else if (File.Exists(nfoLocation + "\\tags.blacklisted.nfo"))
-                    nfoLocation = nfoLocation + "\\tags.blacklisted.nfo";
+                    nfoLocation += "\\tags.blacklisted.nfo";
                 else
                     return false;
             }
             string tagLine;
-            using (StreamReader sr = new StreamReader(nfoLocation)) {
+            using (StreamReader sr = new(nfoLocation)) {
                 sr.ReadLine();
                 tagLine = sr.ReadLine();
             }
-            if (tagLine.StartsWith("MINIMUM SCORE: n/a") || !tagLine.StartsWith("MINIMUM SCORE: ")) 
+            if (tagLine.StartsWith("MINIMUM SCORE: n/a") || !tagLine.StartsWith("MINIMUM SCORE: "))
                 return false;
-            else 
+            else {
+                MinimumScore = tagLine.Replace("MINIMUM SCORE: ", "");
                 return true;
+            }
         }
-        private string getMinimumScore(string nfoLocation) {
-            if (!nfoLocation.EndsWith("tags.nfo") && !nfoLocation.EndsWith("tags.blacklisted.nfo")) {
-                if (File.Exists(nfoLocation + "\\tags.nfo"))
-                    nfoLocation = nfoLocation + "\\tags.nfo";
-                else if (File.Exists(nfoLocation + "\\tags.blacklisted.nfo"))
-                    nfoLocation = nfoLocation + "\\tags.blacklisted.nfo";
-                else
-                    return null;
-            }
-            string tagLine;
-            using (StreamReader sr = new StreamReader(nfoLocation)) {
-                sr.ReadLine();
-                tagLine = sr.ReadLine();
-            }
 
-            if (tagLine.StartsWith("MINIMUM SCORE: ") || !tagLine.StartsWith("MINMIUM SCORE: n/a"))
-                return tagLine.Replace("MINIMUM SCORE: ", "");
-            else
-                return null;
-        }
         private string getTagDownloadOn(string nfoLocation) {
             if (!nfoLocation.EndsWith("tags.nfo") && !nfoLocation.EndsWith("tags.blacklisted.nfo")) {
                 if (File.Exists(nfoLocation + "\\tags.nfo"))
-                    nfoLocation = nfoLocation + "\\tags.nfo";
+                    nfoLocation += "\\tags.nfo";
                 else if (File.Exists(nfoLocation + "\\tags.blacklisted.nfo"))
-                    nfoLocation = nfoLocation + "\\tags.blacklisted.nfo";
+                    nfoLocation += "\\tags.blacklisted.nfo";
                 else
                     return "n/a";
             }
             string downloadedOnLine;
-            using (StreamReader sr = new StreamReader(nfoLocation)) {
+            using (StreamReader sr = new(nfoLocation)) {
                 sr.ReadLine();
                 sr.ReadLine();
                 downloadedOnLine = sr.ReadLine();
@@ -146,64 +131,58 @@ namespace aphrodite {
     #region Form
         public frmRedownloader() {
             InitializeComponent();
+            if (Config.ValidPoint(Config.Settings.FormSettings.frmRedownloader_Location)) {
+                this.StartPosition = FormStartPosition.Manual;
+                this.Location = Config.Settings.FormSettings.frmRedownloader_Location;
+            }
         }
         
         private void frmTagRedownloader_Load(object sender, EventArgs e) {
-            if (Config.Settings.FormSettings.frmRedownloader_Location.X == -32000 || Config.Settings.FormSettings.frmRedownloader_Location.Y == -32000) {
-                this.StartPosition = FormStartPosition.CenterScreen;
-            }
-            else {
-                this.Location = Config.Settings.FormSettings.frmRedownloader_Location;
-            }
             loadDownloads();
         }
         private void frmRedownloader_FormClosing(object sender, FormClosingEventArgs e) {
-            if (Config.Settings.FormSettings.frmRedownloader_Location != this.Location) {
-                Config.Settings.FormSettings.frmRedownloader_Location = this.Location;
-            }
+            Config.Settings.FormSettings.frmRedownloader_Location = this.Location;
         }
 
         private void btnRedownload_Click(object sender, EventArgs e) {
-            if (tcMain.SelectedIndex == 0) {
-                // tags
-                Downloader.Arguments.DownloadTags(getTags(Config.Settings.General.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem)), false);
-            }
-            else if (tcMain.SelectedIndex == 1) {
-                // pools
-                int poolid = getPoolID(Config.Settings.General.saveLocation + "\\Pools\\" + lbPools.GetItemText(lbPools.SelectedItem));
-                if (poolid == -1) {
-                    return;
-                }
+            switch (tcMain.SelectedIndex) {
+                case 0: {
+                    Downloader.DownloadTags(getTags(Config.Settings.General.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem)), false);
+                } break;
 
-                Downloader.Arguments.DownloadPool(poolid.ToString(), false);
+                case 1: {
+                    int poolid = getPoolID(Config.Settings.General.saveLocation + "\\Pools\\" + lbPools.GetItemText(lbPools.SelectedItem));
+                    if (poolid != -1) {
+                        Downloader.DownloadPool(poolid.ToString(), false);
+                    }
+                } break;
             }
         }
         private void lbTags_MouseDoubleClick(object sender, MouseEventArgs e) {
-            if (lbTags.IndexFromPoint(e.Location) != System.Windows.Forms.ListBox.NoMatches) {
-                Downloader.Arguments.DownloadTags(getTags(Config.Settings.General.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem)), false);
+            if (lbTags.IndexFromPoint(e.Location) != ListBox.NoMatches) {
+                Downloader.DownloadTags(getTags(Config.Settings.General.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem)), false);
             }
         }
         private void lbTags_SelectedIndexChanged(object sender, EventArgs e) {
-            if (lbTags.SelectedIndex == -1) {
-                return;
+            if (lbTags.SelectedIndex > -1) {
+                lbDownloadedOn.Text = "Selected tag: " + lbTags.GetItemText(lbTags.SelectedItem) + "\r\nDownloaded on: " + getTagDownloadOn(Config.Settings.General.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem));
             }
-            lbDownloadedOn.Text = "Selected tag: " + lbTags.GetItemText(lbTags.SelectedItem) + "\r\nDownloaded on: " + getTagDownloadOn(Config.Settings.General.saveLocation + "\\Tags\\" + lbTags.GetItemText(lbTags.SelectedItem));
         }
         private void lbPools_MouseDoubleClick(object sender, MouseEventArgs e) {
-            if (lbTags.IndexFromPoint(e.Location) != System.Windows.Forms.ListBox.NoMatches) {
+            //if (lbTags.IndexFromPoint(e.Location) != ListBox.NoMatches) {
+            if (lbTags.SelectedIndex > -1) {
                 int poolid = getPoolID(Config.Settings.General.saveLocation + "\\Pools\\" + lbPools.GetItemText(lbPools.SelectedItem));
                 if (poolid == -1) {
                     return;
                 }
 
-                Downloader.Arguments.DownloadPool(poolid.ToString(), false);
+                Downloader.DownloadPool(poolid.ToString(), false);
             }
         }
         private void lbPools_SelectedIndexChanged(object sender, EventArgs e) {
-            if (lbPools.SelectedIndex == -1) {
-                return;
+            if (lbPools.SelectedIndex > -1) {
+                lbDownloadedOn.Text = "Selected pool: " + lbPools.GetItemText(lbPools.SelectedItem) + "\r\nDownloaded on: " + getPoolDownloadOn(Config.Settings.General.saveLocation + "\\Pools\\" + lbPools.GetItemText(lbPools.SelectedItem));
             }
-            lbDownloadedOn.Text = "Selected pool: " + lbPools.GetItemText(lbPools.SelectedItem) + "\r\nDownloaded on: " + getPoolDownloadOn(Config.Settings.General.saveLocation + "\\Pools\\" + lbPools.GetItemText(lbPools.SelectedItem));
         }
 
         private void btnRenumerate_Click(object sender, EventArgs e) {

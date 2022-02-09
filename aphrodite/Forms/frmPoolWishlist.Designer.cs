@@ -24,25 +24,27 @@
         /// </summary>
         private void InitializeComponent() {
             this.chkUpdate = new System.Windows.Forms.CheckBox();
-            this.menuWishlist = new System.Windows.Forms.ContextMenu();
+            this.cmWishlist = new System.Windows.Forms.ContextMenu();
             this.mOpenPoolInBrowser = new System.Windows.Forms.MenuItem();
             this.mCopyPoolLink = new System.Windows.Forms.MenuItem();
             this.mCopyPoolId = new System.Windows.Forms.MenuItem();
-            this.lPoolLink = new aphrodite.Controls.LinkLabelHand();
-            this.txtName = new aphrodite.Controls.ExtendedTextBox();
-            this.btnDownload = new aphrodite.Controls.ExtendedButton();
-            this.btnRemove = new aphrodite.Controls.ExtendedButton();
-            this.btnAddUpdate = new aphrodite.Controls.ExtendedButton();
-            this.txtURL = new aphrodite.Controls.ExtendedTextBox();
-            this.listWishlistItems = new aphrodite.Controls.AeroListBox();
-            this.btnSave = new aphrodite.Controls.ExtendedButton();
-            this.btnCancel = new aphrodite.Controls.ExtendedButton();
+            this.lPoolLink = new murrty.controls.ExtendedLinkLabel();
+            this.txtName = new murrty.controls.ExtendedTextBox();
+            this.btnDownload = new murrty.controls.ExtendedButton();
+            this.btnRemove = new murrty.controls.ExtendedButton();
+            this.btnAddUpdate = new murrty.controls.ExtendedButton();
+            this.txtURL = new murrty.controls.ExtendedTextBox();
+            this.lbWishlistItems = new aphrodite.Controls.AeroListBox();
+            this.btnSave = new murrty.controls.ExtendedButton();
+            this.btnCancel = new murrty.controls.ExtendedButton();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // chkUpdate
             // 
             this.chkUpdate.AutoSize = true;
-            this.chkUpdate.Location = new System.Drawing.Point(12, 266);
+            this.chkUpdate.Location = new System.Drawing.Point(12, 270);
             this.chkUpdate.Name = "chkUpdate";
             this.chkUpdate.Size = new System.Drawing.Size(95, 17);
             this.chkUpdate.TabIndex = 6;
@@ -50,9 +52,9 @@
             this.chkUpdate.UseVisualStyleBackColor = true;
             this.chkUpdate.CheckedChanged += new System.EventHandler(this.chkUpdate_CheckedChanged);
             // 
-            // menuWishlist
+            // cmWishlist
             // 
-            this.menuWishlist.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.cmWishlist.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.mOpenPoolInBrowser,
             this.mCopyPoolLink,
             this.mCopyPoolId});
@@ -77,9 +79,11 @@
             // 
             // lPoolLink
             // 
+            this.lPoolLink.ActiveLinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.lPoolLink.AutoSize = true;
             this.lPoolLink.Cursor = System.Windows.Forms.Cursors.Hand;
             this.lPoolLink.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
+            this.lPoolLink.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(102)))), ((int)(((byte)(204)))));
             this.lPoolLink.Location = new System.Drawing.Point(12, 190);
             this.lPoolLink.Name = "lPoolLink";
             this.lPoolLink.Size = new System.Drawing.Size(196, 13);
@@ -88,11 +92,12 @@
             this.lPoolLink.Text = "The URL of the pool will display here";
             this.lPoolLink.UseMnemonic = false;
             this.lPoolLink.Visible = false;
+            this.lPoolLink.VisitedLinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(0)))), ((int)(((byte)(128)))));
             this.lPoolLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lPoolLink_LinkClicked);
             // 
             // txtName
             // 
-            this.txtName.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
+            this.txtName.ButtonAlignment = murrty.controls.ButtonAlignment.Left;
             this.txtName.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
             this.txtName.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtName.ButtonImageIndex = -1;
@@ -102,13 +107,13 @@
             this.txtName.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.txtName.Location = new System.Drawing.Point(12, 211);
             this.txtName.Name = "txtName";
-            this.txtName.Size = new System.Drawing.Size(286, 22);
+            this.txtName.Size = new System.Drawing.Size(288, 22);
             this.txtName.TabIndex = 3;
             this.txtName.TextHint = "Pool name...";
             // 
             // btnDownload
             // 
-            this.btnDownload.Location = new System.Drawing.Point(148, 262);
+            this.btnDownload.Location = new System.Drawing.Point(150, 266);
             this.btnDownload.Name = "btnDownload";
             this.btnDownload.Size = new System.Drawing.Size(76, 23);
             this.btnDownload.TabIndex = 7;
@@ -118,7 +123,7 @@
             // 
             // btnRemove
             // 
-            this.btnRemove.Location = new System.Drawing.Point(230, 262);
+            this.btnRemove.Location = new System.Drawing.Point(232, 266);
             this.btnRemove.Name = "btnRemove";
             this.btnRemove.Size = new System.Drawing.Size(68, 23);
             this.btnRemove.TabIndex = 8;
@@ -128,7 +133,7 @@
             // 
             // btnAddUpdate
             // 
-            this.btnAddUpdate.Location = new System.Drawing.Point(230, 235);
+            this.btnAddUpdate.Location = new System.Drawing.Point(232, 239);
             this.btnAddUpdate.Name = "btnAddUpdate";
             this.btnAddUpdate.Size = new System.Drawing.Size(68, 23);
             this.btnAddUpdate.TabIndex = 5;
@@ -138,7 +143,7 @@
             // 
             // txtURL
             // 
-            this.txtURL.ButtonAlignment = aphrodite.Controls.ButtonAlignments.Left;
+            this.txtURL.ButtonAlignment = murrty.controls.ButtonAlignment.Left;
             this.txtURL.ButtonCursor = System.Windows.Forms.Cursors.IBeam;
             this.txtURL.ButtonFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtURL.ButtonImageIndex = -1;
@@ -146,24 +151,24 @@
             this.txtURL.ButtonSize = new System.Drawing.Size(22, 21);
             this.txtURL.ButtonText = "";
             this.txtURL.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.txtURL.Location = new System.Drawing.Point(12, 237);
+            this.txtURL.Location = new System.Drawing.Point(12, 241);
             this.txtURL.Name = "txtURL";
-            this.txtURL.Size = new System.Drawing.Size(212, 22);
+            this.txtURL.Size = new System.Drawing.Size(214, 22);
             this.txtURL.TabIndex = 4;
             this.txtURL.TextHint = "Pool URL...";
             // 
-            // listWishlistItems
+            // lbWishlistItems
             // 
-            this.listWishlistItems.FormattingEnabled = true;
-            this.listWishlistItems.Location = new System.Drawing.Point(12, 10);
-            this.listWishlistItems.Name = "listWishlistItems";
-            this.listWishlistItems.Size = new System.Drawing.Size(286, 173);
-            this.listWishlistItems.TabIndex = 1;
-            this.listWishlistItems.SelectedIndexChanged += new System.EventHandler(this.lbWish_SelectedIndexChanged);
+            this.lbWishlistItems.FormattingEnabled = true;
+            this.lbWishlistItems.Location = new System.Drawing.Point(12, 10);
+            this.lbWishlistItems.Name = "lbWishlistItems";
+            this.lbWishlistItems.Size = new System.Drawing.Size(288, 173);
+            this.lbWishlistItems.TabIndex = 1;
+            this.lbWishlistItems.SelectedIndexChanged += new System.EventHandler(this.lbWish_SelectedIndexChanged);
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(230, 298);
+            this.btnSave.Location = new System.Drawing.Point(232, 8);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(68, 23);
             this.btnSave.TabIndex = 9;
@@ -173,7 +178,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(156, 298);
+            this.btnCancel.Location = new System.Drawing.Point(158, 8);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(68, 23);
             this.btnCancel.TabIndex = 10;
@@ -181,15 +186,25 @@
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
+            // panel1
+            // 
+            this.panel1.BackColor = System.Drawing.SystemColors.Menu;
+            this.panel1.Controls.Add(this.btnCancel);
+            this.panel1.Controls.Add(this.btnSave);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panel1.Location = new System.Drawing.Point(0, 301);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(312, 42);
+            this.panel1.TabIndex = 11;
+            // 
             // frmPoolWishlist
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(310, 333);
-            this.Controls.Add(this.btnCancel);
-            this.Controls.Add(this.btnSave);
+            this.BackColor = System.Drawing.SystemColors.Window;
+            this.ClientSize = new System.Drawing.Size(312, 343);
             this.Controls.Add(this.lPoolLink);
             this.Controls.Add(this.chkUpdate);
             this.Controls.Add(this.txtName);
@@ -197,18 +212,19 @@
             this.Controls.Add(this.btnRemove);
             this.Controls.Add(this.btnAddUpdate);
             this.Controls.Add(this.txtURL);
-            this.Controls.Add(this.listWishlistItems);
+            this.Controls.Add(this.lbWishlistItems);
+            this.Controls.Add(this.panel1);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = global::aphrodite.Properties.Resources.Brad;
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(328, 370);
-            this.MinimumSize = new System.Drawing.Size(328, 370);
+            this.MaximumSize = new System.Drawing.Size(330, 380);
+            this.MinimumSize = new System.Drawing.Size(330, 380);
             this.Name = "frmPoolWishlist";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Pool Wishlist";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmPoolWishlist_FormClosing);
-            this.Load += new System.EventHandler(this.frmPoolWishlist_Load);
+            this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -216,19 +232,20 @@
 
         #endregion
 
-        private Controls.AeroListBox listWishlistItems;
-        private Controls.ExtendedTextBox txtURL;
-        private Controls.ExtendedButton btnAddUpdate;
-        private Controls.ExtendedButton btnRemove;
-        private Controls.ExtendedButton btnDownload;
-        private Controls.ExtendedTextBox txtName;
+        private Controls.AeroListBox lbWishlistItems;
+        private murrty.controls.ExtendedTextBox txtURL;
+        private murrty.controls.ExtendedButton btnAddUpdate;
+        private murrty.controls.ExtendedButton btnRemove;
+        private murrty.controls.ExtendedButton btnDownload;
+        private murrty.controls.ExtendedTextBox txtName;
         private System.Windows.Forms.CheckBox chkUpdate;
-        private Controls.LinkLabelHand lPoolLink;
-        private System.Windows.Forms.ContextMenu menuWishlist;
+        private murrty.controls.ExtendedLinkLabel lPoolLink;
+        private System.Windows.Forms.ContextMenu cmWishlist;
         private System.Windows.Forms.MenuItem mOpenPoolInBrowser;
         private System.Windows.Forms.MenuItem mCopyPoolLink;
         private System.Windows.Forms.MenuItem mCopyPoolId;
-        private Controls.ExtendedButton btnSave;
-        private Controls.ExtendedButton btnCancel;
+        private murrty.controls.ExtendedButton btnSave;
+        private murrty.controls.ExtendedButton btnCancel;
+        private System.Windows.Forms.Panel panel1;
     }
 }

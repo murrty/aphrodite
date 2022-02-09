@@ -24,12 +24,12 @@
         /// </summary>
         private void InitializeComponent() {
             this.lbHeader = new System.Windows.Forms.Label();
-            this.btnReset = new aphrodite.Controls.ExtendedButton();
-            this.btnSave = new aphrodite.Controls.ExtendedButton();
-            this.btnCancel = new aphrodite.Controls.ExtendedButton();
+            this.btnReset = new murrty.controls.ExtendedButton();
+            this.btnSave = new murrty.controls.ExtendedButton();
+            this.btnCancel = new murrty.controls.ExtendedButton();
             this.txtUndesired = new System.Windows.Forms.TextBox();
-            this.btnAdd = new aphrodite.Controls.ExtendedButton();
-            this.btnRemove = new aphrodite.Controls.ExtendedButton();
+            this.btnAdd = new murrty.controls.ExtendedButton();
+            this.btnRemove = new murrty.controls.ExtendedButton();
             this.listTags = new aphrodite.Controls.AeroListBox();
             this.pnLower = new System.Windows.Forms.Panel();
             this.pnLower.SuspendLayout();
@@ -85,6 +85,7 @@
             this.txtUndesired.Size = new System.Drawing.Size(150, 20);
             this.txtUndesired.TabIndex = 24;
             this.txtUndesired.TextChanged += new System.EventHandler(this.txtUndesired_TextChanged);
+            this.txtUndesired.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtUndesired_KeyPress);
             // 
             // btnAdd
             // 
@@ -132,6 +133,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(319, 320);
             this.Controls.Add(this.btnReset);
             this.Controls.Add(this.btnCancel);
@@ -149,7 +151,6 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Undesired Tags";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmUndesiredTags_FormClosing);
-            this.Load += new System.EventHandler(this.frmUndesiredTags_Load);
             this.pnLower.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -159,13 +160,13 @@
         #endregion
 
         private System.Windows.Forms.Label lbHeader;
-        private Controls.ExtendedButton btnReset;
-        private Controls.ExtendedButton btnSave;
-        private Controls.ExtendedButton btnCancel;
+        private murrty.controls.ExtendedButton btnReset;
+        private murrty.controls.ExtendedButton btnSave;
+        private murrty.controls.ExtendedButton btnCancel;
         private Controls.AeroListBox listTags;
         private System.Windows.Forms.TextBox txtUndesired;
-        private Controls.ExtendedButton btnAdd;
-        private Controls.ExtendedButton btnRemove;
+        private murrty.controls.ExtendedButton btnAdd;
+        private murrty.controls.ExtendedButton btnRemove;
         private System.Windows.Forms.Panel pnLower;
     }
 }

@@ -144,9 +144,9 @@ If there are 5 tags and both minimum favorites and score are used, minimum favor
     <value>A protocol is used by browsers to run applications, usually with
 arguments from websites. Using a protocol with this program is
 useful if you want to download while browsing e621.
-They're all optional, but require a userscript.
 
-the 'images:' protocol uses a separate userscript for... various reasons.</value>
+Using the protocol is optional, but it enables the ability to download
+from the supported sites using your browser.</value>
   </data>
   <data name="rtbParams.Text" xml:space="preserve">
     <value>%md5%         =  The MD5 of the file
