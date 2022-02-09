@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Web;
 
 namespace aphrodite {
 
@@ -47,6 +49,29 @@ namespace aphrodite {
         /// </summary>
         /// <returns>True if the arguments were fully parsed; otherwise, false.</returns>
         public static bool ParseArguments() => ParseArguments(Environment.GetCommandLineArgs());
+        
+        /// <summary>
+        /// Decodes a URL encoded argument into an array.
+        /// </summary>
+        /// <param name="Argument"></param>
+        /// <returns></returns>
+        public static string[] DecodeUrlEncodedArgument(string Argument) {
+            try {
+                return Regex.Matches(HttpUtility.UrlDecode(Argument), @"\""(\""\""|[^\""])+\""|[^ ]+",
+                    RegexOptions.ExplicitCapture)
+                        .Cast<Match>()
+                        .Select(x => x.Value)
+                        .Select(x => x.StartsWith("\"") && x.EndsWith("\"") ? x.Substring(1, x.Length - 2).Replace("\"\"", "\"") : x)
+                        .Select(x => x.StartsWith("\\\"") && x.EndsWith("\"") ? x.Substring(1, x.Length - 2) : x)
+                        .ToArray();
+
+                return Regex.Split(HttpUtility.UrlDecode(Argument), "(?<=^[^\"]*(?:\"[^\"]*\"[^\"]*)*) (?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+            }
+            catch (Exception ex) {
+                Log.ReportException(ex);
+                return new string[] { Argument };
+            }
+        }
 
         /// <summary>
         /// Parses an array of arguments.
@@ -58,6 +83,8 @@ namespace aphrodite {
                 try {
                     if (Arguments.Length > 0) {
                         if (Arguments[0].StartsWith("aphrodite:")) {
+                            // We'll have to assume it's encoded.
+                            Arguments = DecodeUrlEncodedArgument(Arguments[0]);
                             Arguments[0] = Arguments[0].Substring(10);
                         }
 
