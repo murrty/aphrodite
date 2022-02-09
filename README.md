@@ -5,7 +5,7 @@ a(nother), REALLY glorified, e621 image/pool downloader
 # Usage
 Run, enter tags or go enter a pool id, click download. easy.
 
-You can also use arguemnts. Refer to the [arguments readme](https://github.com/murrty/aphrodite/blob/master/ARGUMENTS.md)
+You can also use arguments. Refer to the [arguments readme](https://github.com/murrty/aphrodite/blob/master/ARGUMENTS.md)
 
 # Protocol & Userscript plugin
 Yes, just like everything else, this supports a protocol. "Pools:" and "Tags:" are the ones used. Run the program as admin, click the "Protocol" item at the top of the program and it'll automatically attempt to install it for you.
