@@ -71,7 +71,7 @@ namespace aphrodite.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 2022-01-30.
+        ///   Looks up a localized string similar to 2022-02-09.
         /// </summary>
         internal static string BuildDate {
             get {

@@ -46,7 +46,7 @@
             // 
             // btnMainForm
             // 
-            this.btnMainForm.Location = new System.Drawing.Point(164, 9);
+            this.btnMainForm.Location = new System.Drawing.Point(83, 9);
             this.btnMainForm.Name = "btnMainForm";
             this.btnMainForm.Size = new System.Drawing.Size(75, 23);
             this.btnMainForm.TabIndex = 3;
@@ -57,7 +57,7 @@
             // btnCancel
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCancel.Location = new System.Drawing.Point(83, 9);
+            this.btnCancel.Location = new System.Drawing.Point(245, 9);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 1;
@@ -68,7 +68,7 @@
             // btnDownload
             // 
             this.btnDownload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDownload.Location = new System.Drawing.Point(245, 9);
+            this.btnDownload.Location = new System.Drawing.Point(164, 9);
             this.btnDownload.Name = "btnDownload";
             this.btnDownload.Size = new System.Drawing.Size(75, 23);
             this.btnDownload.TabIndex = 0;
@@ -96,6 +96,7 @@
             this.txtArguments.ButtonImageKey = "";
             this.txtArguments.ButtonSize = new System.Drawing.Size(22, 19);
             this.txtArguments.ButtonText = "X";
+            this.txtArguments.ButtonTextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.txtArguments.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtArguments.Location = new System.Drawing.Point(51, 58);
             this.txtArguments.Name = "txtArguments";

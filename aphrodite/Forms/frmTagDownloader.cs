@@ -404,7 +404,9 @@ namespace aphrodite {
                     }
                     #endregion
 
-                    #region Parsing API 
+                    #region Parsing API
+
+                    #region Define api-based vars for.
                     // e621 XML data
                     XmlNodeList xmlID;
                     XmlNodeList xmlMD5;
@@ -433,8 +435,6 @@ namespace aphrodite {
                     XmlAttributeCollection xmlSearchInfo;
                     XmlAttributeCollection xmlCurrentPostAttributes;
 
-                    Status = DownloadStatus.Parsing;
-
                     // Shared vars
                     int NewFiles = 0;               // The count of new files that will be downloaded.
                     int NewFilesSkipped = 0;        // The count of files that will NOT be downloaded.
@@ -458,7 +458,10 @@ namespace aphrodite {
                     string IdAttribute;             // XmlAttribute of the post id.
                     string Md5Attribute;            // XmlAttribute of the post MD5.
                     string ExtensionFromFileUrl;    // XmlAttribute of the post file extension.
+                    #endregion
 
+                    #region Main parser
+                    Status = DownloadStatus.Parsing;
                     for (int ApiPage = 0; ApiPage < CurrentPage; ApiPage++) {
                         if (DownloadInfo.PageLimit > 0 && CurrentPage > DownloadInfo.PageLimit) {
                             Log.Write("PageLimit reached, breaking parse loop.");
@@ -562,664 +565,447 @@ namespace aphrodite {
                         CurrentXml = string.Empty;
                         #endregion
 
-                        #region e621 parsing
-                        if (DownloadInfo.Site == DownloadSite.e621) {
-                            xmlID = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/id");
-                            xmlMD5 = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/file/md5");
-                            xmlURL = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/file/url");
-                            xmlTagsGeneral = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/tags/general");
-                            xmlTagsSpecies = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/tags/species");
-                            xmlTagsCharacter = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/tags/character");
-                            xmlTagsCopyright = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/tags/copyright");
-                            xmlTagsArtist = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/tags/artist");
-                            xmlTagsInvalid = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/tags/invalid");
-                            xmlTagsLore = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/tags/lore");
-                            xmlTagsMeta = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/tags/meta");
-                            xmlTagsLocked = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/locked_tags");
-                            xmlScore = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/score/total");
-                            xmlScoreUp = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/score/up");
-                            xmlScoreDown = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/score/down");
-                            xmlFavCount = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/fav_count");
-                            xmlRating = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/rating");
-                            xmlAuthor = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/uploader_id");
-                            xmlDescription = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/description");
-                            xmlExt = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/file/ext");
-                            xmlDeleted = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/flags/deleted");
+                        switch (DownloadInfo.Site) {
 
-                            if (xmlID.Count > 0) {
-                                NewFiles = 0;           // The amount of new files added, used for the log.
-                                NewFilesSkipped = 0;    // The amount of new files skipped, used for the log.
+                            #region e621 parsing
+                            case DownloadSite.e621: {
+                                xmlID = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/id");
+                                xmlMD5 = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/file/md5");
+                                xmlURL = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/file/url");
+                                xmlTagsGeneral = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/tags/general");
+                                xmlTagsSpecies = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/tags/species");
+                                xmlTagsCharacter = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/tags/character");
+                                xmlTagsCopyright = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/tags/copyright");
+                                xmlTagsArtist = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/tags/artist");
+                                xmlTagsInvalid = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/tags/invalid");
+                                xmlTagsLore = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/tags/lore");
+                                xmlTagsMeta = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/tags/meta");
+                                xmlTagsLocked = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/locked_tags");
+                                xmlScore = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/score/total");
+                                xmlScoreUp = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/score/up");
+                                xmlScoreDown = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/score/down");
+                                xmlFavCount = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/fav_count");
+                                xmlRating = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/rating");
+                                xmlAuthor = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/uploader_id");
+                                xmlDescription = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/description");
+                                xmlExt = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/file/ext");
+                                xmlDeleted = xmlDoc.DocumentElement.SelectNodes("/root/posts/item/flags/deleted");
 
-                                Log.Write($"Parsing api page {CurrentPage}...");
-                                this.Invoke((Action)delegate () {
-                                    sbStatus.Text = $"Parsing api page {CurrentPage}...";
-                                });
+                                if (xmlID.Count > 0) {
+                                    NewFiles = 0;           // The amount of new files added, used for the log.
+                                    NewFilesSkipped = 0;    // The amount of new files skipped, used for the log.
 
-                                // Begin parsing the XML for tag information per item.
-                                for (int CurrentPost = 0; CurrentPost < xmlID.Count; CurrentPost++) {
-                                    if (DownloadInfo.ImageLimit > 0 && DownloadInfo.ImageLimit == TotalFilesToDownload) {
-                                        ImageLimitReached = true;
-                                        Log.Write("ImageLimit reached, breaking parse loop.");
-                                        break;
-                                    }
+                                    Log.Write($"Parsing api page {CurrentPage}...");
+                                    this.Invoke((Action)delegate () {
+                                        sbStatus.Text = $"Parsing api page {CurrentPage}...";
+                                    });
 
-                                    // Set the parse variables.
-                                    rating = xmlRating[CurrentPost].InnerText;
-                                    PostIsGraylisted = false;
-                                    PostIsBlacklisted = false;
-                                    PostTags.Clear();
-                                    FoundGraylistedTags = string.Empty;
-                                    FoundBlacklistedTags = string.Empty;
-                                    ReadTags = string.Empty;
-
-                                    #region skip ratings & below minimums
-                                    switch (xmlRating[CurrentPost].InnerText.ToLower()) {
-                                        case "e":
-                                        case "explicit":
-                                            switch (DownloadInfo.SaveExplicit) {
-                                                case false:
-                                                    TotalPostsParsed++;
-                                                    continue;
-                                            }
-                                            rating = "Explicit";
+                                    // Begin parsing the XML for tag information per item.
+                                    for (int CurrentPost = 0; CurrentPost < xmlID.Count; CurrentPost++) {
+                                        if (DownloadInfo.ImageLimit > 0 && DownloadInfo.ImageLimit == TotalFilesToDownload) {
+                                            ImageLimitReached = true;
+                                            Log.Write("ImageLimit reached, breaking parse loop.");
                                             break;
-
-                                        case "q":
-                                        case "questionable":
-                                            switch (DownloadInfo.SaveQuestionable) {
-                                                case false:
-                                                    TotalPostsParsed++;
-                                                    continue;
-                                            }
-                                            rating = "Questionable";
-                                            break;
-
-                                        case "s":
-                                        case "safe":
-                                            switch (DownloadInfo.SaveSafe) {
-                                                case false:
-                                                    TotalPostsParsed++;
-                                                    continue;
-                                            }
-                                            rating = "Safe";
-                                            break;
-
-                                        default:
-                                            rating = "Unknown rating";
-                                            break;
-                                    }
-
-                                    switch (DownloadInfo.FavoriteCount > 0 && Int32.Parse(xmlFavCount[CurrentPost].InnerText) < DownloadInfo.FavoriteCount) {
-                                        case true:
-                                            TotalPostsParsed++;
-                                            continue;
-                                    }
-
-                                    switch (DownloadInfo.UseMinimumScore && Int32.Parse(xmlScore[CurrentPost].InnerText) < DownloadInfo.MinimumScore) {
-                                        case true:
-                                            TotalPostsParsed++;
-                                            continue;
-                                    }
-                                    #endregion
-
-                                    #region Tag parsing + blacklist/graylist filtering
-                                    // Create new tag list to merge all the tag groups into one.
-                                    ReadTags += "\r\n          General: [ ";
-                                    switch (xmlTagsGeneral[CurrentPost].ChildNodes.Count > 0) {
-                                        case true:
-                                            for (int x = 0; x < xmlTagsGeneral[CurrentPost].ChildNodes.Count; x++) {
-                                                PostTags.Add(xmlTagsGeneral[CurrentPost].ChildNodes[x].InnerText);
-                                                ReadTags += xmlTagsGeneral[CurrentPost].ChildNodes[x].InnerText + ", ";
-                                            }
-                                            ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                                            break;
-
-                                        case false:
-                                            ReadTags += "none";
-                                            break;
-                                    }
-
-                                    ReadTags += " ]\r\n          Species: [ ";
-                                    switch (xmlTagsSpecies[CurrentPost].ChildNodes.Count > 0) {
-                                        case true:
-                                            for (int x = 0; x < xmlTagsSpecies[CurrentPost].ChildNodes.Count; x++) {
-                                                PostTags.Add(xmlTagsSpecies[CurrentPost].ChildNodes[x].InnerText);
-                                                ReadTags += xmlTagsSpecies[CurrentPost].ChildNodes[x].InnerText + ", ";
-                                            }
-                                            ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                                            break;
-
-                                        case false:
-                                            ReadTags += "none";
-                                            break;
-                                    }
-
-                                    ReadTags += " ]\r\n          Character(s): [ ";
-                                    switch (xmlTagsCharacter[CurrentPost].ChildNodes.Count > 0) {
-                                        case true:
-                                            for (int x = 0; x < xmlTagsCharacter[CurrentPost].ChildNodes.Count; x++) {
-                                                PostTags.Add(xmlTagsCharacter[CurrentPost].ChildNodes[x].InnerText);
-                                                ReadTags += xmlTagsCharacter[CurrentPost].ChildNodes[x].InnerText + ", ";
-                                            }
-                                            ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                                            break;
-
-                                        case false:
-                                            ReadTags += "none";
-                                            break;
-                                    }
-
-                                    ReadTags += " ]\r\n          Copyright: [ ";
-                                    switch (xmlTagsCopyright[CurrentPost].ChildNodes.Count > 0) {
-                                        case true:
-                                            for (int x = 0; x < xmlTagsCopyright[CurrentPost].ChildNodes.Count; x++) {
-                                                PostTags.Add(xmlTagsCopyright[CurrentPost].ChildNodes[x].InnerText);
-                                                ReadTags += xmlTagsCopyright[CurrentPost].ChildNodes[x].InnerText + ", ";
-                                            }
-                                            ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                                            break;
-
-                                        case false:
-                                            ReadTags += "none";
-                                            break;
-                                    }
-
-                                    ReadTags += " ]\r\n          Artist: [ ";
-                                    switch (xmlTagsArtist[CurrentPost].ChildNodes.Count > 0) {
-                                        case true:
-                                            for (int x = 0; x < xmlTagsArtist[CurrentPost].ChildNodes.Count; x++) {
-                                                PostTags.Add(xmlTagsArtist[CurrentPost].ChildNodes[x].InnerText);
-                                                ReadTags += xmlTagsArtist[CurrentPost].ChildNodes[x].InnerText + ", ";
-                                            }
-                                            ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                                            break;
-
-                                        case false:
-                                            ReadTags += "none";
-                                            break;
-                                    }
-
-                                    ReadTags += " ]\r\n          Lore: [ ";
-                                    switch (xmlTagsLore[CurrentPost].ChildNodes.Count > 0) {
-                                        case true:
-                                            for (int x = 0; x < xmlTagsLore[CurrentPost].ChildNodes.Count; x++) {
-                                                PostTags.Add(xmlTagsLore[CurrentPost].ChildNodes[x].InnerText);
-                                                ReadTags += xmlTagsLore[CurrentPost].ChildNodes[x].InnerText + ", ";
-                                            }
-                                            ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                                            break;
-
-                                        case false:
-                                            ReadTags += "none";
-                                            break;
-                                    }
-
-                                    ReadTags += " ]\r\n          Meta: [ ";
-                                    switch (xmlTagsMeta[CurrentPost].ChildNodes.Count > 0) {
-                                        case true:
-                                            for (int x = 0; x < xmlTagsMeta[CurrentPost].ChildNodes.Count; x++) {
-                                                PostTags.Add(xmlTagsMeta[CurrentPost].ChildNodes[x].InnerText);
-                                                ReadTags += xmlTagsMeta[CurrentPost].ChildNodes[x].InnerText + ", ";
-                                            }
-                                            ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                                            break;
-
-                                        case false:
-                                            ReadTags += "none";
-                                            break;
-                                    }
-
-                                    ReadTags += " ]\r\n          Locked tags: [ ";
-                                    switch (xmlTagsLocked[CurrentPost].ChildNodes.Count > 0) {
-                                        case true:
-                                            for (int x = 0; x < xmlTagsLocked[CurrentPost].ChildNodes.Count; x++) {
-                                                PostTags.Add(xmlTagsLocked[CurrentPost].ChildNodes[x].InnerText);
-                                                ReadTags += xmlTagsLocked[CurrentPost].ChildNodes[x].InnerText + ", ";
-                                            }
-                                            ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',') + " ]";
-                                            break;
-
-                                        case false:
-                                            ReadTags += "none";
-                                            break;
-                                    }
-
-                                    ReadTags += " ]\r\n          Invalid: [ ";
-                                    switch (xmlTagsInvalid[CurrentPost].ChildNodes.Count > 0) {
-                                        case true:
-                                            for (int x = 0; x < xmlTagsInvalid[CurrentPost].ChildNodes.Count; x++) {
-                                                PostTags.Add(xmlTagsInvalid[CurrentPost].ChildNodes[x].InnerText);
-                                                ReadTags += xmlTagsInvalid[CurrentPost].ChildNodes[x].InnerText + ", ";
-                                            }
-                                            ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
-                                            break;
-
-                                        case false:
-                                            ReadTags += "none";
-                                            break;
-                                    }
-                                    ReadTags += " ]";
-
-                                    // Check the tags
-                                    for (int j = 0; j < PostTags.Count; j++) {
-                                        if (DownloadInfo.Blacklist.Length > 0) {
-                                            for (int k = 0; k < DownloadInfo.Blacklist.Length; k++) {
-                                                if (PostTags[j] == DownloadInfo.Blacklist[k]) {
-                                                    PostIsBlacklisted = true;
-                                                    FoundBlacklistedTags += DownloadInfo.Blacklist[k] + " ";
-                                                }
-                                            }
-                                            FoundBlacklistedTags = FoundBlacklistedTags.Trim();
                                         }
 
-                                        if (DownloadInfo.Graylist.Length > 0) {
-                                            for (int k = 0; k < DownloadInfo.Graylist.Length; k++) {
-                                                if (PostTags[j] == DownloadInfo.Graylist[k]) {
-                                                    PostIsGraylisted = true;
-                                                    FoundGraylistedTags += DownloadInfo.Graylist[k] + " ";
+                                        // Set the parse variables.
+                                        rating = xmlRating[CurrentPost].InnerText;
+                                        PostIsGraylisted = false;
+                                        PostIsBlacklisted = false;
+                                        PostTags.Clear();
+                                        FoundGraylistedTags = string.Empty;
+                                        FoundBlacklistedTags = string.Empty;
+                                        ReadTags = string.Empty;
+
+                                        #region skip ratings & below minimums
+                                        switch (xmlRating[CurrentPost].InnerText.ToLower()) {
+                                            case "e":
+                                            case "explicit":
+                                                switch (DownloadInfo.SaveExplicit) {
+                                                    case false:
+                                                        TotalPostsParsed++;
+                                                        continue;
                                                 }
-                                            }
-                                        }
-                                        FoundGraylistedTags = FoundBlacklistedTags.Trim();
-                                    }
+                                                rating = "Explicit";
+                                                break;
 
-                                    // Continue if graylisted or blacklisted
-                                    if (PostIsBlacklisted && !DownloadInfo.SaveBlacklistedFiles) {
-                                        BlacklistedSkippedCount++;
-                                        TotalPostsParsed++;
-                                        NewFilesSkipped++;
-                                        continue;
-                                    }
-                                    else if (PostIsGraylisted && !DownloadInfo.SaveGraylistedFiles) {
-                                        GraylistedSkippedCount++;
-                                        TotalPostsParsed++;
-                                        NewFilesSkipped++;
-                                        continue;
-                                    }
-                                    #endregion
-
-                                    #region file name + e621 global blacklist bypass
-                                    // File name artist for the schema
-                                    string fileNameArtist = "(none)";
-                                    if (xmlTagsArtist[CurrentPost].ChildNodes.Count > 0) {
-                                        for (int CurrentArtistTag = 0; CurrentArtistTag < xmlTagsArtist[CurrentPost].ChildNodes.Count; CurrentArtistTag++) {
-                                            if (UseHardcodedFilter) {
-                                                if (!UndesiredTags.IsUndesiredHardcoded(xmlTagsArtist[CurrentPost].ChildNodes[CurrentArtistTag].InnerText)) {
-                                                    fileNameArtist = xmlTagsArtist[CurrentPost].ChildNodes[CurrentArtistTag].InnerText;
-                                                    break;
+                                            case "q":
+                                            case "questionable":
+                                                switch (DownloadInfo.SaveQuestionable) {
+                                                    case false:
+                                                        TotalPostsParsed++;
+                                                        continue;
                                                 }
-                                            }
-                                            else {
-                                                if (!UndesiredTags.IsUndesired(xmlTagsArtist[CurrentPost].ChildNodes[CurrentArtistTag].InnerText, DownloadInfo.UndesiredTags)) {
-                                                    fileNameArtist = xmlTagsArtist[CurrentPost].ChildNodes[CurrentArtistTag].InnerText;
-                                                    break;
+                                                rating = "Questionable";
+                                                break;
+
+                                            case "s":
+                                            case "safe":
+                                                switch (DownloadInfo.SaveSafe) {
+                                                    case false:
+                                                        TotalPostsParsed++;
+                                                        continue;
                                                 }
-                                            }
-                                        }
-                                    }
+                                                rating = "Safe";
+                                                break;
 
-                                    // Replace schema flags with post info
-                                    NewFileName =
-                                        DownloadInfo.FileNameSchema
-                                            .Replace("%md5%", xmlMD5[CurrentPost].InnerText)
-                                            .Replace("%id%", xmlID[CurrentPost].InnerText)
-                                            .Replace("%rating%", rating.ToLower())
-                                            .Replace("%rating2%", xmlRating[CurrentPost].InnerText)
-                                            .Replace("%artist%", fileNameArtist)
-                                            .Replace("%ext%", xmlExt[CurrentPost].InnerText)
-                                            .Replace("%fav_count%", xmlFavCount[CurrentPost].InnerText)
-                                            .Replace("%score%", xmlScore[CurrentPost].InnerText)
-                                            .Replace("%scoreup%", xmlScoreUp[CurrentPost].InnerText)
-                                            .Replace("%scoredown%", xmlScoreDown[CurrentPost].InnerText)
-                                            .Replace("%author%", xmlAuthor[CurrentPost].InnerText) + "." + xmlExt[CurrentPost].InnerText;
-
-                                    // Check for null file url + fix for files that are auto blacklisted :)
-                                    string NewUrl = xmlURL[CurrentPost].InnerText;
-                                    if (string.IsNullOrEmpty(NewUrl) && xmlDeleted[CurrentPost].InnerText.ToLower() == "false") {
-                                        NewUrl = ApiTools.GetBlacklistedImageUrl(xmlMD5[CurrentPost].InnerText, xmlExt[CurrentPost].InnerText);
-                                    }
-                                    #endregion
-
-                                    #region description + .nfo files (so the existing ones don't get replaced)
-                                    // Start adding to the nfo buffer and URL lists
-                                    if (DownloadInfo.SaveInfo) {
-                                        // Set the description
-                                        string ImageDescription = " No description";
-                                        switch (string.IsNullOrWhiteSpace(xmlDescription[CurrentPost].InnerText)) {
-                                            case false:
-                                                ImageDescription = xmlDescription[CurrentPost].InnerText;
+                                            default:
+                                                rating = "Unknown rating";
                                                 break;
                                         }
 
-                                        if (PostIsBlacklisted) {
-                                            BlacklistedInfoBuffer +=
-                                                $"POST {xmlID[CurrentPost].InnerText}:\n" +
-                                                $"    MD5: {xmlMD5[CurrentPost].InnerText}\n" +
-                                                $"    URL: https://e621.net/posts/show/{xmlID[CurrentPost].InnerText}\n" +
-                                                $"    TAGS:\n{ReadTags}\n" +
-                                                $"    OFFENDING TAGS: {FoundBlacklistedTags + (PostIsGraylisted ? " |<~Bl|Gr~>| " + FoundGraylistedTags : "")}\n" +
-                                                $"    SCORE: Up {xmlScoreUp[CurrentPost].InnerText}, Down {xmlScoreDown[CurrentPost].InnerText}, Total {xmlScore[CurrentPost].InnerText}\n" +
-                                                $"    RATING: {rating}\n" +
-                                                $"    DESCRIPTION: {ImageDescription}\n\n";
+                                        switch (DownloadInfo.FavoriteCount > 0 && Int32.Parse(xmlFavCount[CurrentPost].InnerText) < DownloadInfo.FavoriteCount) {
+                                            case true:
+                                                TotalPostsParsed++;
+                                                continue;
+                                        }
 
+                                        switch (DownloadInfo.UseMinimumScore && Int32.Parse(xmlScore[CurrentPost].InnerText) < DownloadInfo.MinimumScore) {
+                                            case true:
+                                                TotalPostsParsed++;
+                                                continue;
+                                        }
+                                        #endregion
+
+                                        #region Tag parsing + blacklist/graylist filtering
+                                        // Create new tag list to merge all the tag groups into one.
+                                        ReadTags += "\r\n          General: [ ";
+                                        switch (xmlTagsGeneral[CurrentPost].ChildNodes.Count > 0) {
+                                            case true:
+                                                for (int x = 0; x < xmlTagsGeneral[CurrentPost].ChildNodes.Count; x++) {
+                                                    PostTags.Add(xmlTagsGeneral[CurrentPost].ChildNodes[x].InnerText);
+                                                    ReadTags += xmlTagsGeneral[CurrentPost].ChildNodes[x].InnerText + ", ";
+                                                }
+                                                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                                                break;
+
+                                            case false:
+                                                ReadTags += "none";
+                                                break;
+                                        }
+
+                                        ReadTags += " ]\r\n          Species: [ ";
+                                        switch (xmlTagsSpecies[CurrentPost].ChildNodes.Count > 0) {
+                                            case true:
+                                                for (int x = 0; x < xmlTagsSpecies[CurrentPost].ChildNodes.Count; x++) {
+                                                    PostTags.Add(xmlTagsSpecies[CurrentPost].ChildNodes[x].InnerText);
+                                                    ReadTags += xmlTagsSpecies[CurrentPost].ChildNodes[x].InnerText + ", ";
+                                                }
+                                                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                                                break;
+
+                                            case false:
+                                                ReadTags += "none";
+                                                break;
+                                        }
+
+                                        ReadTags += " ]\r\n          Character(s): [ ";
+                                        switch (xmlTagsCharacter[CurrentPost].ChildNodes.Count > 0) {
+                                            case true:
+                                                for (int x = 0; x < xmlTagsCharacter[CurrentPost].ChildNodes.Count; x++) {
+                                                    PostTags.Add(xmlTagsCharacter[CurrentPost].ChildNodes[x].InnerText);
+                                                    ReadTags += xmlTagsCharacter[CurrentPost].ChildNodes[x].InnerText + ", ";
+                                                }
+                                                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                                                break;
+
+                                            case false:
+                                                ReadTags += "none";
+                                                break;
+                                        }
+
+                                        ReadTags += " ]\r\n          Copyright: [ ";
+                                        switch (xmlTagsCopyright[CurrentPost].ChildNodes.Count > 0) {
+                                            case true:
+                                                for (int x = 0; x < xmlTagsCopyright[CurrentPost].ChildNodes.Count; x++) {
+                                                    PostTags.Add(xmlTagsCopyright[CurrentPost].ChildNodes[x].InnerText);
+                                                    ReadTags += xmlTagsCopyright[CurrentPost].ChildNodes[x].InnerText + ", ";
+                                                }
+                                                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                                                break;
+
+                                            case false:
+                                                ReadTags += "none";
+                                                break;
+                                        }
+
+                                        ReadTags += " ]\r\n          Artist: [ ";
+                                        switch (xmlTagsArtist[CurrentPost].ChildNodes.Count > 0) {
+                                            case true:
+                                                for (int x = 0; x < xmlTagsArtist[CurrentPost].ChildNodes.Count; x++) {
+                                                    PostTags.Add(xmlTagsArtist[CurrentPost].ChildNodes[x].InnerText);
+                                                    ReadTags += xmlTagsArtist[CurrentPost].ChildNodes[x].InnerText + ", ";
+                                                }
+                                                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                                                break;
+
+                                            case false:
+                                                ReadTags += "none";
+                                                break;
+                                        }
+
+                                        ReadTags += " ]\r\n          Lore: [ ";
+                                        switch (xmlTagsLore[CurrentPost].ChildNodes.Count > 0) {
+                                            case true:
+                                                for (int x = 0; x < xmlTagsLore[CurrentPost].ChildNodes.Count; x++) {
+                                                    PostTags.Add(xmlTagsLore[CurrentPost].ChildNodes[x].InnerText);
+                                                    ReadTags += xmlTagsLore[CurrentPost].ChildNodes[x].InnerText + ", ";
+                                                }
+                                                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                                                break;
+
+                                            case false:
+                                                ReadTags += "none";
+                                                break;
+                                        }
+
+                                        ReadTags += " ]\r\n          Meta: [ ";
+                                        switch (xmlTagsMeta[CurrentPost].ChildNodes.Count > 0) {
+                                            case true:
+                                                for (int x = 0; x < xmlTagsMeta[CurrentPost].ChildNodes.Count; x++) {
+                                                    PostTags.Add(xmlTagsMeta[CurrentPost].ChildNodes[x].InnerText);
+                                                    ReadTags += xmlTagsMeta[CurrentPost].ChildNodes[x].InnerText + ", ";
+                                                }
+                                                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                                                break;
+
+                                            case false:
+                                                ReadTags += "none";
+                                                break;
+                                        }
+
+                                        ReadTags += " ]\r\n          Locked tags: [ ";
+                                        switch (xmlTagsLocked[CurrentPost].ChildNodes.Count > 0) {
+                                            case true:
+                                                for (int x = 0; x < xmlTagsLocked[CurrentPost].ChildNodes.Count; x++) {
+                                                    PostTags.Add(xmlTagsLocked[CurrentPost].ChildNodes[x].InnerText);
+                                                    ReadTags += xmlTagsLocked[CurrentPost].ChildNodes[x].InnerText + ", ";
+                                                }
+                                                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',') + " ]";
+                                                break;
+
+                                            case false:
+                                                ReadTags += "none";
+                                                break;
+                                        }
+
+                                        ReadTags += " ]\r\n          Invalid: [ ";
+                                        switch (xmlTagsInvalid[CurrentPost].ChildNodes.Count > 0) {
+                                            case true:
+                                                for (int x = 0; x < xmlTagsInvalid[CurrentPost].ChildNodes.Count; x++) {
+                                                    PostTags.Add(xmlTagsInvalid[CurrentPost].ChildNodes[x].InnerText);
+                                                    ReadTags += xmlTagsInvalid[CurrentPost].ChildNodes[x].InnerText + ", ";
+                                                }
+                                                ReadTags = ReadTags.TrimEnd(' ').TrimEnd(',');
+                                                break;
+
+                                            case false:
+                                                ReadTags += "none";
+                                                break;
+                                        }
+                                        ReadTags += " ]";
+
+                                        // Check the tags
+                                        for (int j = 0; j < PostTags.Count; j++) {
+                                            if (DownloadInfo.Blacklist.Length > 0) {
+                                                for (int k = 0; k < DownloadInfo.Blacklist.Length; k++) {
+                                                    if (PostTags[j] == DownloadInfo.Blacklist[k]) {
+                                                        PostIsBlacklisted = true;
+                                                        FoundBlacklistedTags += DownloadInfo.Blacklist[k] + " ";
+                                                    }
+                                                }
+                                                FoundBlacklistedTags = FoundBlacklistedTags.Trim();
+                                            }
+
+                                            if (DownloadInfo.Graylist.Length > 0) {
+                                                for (int k = 0; k < DownloadInfo.Graylist.Length; k++) {
+                                                    if (PostTags[j] == DownloadInfo.Graylist[k]) {
+                                                        PostIsGraylisted = true;
+                                                        FoundGraylistedTags += DownloadInfo.Graylist[k] + " ";
+                                                    }
+                                                }
+                                            }
+                                            FoundGraylistedTags = FoundBlacklistedTags.Trim();
+                                        }
+
+                                        // Continue if graylisted or blacklisted
+                                        if (PostIsBlacklisted && !DownloadInfo.SaveBlacklistedFiles) {
+                                            BlacklistedSkippedCount++;
+                                            TotalPostsParsed++;
+                                            NewFilesSkipped++;
+                                            continue;
+                                        }
+                                        else if (PostIsGraylisted && !DownloadInfo.SaveGraylistedFiles) {
+                                            GraylistedSkippedCount++;
+                                            TotalPostsParsed++;
+                                            NewFilesSkipped++;
+                                            continue;
+                                        }
+                                        #endregion
+
+                                        #region file name + e621 global blacklist bypass
+                                        // File name artist for the schema
+                                        string fileNameArtist = "(none)";
+                                        if (xmlTagsArtist[CurrentPost].ChildNodes.Count > 0) {
+                                            for (int CurrentArtistTag = 0; CurrentArtistTag < xmlTagsArtist[CurrentPost].ChildNodes.Count; CurrentArtistTag++) {
+                                                if (UseHardcodedFilter) {
+                                                    if (!UndesiredTags.IsUndesiredHardcoded(xmlTagsArtist[CurrentPost].ChildNodes[CurrentArtistTag].InnerText)) {
+                                                        fileNameArtist = xmlTagsArtist[CurrentPost].ChildNodes[CurrentArtistTag].InnerText;
+                                                        break;
+                                                    }
+                                                }
+                                                else {
+                                                    if (!UndesiredTags.IsUndesired(xmlTagsArtist[CurrentPost].ChildNodes[CurrentArtistTag].InnerText, DownloadInfo.UndesiredTags)) {
+                                                        fileNameArtist = xmlTagsArtist[CurrentPost].ChildNodes[CurrentArtistTag].InnerText;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        // Replace schema flags with post info
+                                        NewFileName =
+                                            DownloadInfo.FileNameSchema
+                                                .Replace("%md5%", xmlMD5[CurrentPost].InnerText)
+                                                .Replace("%id%", xmlID[CurrentPost].InnerText)
+                                                .Replace("%rating%", rating.ToLower())
+                                                .Replace("%rating2%", xmlRating[CurrentPost].InnerText)
+                                                .Replace("%artist%", fileNameArtist)
+                                                .Replace("%ext%", xmlExt[CurrentPost].InnerText)
+                                                .Replace("%fav_count%", xmlFavCount[CurrentPost].InnerText)
+                                                .Replace("%score%", xmlScore[CurrentPost].InnerText)
+                                                .Replace("%scoreup%", xmlScoreUp[CurrentPost].InnerText)
+                                                .Replace("%scoredown%", xmlScoreDown[CurrentPost].InnerText)
+                                                .Replace("%author%", xmlAuthor[CurrentPost].InnerText) + "." + xmlExt[CurrentPost].InnerText;
+
+                                        // Check for null file url + fix for files that are auto blacklisted :)
+                                        string NewUrl = xmlURL[CurrentPost].InnerText;
+                                        if (string.IsNullOrEmpty(NewUrl) && xmlDeleted[CurrentPost].InnerText.ToLower() == "false") {
+                                            NewUrl = ApiTools.GetBlacklistedImageUrl(xmlMD5[CurrentPost].InnerText, xmlExt[CurrentPost].InnerText);
+                                        }
+                                        #endregion
+
+                                        #region description + .nfo files (so the existing ones don't get replaced)
+                                        // Start adding to the nfo buffer and URL lists
+                                        if (DownloadInfo.SaveInfo) {
+                                            // Set the description
+                                            string ImageDescription = " No description";
+                                            switch (string.IsNullOrWhiteSpace(xmlDescription[CurrentPost].InnerText)) {
+                                                case false:
+                                                    ImageDescription = xmlDescription[CurrentPost].InnerText;
+                                                    break;
+                                            }
+
+                                            if (PostIsBlacklisted) {
+                                                BlacklistedInfoBuffer +=
+                                                    $"POST {xmlID[CurrentPost].InnerText}:\n" +
+                                                    $"    MD5: {xmlMD5[CurrentPost].InnerText}\n" +
+                                                    $"    URL: https://e621.net/posts/show/{xmlID[CurrentPost].InnerText}\n" +
+                                                    $"    TAGS:\n{ReadTags}\n" +
+                                                    $"    OFFENDING TAGS: {FoundBlacklistedTags + (PostIsGraylisted ? " |<~Bl|Gr~>| " + FoundGraylistedTags : "")}\n" +
+                                                    $"    SCORE: Up {xmlScoreUp[CurrentPost].InnerText}, Down {xmlScoreDown[CurrentPost].InnerText}, Total {xmlScore[CurrentPost].InnerText}\n" +
+                                                    $"    RATING: {rating}\n" +
+                                                    $"    DESCRIPTION: {ImageDescription}\n\n";
+
+                                            }
+                                            else if (PostIsGraylisted) {
+                                                GraylistedInfoBuffer +=
+                                                    $"POST {xmlID[CurrentPost].InnerText}:\n" +
+                                                    $"    MD5: {xmlMD5[CurrentPost].InnerText}\n" +
+                                                    $"    URL: https://e621.net/posts/show/{xmlID[CurrentPost].InnerText}\n" +
+                                                    $"    TAGS:\n{ReadTags}\n" +
+                                                    $"    OFFENDING TAGS: {FoundGraylistedTags}\n" +
+                                                    $"    SCORE: Up {xmlScoreUp[CurrentPost].InnerText}, Down {xmlScoreDown[CurrentPost].InnerText}, Total {xmlScore[CurrentPost].InnerText}\n" +
+                                                    $"    RATING: {rating}\n" +
+                                                    $"    DESCRIPTION: {ImageDescription}\n\n";
+                                            }
+                                            else {
+                                                CleanInfoBuffer +=
+                                                    $"POST {xmlID[CurrentPost].InnerText}:\n" +
+                                                    $"    MD5: {xmlMD5[CurrentPost].InnerText}\n" +
+                                                    $"    URL: https://e621.net/post/show/{xmlID[CurrentPost].InnerText}\n" +
+                                                    $"    TAGS:\n{ReadTags}\n" +
+                                                    $"    SCORE: Up {xmlScoreUp[CurrentPost].InnerText}, Down {xmlScoreDown[CurrentPost].InnerText}, Total {xmlScore[CurrentPost].InnerText}\n" +
+                                                    $"    RATING: {rating}\n" +
+                                                    $"    DESCRIPITON:{ImageDescription}\n\n";
+                                            }
+                                        }
+                                        #endregion
+
+                                        #region Add to the lists and counts
+                                        NewPath = DownloadInfo.DownloadPath;
+
+                                        if (DownloadInfo.SeparateRatings) {
+                                            NewPath += xmlRating[CurrentPost].InnerText.ToLower() switch {
+                                                "e" or "explicit" => "\\explicit",
+                                                "q" or "questionable" => "\\questionable",
+                                                "s" or "safe" => "\\safe",
+                                                _ => "\\unknown"
+                                            };
+                                        }
+
+                                        if (PostIsBlacklisted) {
+                                            NewPath += "\\blacklisted";
                                         }
                                         else if (PostIsGraylisted) {
-                                            GraylistedInfoBuffer +=
-                                                $"POST {xmlID[CurrentPost].InnerText}:\n" +
-                                                $"    MD5: {xmlMD5[CurrentPost].InnerText}\n" +
-                                                $"    URL: https://e621.net/posts/show/{xmlID[CurrentPost].InnerText}\n" +
-                                                $"    TAGS:\n{ReadTags}\n" +
-                                                $"    OFFENDING TAGS: {FoundGraylistedTags}\n" +
-                                                $"    SCORE: Up {xmlScoreUp[CurrentPost].InnerText}, Down {xmlScoreDown[CurrentPost].InnerText}, Total {xmlScore[CurrentPost].InnerText}\n" +
-                                                $"    RATING: {rating}\n" +
-                                                $"    DESCRIPTION: {ImageDescription}\n\n";
+                                            NewPath += "\\graylisted";
                                         }
-                                        else {
-                                            CleanInfoBuffer +=
-                                                $"POST {xmlID[CurrentPost].InnerText}:\n" +
-                                                $"    MD5: {xmlMD5[CurrentPost].InnerText}\n" +
-                                                $"    URL: https://e621.net/post/show/{xmlID[CurrentPost].InnerText}\n" +
-                                                $"    TAGS:\n{ReadTags}\n" +
-                                                $"    SCORE: Up {xmlScoreUp[CurrentPost].InnerText}, Down {xmlScoreDown[CurrentPost].InnerText}, Total {xmlScore[CurrentPost].InnerText}\n" +
-                                                $"    RATING: {rating}\n" +
-                                                $"    DESCRIPITON:{ImageDescription}\n\n";
+
+                                        if (DownloadInfo.SeparateNonImages) {
+                                            NewPath += xmlExt[CurrentPost].InnerText.ToLower() switch {
+                                                "gif" => "\\gif",
+                                                "apng" => "\\apng",
+                                                "webm" => "\\webm",
+                                                "swf" => "\\swf",
+                                                _ => ""
+                                            };
                                         }
-                                    }
-                                    #endregion
 
-                                    #region Add to the lists and counts
-                                    NewPath = DownloadInfo.DownloadPath;
+                                        NewPath += "\\" + NewFileName;
+                                        TotalPostsParsed++;
 
-                                    if (DownloadInfo.SeparateRatings) {
-                                        NewPath += xmlRating[CurrentPost].InnerText.ToLower() switch {
-                                            "e" or "explicit" => "\\explicit",
-                                            "q" or "questionable" => "\\questionable",
-                                            "s" or "safe" => "\\safe",
-                                            _ => "\\unknown"
-                                        };
-                                    }
+                                        switch (xmlRating[CurrentPost].InnerText.ToLower()) {
 
-                                    if (PostIsBlacklisted) {
-                                        NewPath += "\\blacklisted";
-                                    }
-                                    else if (PostIsGraylisted) {
-                                        NewPath += "\\graylisted";
-                                    }
-
-                                    if (DownloadInfo.SeparateNonImages) {
-                                        NewPath += xmlExt[CurrentPost].InnerText.ToLower() switch {
-                                            "gif" => "\\gif",
-                                            "apng" => "\\apng",
-                                            "webm" => "\\webm",
-                                            "swf" => "\\swf",
-                                            _ => ""
-                                        };
-                                    }
-
-                                    NewPath += "\\" + NewFileName;
-                                    TotalPostsParsed++;
-
-                                    switch (xmlRating[CurrentPost].InnerText.ToLower()) {
-
-                                        #region Explicit
-                                        case "e":
-                                        case "explicit":
-                                            if (File.Exists(NewPath)) {
-                                                if (PostIsBlacklisted) {
-                                                    BlacklistedExplicitExistCount++;
-                                                }
-                                                else if (PostIsGraylisted) {
-                                                    GraylistedExplicitExistCount++;
+                                            #region Explicit
+                                            case "e":
+                                            case "explicit":
+                                                if (File.Exists(NewPath)) {
+                                                    if (PostIsBlacklisted) {
+                                                        BlacklistedExplicitExistCount++;
+                                                    }
+                                                    else if (PostIsGraylisted) {
+                                                        GraylistedExplicitExistCount++;
+                                                    }
+                                                    else {
+                                                        CleanExplicitExistCount++;
+                                                    }
+                                                    continue;
                                                 }
                                                 else {
-                                                    CleanExplicitExistCount++;
-                                                }
-                                                continue;
-                                            }
-                                            else {
-                                                TotalFilesToDownload++;
-                                                if (PostIsBlacklisted) {
-                                                    if (DownloadInfo.SeparateNonImages) {
-                                                        switch (xmlExt[CurrentPost].InnerText.ToLower()) {
-                                                            case "gif":
-                                                                BlacklistedExplicitNonImages.Gif = true;
-                                                                break;
-                                                            case "apng":
-                                                                BlacklistedExplicitNonImages.Apng = true;
-                                                                break;
-                                                            case "webm":
-                                                                BlacklistedExplicitNonImages.Webm = true;
-                                                                break;
-                                                            case "swf":
-                                                                BlacklistedExplicitNonImages.Swf = true;
-                                                                break;
+                                                    TotalFilesToDownload++;
+                                                    if (PostIsBlacklisted) {
+                                                        if (DownloadInfo.SeparateNonImages) {
+                                                            switch (xmlExt[CurrentPost].InnerText.ToLower()) {
+                                                                case "gif":
+                                                                    BlacklistedExplicitNonImages.Gif = true;
+                                                                    break;
+                                                                case "apng":
+                                                                    BlacklistedExplicitNonImages.Apng = true;
+                                                                    break;
+                                                                case "webm":
+                                                                    BlacklistedExplicitNonImages.Webm = true;
+                                                                    break;
+                                                                case "swf":
+                                                                    BlacklistedExplicitNonImages.Swf = true;
+                                                                    break;
+                                                            }
                                                         }
-                                                    }
 
-                                                    BlacklistedExplicitCount++;
-                                                    if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
-                                                        BlacklistedExplicitURLs.Add(NewUrl);
-                                                        BlacklistedExplicitFileNames.Add(NewFileName);
-                                                        BlacklistedExplicitFilePaths.Add(NewPath);
-                                                    }
-                                                    else {
-                                                        BlacklistedURLs.Add(NewUrl);
-                                                        BlacklistedFileNames.Add(NewFileName);
-                                                        BlacklistedFilePaths.Add(NewPath);
-                                                    }
-                                                }
-                                                else if (PostIsGraylisted) {
-                                                    if (DownloadInfo.SeparateNonImages) {
-                                                        switch (xmlExt[CurrentPost].InnerText.ToLower()) {
-                                                            case "gif":
-                                                                GraylistedExplicitNonImages.Gif = true;
-                                                                break;
-                                                            case "apng":
-                                                                GraylistedExplicitNonImages.Apng = true;
-                                                                break;
-                                                            case "webm":
-                                                                GraylistedExplicitNonImages.Webm = true;
-                                                                break;
-                                                            case "swf":
-                                                                GraylistedExplicitNonImages.Swf = true;
-                                                                break;
-                                                        }
-                                                    }
-
-                                                    GraylistedExplicitCount++;
-                                                    if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
-                                                        GraylistedExplicitURLs.Add(NewUrl);
-                                                        GraylistedExplicitFileNames.Add(NewFileName);
-                                                        GraylistedExplicitFilePaths.Add(NewPath);
-                                                    }
-                                                    else {
-                                                        GraylistedURLs.Add(NewUrl);
-                                                        GraylistedFileNames.Add(NewFileName);
-                                                        GraylistedFilePaths.Add(NewPath);
-
-                                                    }
-                                                }
-                                                else {
-                                                    if (DownloadInfo.SeparateNonImages) {
-                                                        switch (xmlExt[CurrentPost].InnerText.ToLower()) {
-                                                            case "gif":
-                                                                CleanExplicitNonImages.Gif = true;
-                                                                break;
-                                                            case "apng":
-                                                                CleanExplicitNonImages.Apng = true;
-                                                                break;
-                                                            case "webm":
-                                                                CleanExplicitNonImages.Webm = true;
-                                                                break;
-                                                            case "swf":
-                                                                CleanExplicitNonImages.Swf = true;
-                                                                break;
-                                                        }
-                                                    }
-                                                    CleanExplicitCount++;
-                                                    if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
-                                                        CleanExplicitURLs.Add(NewUrl);
-                                                        CleanExplicitFileNames.Add(NewFileName);
-                                                        CleanExplicitFilePaths.Add(NewPath);
-                                                    }
-                                                    else {
-                                                        CleanURLs.Add(NewUrl);
-                                                        CleanFileNames.Add(NewFileName);
-                                                        CleanFilePaths.Add(NewPath);
-                                                    }
-                                                }
-                                            }
-                                            break;
-                                        #endregion
-
-                                        #region questionable
-                                        case "q":
-                                        case "questionable":
-                                            if (File.Exists(NewPath)) {
-                                                if (PostIsBlacklisted) {
-                                                    BlacklistedQuestionableExistCount++;
-                                                }
-                                                else if (PostIsGraylisted) {
-                                                    GraylistedQuestionableExistCount++;
-                                                }
-                                                else {
-                                                    CleanQuestionableExistCount++;
-                                                }
-                                                continue;
-                                            }
-                                            else {
-                                                TotalFilesToDownload++;
-                                                if (PostIsBlacklisted) {
-                                                    if (DownloadInfo.SeparateNonImages) {
-                                                        switch (xmlExt[CurrentPost].InnerText.ToLower()) {
-                                                            case "gif":
-                                                                BlacklistedQuestionableNonImages.Gif = true;
-                                                                break;
-                                                            case "apng":
-                                                                BlacklistedQuestionableNonImages.Apng = true;
-                                                                break;
-                                                            case "webm":
-                                                                BlacklistedQuestionableNonImages.Webm = true;
-                                                                break;
-                                                            case "swf":
-                                                                BlacklistedQuestionableNonImages.Swf = true;
-                                                                break;
-                                                        }
-                                                    }
-                                                    BlacklistedQuestionableCount++;
-                                                    if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
-                                                        BlacklistedQuestionableURLs.Add(NewUrl);
-                                                        BlacklistedQuestionableFileNames.Add(NewFileName);
-                                                        BlacklistedQuestionableFilePaths.Add(NewPath);
-                                                    }
-                                                    else {
-                                                        BlacklistedURLs.Add(NewUrl);
-                                                        BlacklistedFileNames.Add(NewFileName);
-                                                        BlacklistedFilePaths.Add(NewPath);
-                                                    }
-                                                }
-                                                else if (PostIsGraylisted) {
-                                                    if (DownloadInfo.SeparateNonImages) {
-                                                        switch (xmlExt[CurrentPost].InnerText.ToLower()) {
-                                                            case "gif":
-                                                                GraylistedQuestionableNonImages.Gif = true;
-                                                                break;
-                                                            case "apng":
-                                                                GraylistedQuestionableNonImages.Apng = true;
-                                                                break;
-                                                            case "webm":
-                                                                GraylistedQuestionableNonImages.Webm = true;
-                                                                break;
-                                                            case "swf":
-                                                                GraylistedQuestionableNonImages.Swf = true;
-                                                                break;
-                                                        }
-                                                    }
-                                                    GraylistedQuestionableCount++;
-                                                    if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
-                                                        GraylistedQuestionableURLs.Add(NewUrl);
-                                                        GraylistedQuestionableFileNames.Add(NewFileName);
-                                                        GraylistedQuestionableFilePaths.Add(NewPath);
-                                                    }
-                                                    else {
-                                                        GraylistedURLs.Add(NewUrl);
-                                                        GraylistedFileNames.Add(NewFileName);
-                                                        GraylistedFilePaths.Add(NewPath);
-                                                    }
-                                                }
-                                                else {
-                                                    if (DownloadInfo.SeparateNonImages) {
-                                                        switch (xmlExt[CurrentPost].InnerText.ToLower()) {
-                                                            case "gif":
-                                                                CleanQuestionableNonImages.Gif = true;
-                                                                break;
-                                                            case "apng":
-                                                                CleanQuestionableNonImages.Apng = true;
-                                                                break;
-                                                            case "webm":
-                                                                CleanQuestionableNonImages.Webm = true;
-                                                                break;
-                                                            case "swf":
-                                                                CleanQuestionableNonImages.Swf = true;
-                                                                break;
-                                                        }
-                                                    }
-                                                    CleanQuestionableCount++;
-                                                    if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
-                                                        CleanQuestionableURLs.Add(NewUrl);
-                                                        CleanQuestionableFileNames.Add(NewFileName);
-                                                        CleanQuestionableFilePaths.Add(NewPath);
-                                                    }
-                                                    else {
-                                                        CleanURLs.Add(NewUrl);
-                                                        CleanFileNames.Add(NewFileName);
-                                                        CleanFilePaths.Add(NewPath);
-                                                    }
-                                                }
-                                            }
-                                            break;
-                                        #endregion
-
-                                        #region safe
-                                        case "s":
-                                        case "safe":
-                                            if (File.Exists(NewPath)) {
-                                                if (PostIsBlacklisted) {
-                                                    BlacklistedSafeExistCount++;
-                                                }
-                                                else if (PostIsGraylisted) {
-                                                    GraylistedSafeExistCount++;
-                                                }
-                                                else {
-                                                    CleanSafeExistCount++;
-                                                }
-                                                continue;
-                                            }
-                                            else {
-                                                TotalFilesToDownload++;
-                                                if (PostIsBlacklisted) {
-                                                    if (DownloadInfo.SeparateNonImages) {
-                                                        switch (xmlExt[CurrentPost].InnerText.ToLower()) {
-                                                            case "gif":
-                                                                BlacklistedSafeNonImages.Gif = true;
-                                                                break;
-                                                            case "apng":
-                                                                BlacklistedSafeNonImages.Apng = true;
-                                                                break;
-                                                            case "webm":
-                                                                BlacklistedSafeNonImages.Webm = true;
-                                                                break;
-                                                            case "swf":
-                                                                BlacklistedSafeNonImages.Swf = true;
-                                                                break;
-                                                        }
-                                                    }
-                                                    BlacklistedSafeCount++;
-                                                    if (DownloadInfo.SaveBlacklistedFiles) {
+                                                        BlacklistedExplicitCount++;
                                                         if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
-                                                            BlacklistedSafeURLs.Add(NewUrl);
-                                                            BlacklistedSafeFileNames.Add(NewFileName);
-                                                            BlacklistedSafeFilePaths.Add(NewPath);
+                                                            BlacklistedExplicitURLs.Add(NewUrl);
+                                                            BlacklistedExplicitFileNames.Add(NewFileName);
+                                                            BlacklistedExplicitFilePaths.Add(NewPath);
                                                         }
                                                         else {
                                                             BlacklistedURLs.Add(NewUrl);
@@ -1227,584 +1013,579 @@ namespace aphrodite {
                                                             BlacklistedFilePaths.Add(NewPath);
                                                         }
                                                     }
-                                                }
-                                                else if (PostIsGraylisted) {
-                                                    if (DownloadInfo.SeparateNonImages) {
-                                                        switch (xmlExt[CurrentPost].InnerText.ToLower()) {
-                                                            case "gif":
-                                                                GraylistedSafeNonImages.Gif = true;
-                                                                break;
-                                                            case "apng":
-                                                                GraylistedSafeNonImages.Apng = true;
-                                                                break;
-                                                            case "webm":
-                                                                GraylistedSafeNonImages.Webm = true;
-                                                                break;
-                                                            case "swf":
-                                                                GraylistedSafeNonImages.Swf = true;
-                                                                break;
+                                                    else if (PostIsGraylisted) {
+                                                        if (DownloadInfo.SeparateNonImages) {
+                                                            switch (xmlExt[CurrentPost].InnerText.ToLower()) {
+                                                                case "gif":
+                                                                    GraylistedExplicitNonImages.Gif = true;
+                                                                    break;
+                                                                case "apng":
+                                                                    GraylistedExplicitNonImages.Apng = true;
+                                                                    break;
+                                                                case "webm":
+                                                                    GraylistedExplicitNonImages.Webm = true;
+                                                                    break;
+                                                                case "swf":
+                                                                    GraylistedExplicitNonImages.Swf = true;
+                                                                    break;
+                                                            }
+                                                        }
+
+                                                        GraylistedExplicitCount++;
+                                                        if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                            GraylistedExplicitURLs.Add(NewUrl);
+                                                            GraylistedExplicitFileNames.Add(NewFileName);
+                                                            GraylistedExplicitFilePaths.Add(NewPath);
+                                                        }
+                                                        else {
+                                                            GraylistedURLs.Add(NewUrl);
+                                                            GraylistedFileNames.Add(NewFileName);
+                                                            GraylistedFilePaths.Add(NewPath);
+
                                                         }
                                                     }
-                                                    GraylistedSafeCount++;
-                                                    if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
-                                                        GraylistedSafeURLs.Add(NewUrl);
-                                                        GraylistedSafeFileNames.Add(NewFileName);
-                                                        GraylistedSafeFilePaths.Add(NewPath);
-                                                    }
                                                     else {
-                                                        GraylistedURLs.Add(NewUrl);
-                                                        GraylistedFileNames.Add(NewFileName);
-                                                        GraylistedFilePaths.Add(NewPath);
-                                                    }
-                                                }
-                                                else {
-                                                    if (DownloadInfo.SeparateNonImages) {
-                                                        switch (xmlExt[CurrentPost].InnerText.ToLower()) {
-                                                            case "gif":
-                                                                CleanSafeNonImages.Gif = true;
-                                                                break;
-                                                            case "apng":
-                                                                CleanSafeNonImages.Apng = true;
-                                                                break;
-                                                            case "webm":
-                                                                CleanSafeNonImages.Webm = true;
-                                                                break;
-                                                            case "swf":
-                                                                CleanSafeNonImages.Swf = true;
-                                                                break;
+                                                        if (DownloadInfo.SeparateNonImages) {
+                                                            switch (xmlExt[CurrentPost].InnerText.ToLower()) {
+                                                                case "gif":
+                                                                    CleanExplicitNonImages.Gif = true;
+                                                                    break;
+                                                                case "apng":
+                                                                    CleanExplicitNonImages.Apng = true;
+                                                                    break;
+                                                                case "webm":
+                                                                    CleanExplicitNonImages.Webm = true;
+                                                                    break;
+                                                                case "swf":
+                                                                    CleanExplicitNonImages.Swf = true;
+                                                                    break;
+                                                            }
+                                                        }
+                                                        CleanExplicitCount++;
+                                                        if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                            CleanExplicitURLs.Add(NewUrl);
+                                                            CleanExplicitFileNames.Add(NewFileName);
+                                                            CleanExplicitFilePaths.Add(NewPath);
+                                                        }
+                                                        else {
+                                                            CleanURLs.Add(NewUrl);
+                                                            CleanFileNames.Add(NewFileName);
+                                                            CleanFilePaths.Add(NewPath);
                                                         }
                                                     }
-                                                    CleanSafeCount++;
-                                                    if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
-                                                        CleanSafeURLs.Add(NewUrl);
-                                                        CleanSafeFileNames.Add(NewFileName);
-                                                        CleanSafeFilePaths.Add(NewPath);
-                                                    }
-                                                    else {
-                                                        CleanURLs.Add(NewUrl);
-                                                        CleanFileNames.Add(NewFileName);
-                                                        CleanFilePaths.Add(NewPath);
-                                                    }
                                                 }
-                                            }
-                                            break;
+                                                break;
                                             #endregion
 
-                                    }
-
-                                    NewFiles++;
-                                    #endregion
-
-                                }
-
-                                if (xmlID.Count == 320) {
-                                    CurrentPage++;
-                                }
-                            }
-
-                        }
-                        #endregion
-
-                        #region FurryBooru parsing
-                        else if (DownloadInfo.Site == DownloadSite.FurryBooru) {
-                            xmlSearchInfo = xmlDoc.ChildNodes[1].Attributes;
-                            xmlPosts = xmlDoc.ChildNodes[1].ChildNodes;
-
-                            if (xmlPosts.Count > 0) {
-                                NewFiles = 0;
-                                NewFilesSkipped = 0;
-
-                                Log.Write($"Parsing api page {CurrentPage}...");
-                                this.Invoke((Action)delegate () {
-                                    sbStatus.Text = $"Parsing api page {CurrentPage}...";
-                                });
-
-                                for (int CurrentPost = 0; CurrentPage < xmlPosts.Count; CurrentPost++) {
-                                    if (DownloadInfo.ImageLimit > 0 && DownloadInfo.ImageLimit == TotalFilesToDownload) {
-                                        ImageLimitReached = true;
-                                        Log.Write("ImageLimit reached, breaking parse loop.");
-                                        break;
-                                    }
-
-                                    #region Reset variables
-                                    xmlCurrentPostAttributes = null;
-                                    ScoreAttribute = string.Empty;
-                                    FileUrlAttribute = string.Empty;
-                                    RatingAttribute = string.Empty;
-                                    TagsAttribute = string.Empty;
-                                    IdAttribute = string.Empty;
-                                    Md5Attribute = string.Empty;
-                                    ExtensionFromFileUrl = string.Empty;
-                                    rating = string.Empty;
-                                    PostIsGraylisted = false;
-                                    PostIsBlacklisted = false;
-                                    FoundGraylistedTags = string.Empty;
-                                    FoundBlacklistedTags = string.Empty;
-                                    NewFileName = string.Empty;
-                                    NewPath = string.Empty;
-                                    #endregion
-
-                                    #region Retrieve attributes
-                                    xmlCurrentPostAttributes = xmlPosts[CurrentPost].Attributes;
-
-                                    for (int CurrentPostAttributes = 0; CurrentPostAttributes < xmlCurrentPostAttributes.Count; CurrentPostAttributes++) {
-                                        switch (xmlCurrentPostAttributes[CurrentPostAttributes].Name.ToLower()) {
-
-                                            case "score": {
-                                                ScoreAttribute = xmlCurrentPostAttributes[CurrentPostAttributes].InnerText;
-                                            }
-                                            break;
-
-                                            case "file_url": {
-                                                FileUrlAttribute = xmlCurrentPostAttributes[CurrentPostAttributes].InnerText;
-                                                ExtensionFromFileUrl = FileUrlAttribute.Split('.')[FileUrlAttribute.Split('.').Length - 1];
-                                            }
-                                            break;
-
-                                            case "rating": {
-                                                RatingAttribute = xmlCurrentPostAttributes[CurrentPostAttributes].InnerText;
-                                            }
-                                            break;
-
-                                            case "tags": {
-                                                TagsAttribute = xmlCurrentPostAttributes[CurrentPostAttributes].InnerText;
-                                            }
-                                            break;
-
-                                            case "id": {
-                                                IdAttribute = xmlCurrentPostAttributes[CurrentPostAttributes].InnerText;
-                                            }
-                                            break;
-
-                                            case "md5": {
-                                                Md5Attribute = xmlCurrentPostAttributes[CurrentPostAttributes].InnerText;
-                                            }
-                                            break;
-
-                                        }
-                                    }
-                                    #endregion
-
-                                    #region Check ratings & minimums
-                                    switch (RatingAttribute.ToLower()) {
-                                        case "e":
-                                        case "explicit": {
-                                            if (!DownloadInfo.SaveExplicit) {
-                                                TotalPostsParsed++;
-                                                continue;
-                                            }
-                                            rating = "Explicit";
-                                        }
-                                        break;
-
-                                        case "q":
-                                        case "questionable": {
-                                            if (!DownloadInfo.SaveQuestionable) {
-                                                TotalPostsParsed++;
-                                                continue;
-                                            }
-                                            rating = "Questionable";
-                                        }
-                                        break;
-
-                                        case "s":
-                                        case "safe": {
-                                            if (!DownloadInfo.SaveSafe) {
-                                                TotalPostsParsed++;
-                                                continue;
-                                            }
-                                            rating = "Safe";
-                                        }
-                                        break;
-
-                                        default: {
-                                            rating = $"Undefined rating {RatingAttribute}";
-                                        }
-                                        break;
-                                    }
-
-                                    if (DownloadInfo.UseMinimumScore && Int32.Parse(ScoreAttribute) < DownloadInfo.MinimumScore) {
-                                        TotalPostsParsed++;
-                                        continue;
-                                    }
-                                    #endregion
-
-                                    #region Tag parsing & graylist/blacklist filtering
-                                    PostTags = new(TagsAttribute.Trim().Split(' '));
-                                    for (int i = 0; i < PostTags.Count; i++) {
-                                        if (DownloadInfo.Blacklist.Length > 0) {
-                                            for (int j = 0; j < DownloadInfo.Blacklist.Length; j++) {
-                                                if (PostTags[i] == DownloadInfo.Blacklist[j]) {
-                                                    PostIsBlacklisted = true;
-                                                    FoundBlacklistedTags += DownloadInfo.Blacklist[j] + " ";
-                                                }
-                                            }
-                                            FoundBlacklistedTags = FoundBlacklistedTags.Trim();
-                                        }
-
-                                        if (DownloadInfo.Graylist.Length > 0) {
-                                            for (int j = 0; j < DownloadInfo.Graylist.Length; j++) {
-                                                if (PostTags[i] == DownloadInfo.Graylist[j]) {
-                                                    PostIsGraylisted = true;
-                                                    FoundGraylistedTags += DownloadInfo.Graylist[j] + " ";
-                                                }
-                                            }
-                                            FoundGraylistedTags = FoundBlacklistedTags.Trim();
-                                        }
-                                    }
-
-                                    if (PostIsBlacklisted && !DownloadInfo.SaveBlacklistedFiles) {
-                                        BlacklistedSkippedCount++;
-                                        TotalPostsParsed++;
-                                        NewFilesSkipped++;
-                                        continue;
-                                    }
-                                    else if (PostIsGraylisted && !DownloadInfo.SaveGraylistedFiles) {
-                                        GraylistedSkippedCount++;
-                                        TotalPostsParsed++;
-                                        NewFilesSkipped++;
-                                        continue;
-                                    }
-                                    #endregion
-
-                                    #region File name
-                                    // Replace schema flags with post info
-                                    NewFileName =
-                                        DownloadInfo.FileNameSchema
-                                            .Replace("%md5%", Md5Attribute)
-                                            .Replace("%id%", IdAttribute)
-                                            .Replace("%rating%", rating.ToLower())
-                                            .Replace("%rating2%", RatingAttribute)
-                                            .Replace("%ext%", ExtensionFromFileUrl)
-                                            .Replace("%score%", ScoreAttribute) + "." + ExtensionFromFileUrl;
-                                    #endregion
-
-                                    #region nfo files
-                                    if (PostIsBlacklisted) {
-                                        BlacklistedInfoBuffer +=
-                                            $"POST {IdAttribute}:\n" +
-                                            $"    MD5: {Md5Attribute}\n" +
-                                            $"    URL: {FileUrlAttribute}\n" +
-                                            $"    TAGS: {TagsAttribute}\n" +
-                                            $"    OFFENDING TAGS: {FoundBlacklistedTags + (PostIsGraylisted ? " |<~Bl|Gr~>| " + FoundGraylistedTags : "")}\n" +
-                                            $"    SCORE: {ScoreAttribute}\n" +
-                                            $"    RATING: {rating}\n\n";
-
-                                    }
-                                    else if (PostIsGraylisted) {
-                                        GraylistedInfoBuffer +=
-                                            $"POST {IdAttribute}:\n" +
-                                            $"    MD5: {Md5Attribute}\n" +
-                                            $"    URL: {FileUrlAttribute}\n" +
-                                            $"    TAGS: {TagsAttribute}\n" +
-                                            $"    OFFENDING TAGS: {FoundGraylistedTags}\n" +
-                                            $"    SCORE: {ScoreAttribute}\n" +
-                                            $"    RATING: {rating}\n\n";
-                                    }
-                                    else {
-                                        CleanInfoBuffer +=
-                                            $"POST {IdAttribute}:\n" +
-                                            $"    MD5: {Md5Attribute}\n" +
-                                            $"    URL: {FileUrlAttribute}\n" +
-                                            $"    TAGS: {TagsAttribute}\n" +
-                                            $"    SCORE: {ScoreAttribute}\n" +
-                                            $"    RATING: {rating}\n\n";
-                                    }
-                                    #endregion
-
-                                    #region Add to the lists and counts
-                                    NewPath = DownloadInfo.DownloadPath;
-
-                                    if (DownloadInfo.SeparateRatings) {
-                                        NewPath += RatingAttribute.ToLower() switch {
-                                            "e" or "explicit" => "\\explicit",
-                                            "q" or "questionable" => "\\questionable",
-                                            "s" or "safe" => "\\safe",
-                                            _ => "\\unknown"
-                                        };
-                                    }
-
-                                    if (PostIsBlacklisted) {
-                                        NewPath += "\\blacklisted";
-                                    }
-                                    else if (PostIsGraylisted) {
-                                        NewPath += "\\graylisted";
-                                    }
-
-                                    if (DownloadInfo.SeparateNonImages) {
-                                        NewPath += ExtensionFromFileUrl.ToLower() switch {
-                                            "gif" => "\\gif",
-                                            "apng" => "\\apng",
-                                            "webm" => "\\webm",
-                                            "swf" => "\\swf",
-                                            _ => ""
-                                        };
-                                    }
-
-                                    NewPath += "\\" + NewFileName;
-                                    TotalPostsParsed++;
-
-                                    switch (RatingAttribute.ToLower()) {
-
-                                        #region Explicit
-                                        case "e":
-                                        case "explicit":
-                                            if (File.Exists(NewPath)) {
-                                                if (PostIsBlacklisted) {
-                                                    BlacklistedExplicitExistCount++;
-                                                }
-                                                else if (PostIsGraylisted) {
-                                                    GraylistedExplicitExistCount++;
+                                            #region questionable
+                                            case "q":
+                                            case "questionable":
+                                                if (File.Exists(NewPath)) {
+                                                    if (PostIsBlacklisted) {
+                                                        BlacklistedQuestionableExistCount++;
+                                                    }
+                                                    else if (PostIsGraylisted) {
+                                                        GraylistedQuestionableExistCount++;
+                                                    }
+                                                    else {
+                                                        CleanQuestionableExistCount++;
+                                                    }
+                                                    continue;
                                                 }
                                                 else {
-                                                    CleanExplicitExistCount++;
-                                                }
-                                                continue;
-                                            }
-                                            else {
-                                                TotalFilesToDownload++;
-                                                if (PostIsBlacklisted) {
-                                                    if (DownloadInfo.SeparateNonImages) {
-                                                        switch (ExtensionFromFileUrl.ToLower()) {
-                                                            case "gif":
-                                                                BlacklistedExplicitNonImages.Gif = true;
-                                                                break;
-                                                            case "apng":
-                                                                BlacklistedExplicitNonImages.Apng = true;
-                                                                break;
-                                                            case "webm":
-                                                                BlacklistedExplicitNonImages.Webm = true;
-                                                                break;
-                                                            case "swf":
-                                                                BlacklistedExplicitNonImages.Swf = true;
-                                                                break;
+                                                    TotalFilesToDownload++;
+                                                    if (PostIsBlacklisted) {
+                                                        if (DownloadInfo.SeparateNonImages) {
+                                                            switch (xmlExt[CurrentPost].InnerText.ToLower()) {
+                                                                case "gif":
+                                                                    BlacklistedQuestionableNonImages.Gif = true;
+                                                                    break;
+                                                                case "apng":
+                                                                    BlacklistedQuestionableNonImages.Apng = true;
+                                                                    break;
+                                                                case "webm":
+                                                                    BlacklistedQuestionableNonImages.Webm = true;
+                                                                    break;
+                                                                case "swf":
+                                                                    BlacklistedQuestionableNonImages.Swf = true;
+                                                                    break;
+                                                            }
                                                         }
-                                                    }
-
-                                                    BlacklistedExplicitCount++;
-                                                    if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
-                                                        BlacklistedExplicitURLs.Add(FileUrlAttribute);
-                                                        BlacklistedExplicitFileNames.Add(NewFileName);
-                                                        BlacklistedExplicitFilePaths.Add(NewPath);
-                                                    }
-                                                    else {
-                                                        BlacklistedURLs.Add(FileUrlAttribute);
-                                                        BlacklistedFileNames.Add(NewFileName);
-                                                        BlacklistedFilePaths.Add(NewPath);
-                                                    }
-                                                }
-                                                else if (PostIsGraylisted) {
-                                                    if (DownloadInfo.SeparateNonImages) {
-                                                        switch (ExtensionFromFileUrl.ToLower()) {
-                                                            case "gif":
-                                                                GraylistedExplicitNonImages.Gif = true;
-                                                                break;
-                                                            case "apng":
-                                                                GraylistedExplicitNonImages.Apng = true;
-                                                                break;
-                                                            case "webm":
-                                                                GraylistedExplicitNonImages.Webm = true;
-                                                                break;
-                                                            case "swf":
-                                                                GraylistedExplicitNonImages.Swf = true;
-                                                                break;
-                                                        }
-                                                    }
-
-                                                    GraylistedExplicitCount++;
-                                                    if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
-                                                        GraylistedExplicitURLs.Add(FileUrlAttribute);
-                                                        GraylistedExplicitFileNames.Add(NewFileName);
-                                                        GraylistedExplicitFilePaths.Add(NewPath);
-                                                    }
-                                                    else {
-                                                        GraylistedURLs.Add(FileUrlAttribute);
-                                                        GraylistedFileNames.Add(NewFileName);
-                                                        GraylistedFilePaths.Add(NewPath);
-
-                                                    }
-                                                }
-                                                else {
-                                                    if (DownloadInfo.SeparateNonImages) {
-                                                        switch (ExtensionFromFileUrl.ToLower()) {
-                                                            case "gif":
-                                                                CleanExplicitNonImages.Gif = true;
-                                                                break;
-                                                            case "apng":
-                                                                CleanExplicitNonImages.Apng = true;
-                                                                break;
-                                                            case "webm":
-                                                                CleanExplicitNonImages.Webm = true;
-                                                                break;
-                                                            case "swf":
-                                                                CleanExplicitNonImages.Swf = true;
-                                                                break;
-                                                        }
-                                                    }
-                                                    CleanExplicitCount++;
-                                                    if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
-                                                        CleanExplicitURLs.Add(FileUrlAttribute);
-                                                        CleanExplicitFileNames.Add(NewFileName);
-                                                        CleanExplicitFilePaths.Add(NewPath);
-                                                    }
-                                                    else {
-                                                        CleanURLs.Add(FileUrlAttribute);
-                                                        CleanFileNames.Add(NewFileName);
-                                                        CleanFilePaths.Add(NewPath);
-                                                    }
-                                                }
-                                            }
-                                            break;
-                                        #endregion
-
-                                        #region questionable
-                                        case "q":
-                                        case "questionable":
-                                            if (File.Exists(NewPath)) {
-                                                if (PostIsBlacklisted) {
-                                                    BlacklistedQuestionableExistCount++;
-                                                }
-                                                else if (PostIsGraylisted) {
-                                                    GraylistedQuestionableExistCount++;
-                                                }
-                                                else {
-                                                    CleanQuestionableExistCount++;
-                                                }
-                                                continue;
-                                            }
-                                            else {
-                                                TotalFilesToDownload++;
-                                                if (PostIsBlacklisted) {
-                                                    if (DownloadInfo.SeparateNonImages) {
-                                                        switch (ExtensionFromFileUrl.ToLower()) {
-                                                            case "gif":
-                                                                BlacklistedQuestionableNonImages.Gif = true;
-                                                                break;
-                                                            case "apng":
-                                                                BlacklistedQuestionableNonImages.Apng = true;
-                                                                break;
-                                                            case "webm":
-                                                                BlacklistedQuestionableNonImages.Webm = true;
-                                                                break;
-                                                            case "swf":
-                                                                BlacklistedQuestionableNonImages.Swf = true;
-                                                                break;
-                                                        }
-                                                    }
-                                                    BlacklistedQuestionableCount++;
-                                                    if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
-                                                        BlacklistedQuestionableURLs.Add(FileUrlAttribute);
-                                                        BlacklistedQuestionableFileNames.Add(NewFileName);
-                                                        BlacklistedQuestionableFilePaths.Add(NewPath);
-                                                    }
-                                                    else {
-                                                        BlacklistedURLs.Add(FileUrlAttribute);
-                                                        BlacklistedFileNames.Add(NewFileName);
-                                                        BlacklistedFilePaths.Add(NewPath);
-                                                    }
-                                                }
-                                                else if (PostIsGraylisted) {
-                                                    if (DownloadInfo.SeparateNonImages) {
-                                                        switch (ExtensionFromFileUrl.ToLower()) {
-                                                            case "gif":
-                                                                GraylistedQuestionableNonImages.Gif = true;
-                                                                break;
-                                                            case "apng":
-                                                                GraylistedQuestionableNonImages.Apng = true;
-                                                                break;
-                                                            case "webm":
-                                                                GraylistedQuestionableNonImages.Webm = true;
-                                                                break;
-                                                            case "swf":
-                                                                GraylistedQuestionableNonImages.Swf = true;
-                                                                break;
-                                                        }
-                                                    }
-                                                    GraylistedQuestionableCount++;
-                                                    if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
-                                                        GraylistedQuestionableURLs.Add(FileUrlAttribute);
-                                                        GraylistedQuestionableFileNames.Add(NewFileName);
-                                                        GraylistedQuestionableFilePaths.Add(NewPath);
-                                                    }
-                                                    else {
-                                                        GraylistedURLs.Add(FileUrlAttribute);
-                                                        GraylistedFileNames.Add(NewFileName);
-                                                        GraylistedFilePaths.Add(NewPath);
-                                                    }
-                                                }
-                                                else {
-                                                    if (DownloadInfo.SeparateNonImages) {
-                                                        switch (ExtensionFromFileUrl.ToLower()) {
-                                                            case "gif":
-                                                                CleanQuestionableNonImages.Gif = true;
-                                                                break;
-                                                            case "apng":
-                                                                CleanQuestionableNonImages.Apng = true;
-                                                                break;
-                                                            case "webm":
-                                                                CleanQuestionableNonImages.Webm = true;
-                                                                break;
-                                                            case "swf":
-                                                                CleanQuestionableNonImages.Swf = true;
-                                                                break;
-                                                        }
-                                                    }
-                                                    CleanQuestionableCount++;
-                                                    if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
-                                                        CleanQuestionableURLs.Add(FileUrlAttribute);
-                                                        CleanQuestionableFileNames.Add(NewFileName);
-                                                        CleanQuestionableFilePaths.Add(NewPath);
-                                                    }
-                                                    else {
-                                                        CleanURLs.Add(FileUrlAttribute);
-                                                        CleanFileNames.Add(NewFileName);
-                                                        CleanFilePaths.Add(NewPath);
-                                                    }
-                                                }
-                                            }
-                                            break;
-                                        #endregion
-
-                                        #region safe
-                                        case "s":
-                                        case "safe":
-                                            if (File.Exists(NewPath)) {
-                                                if (PostIsBlacklisted) {
-                                                    BlacklistedSafeExistCount++;
-                                                }
-                                                else if (PostIsGraylisted) {
-                                                    GraylistedSafeExistCount++;
-                                                }
-                                                else {
-                                                    CleanSafeExistCount++;
-                                                }
-                                                continue;
-                                            }
-                                            else {
-                                                TotalFilesToDownload++;
-                                                if (PostIsBlacklisted) {
-                                                    if (DownloadInfo.SeparateNonImages) {
-                                                        switch (ExtensionFromFileUrl.ToLower()) {
-                                                            case "gif":
-                                                                BlacklistedSafeNonImages.Gif = true;
-                                                                break;
-                                                            case "apng":
-                                                                BlacklistedSafeNonImages.Apng = true;
-                                                                break;
-                                                            case "webm":
-                                                                BlacklistedSafeNonImages.Webm = true;
-                                                                break;
-                                                            case "swf":
-                                                                BlacklistedSafeNonImages.Swf = true;
-                                                                break;
-                                                        }
-                                                    }
-                                                    BlacklistedSafeCount++;
-                                                    if (DownloadInfo.SaveBlacklistedFiles) {
+                                                        BlacklistedQuestionableCount++;
                                                         if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
-                                                            BlacklistedSafeURLs.Add(FileUrlAttribute);
-                                                            BlacklistedSafeFileNames.Add(NewFileName);
-                                                            BlacklistedSafeFilePaths.Add(NewPath);
+                                                            BlacklistedQuestionableURLs.Add(NewUrl);
+                                                            BlacklistedQuestionableFileNames.Add(NewFileName);
+                                                            BlacklistedQuestionableFilePaths.Add(NewPath);
+                                                        }
+                                                        else {
+                                                            BlacklistedURLs.Add(NewUrl);
+                                                            BlacklistedFileNames.Add(NewFileName);
+                                                            BlacklistedFilePaths.Add(NewPath);
+                                                        }
+                                                    }
+                                                    else if (PostIsGraylisted) {
+                                                        if (DownloadInfo.SeparateNonImages) {
+                                                            switch (xmlExt[CurrentPost].InnerText.ToLower()) {
+                                                                case "gif":
+                                                                    GraylistedQuestionableNonImages.Gif = true;
+                                                                    break;
+                                                                case "apng":
+                                                                    GraylistedQuestionableNonImages.Apng = true;
+                                                                    break;
+                                                                case "webm":
+                                                                    GraylistedQuestionableNonImages.Webm = true;
+                                                                    break;
+                                                                case "swf":
+                                                                    GraylistedQuestionableNonImages.Swf = true;
+                                                                    break;
+                                                            }
+                                                        }
+                                                        GraylistedQuestionableCount++;
+                                                        if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                            GraylistedQuestionableURLs.Add(NewUrl);
+                                                            GraylistedQuestionableFileNames.Add(NewFileName);
+                                                            GraylistedQuestionableFilePaths.Add(NewPath);
+                                                        }
+                                                        else {
+                                                            GraylistedURLs.Add(NewUrl);
+                                                            GraylistedFileNames.Add(NewFileName);
+                                                            GraylistedFilePaths.Add(NewPath);
+                                                        }
+                                                    }
+                                                    else {
+                                                        if (DownloadInfo.SeparateNonImages) {
+                                                            switch (xmlExt[CurrentPost].InnerText.ToLower()) {
+                                                                case "gif":
+                                                                    CleanQuestionableNonImages.Gif = true;
+                                                                    break;
+                                                                case "apng":
+                                                                    CleanQuestionableNonImages.Apng = true;
+                                                                    break;
+                                                                case "webm":
+                                                                    CleanQuestionableNonImages.Webm = true;
+                                                                    break;
+                                                                case "swf":
+                                                                    CleanQuestionableNonImages.Swf = true;
+                                                                    break;
+                                                            }
+                                                        }
+                                                        CleanQuestionableCount++;
+                                                        if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                            CleanQuestionableURLs.Add(NewUrl);
+                                                            CleanQuestionableFileNames.Add(NewFileName);
+                                                            CleanQuestionableFilePaths.Add(NewPath);
+                                                        }
+                                                        else {
+                                                            CleanURLs.Add(NewUrl);
+                                                            CleanFileNames.Add(NewFileName);
+                                                            CleanFilePaths.Add(NewPath);
+                                                        }
+                                                    }
+                                                }
+                                                break;
+                                            #endregion
+
+                                            #region safe
+                                            case "s":
+                                            case "safe":
+                                                if (File.Exists(NewPath)) {
+                                                    if (PostIsBlacklisted) {
+                                                        BlacklistedSafeExistCount++;
+                                                    }
+                                                    else if (PostIsGraylisted) {
+                                                        GraylistedSafeExistCount++;
+                                                    }
+                                                    else {
+                                                        CleanSafeExistCount++;
+                                                    }
+                                                    continue;
+                                                }
+                                                else {
+                                                    TotalFilesToDownload++;
+                                                    if (PostIsBlacklisted) {
+                                                        if (DownloadInfo.SeparateNonImages) {
+                                                            switch (xmlExt[CurrentPost].InnerText.ToLower()) {
+                                                                case "gif":
+                                                                    BlacklistedSafeNonImages.Gif = true;
+                                                                    break;
+                                                                case "apng":
+                                                                    BlacklistedSafeNonImages.Apng = true;
+                                                                    break;
+                                                                case "webm":
+                                                                    BlacklistedSafeNonImages.Webm = true;
+                                                                    break;
+                                                                case "swf":
+                                                                    BlacklistedSafeNonImages.Swf = true;
+                                                                    break;
+                                                            }
+                                                        }
+                                                        BlacklistedSafeCount++;
+                                                        if (DownloadInfo.SaveBlacklistedFiles) {
+                                                            if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                                BlacklistedSafeURLs.Add(NewUrl);
+                                                                BlacklistedSafeFileNames.Add(NewFileName);
+                                                                BlacklistedSafeFilePaths.Add(NewPath);
+                                                            }
+                                                            else {
+                                                                BlacklistedURLs.Add(NewUrl);
+                                                                BlacklistedFileNames.Add(NewFileName);
+                                                                BlacklistedFilePaths.Add(NewPath);
+                                                            }
+                                                        }
+                                                    }
+                                                    else if (PostIsGraylisted) {
+                                                        if (DownloadInfo.SeparateNonImages) {
+                                                            switch (xmlExt[CurrentPost].InnerText.ToLower()) {
+                                                                case "gif":
+                                                                    GraylistedSafeNonImages.Gif = true;
+                                                                    break;
+                                                                case "apng":
+                                                                    GraylistedSafeNonImages.Apng = true;
+                                                                    break;
+                                                                case "webm":
+                                                                    GraylistedSafeNonImages.Webm = true;
+                                                                    break;
+                                                                case "swf":
+                                                                    GraylistedSafeNonImages.Swf = true;
+                                                                    break;
+                                                            }
+                                                        }
+                                                        GraylistedSafeCount++;
+                                                        if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                            GraylistedSafeURLs.Add(NewUrl);
+                                                            GraylistedSafeFileNames.Add(NewFileName);
+                                                            GraylistedSafeFilePaths.Add(NewPath);
+                                                        }
+                                                        else {
+                                                            GraylistedURLs.Add(NewUrl);
+                                                            GraylistedFileNames.Add(NewFileName);
+                                                            GraylistedFilePaths.Add(NewPath);
+                                                        }
+                                                    }
+                                                    else {
+                                                        if (DownloadInfo.SeparateNonImages) {
+                                                            switch (xmlExt[CurrentPost].InnerText.ToLower()) {
+                                                                case "gif":
+                                                                    CleanSafeNonImages.Gif = true;
+                                                                    break;
+                                                                case "apng":
+                                                                    CleanSafeNonImages.Apng = true;
+                                                                    break;
+                                                                case "webm":
+                                                                    CleanSafeNonImages.Webm = true;
+                                                                    break;
+                                                                case "swf":
+                                                                    CleanSafeNonImages.Swf = true;
+                                                                    break;
+                                                            }
+                                                        }
+                                                        CleanSafeCount++;
+                                                        if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                            CleanSafeURLs.Add(NewUrl);
+                                                            CleanSafeFileNames.Add(NewFileName);
+                                                            CleanSafeFilePaths.Add(NewPath);
+                                                        }
+                                                        else {
+                                                            CleanURLs.Add(NewUrl);
+                                                            CleanFileNames.Add(NewFileName);
+                                                            CleanFilePaths.Add(NewPath);
+                                                        }
+                                                    }
+                                                }
+                                                break;
+                                                #endregion
+
+                                        }
+
+                                        NewFiles++;
+                                        #endregion
+
+                                    }
+
+                                    if (xmlID.Count == 320) {
+                                        CurrentPage++;
+                                    }
+                                }
+                            } break;
+                            #endregion
+
+                            #region FurryBooru parsing
+                            case DownloadSite.FurryBooru: {
+                                xmlPosts = xmlDoc.ChildNodes[1].ChildNodes;
+                                xmlSearchInfo = xmlDoc.ChildNodes[1].Attributes;
+
+                                if (xmlPosts.Count > 0) {
+                                    NewFiles = 0;
+                                    NewFilesSkipped = 0;
+
+                                    Log.Write($"Parsing api page {CurrentPage}...");
+                                    this.Invoke((Action)delegate () {
+                                        sbStatus.Text = $"Parsing api page {CurrentPage}...";
+                                    });
+
+                                    for (int CurrentPost = 0; CurrentPost < xmlPosts.Count; CurrentPost++) {
+                                        if (!xmlPosts[CurrentPost].Name.ToLower().StartsWith("post")) {
+                                            continue;
+                                        }
+                                        if (DownloadInfo.ImageLimit > 0 && DownloadInfo.ImageLimit == TotalFilesToDownload) {
+                                            ImageLimitReached = true;
+                                            Log.Write("ImageLimit reached, breaking parse loop.");
+                                            break;
+                                        }
+
+                                        #region Reset variables
+                                        xmlCurrentPostAttributes = null;
+                                        ScoreAttribute = string.Empty;
+                                        FileUrlAttribute = string.Empty;
+                                        RatingAttribute = string.Empty;
+                                        TagsAttribute = string.Empty;
+                                        IdAttribute = string.Empty;
+                                        Md5Attribute = string.Empty;
+                                        ExtensionFromFileUrl = string.Empty;
+                                        rating = string.Empty;
+                                        PostIsGraylisted = false;
+                                        PostIsBlacklisted = false;
+                                        FoundGraylistedTags = string.Empty;
+                                        FoundBlacklistedTags = string.Empty;
+                                        NewFileName = string.Empty;
+                                        NewPath = string.Empty;
+                                        #endregion
+
+                                        #region Retrieve attributes
+                                        xmlCurrentPostAttributes = xmlPosts[CurrentPost].Attributes;
+
+                                        for (int CurrentPostAttributes = 0; CurrentPostAttributes < xmlCurrentPostAttributes.Count; CurrentPostAttributes++) {
+                                            switch (xmlCurrentPostAttributes[CurrentPostAttributes].Name.ToLower()) {
+
+                                                case "score": {
+                                                    ScoreAttribute = xmlCurrentPostAttributes[CurrentPostAttributes].InnerText;
+                                                } break;
+
+                                                case "file_url": {
+                                                    FileUrlAttribute = xmlCurrentPostAttributes[CurrentPostAttributes].InnerText;
+                                                    ExtensionFromFileUrl = FileUrlAttribute.Split('.')[^1];
+                                                } break;
+
+                                                case "rating": {
+                                                    RatingAttribute = xmlCurrentPostAttributes[CurrentPostAttributes].InnerText;
+                                                } break;
+
+                                                case "tags": {
+                                                    TagsAttribute = xmlCurrentPostAttributes[CurrentPostAttributes].InnerText;
+                                                } break;
+
+                                                case "id": {
+                                                    IdAttribute = xmlCurrentPostAttributes[CurrentPostAttributes].InnerText;
+                                                } break;
+
+                                                case "md5": {
+                                                    Md5Attribute = xmlCurrentPostAttributes[CurrentPostAttributes].InnerText;
+                                                } break;
+
+                                            }
+                                        }
+                                        #endregion
+
+                                        #region Check ratings & minimums
+                                        switch (RatingAttribute.ToLower()) {
+                                            case "e":
+                                            case "explicit": {
+                                                if (!DownloadInfo.SaveExplicit) {
+                                                    TotalPostsParsed++;
+                                                    continue;
+                                                }
+                                                rating = "Explicit";
+                                            }
+                                            break;
+
+                                            case "q":
+                                            case "questionable": {
+                                                if (!DownloadInfo.SaveQuestionable) {
+                                                    TotalPostsParsed++;
+                                                    continue;
+                                                }
+                                                rating = "Questionable";
+                                            }
+                                            break;
+
+                                            case "s":
+                                            case "safe": {
+                                                if (!DownloadInfo.SaveSafe) {
+                                                    TotalPostsParsed++;
+                                                    continue;
+                                                }
+                                                rating = "Safe";
+                                            }
+                                            break;
+
+                                            default: {
+                                                rating = $"Undefined rating {RatingAttribute}";
+                                            }
+                                            break;
+                                        }
+
+                                        if (DownloadInfo.UseMinimumScore && Int32.Parse(ScoreAttribute) < DownloadInfo.MinimumScore) {
+                                            TotalPostsParsed++;
+                                            continue;
+                                        }
+                                        #endregion
+
+                                        #region Tag parsing & graylist/blacklist filtering
+                                        PostTags = new(TagsAttribute.Trim().Split(' '));
+                                        for (int i = 0; i < PostTags.Count; i++) {
+                                            if (DownloadInfo.Blacklist.Length > 0) {
+                                                for (int j = 0; j < DownloadInfo.Blacklist.Length; j++) {
+                                                    if (PostTags[i] == DownloadInfo.Blacklist[j]) {
+                                                        PostIsBlacklisted = true;
+                                                        FoundBlacklistedTags += DownloadInfo.Blacklist[j] + " ";
+                                                    }
+                                                }
+                                                FoundBlacklistedTags = FoundBlacklistedTags.Trim();
+                                            }
+
+                                            if (DownloadInfo.Graylist.Length > 0) {
+                                                for (int j = 0; j < DownloadInfo.Graylist.Length; j++) {
+                                                    if (PostTags[i] == DownloadInfo.Graylist[j]) {
+                                                        PostIsGraylisted = true;
+                                                        FoundGraylistedTags += DownloadInfo.Graylist[j] + " ";
+                                                    }
+                                                }
+                                                FoundGraylistedTags = FoundBlacklistedTags.Trim();
+                                            }
+                                        }
+
+                                        if (PostIsBlacklisted && !DownloadInfo.SaveBlacklistedFiles) {
+                                            BlacklistedSkippedCount++;
+                                            TotalPostsParsed++;
+                                            NewFilesSkipped++;
+                                            continue;
+                                        }
+                                        else if (PostIsGraylisted && !DownloadInfo.SaveGraylistedFiles) {
+                                            GraylistedSkippedCount++;
+                                            TotalPostsParsed++;
+                                            NewFilesSkipped++;
+                                            continue;
+                                        }
+                                        #endregion
+
+                                        #region File name
+                                        // Replace schema flags with post info
+                                        NewFileName =
+                                            DownloadInfo.FileNameSchema
+                                                .Replace("%md5%", Md5Attribute)
+                                                .Replace("%id%", IdAttribute)
+                                                .Replace("%rating%", rating.ToLower())
+                                                .Replace("%rating2%", RatingAttribute)
+                                                .Replace("%ext%", ExtensionFromFileUrl)
+                                                .Replace("%score%", ScoreAttribute) + "." + ExtensionFromFileUrl;
+                                        #endregion
+
+                                        #region nfo files
+                                        if (PostIsBlacklisted) {
+                                            BlacklistedInfoBuffer +=
+                                                $"POST {IdAttribute}:\n" +
+                                                $"    MD5: {Md5Attribute}\n" +
+                                                $"    URL: {FileUrlAttribute}\n" +
+                                                $"    TAGS: {TagsAttribute}\n" +
+                                                $"    OFFENDING TAGS: {FoundBlacklistedTags + (PostIsGraylisted ? " |<~Bl|Gr~>| " + FoundGraylistedTags : "")}\n" +
+                                                $"    SCORE: {ScoreAttribute}\n" +
+                                                $"    RATING: {rating}\n\n";
+
+                                        }
+                                        else if (PostIsGraylisted) {
+                                            GraylistedInfoBuffer +=
+                                                $"POST {IdAttribute}:\n" +
+                                                $"    MD5: {Md5Attribute}\n" +
+                                                $"    URL: {FileUrlAttribute}\n" +
+                                                $"    TAGS: {TagsAttribute}\n" +
+                                                $"    OFFENDING TAGS: {FoundGraylistedTags}\n" +
+                                                $"    SCORE: {ScoreAttribute}\n" +
+                                                $"    RATING: {rating}\n\n";
+                                        }
+                                        else {
+                                            CleanInfoBuffer +=
+                                                $"POST {IdAttribute}:\n" +
+                                                $"    MD5: {Md5Attribute}\n" +
+                                                $"    URL: {FileUrlAttribute}\n" +
+                                                $"    TAGS: {TagsAttribute}\n" +
+                                                $"    SCORE: {ScoreAttribute}\n" +
+                                                $"    RATING: {rating}\n\n";
+                                        }
+                                        #endregion
+
+                                        #region Add to the lists and counts
+                                        NewPath = DownloadInfo.DownloadPath;
+
+                                        if (DownloadInfo.SeparateRatings) {
+                                            NewPath += RatingAttribute.ToLower() switch {
+                                                "e" or "explicit" => "\\explicit",
+                                                "q" or "questionable" => "\\questionable",
+                                                "s" or "safe" => "\\safe",
+                                                _ => "\\unknown"
+                                            };
+                                        }
+
+                                        if (PostIsBlacklisted) {
+                                            NewPath += "\\blacklisted";
+                                        }
+                                        else if (PostIsGraylisted) {
+                                            NewPath += "\\graylisted";
+                                        }
+
+                                        if (DownloadInfo.SeparateNonImages) {
+                                            NewPath += ExtensionFromFileUrl.ToLower() switch {
+                                                "gif" => "\\gif",
+                                                "apng" => "\\apng",
+                                                "webm" => "\\webm",
+                                                "swf" => "\\swf",
+                                                _ => ""
+                                            };
+                                        }
+
+                                        NewPath += "\\" + NewFileName;
+
+                                        switch (RatingAttribute.ToLower()) {
+
+                                            #region Explicit
+                                            case "e":
+                                            case "explicit":
+                                                if (File.Exists(NewPath)) {
+                                                    if (PostIsBlacklisted) {
+                                                        BlacklistedExplicitExistCount++;
+                                                    }
+                                                    else if (PostIsGraylisted) {
+                                                        GraylistedExplicitExistCount++;
+                                                    }
+                                                    else {
+                                                        CleanExplicitExistCount++;
+                                                    }
+                                                    continue;
+                                                }
+                                                else {
+                                                    TotalFilesToDownload++;
+                                                    if (PostIsBlacklisted) {
+                                                        if (DownloadInfo.SeparateNonImages) {
+                                                            switch (ExtensionFromFileUrl.ToLower()) {
+                                                                case "gif":
+                                                                    BlacklistedExplicitNonImages.Gif = true;
+                                                                    break;
+                                                                case "apng":
+                                                                    BlacklistedExplicitNonImages.Apng = true;
+                                                                    break;
+                                                                case "webm":
+                                                                    BlacklistedExplicitNonImages.Webm = true;
+                                                                    break;
+                                                                case "swf":
+                                                                    BlacklistedExplicitNonImages.Swf = true;
+                                                                    break;
+                                                            }
+                                                        }
+
+                                                        BlacklistedExplicitCount++;
+                                                        if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                            BlacklistedExplicitURLs.Add(FileUrlAttribute);
+                                                            BlacklistedExplicitFileNames.Add(NewFileName);
+                                                            BlacklistedExplicitFilePaths.Add(NewPath);
                                                         }
                                                         else {
                                                             BlacklistedURLs.Add(FileUrlAttribute);
@@ -1812,86 +1593,305 @@ namespace aphrodite {
                                                             BlacklistedFilePaths.Add(NewPath);
                                                         }
                                                     }
-                                                }
-                                                else if (PostIsGraylisted) {
-                                                    if (DownloadInfo.SeparateNonImages) {
-                                                        switch (ExtensionFromFileUrl.ToLower()) {
-                                                            case "gif":
-                                                                GraylistedSafeNonImages.Gif = true;
-                                                                break;
-                                                            case "apng":
-                                                                GraylistedSafeNonImages.Apng = true;
-                                                                break;
-                                                            case "webm":
-                                                                GraylistedSafeNonImages.Webm = true;
-                                                                break;
-                                                            case "swf":
-                                                                GraylistedSafeNonImages.Swf = true;
-                                                                break;
+                                                    else if (PostIsGraylisted) {
+                                                        if (DownloadInfo.SeparateNonImages) {
+                                                            switch (ExtensionFromFileUrl.ToLower()) {
+                                                                case "gif":
+                                                                    GraylistedExplicitNonImages.Gif = true;
+                                                                    break;
+                                                                case "apng":
+                                                                    GraylistedExplicitNonImages.Apng = true;
+                                                                    break;
+                                                                case "webm":
+                                                                    GraylistedExplicitNonImages.Webm = true;
+                                                                    break;
+                                                                case "swf":
+                                                                    GraylistedExplicitNonImages.Swf = true;
+                                                                    break;
+                                                            }
+                                                        }
+
+                                                        GraylistedExplicitCount++;
+                                                        if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                            GraylistedExplicitURLs.Add(FileUrlAttribute);
+                                                            GraylistedExplicitFileNames.Add(NewFileName);
+                                                            GraylistedExplicitFilePaths.Add(NewPath);
+                                                        }
+                                                        else {
+                                                            GraylistedURLs.Add(FileUrlAttribute);
+                                                            GraylistedFileNames.Add(NewFileName);
+                                                            GraylistedFilePaths.Add(NewPath);
+
                                                         }
                                                     }
-                                                    GraylistedSafeCount++;
-                                                    if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
-                                                        GraylistedSafeURLs.Add(FileUrlAttribute);
-                                                        GraylistedSafeFileNames.Add(NewFileName);
-                                                        GraylistedSafeFilePaths.Add(NewPath);
-                                                    }
                                                     else {
-                                                        GraylistedURLs.Add(FileUrlAttribute);
-                                                        GraylistedFileNames.Add(NewFileName);
-                                                        GraylistedFilePaths.Add(NewPath);
-                                                    }
-                                                }
-                                                else {
-                                                    if (DownloadInfo.SeparateNonImages) {
-                                                        switch (ExtensionFromFileUrl.ToLower()) {
-                                                            case "gif":
-                                                                CleanSafeNonImages.Gif = true;
-                                                                break;
-                                                            case "apng":
-                                                                CleanSafeNonImages.Apng = true;
-                                                                break;
-                                                            case "webm":
-                                                                CleanSafeNonImages.Webm = true;
-                                                                break;
-                                                            case "swf":
-                                                                CleanSafeNonImages.Swf = true;
-                                                                break;
+                                                        if (DownloadInfo.SeparateNonImages) {
+                                                            switch (ExtensionFromFileUrl.ToLower()) {
+                                                                case "gif":
+                                                                    CleanExplicitNonImages.Gif = true;
+                                                                    break;
+                                                                case "apng":
+                                                                    CleanExplicitNonImages.Apng = true;
+                                                                    break;
+                                                                case "webm":
+                                                                    CleanExplicitNonImages.Webm = true;
+                                                                    break;
+                                                                case "swf":
+                                                                    CleanExplicitNonImages.Swf = true;
+                                                                    break;
+                                                            }
+                                                        }
+                                                        CleanExplicitCount++;
+                                                        if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                            CleanExplicitURLs.Add(FileUrlAttribute);
+                                                            CleanExplicitFileNames.Add(NewFileName);
+                                                            CleanExplicitFilePaths.Add(NewPath);
+                                                        }
+                                                        else {
+                                                            CleanURLs.Add(FileUrlAttribute);
+                                                            CleanFileNames.Add(NewFileName);
+                                                            CleanFilePaths.Add(NewPath);
                                                         }
                                                     }
-                                                    CleanSafeCount++;
-                                                    if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
-                                                        CleanSafeURLs.Add(FileUrlAttribute);
-                                                        CleanSafeFileNames.Add(NewFileName);
-                                                        CleanSafeFilePaths.Add(NewPath);
-                                                    }
-                                                    else {
-                                                        CleanURLs.Add(FileUrlAttribute);
-                                                        CleanFileNames.Add(NewFileName);
-                                                        CleanFilePaths.Add(NewPath);
-                                                    }
                                                 }
-                                            }
-                                            break;
+                                                break;
                                             #endregion
 
+                                            #region questionable
+                                            case "q":
+                                            case "questionable":
+                                                if (File.Exists(NewPath)) {
+                                                    if (PostIsBlacklisted) {
+                                                        BlacklistedQuestionableExistCount++;
+                                                    }
+                                                    else if (PostIsGraylisted) {
+                                                        GraylistedQuestionableExistCount++;
+                                                    }
+                                                    else {
+                                                        CleanQuestionableExistCount++;
+                                                    }
+                                                    continue;
+                                                }
+                                                else {
+                                                    TotalFilesToDownload++;
+                                                    if (PostIsBlacklisted) {
+                                                        if (DownloadInfo.SeparateNonImages) {
+                                                            switch (ExtensionFromFileUrl.ToLower()) {
+                                                                case "gif":
+                                                                    BlacklistedQuestionableNonImages.Gif = true;
+                                                                    break;
+                                                                case "apng":
+                                                                    BlacklistedQuestionableNonImages.Apng = true;
+                                                                    break;
+                                                                case "webm":
+                                                                    BlacklistedQuestionableNonImages.Webm = true;
+                                                                    break;
+                                                                case "swf":
+                                                                    BlacklistedQuestionableNonImages.Swf = true;
+                                                                    break;
+                                                            }
+                                                        }
+                                                        BlacklistedQuestionableCount++;
+                                                        if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                            BlacklistedQuestionableURLs.Add(FileUrlAttribute);
+                                                            BlacklistedQuestionableFileNames.Add(NewFileName);
+                                                            BlacklistedQuestionableFilePaths.Add(NewPath);
+                                                        }
+                                                        else {
+                                                            BlacklistedURLs.Add(FileUrlAttribute);
+                                                            BlacklistedFileNames.Add(NewFileName);
+                                                            BlacklistedFilePaths.Add(NewPath);
+                                                        }
+                                                    }
+                                                    else if (PostIsGraylisted) {
+                                                        if (DownloadInfo.SeparateNonImages) {
+                                                            switch (ExtensionFromFileUrl.ToLower()) {
+                                                                case "gif":
+                                                                    GraylistedQuestionableNonImages.Gif = true;
+                                                                    break;
+                                                                case "apng":
+                                                                    GraylistedQuestionableNonImages.Apng = true;
+                                                                    break;
+                                                                case "webm":
+                                                                    GraylistedQuestionableNonImages.Webm = true;
+                                                                    break;
+                                                                case "swf":
+                                                                    GraylistedQuestionableNonImages.Swf = true;
+                                                                    break;
+                                                            }
+                                                        }
+                                                        GraylistedQuestionableCount++;
+                                                        if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                            GraylistedQuestionableURLs.Add(FileUrlAttribute);
+                                                            GraylistedQuestionableFileNames.Add(NewFileName);
+                                                            GraylistedQuestionableFilePaths.Add(NewPath);
+                                                        }
+                                                        else {
+                                                            GraylistedURLs.Add(FileUrlAttribute);
+                                                            GraylistedFileNames.Add(NewFileName);
+                                                            GraylistedFilePaths.Add(NewPath);
+                                                        }
+                                                    }
+                                                    else {
+                                                        if (DownloadInfo.SeparateNonImages) {
+                                                            switch (ExtensionFromFileUrl.ToLower()) {
+                                                                case "gif":
+                                                                    CleanQuestionableNonImages.Gif = true;
+                                                                    break;
+                                                                case "apng":
+                                                                    CleanQuestionableNonImages.Apng = true;
+                                                                    break;
+                                                                case "webm":
+                                                                    CleanQuestionableNonImages.Webm = true;
+                                                                    break;
+                                                                case "swf":
+                                                                    CleanQuestionableNonImages.Swf = true;
+                                                                    break;
+                                                            }
+                                                        }
+                                                        CleanQuestionableCount++;
+                                                        if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                            CleanQuestionableURLs.Add(FileUrlAttribute);
+                                                            CleanQuestionableFileNames.Add(NewFileName);
+                                                            CleanQuestionableFilePaths.Add(NewPath);
+                                                        }
+                                                        else {
+                                                            CleanURLs.Add(FileUrlAttribute);
+                                                            CleanFileNames.Add(NewFileName);
+                                                            CleanFilePaths.Add(NewPath);
+                                                        }
+                                                    }
+                                                }
+                                                break;
+                                            #endregion
+
+                                            #region safe
+                                            case "s":
+                                            case "safe":
+                                                if (File.Exists(NewPath)) {
+                                                    if (PostIsBlacklisted) {
+                                                        BlacklistedSafeExistCount++;
+                                                    }
+                                                    else if (PostIsGraylisted) {
+                                                        GraylistedSafeExistCount++;
+                                                    }
+                                                    else {
+                                                        CleanSafeExistCount++;
+                                                    }
+                                                    continue;
+                                                }
+                                                else {
+                                                    TotalFilesToDownload++;
+                                                    if (PostIsBlacklisted) {
+                                                        if (DownloadInfo.SeparateNonImages) {
+                                                            switch (ExtensionFromFileUrl.ToLower()) {
+                                                                case "gif":
+                                                                    BlacklistedSafeNonImages.Gif = true;
+                                                                    break;
+                                                                case "apng":
+                                                                    BlacklistedSafeNonImages.Apng = true;
+                                                                    break;
+                                                                case "webm":
+                                                                    BlacklistedSafeNonImages.Webm = true;
+                                                                    break;
+                                                                case "swf":
+                                                                    BlacklistedSafeNonImages.Swf = true;
+                                                                    break;
+                                                            }
+                                                        }
+                                                        BlacklistedSafeCount++;
+                                                        if (DownloadInfo.SaveBlacklistedFiles) {
+                                                            if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                                BlacklistedSafeURLs.Add(FileUrlAttribute);
+                                                                BlacklistedSafeFileNames.Add(NewFileName);
+                                                                BlacklistedSafeFilePaths.Add(NewPath);
+                                                            }
+                                                            else {
+                                                                BlacklistedURLs.Add(FileUrlAttribute);
+                                                                BlacklistedFileNames.Add(NewFileName);
+                                                                BlacklistedFilePaths.Add(NewPath);
+                                                            }
+                                                        }
+                                                    }
+                                                    else if (PostIsGraylisted) {
+                                                        if (DownloadInfo.SeparateNonImages) {
+                                                            switch (ExtensionFromFileUrl.ToLower()) {
+                                                                case "gif":
+                                                                    GraylistedSafeNonImages.Gif = true;
+                                                                    break;
+                                                                case "apng":
+                                                                    GraylistedSafeNonImages.Apng = true;
+                                                                    break;
+                                                                case "webm":
+                                                                    GraylistedSafeNonImages.Webm = true;
+                                                                    break;
+                                                                case "swf":
+                                                                    GraylistedSafeNonImages.Swf = true;
+                                                                    break;
+                                                            }
+                                                        }
+                                                        GraylistedSafeCount++;
+                                                        if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                            GraylistedSafeURLs.Add(FileUrlAttribute);
+                                                            GraylistedSafeFileNames.Add(NewFileName);
+                                                            GraylistedSafeFilePaths.Add(NewPath);
+                                                        }
+                                                        else {
+                                                            GraylistedURLs.Add(FileUrlAttribute);
+                                                            GraylistedFileNames.Add(NewFileName);
+                                                            GraylistedFilePaths.Add(NewPath);
+                                                        }
+                                                    }
+                                                    else {
+                                                        if (DownloadInfo.SeparateNonImages) {
+                                                            switch (ExtensionFromFileUrl.ToLower()) {
+                                                                case "gif":
+                                                                    CleanSafeNonImages.Gif = true;
+                                                                    break;
+                                                                case "apng":
+                                                                    CleanSafeNonImages.Apng = true;
+                                                                    break;
+                                                                case "webm":
+                                                                    CleanSafeNonImages.Webm = true;
+                                                                    break;
+                                                                case "swf":
+                                                                    CleanSafeNonImages.Swf = true;
+                                                                    break;
+                                                            }
+                                                        }
+                                                        CleanSafeCount++;
+                                                        if (DownloadInfo.SeparateRatings && !DownloadInfo.DownloadNewestToOldest) {
+                                                            CleanSafeURLs.Add(FileUrlAttribute);
+                                                            CleanSafeFileNames.Add(NewFileName);
+                                                            CleanSafeFilePaths.Add(NewPath);
+                                                        }
+                                                        else {
+                                                            CleanURLs.Add(FileUrlAttribute);
+                                                            CleanFileNames.Add(NewFileName);
+                                                            CleanFilePaths.Add(NewPath);
+                                                        }
+                                                    }
+                                                }
+                                                break;
+                                                #endregion
+
+                                        }
+
+                                        NewFiles++;
+                                        TotalPostsParsed++;
+                                        #endregion
+
                                     }
-
-                                    NewFiles++;
-                                    #endregion
-
                                 }
 
-                            }
+                                if (xmlPosts.Count == 100) {
+                                    CurrentPage++;
+                                }
+                            } break;
+                            #endregion
 
-                            if (xmlPosts.Count == 100) {
-                                CurrentPage++;
-                            }
-
+                            default: return;
                         }
-                        #endregion
-
-                        else return;
 
                         #region after page update totals
                         this.Invoke((Action)delegate () {
@@ -1915,13 +1915,20 @@ namespace aphrodite {
                             break;
                         }
                     }
+                    #endregion
 
+                    #endregion
+
+                    #region Pre-download stuff
                     if (CleanExplicitCount + CleanQuestionableCount + CleanSafeCount +
                     GraylistedExplicitCount + GraylistedQuestionableCount + GraylistedSafeCount +
                     BlacklistedExplicitCount + BlacklistedQuestionableCount + BlacklistedSafeCount == 0) {
                         throw new NoFilesToDownloadException();
                     }
-                    #endregion
+
+                    this.Invoke((Action)delegate {
+                        sbStatus.Text = "Preparing download...";
+                    });
 
                     #region Output folder creation
                     Status = DownloadStatus.ReadyToDownload;
@@ -2144,11 +2151,6 @@ namespace aphrodite {
                     }
                     #endregion
 
-                    #region Pre-download stuff
-                    this.Invoke((Action)delegate {
-                        sbStatus.Text = "Preparing download...";
-                    });
-
                     Status = DownloadStatus.ReadyToDownload;
 
                     // Save the .nfo
@@ -2222,7 +2224,7 @@ namespace aphrodite {
                                 pbDownloadStatus.Value = 0;
 
                                 // protect from overflow
-                                if (pbTotalStatus.Value < pbTotalStatus.Maximum && e.Error != null) {
+                                if (pbTotalStatus.Value < pbTotalStatus.Maximum) {
                                     pbTotalStatus.Value = Math.Min(DownloadedFiles, pbTotalStatus.Maximum);
                                 }
                             });

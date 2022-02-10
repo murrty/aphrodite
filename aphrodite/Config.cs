@@ -105,6 +105,7 @@ namespace aphrodite {
         /// Saves all configurations.
         /// </summary>
         public void Save() {
+            Initialization.Save();
             FormSettings.Save();
             General.Save();
             Tags.Save();
@@ -3039,27 +3040,19 @@ namespace aphrodite {
         /// Sets the protocol in the registry to the current program path.
         /// </summary>
         /// <returns></returns>
-        public static bool SetRegistryKey() {
-            if (!Program.IsAdmin) return false;
+        public static int SetRegistryKey() {
+            if (!Program.IsAdmin) return 2;
             try {
-                //Registry.ClassesRoot.CreateSubKey("aphrodite");
-                //AphroditeRegistryKey = Registry.ClassesRoot.OpenSubKey("aphrodite", true);
                 AphroditeRegistryKey = Registry.ClassesRoot.CreateSubKey("aphrodite");
                 AphroditeRegistryKey.SetValue("URL Protocol", "");
                 AphroditeRegistryKey.Close();
 
-                //Registry.ClassesRoot.CreateSubKey("aphrodite\\shell");
-                //Registry.ClassesRoot.CreateSubKey("aphrodite\\shell\\open");
-                //Registry.ClassesRoot.CreateSubKey("aphrodite\\shell\\open\\command");
-                //AphroditeRegistryKey = Registry.ClassesRoot.OpenSubKey("aphrodite\\shell\\open\\command", true);
                 AphroditeRegistryKey = Registry.ClassesRoot.CreateSubKey("aphrodite\\shell\\open\\command");
                 AphroditeRegistryKey.SetValue("", $"\"{Program.FullApplicationPath}\" \"%1\"");
                 AphroditeRegistryKey.Close();
 
-                //Registry.ClassesRoot.CreateSubKey("aphrodite\\DefaultIcon");
-                //AphroditeRegistryKey = Registry.ClassesRoot.OpenSubKey("aphrodite\\DefaultIcon", true);
                 AphroditeRegistryKey = Registry.ClassesRoot.CreateSubKey("aphrodite\\DefaultIcon");
-                AphroditeRegistryKey.SetValue("", $"\"{Program.FullApplicationPath}\"");
+                AphroditeRegistryKey.SetValue("", $"\"{Program.FullApplicationPath}\",0");
                 AphroditeRegistryKey.Close();
                 AphroditeRegistryKey.Dispose();
 
@@ -3071,26 +3064,50 @@ namespace aphrodite {
                          OldTagsProtocolExists || OldPoolProtocolExists || OldImagesProtocolExists || OldPoolWishlistProtocolExists;
 
                 if (OldProtocolExists
-                && Log.MessageBox("One or more protocols exist using the old formats. Would you like to delete them?", System.Windows.Forms.MessageBoxButtons.YesNo) == System.Windows.Forms.DialogResult.Yes) {
+                && Log.MessageBox("One or more protocols exist using the old formats (\"tags\", \"pools\", \"images\", or \"poolwl\").\n\nWould you like to delete them?", System.Windows.Forms.MessageBoxButtons.YesNo) == System.Windows.Forms.DialogResult.Yes) {
                     if (OldTagsProtocolExists) {
-                        Registry.ClassesRoot.DeleteSubKey("tags");
+                        try {
+                            Registry.ClassesRoot.DeleteSubKeyTree("tags", false);
+                        }
+                        catch (Exception ex) {
+                            Log.ReportException(ex);
+                            return 3;
+                        }
                     }
                     if (OldPoolProtocolExists) {
-                        Registry.ClassesRoot.DeleteSubKey("pools");
+                        try {
+                            Registry.ClassesRoot.DeleteSubKeyTree("pools", false);
+                        }
+                        catch (Exception ex) {
+                            Log.ReportException(ex);
+                            return 4;
+                        }
                     }
                     if (OldImagesProtocolExists) {
-                        Registry.ClassesRoot.DeleteSubKey("images");
+                        try {
+                            Registry.ClassesRoot.DeleteSubKeyTree("images", false);
+                        }
+                        catch (Exception ex) {
+                            Log.ReportException(ex);
+                            return 5;
+                        }
                     }
                     if (OldPoolWishlistProtocolExists) {
-                        Registry.ClassesRoot.DeleteSubKey("poolwl");
+                        try {
+                            Registry.ClassesRoot.DeleteSubKeyTree("poolwl", false);
+                        }
+                        catch (Exception ex) {
+                            Log.ReportException(ex);
+                            return 6;
+                        }
                     }
                 }
 
-                return true;
+                return 0;
             }
             catch (Exception ex) {
                 Log.ReportException(ex);
-                return false;
+                return 1;
             }
         }
 
@@ -3386,7 +3403,7 @@ namespace aphrodite {
         /// <param name="Value">The Color value to write to the key.</param>
         /// <param name="Section">The string name of the section it's located at. Default to ExecutableName.</param>
         public void Write(string Key, Color Value, string Section = null) {
-            WriteString(Key, $"#{Value.ToArgb().ToString("X").Substring(2)}", Section);
+            WriteString(Key, $"#{Value.ToArgb().ToString("X")[2..]}", Section);
         }
 
         /// <summary>

@@ -251,46 +251,46 @@ namespace aphrodite {
                 case DownloadSite.e621: {
                     Tags =
                         PageUrl.IndexOf("?tags=") > -1 ?
-                        PageUrl.Split('?')[1].Split('&')[0].Substring(6) :
+                        PageUrl.Split('?')[1].Split('&')[0][6..] :
                         PageUrl.IndexOf("&tags=") > -1 ?
-                        PageUrl.Substring(PageUrl.IndexOf("&tags=") + 6).Split('&')[0] :
+                        PageUrl[(PageUrl.IndexOf("&tags=") + 6)..].Split('&')[0] :
                         "[no tags]";
 
                     PageNumber =
                         PageUrl.IndexOf("?page=") > -1 ?
-                        PageUrl.Split('?')[1].Split('&')[0].Substring(6) :
+                        PageUrl.Split('?')[1].Split('&')[0][6..] :
                         PageUrl.IndexOf("&page=") > -1 ?
-                        PageUrl.Substring(PageUrl.IndexOf("&page=") + 6).Split('&')[0] :
+                        PageUrl[(PageUrl.IndexOf("&page=") + 6)..].Split('&')[0] :
                         "1";
 
                     PageDisplayedImagesCount =
                         PageUrl.IndexOf("?limit=") > -1 ?
-                        PageUrl.Split('?')[1].Split('&')[0].Substring(7) :
+                        PageUrl.Split('?')[1].Split('&')[0][7..] :
                         PageUrl.IndexOf("&limit=") > -1 ?
-                        PageUrl.Substring(PageUrl.IndexOf("&limit=") + 7).Split('&')[0] :
+                        PageUrl[(PageUrl.IndexOf("&limit=") + 7)..].Split('&')[0] :
                         "75"; // 75 is the default.
                 } break;
 
                 case DownloadSite.FurryBooru: {
                     Tags =
                         PageUrl.IndexOf("?tags=") > -1 ?
-                        PageUrl.Split('?')[1].Split('&')[0].Substring(6) :
+                        PageUrl.Split('?')[1].Split('&')[0][6..] :
                         PageUrl.IndexOf("&tags=") > -1 ?
-                        PageUrl.Substring(PageUrl.IndexOf("&tags=") + 6).Split('&')[0] :
+                        PageUrl[(PageUrl.IndexOf("&tags=") + 6)..].Split('&')[0] :
                         "all";
 
                     PageNumber =
                         PageUrl.IndexOf("?pid=") > -1 ?
-                        PageUrl.Split('?')[1].Split('&')[0].Substring(5) :
+                        PageUrl.Split('?')[1].Split('&')[0][5..] :
                         PageUrl.IndexOf("&pid=") > -1 ?
-                        PageUrl.Substring(PageUrl.IndexOf("&pid=") + 5).Split('&')[0] :
+                        PageUrl[(PageUrl.IndexOf("&pid=") + 5)..].Split('&')[0] :
                         "0";
 
                     PageDisplayedImagesCount =
                         PageUrl.IndexOf("?limit=") > -1 ?
-                        PageUrl.Split('?')[1].Split('&')[0].Substring(7) :
+                        PageUrl.Split('?')[1].Split('&')[0][7..] :
                         PageUrl.IndexOf("&limit=") > -1 ?
-                        PageUrl.Substring(PageUrl.IndexOf("&limit=") + 7).Split('&')[0] :
+                        PageUrl[(PageUrl.IndexOf("&limit=") + 7)..].Split('&')[0] :
                         "40"; // 40 is the default.
                 } break;
             }

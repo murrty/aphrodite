@@ -242,7 +242,7 @@ namespace aphrodite {
 
             if (ApiTools.IsValidInkBunnyLink(Artists)) {
                 if (ApiTools.IsValidInkBunnyUserLink(Artists)) {
-                    Artists = Artists.Substring(Artists.IndexOf("inkbunny.net")).Split('/')[0].Split('?')[0];
+                    Artists = Artists[Artists.IndexOf("inkbunny.net")..].Split('/')[0].Split('?')[0];
                 }
                 else {
                     Log.MessageBox("The artists text box is a valid ink bunny link, but not a valid user link.");
@@ -253,10 +253,10 @@ namespace aphrodite {
             if (ApiTools.IsValidInkBunnyLink(Users)) {
                 if (ApiTools.IsValidInkBunnyUserFavoritesLink(Users)) {
                     if (Users.IndexOf("favs_user_id") > 0) {
-                        Users = Users.Substring(Users.IndexOf("favs_user_id")).Split('=')[1].Split('&')[0];
+                        Users = Users[Users.IndexOf("favs_user_id")..].Split('=')[1].Split('&')[0];
                     }
                     else if (Users.IndexOf("user_id") > 0) {
-                        Users = Users.Substring(Users.IndexOf("user_id")).Split('=')[1].Split('&')[0];
+                        Users = Users[Users.IndexOf("user_id")..].Split('=')[1].Split('&')[0];
                     }
                     else {
                         Log.MessageBox("The users' favorites text box is a valid favorites link, but there was no index to get the ID from.");

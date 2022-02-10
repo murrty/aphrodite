@@ -52,7 +52,7 @@ namespace aphrodite {
 
             if (ProtocolInstalled) {
                 btnInstallProtocol.Enabled = false;
-                btnInstallProtocol.Text = "protocol installed";
+                btnInstallProtocol.Text = "protocol is installed";
             }
             else {
                 btnInstallProtocol.ShowUACShield = !Program.IsAdmin;
@@ -199,8 +199,13 @@ namespace aphrodite {
         }
 
         private bool InstallProtocol() {
+            if (ProtocolInstalled) {
+                Log.MessageBox("The protocol is already installed, and pointing to this program.");
+                return true;
+            }
+            int ExitCode;
             if (Program.IsAdmin) {
-                return SystemRegistry.SetRegistryKey();
+                ExitCode = SystemRegistry.SetRegistryKey();
             }
             else {
                 Process ProtocolProcess = new() {
@@ -213,7 +218,39 @@ namespace aphrodite {
                 };
                 ProtocolProcess.Start();
                 ProtocolProcess.WaitForExit();
-                return ProtocolProcess.ExitCode == 0;
+                ExitCode = ProtocolProcess.ExitCode;
+            }
+            
+            switch (ExitCode) {
+                case 0: return true;
+                    
+                case 1: {
+                    Log.MessageBox("The protocol installation reported an exception, and most likely did not work.");
+                } return false;
+
+                case 2: {
+                    Log.MessageBox("The protocol installation could not proceed, because it was not able to gain administrative permission.");
+                } return false;
+
+                case 3: {
+                    Log.MessageBox("The \"tags\" protocol uninstallation failed, but the main protocol was installed.");
+                } return true;
+
+                case 4: {
+                    Log.MessageBox("The \"pools\" protocol uninstallation failed, but the main protocol was installed.");
+                } return true;
+
+                case 5: {
+                    Log.MessageBox("The \"imagess\" protocol uninstallation failed, but the main protocol was installed.");
+                } return true;
+
+                case 6: {
+                    Log.MessageBox("The \"poolwl\" protocol uninstallation failed, but the main protocol was installed.");
+                } return true;
+
+                default: {
+                    Log.MessageBox("The exit code was an unexpected code, can't determine protocol status.");
+                } return false;
             }
         }
 
@@ -306,14 +343,16 @@ namespace aphrodite {
         }
 
         private void btnInstallProtocol_Click(object sender, EventArgs e) {
-            if (InstallProtocol()) {
-                btnInstallProtocol.ShowUACShield = false;
-                btnInstallProtocol.Enabled = false;
-                btnInstallProtocol.Text = "protocol installed";
-                ProtocolInstalled = true;
+            if (!ProtocolInstalled) {
+                if (InstallProtocol()) {
+                    btnInstallProtocol.ShowUACShield = false;
+                    btnInstallProtocol.Enabled = false;
+                    btnInstallProtocol.Text = "protocol was installed";
+                    ProtocolInstalled = true;
+                }
             }
             else {
-                Log.MessageBox("Failed to install protocol");
+                Log.MessageBox("The protocol is already installed, and pointing to this program.");
             }
         }
 

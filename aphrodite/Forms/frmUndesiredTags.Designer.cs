@@ -38,7 +38,7 @@
             // lbHeader
             // 
             this.lbHeader.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbHeader.Location = new System.Drawing.Point(12, 9);
+            this.lbHeader.Location = new System.Drawing.Point(12, 3);
             this.lbHeader.Name = "lbHeader";
             this.lbHeader.Size = new System.Drawing.Size(295, 79);
             this.lbHeader.TabIndex = 0;
@@ -59,7 +59,7 @@
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(236, 8);
+            this.btnSave.Location = new System.Drawing.Point(159, 8);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(71, 23);
             this.btnSave.TabIndex = 21;
@@ -69,7 +69,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(155, 286);
+            this.btnCancel.Location = new System.Drawing.Point(236, 8);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(71, 23);
             this.btnCancel.TabIndex = 20;
@@ -122,6 +122,7 @@
             // 
             this.pnLower.BackColor = System.Drawing.SystemColors.Menu;
             this.pnLower.Controls.Add(this.btnSave);
+            this.pnLower.Controls.Add(this.btnCancel);
             this.pnLower.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pnLower.Location = new System.Drawing.Point(0, 278);
             this.pnLower.Name = "pnLower";
@@ -136,7 +137,6 @@
             this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(319, 320);
             this.Controls.Add(this.btnReset);
-            this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnRemove);
             this.Controls.Add(this.btnAdd);
             this.Controls.Add(this.txtUndesired);

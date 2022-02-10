@@ -156,7 +156,7 @@ namespace murrty.controls {
         protected override CreateParams CreateParams {
             get {
                 CreateParams cp = base.CreateParams;
-                cp.ExStyle |= 0x20;
+                cp.ExStyle |= WS_EX_TRANSPARENT;
                 return cp;
             }
         }
@@ -169,7 +169,7 @@ namespace murrty.controls {
                     else base.WndProc(ref m);
                 } break;
 
-                case 0x000F: {
+                case WM_PAINT: {
                     DrawText();
                 } break;
             }
@@ -182,10 +182,10 @@ namespace murrty.controls {
         protected override void OnPaintBackground(PaintEventArgs e) {
             if (DesignMode) {
                 ControlPaint.DrawBorder(e.Graphics, ClientRectangle,
-                    Color.Black, 1, ButtonBorderStyle.Dashed,
-                    Color.Black, 1, ButtonBorderStyle.Dashed,
-                    Color.Black, 1, ButtonBorderStyle.Dashed,
-                    Color.Black, 1, ButtonBorderStyle.Dashed
+                    Color.Red, 1, ButtonBorderStyle.Dashed,
+                    Color.Red, 1, ButtonBorderStyle.Dashed,
+                    Color.Red, 1, ButtonBorderStyle.Dashed,
+                    Color.Red, 1, ButtonBorderStyle.Dashed
                 );
             }
         }

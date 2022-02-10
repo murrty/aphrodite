@@ -108,6 +108,19 @@ namespace aphrodite {
                 LogForm?.Append(message, initial);
             }
         }
+
+        /// <summary>
+        /// Writes a message to the log, not including date/time of the message.
+        /// </summary>
+        /// <param name="message">The message to be sent to the log</param>
+        /// <param name="initial">If the message is the initial one to be sent, does not add a new line break.</param>
+        [DebuggerStepThrough]
+        public static void WriteNoDate(string message, bool initial = false) {
+            Debug.Print(message);
+            if (LogEnabled) {
+                LogForm?.AppendNoDate(message, initial);
+            }
+        }
         #endregion
 
         #region Exception handling

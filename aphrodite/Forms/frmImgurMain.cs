@@ -149,7 +149,7 @@ namespace aphrodite {
                     if (e.Modifiers == Keys.Control && Clipboard.ContainsText()) {
                         if (ApiTools.IsValidImgurLink(Clipboard.GetText())) {
                             string AlbumID = Clipboard.GetText();
-                            AlbumID = AlbumID.Substring(AlbumID.IndexOf("/a/") + 3).Split('?')[0].Split('/')[0];
+                            AlbumID = AlbumID[(AlbumID.IndexOf("/a/") + 3)..].Split('?')[0].Split('/')[0];
                             txtAlbum.Text = AlbumID;
                             System.Media.SystemSounds.Asterisk.Play();
                         }

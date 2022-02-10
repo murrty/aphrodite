@@ -129,7 +129,7 @@ namespace aphrodite {
         /// <returns>A formatted URL if valid; otherwise, null.</returns>
         public static string GetBlacklistedImageUrl(string md5, string ext) =>
             string.IsNullOrWhiteSpace(md5) || string.IsNullOrWhiteSpace(ext) ? null
-            : "https://static1.e621.net/data/" + md5.Substring(0, 2) + "/" + md5.Substring(2, 2) + "/" + md5 + "." + ext;
+            : "https://static1.e621.net/data/" + md5[..2] + "/" + md5[2..4] + "/" + md5 + "." + ext;
 
         /// <summary>
         /// Counts the api pages to parse through for a pool.

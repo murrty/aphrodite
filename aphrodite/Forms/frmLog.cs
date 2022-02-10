@@ -39,6 +39,11 @@ namespace murrty.forms {
             IsShown = false;
         }
 
+        /// <summary>
+        /// Appends text to the log.
+        /// </summary>
+        /// <param name="message">The message to append.</param>
+        /// <param name="initial">Whether the message is the first message of the log.</param>
         [System.Diagnostics.DebuggerStepThrough]
         public void Append(string message, bool initial = false) {
             if (rtbLog.InvokeRequired) {
@@ -49,6 +54,25 @@ namespace murrty.forms {
             else {
                 rtbLog.AppendText(
                     $"{(initial ? "" : "\n")}[{DateTime.Now:yyyy/MM/dd HH:mm:ss.fff}] {message}"
+                );
+            }
+        }
+
+        /// <summary>
+        /// Appends text to the log, not including date/time of the message.
+        /// </summary>
+        /// <param name="message">The message to append.</param>
+        /// <param name="initial">Whether the message is the first message of the log.</param>
+        [System.Diagnostics.DebuggerStepThrough]
+        public void AppendNoDate(string message, bool initial = false) {
+            if (rtbLog.InvokeRequired) {
+                rtbLog.Invoke((Action)delegate () {
+                    Append(message, initial);
+                });
+            }
+            else {
+                rtbLog.AppendText(
+                    $"{(initial ? "" : "\n")}{message}"
                 );
             }
         }

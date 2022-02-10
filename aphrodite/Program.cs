@@ -19,7 +19,7 @@ namespace aphrodite {
         /// <summary>
         /// The beta version of the program (if <see cref="IsBetaVersion"/> is true).
         /// </summary>
-        public const string BetaVersion = "2.3-pre1";
+        public const string BetaVersion = "2.3-pre2";
         /// <summary>
         /// The const delay for when threads sleep.
         /// </summary>
@@ -50,6 +50,10 @@ namespace aphrodite {
         /// Whether the program has ran as administrator.
         /// </summary>
         public static bool IsAdmin = false;
+        /// <summary>
+        /// Whether arguments should be printed to the log.
+        /// </summary>
+        public static bool PrintArgsToLog = false;
 
         [STAThread]
         static void Main(string[] args) {
@@ -86,15 +90,18 @@ namespace aphrodite {
                         "Just so you know."
                     );
                     Config.Settings.Initialization.FirstTime = false;
+                    Config.Settings.Initialization.Save();
                 }
                 Config.Settings.FormSettings.Load();
+                
+                PrintArgsToLog = File.Exists(Environment.CurrentDirectory + "\\args.txt") || File.Exists(Environment.CurrentDirectory + "\\args") || IsDebug;
                 Arguments.ParseArguments(args);
                 switch (Arguments.ArgumentType) {
 
                     #region Update protocols
                     case ArgumentType.UpdateProtocol: {
-                        if (IsAdmin && !IsDebug) {
-                            Environment.ExitCode = SystemRegistry.SetRegistryKey() ? 0 : 1;
+                        if (IsAdmin) {
+                            Environment.ExitCode = SystemRegistry.SetRegistryKey();
                         }
                         else Environment.ExitCode = 1;
                     } break;

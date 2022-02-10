@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Web;
 
 namespace aphrodite {
 
+#pragma warning disable CS0162 // Unreachable code detected
     /// <summary>
     /// The argument parser used to manipulate the program outside of the main form.
     /// </summary>
@@ -47,6 +50,29 @@ namespace aphrodite {
         /// </summary>
         /// <returns>True if the arguments were fully parsed; otherwise, false.</returns>
         public static bool ParseArguments() => ParseArguments(Environment.GetCommandLineArgs());
+        
+        /// <summary>
+        /// Decodes a URL encoded argument into an array.
+        /// </summary>
+        /// <param name="Argument"></param>
+        /// <returns></returns>
+        public static string[] DecodeUrlEncodedArgument(string Argument) {
+            try {
+                return Argument.StartsWith("aphrodite:") ?
+                    Regex.Matches(HttpUtility.UrlDecode(Argument), @"\""(\""\""|[^\""])+\""|[^ ]+", RegexOptions.ExplicitCapture)
+                        .Cast<Match>()
+                        .Select(x => x.Value)
+                        .Select(x => x.StartsWith("\"") && x.EndsWith("\"") ? x[1..^1].Replace("\"\"", "\"") : x)
+                        .Select(x => x.StartsWith("\\\"") && x.EndsWith("\"") ? x[1..^1] : x)
+                        .ToArray() : null;
+
+                return Regex.Split(HttpUtility.UrlDecode(Argument), "(?<=^[^\"]*(?:\"[^\"]*\"[^\"]*)*) (?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+            }
+            catch (Exception ex) {
+                Log.ReportException(ex);
+                return new string[] { Argument };
+            }
+        }
 
         /// <summary>
         /// Parses an array of arguments.
@@ -57,8 +83,17 @@ namespace aphrodite {
             if (!ArgumentsParsed) {
                 try {
                     if (Arguments.Length > 0) {
+                        
+                        if (Program.PrintArgsToLog) {
+                            for (int i = 0; i < Arguments.Length; i++) {
+                                Log.WriteNoDate($"ARG {i:000.##}: [{Arguments[i]}]");
+                            }
+                        }
+                        
                         if (Arguments[0].StartsWith("aphrodite:")) {
-                            Arguments[0] = Arguments[0].Substring(10);
+                            // We'll have to assume it's encoded.
+                            Arguments = DecodeUrlEncodedArgument(Arguments[0]) ?? Arguments;
+                            Arguments[0] = Arguments[0][10..];
                         }
 
                         string NewArgumentData = Arguments.Length > 1 ? Arguments[1] : null;
@@ -87,13 +122,12 @@ namespace aphrodite {
                                     } break;
 
                                     default: {
-                                        NewArgumentData = System.Web.HttpUtility.UrlDecode(NewArgumentData.Replace("|", " ").Trim('"'));
                                         if (ApiTools.IsValidPageWithTagsLink(NewArgumentData)) {
                                             if (NewArgumentData.IndexOf("?tags=") > 0) {
-                                                NewArgumentData = NewArgumentData.Substring(NewArgumentData.IndexOf("?tags=")).Replace("?tags=", "").Split('&')[0].Replace("+", "");
+                                                NewArgumentData = NewArgumentData[NewArgumentData.IndexOf("?tags=")..].Replace("?tags=", "").Split('&')[0];
                                             }
                                             else if (NewArgumentData.IndexOf("&tags=") > 0) {
-                                                NewArgumentData = NewArgumentData.Substring(NewArgumentData.IndexOf("&tags=")).Replace("&tags=", "").Split('&')[0];
+                                                NewArgumentData = NewArgumentData[NewArgumentData.IndexOf("&tags=")..].Replace("&tags=", "").Split('&')[0];
                                             }
                                             else {
                                                 throw new ArgumentParsingUrlException("Valid tags page, but couldn't find tags in the url.", NewArgumentData);
@@ -170,11 +204,13 @@ namespace aphrodite {
 
                                                     case System.Windows.Forms.DialogResult.No: {
                                                         ArgumentType = ArgumentType.PushTags;
-                                                        ArgumentData = System.Web.HttpUtility.UrlDecode(
-                                                                    NewArgumentData.IndexOf("?tags=") > 0 ? NewArgumentData.Substring(NewArgumentData.IndexOf("?tags=")).Replace("?tags=", "").Split('&')[0] :
-                                                                    NewArgumentData.IndexOf("&tags=") > 0 ? NewArgumentData.Substring(NewArgumentData.IndexOf("&tags=")).Replace("&tags=", "").Split('&')[0] :
-                                                                    throw new ArgumentParsingUrlException("Valid tags page, but couldn't find the tags in the url.", NewArgumentData)
-                                                                ).Replace("+", " ").Trim();
+                                                        ArgumentData =
+                                                            (NewArgumentData.IndexOf("?tags=") > 0 ? 
+                                                                NewArgumentData[NewArgumentData.IndexOf("?tags=")..].Replace("?tags=", "").Split('&')[0] :
+                                                                NewArgumentData.IndexOf("&tags=") > 0 ?
+                                                                    NewArgumentData[NewArgumentData.IndexOf("&tags=")..].Replace("&tags=", "").Split('&')[0] :
+                                                            throw new ArgumentParsingUrlException("Valid tags page, but couldn't find the tags in the url.", NewArgumentData))
+                                                                .Replace("+", " ").Trim();
                                                     }
                                                     break;
 
@@ -218,9 +254,9 @@ namespace aphrodite {
                                     } break;
 
                                     default: {
-                                        NewArgumentData = NewArgumentData.Split('?')[0].Trim('"');
+                                        NewArgumentData = NewArgumentData.Split('?')[0];
                                         if (ApiTools.IsValidPoolLink(NewArgumentData)) {
-                                            NewArgumentData = NewArgumentData.Substring(NewArgumentData.IndexOf("/pools/") + 7);
+                                            NewArgumentData = NewArgumentData[(NewArgumentData.IndexOf("/pools/") + 7)..];
                                         }
 
                                         if (ApiTools.IsNumericOnly(NewArgumentData)) {
@@ -279,9 +315,9 @@ namespace aphrodite {
                                     } break;
 
                                     default: {
-                                        NewArgumentData = NewArgumentData.Split('?')[0].Trim('"');
+                                        NewArgumentData = NewArgumentData.Split('?')[0];
                                         if (ApiTools.IsValidImageLink(NewArgumentData)) {
-                                            NewArgumentData = NewArgumentData.Substring(NewArgumentData.IndexOf("/posts/") + 7);
+                                            NewArgumentData = NewArgumentData[(NewArgumentData.IndexOf("/posts/") + 7)..];
                                         }
 
                                         if (ApiTools.IsNumericOnly(NewArgumentData)) {
@@ -384,7 +420,8 @@ namespace aphrodite {
                             case "settings":
                             case "-settings":
                             case "configuration":
-                            case "-configuration": {
+                            case "-configuration":
+                            case "configuresettings": {
                                 if (Arguments.Length > 1) {
                                     switch (Arguments[1].ToLower()) {
                                         case "t":
@@ -502,9 +539,6 @@ namespace aphrodite {
                             case "-fb":
                             case "furrybooru":
                             case "-furrybooru": {
-                                ArgumentType = ArgumentType.ShowFurryBooru;
-                                break;
-
                                 if (Arguments.Length > 1) {
                                     switch (Arguments[1].ToLower()) {
                                         case "configuresettings": {
@@ -512,9 +546,48 @@ namespace aphrodite {
                                         } break;
 
                                         default: {
-                                            NewArgumentData =
-                                                Arguments.Length > 2 ? System.Web.HttpUtility.UrlDecode(string.Join(" ", Arguments, 1, Arguments.Length - 1)) : Arguments[1].Trim('"');
+                                            if (ApiTools.IsValidPageWithTagsLink(NewArgumentData)) {
+                                                if (NewArgumentData.IndexOf("?tags=") > 0) {
+                                                    NewArgumentData = NewArgumentData[NewArgumentData.IndexOf("?tags=")..].Replace("?tags=", "").Split('&')[0];
+                                                }
+                                                else if (NewArgumentData.IndexOf("&tags=") > 0) {
+                                                    NewArgumentData = NewArgumentData[NewArgumentData.IndexOf("&tags=")..].Replace("&tags=", "").Split('&')[0];
+                                                }
+                                                else {
+                                                    throw new ArgumentParsingUrlException("Valid tags page, but couldn't find tags in the url.", NewArgumentData);
+                                                }
+                                            }
 
+                                            if (Config.Settings.Initialization.AutoDownloadWithArguments) {
+                                                using frmArgument ArgumentDialog = new(NewArgumentData, DownloadType.FurryBooru);
+                                                switch (ArgumentDialog.ShowDialog()) {
+                                                    case System.Windows.Forms.DialogResult.Yes: {
+                                                        ArgumentType = ArgumentType.DownloadFurryBooru;
+                                                        ArgumentData =
+                                                            ArgumentDialog.AppendedArgument.Split(' ').Length > 6 ?
+                                                                string.Join(" ", ArgumentDialog.AppendedArgument.Split(' '), 0, 6) :
+                                                                ArgumentDialog.AppendedArgument;
+                                                    }
+                                                    break;
+
+                                                    case System.Windows.Forms.DialogResult.No: {
+                                                        ArgumentType = ArgumentType.PushFurryBooru;
+                                                        ArgumentData = NewArgumentData.Replace("+", " ").Trim();
+                                                    }
+                                                    break;
+
+                                                    case System.Windows.Forms.DialogResult.Cancel: {
+                                                        ArgumentType = ArgumentType.CancelledArgumentsDownload;
+                                                        ArgumentData = null;
+                                                    }
+                                                    break;
+                                                }
+                                            }
+                                            else {
+                                                Log.Write("tags: argument has tags, but the program is not configured to auto-download.");
+                                                ArgumentType = ArgumentType.PushFurryBooru;
+                                                ArgumentData = NewArgumentData;
+                                            }
 
                                         } break;
                                     }
@@ -535,8 +608,6 @@ namespace aphrodite {
                                         } break;
 
                                         default: {
-                                            NewArgumentData = NewArgumentData.Trim('"');
-
                                             int Index = Array.FindIndex(Arguments, X => X.ToLower() == "keywords" || X.ToLower() == "-keywords");
                                             string KeywordsTemp = Index > -1 && Arguments.Length >= Index + 1 ? Arguments[Index] : null;
 
@@ -624,11 +695,8 @@ namespace aphrodite {
                                         } break;
 
                                         default: {
-                                            NewArgumentData = NewArgumentData.Trim('"');
                                             if (ApiTools.IsValidImgurLink(NewArgumentData)) {
-                                                NewArgumentData =
-                                                    NewArgumentData
-                                                    .Substring(NewArgumentData.IndexOf("/a/") + 3)
+                                                NewArgumentData = NewArgumentData[(NewArgumentData.IndexOf("/a/") + 3)..]
                                                     .Split('/')[0]
                                                     .Split('?')[0]
                                                     .Split('#')[0];
@@ -673,7 +741,7 @@ namespace aphrodite {
                             #endregion
 
                             default: {
-                                Console.WriteLine("An argument was parsed, but it's not one that's handleable.");
+                                Log.Write($"The argument {Arguments[0]} is not handled by the program.");
                             } break;
 
                         }
@@ -689,8 +757,8 @@ namespace aphrodite {
             }
             return ArgumentsParsed;
         }
-
         #endregion
 
     }
+#pragma warning restore CS0162 // Unreachable code detected
 }

@@ -14,10 +14,6 @@ namespace aphrodite {
         private frmRedownloader Redownloader;
 
         private Thread UpdateCheckThread;
-        // Valid protocols:
-        //                  'pools:'
-        //                  'tags:'
-        //                  'images:'
         #endregion
 
         #region Form
@@ -128,7 +124,7 @@ namespace aphrodite {
                         }
                     }
                     else {
-                        this.Text = this.Text.Substring(0, this.Text.Length - 6);
+                        this.Text = this.Text[0..^6];
                     }
                     break;
             }

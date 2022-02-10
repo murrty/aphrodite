@@ -27,6 +27,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmSettings));
             this.tbMain = new System.Windows.Forms.TabControl();
             this.tabGeneral = new System.Windows.Forms.TabPage();
+            this.chkCheckForBetaUpdates = new System.Windows.Forms.CheckBox();
             this.chkCheckForUpdates = new System.Windows.Forms.CheckBox();
             this.chkArgumentFormTopMost = new System.Windows.Forms.CheckBox();
             this.chkAutoDownloadWithArguments = new System.Windows.Forms.CheckBox();
@@ -117,7 +118,6 @@
             this.btnSave = new murrty.controls.ExtendedButton();
             this.btnCancel = new murrty.controls.ExtendedButton();
             this.pnControls = new System.Windows.Forms.Panel();
-            this.chkCheckForBetaUpdates = new System.Windows.Forms.CheckBox();
             this.tbMain.SuspendLayout();
             this.tabGeneral.SuspendLayout();
             this.tabTags.SuspendLayout();
@@ -180,6 +180,16 @@
             this.tabGeneral.TabIndex = 0;
             this.tabGeneral.Text = "General";
             this.tabGeneral.UseVisualStyleBackColor = true;
+            // 
+            // chkCheckForBetaUpdates
+            // 
+            this.chkCheckForBetaUpdates.AutoSize = true;
+            this.chkCheckForBetaUpdates.Location = new System.Drawing.Point(219, 160);
+            this.chkCheckForBetaUpdates.Name = "chkCheckForBetaUpdates";
+            this.chkCheckForBetaUpdates.Size = new System.Drawing.Size(145, 17);
+            this.chkCheckForBetaUpdates.TabIndex = 22;
+            this.chkCheckForBetaUpdates.Text = "Check for beta updates";
+            this.chkCheckForBetaUpdates.UseVisualStyleBackColor = true;
             // 
             // chkCheckForUpdates
             // 
@@ -1229,7 +1239,7 @@
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(321, 9);
+            this.btnSave.Location = new System.Drawing.Point(240, 9);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(75, 23);
             this.btnSave.TabIndex = 8;
@@ -1240,7 +1250,7 @@
             // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(240, 9);
+            this.btnCancel.Location = new System.Drawing.Point(321, 9);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 9;
@@ -1260,16 +1270,6 @@
             this.pnControls.Name = "pnControls";
             this.pnControls.Size = new System.Drawing.Size(408, 42);
             this.pnControls.TabIndex = 11;
-            // 
-            // chkCheckForBetaUpdates
-            // 
-            this.chkCheckForBetaUpdates.AutoSize = true;
-            this.chkCheckForBetaUpdates.Location = new System.Drawing.Point(219, 160);
-            this.chkCheckForBetaUpdates.Name = "chkCheckForBetaUpdates";
-            this.chkCheckForBetaUpdates.Size = new System.Drawing.Size(145, 17);
-            this.chkCheckForBetaUpdates.TabIndex = 22;
-            this.chkCheckForBetaUpdates.Text = "Check for beta updates";
-            this.chkCheckForBetaUpdates.UseVisualStyleBackColor = true;
             // 
             // frmSettings
             // 
