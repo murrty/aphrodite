@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -13,12 +14,6 @@ namespace aphrodite {
 
     public partial class frmInkBunnyDownloader : ExtendedForm {
 
-        // Search parsing!
-        // https://inkbunny.net/api_search.php?sid={API}&text=zangoose&submissions_per_page=100
-        // https://inkbunny.net/api_search.php?sid={API}&text=zangoose&submission_ids_only=yes&submissions_per_page=100
-        // https://inkbunny.net/api_submissions.php?sid={API}&submission_ids=2394431,2394393,2394336,2394307,2394243,2392846
-        // https://inkbunny.net/api_submissions.php?sid={API}&submission_ids=2154181
-        // &page=1
 
         #region Fields
         private const string BaseApiSearch = "https://inkbunny.net/api_search.php?sid={0}&submissions_per_page=100";
@@ -210,7 +205,7 @@ namespace aphrodite {
             DownloadInfo = NewInfo;
         }
 
-        private void frmInkBunnyDownloader_FormClosing(Object sender, FormClosingEventArgs e) {
+        private void frmInkBunnyDownloader_FormClosing(object sender, FormClosingEventArgs e) {
             Config.Settings.FormSettings.frmInkBunnyDownloader_Location = this.Location;
             switch (Status) {
                 case DownloadStatus.Finished:
@@ -873,6 +868,7 @@ namespace aphrodite {
                             string NewFileName;
                             string FileExtension;
                             string NewPath;
+                            string[] Keywords;
 
                             for (int CurrentSubmission = 0; CurrentSubmission < xmlFiles.Count; CurrentSubmission++) {
                                 if (ImageLimitReached) {
@@ -886,6 +882,7 @@ namespace aphrodite {
                                 NewFileName = string.Empty;
                                 FileExtension = string.Empty;
                                 NewPath = DownloadInfo.DownloadPath;
+                                Keywords = null;
 
                                 #region Check the submission rating
                                 if (xmlSubmissionRating[CurrentSubmission].InnerText.ToLower() != "0") {
@@ -948,11 +945,16 @@ namespace aphrodite {
                                 #endregion
 
                                 #region Check the keywords
-                                // TODO: Add offending tags to a buffer.
                                 xmlInnerKeywords = xmlKeywords[CurrentSubmission].SelectNodes("item/keyword_name");
-                                for (int CurrentKeyword = 0; CurrentKeyword < xmlInnerKeywords.Count; CurrentKeyword++) {
+                                Keywords = xmlInnerKeywords
+                                    .Cast<XmlNode>()
+                                    .Select(x => x.InnerText)
+                                    .Select(x => x.Contains(' ') ? x.Replace(" ", "_") : x)
+                                    .ToArray();
+
+                                for (int CurrentKeyword = 0; CurrentKeyword < Keywords.Length; CurrentKeyword++) {
                                     for (int CurrentBlacklistedTag = 0; CurrentBlacklistedTag < DownloadInfo.Blacklist.Length; CurrentBlacklistedTag++) {
-                                        if (xmlInnerKeywords[CurrentKeyword].InnerText.ToLower() == DownloadInfo.Blacklist[CurrentBlacklistedTag].ToLower()) {
+                                        if (Keywords[CurrentKeyword].ToLower() == DownloadInfo.Blacklist[CurrentBlacklistedTag].ToLower()) {
                                             SubmissionIsBlacklisted = true;
                                             break;
                                         }
@@ -963,7 +965,7 @@ namespace aphrodite {
                                     }
 
                                     for (int CurrentGraylistedTag = 0; CurrentGraylistedTag < DownloadInfo.Graylist.Length; CurrentGraylistedTag++) {
-                                        if (xmlInnerKeywords[CurrentKeyword].InnerText.ToLower() == DownloadInfo.Graylist[CurrentGraylistedTag].ToLower()) {
+                                        if (Keywords[CurrentKeyword].ToLower() == DownloadInfo.Graylist[CurrentGraylistedTag].ToLower()) {
                                             SubmissionIsGraylisted = true;
                                             break;
                                         }
