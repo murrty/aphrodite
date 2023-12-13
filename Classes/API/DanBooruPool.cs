@@ -41,7 +41,8 @@ public class DanBooruPool : Pool {
     // Since this is just a getter in this case, ignore the set field. 'JsonIgnore' is not required.
     public override object PoolUpdateTime { get => updated_at; set { }  }
 
-    // If this was a 'PostsIncluded' pool, this would point to the array (or deserialize into, if possible).
-    // Since it's not, this is just here for examples sake.
+    // If this was a 'PostsIncluded' pool, this would point to the array (or deserialize into, if possible). Since it's not, this is just here for examples sake.
     public override Post[] PoolPosts { get; set; }
+
+    // You'll notice that they don't require 'JsonIgnore', that's because the parent is 'opt-in', as in they require an attribute to be serialized.
 }
