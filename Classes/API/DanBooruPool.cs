@@ -38,8 +38,8 @@ public class DanBooruPool : Pool {
     [JsonProperty("post_count")]
     public override int PageCount { get; set; }
 
-    // Since this is just a getter in this case, ignore the set field. 'JsonIgnore' is not required.
-    public override object PoolUpdateTime { get => updated_at; set { }  }
+    // They don't require the 'set' field and just the getter can be overridden.
+    public override object PoolUpdateTime => updated_at;
 
     // If this was a 'PostsIncluded' pool, this would point to the array (or deserialize into, if possible). Since it's not, this is just here for examples sake.
     public override Post[] PoolPosts { get; set; }

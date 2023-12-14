@@ -213,13 +213,14 @@ public sealed class DanBooruPost : Post {
     //}
     #endregion
 
-    // These are required values.
+    // These are required values. They require the 'set' field.
     public override bool PostDeleted { get => is_deleted || FileUrl.IsNullEmptyWhitespace(); set { } }
     public override string Rating {
         get {
+            // We need to re-map the rating for danbooru to conformt.
             return rating switch {
-                "g" or "general" => "s", // General
-                "s" or "sensitive" => "q", // Sensitive
+                "g" or "general" => "s", // General should be 'safe' or 's'
+                "s" or "sensitive" => "q", // Sensitive, should be 'questionable' or 'q'
                 "q" or "questionable" => "q", // Questionable
                 "e" or "explicit" => "e", // Explicit
 
@@ -229,16 +230,11 @@ public sealed class DanBooruPost : Post {
         set { }
     }
 
-    // These are optional.
-    public override string[] Tags {
-        get {
-            return !tag_string.IsNullEmptyWhitespace() ? tag_string.SplitRemoveEmpty(' ') : [];
-        }
-        set { }
-    }
+    // These are optional. They don't require the 'set' field and just the getter can be overridden.
+    public override string[] Tags => !tag_string.IsNullEmptyWhitespace() ? tag_string.SplitRemoveEmpty(' ') : [];
     public override string[] ArtistTags => !string.IsNullOrWhiteSpace(tag_string_artist) ? tag_string_artist.Split(' ') : [];
-    public override string Author { get => uploader_id.ToString(); set { } }
-    public override object PostUpdateTime { get => updated_at; set { } }
+    public override string Author => uploader_id.ToString();
+    public override object PostUpdateTime => updated_at;
 
     // You'll notice that they don't require 'JsonIgnore', that's because the parent is 'opt-in', as in they require an attribute to be serialized.
 }
